@@ -1,0 +1,130 @@
+package org.topbraid.shacl.model;
+
+import org.topbraid.shacl.arq.functions.SHACLHasShapeFunction;
+import org.topbraid.shacl.model.impl.SHACLArgumentImpl;
+import org.topbraid.shacl.model.impl.SHACLConstraintViolationImpl;
+import org.topbraid.shacl.model.impl.SHACLFunctionImpl;
+import org.topbraid.shacl.model.impl.SHACLNativeConstraintImpl;
+import org.topbraid.shacl.model.impl.SHACLPropertyConstraintImpl;
+import org.topbraid.shacl.model.impl.SHACLShapeImpl;
+import org.topbraid.shacl.model.impl.SHACLTemplateCallImpl;
+import org.topbraid.shacl.model.impl.SHACLTemplateConstraintImpl;
+import org.topbraid.shacl.model.impl.SHACLTemplateImpl;
+import org.topbraid.shacl.util.SHACLUtil;
+import org.topbraid.shacl.vocabulary.SHACL;
+import org.topbraid.spin.arq.functions.InvokeFunction;
+import org.topbraid.spin.arq.functions.WalkObjectsFunction;
+import org.topbraid.spin.arq.functions.WalkSubjectsFunction;
+import org.topbraid.spin.util.JenaUtil;
+import org.topbraid.spin.util.SimpleImplementation;
+
+import com.hp.hpl.jena.enhanced.BuiltinPersonalities;
+import com.hp.hpl.jena.enhanced.Personality;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.sparql.function.FunctionRegistry;
+import com.hp.hpl.jena.vocabulary.RDF;
+
+public class SHACLFactory {
+    
+    static {
+		init(BuiltinPersonalities.model);
+    }
+
+    
+	private static void init(Personality<RDFNode> p) {
+    	p.add(SHACLArgument.class, new SimpleImplementation(SHACL.Argument.asNode(), SHACLArgumentImpl.class));
+    	p.add(SHACLConstraintViolation.class, new SimpleImplementation(SHACL.ConstraintViolation.asNode(), SHACLConstraintViolationImpl.class));
+    	p.add(SHACLFunction.class, new SimpleImplementation(SHACL.Function.asNode(), SHACLFunctionImpl.class));
+    	p.add(SHACLPropertyConstraint.class, new SimpleImplementation(SHACL.PropertyConstraint.asNode(), SHACLPropertyConstraintImpl.class));
+    	p.add(SHACLShape.class, new SimpleImplementation(SHACL.Shape.asNode(), SHACLShapeImpl.class));
+    	p.add(SHACLNativeConstraint.class, new SimpleImplementation(SHACL.NativeConstraint.asNode(), SHACLNativeConstraintImpl.class));
+    	p.add(SHACLTemplate.class, new SimpleImplementation(SHACL.Template.asNode(), SHACLTemplateImpl.class));
+    	p.add(SHACLTemplateCall.class, new SimpleImplementation(SHACL.Templates.asNode(), SHACLTemplateCallImpl.class));
+    	p.add(SHACLTemplateConstraint.class, new SimpleImplementation(SHACL.TemplateConstraint.asNode(), SHACLTemplateConstraintImpl.class));
+    	
+		FunctionRegistry.get().put(SHACL.invoke.getURI(), InvokeFunction.class);
+		FunctionRegistry.get().put(SHACL.hasShape.getURI(), SHACLHasShapeFunction.class);
+		FunctionRegistry.get().put(SHACL.walkObjects.getURI(), WalkObjectsFunction.class);
+		FunctionRegistry.get().put(SHACL.walkSubjects.getURI(), WalkSubjectsFunction.class);
+    }
+	
+	
+	public static SHACLArgument asArgument(RDFNode resource) {
+		return resource.as(SHACLArgument.class);
+	}
+	
+	
+	public static SHACLNativeConstraint asNativeConstraint(RDFNode node) {
+		return node.as(SHACLNativeConstraint.class);
+	}
+	
+	
+	public static SHACLPropertyConstraint asPropertyConstraint(RDFNode node) {
+		return node.as(SHACLPropertyConstraint.class);
+	}
+	
+	
+	public static SHACLShape asShape(RDFNode node) {
+		return node.as(SHACLShape.class);
+	}
+	
+	
+	public static SHACLTemplate asTemplate(RDFNode resource) {
+		return resource.as(SHACLTemplate.class);
+	}
+	
+	
+	public static SHACLTemplateCall asTemplateCall(RDFNode resource) {
+		return resource.as(SHACLTemplateCall.class);
+	}
+	
+	
+	public static SHACLTemplateConstraint asTemplateConstraint(RDFNode node) {
+		return node.as(SHACLTemplateConstraint.class);
+	}
+	
+	
+	public static boolean isSPARQLConstraint(RDFNode node) {
+		if(node != null && node.isAnon()) {
+			if(((Resource)node).hasProperty(RDF.type, SHACL.NativeConstraint)) {
+				return true;
+			}
+			if(!((Resource)node).hasProperty(RDF.type)) {
+				return SHACL.NativeConstraint.equals(SHACLUtil.getDefaultTemplateType((Resource)node));
+			}
+		}
+		return false;
+	}
+    
+    
+	/**
+	 * Checks if a given RDFNode represents a template call.
+	 * It either needs to be an instance of an instance of sh:Template, or be a typeless blank node
+	 * that has an incoming edge via a property such as sh:property, that has a
+	 * declared sh:defaultType.
+	 * @param node  the node to check
+	 * @return true if node is a template call
+	 */
+	public static boolean isTemplateCall(RDFNode node) {
+		if(node != null && node.isResource()) {
+			Resource resource = (Resource) node;
+			
+			// Return true if this has sh:Template as its metaclass
+			for(Resource type : JenaUtil.getTypes(resource)) {
+				if(JenaUtil.hasIndirectType(type, SHACL.Template)) {
+					return true;
+				}
+			}
+			
+			// If this is a typeless blank node, check for defaultType of incoming references
+			if(resource.isAnon() && !resource.hasProperty(RDF.type)) {
+				Resource dt = SHACLUtil.getDefaultTemplateType(resource);
+				if(dt != null && !SHACL.NativeConstraint.equals(dt)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+}
