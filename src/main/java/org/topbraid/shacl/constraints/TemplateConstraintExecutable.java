@@ -15,6 +15,11 @@ import org.topbraid.spin.util.JenaUtil;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Resource;
 
+/**
+ * A ConstraintExecutable backed by a template call.
+ * 
+ * @author Holger Knublauch
+ */
 public class TemplateConstraintExecutable extends ConstraintExecutable {
 	
 	private SHACLTemplateConstraint constraint;
@@ -43,7 +48,7 @@ public class TemplateConstraintExecutable extends ConstraintExecutable {
 	}
 
 
-	public List<SHACLShape> getScopes() {
+	public List<SHACLShape> getScopeShapes() {
 		List<SHACLShape> results = new LinkedList<SHACLShape>();
 		for(Resource scope : JenaUtil.getResourceProperties(constraint, SH.scopeShape)) {
 			results.add(SHACLFactory.asShape(scope));
@@ -52,10 +57,6 @@ public class TemplateConstraintExecutable extends ConstraintExecutable {
 	}
 
 	
-	/**
-	 * Gets the severity level, if specified (e.g. sh:Warning).
-	 * @return the severity class, never null
-	 */
 	public Resource getSeverity() {
 		Resource severity = JenaUtil.getResourceProperty(template, SH.severity);
 		return severity == null ? SH.Error : severity;

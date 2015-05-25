@@ -11,6 +11,12 @@ import org.topbraid.spin.util.JenaUtil;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Resource;
 
+/**
+ * A ConstrainExecutable representing a directly executable constraint,
+ * e.g. backed by a sh:sparql query.
+ * 
+ * @author Holger Knublauch
+ */
 public class NativeConstraintExecutable extends ConstraintExecutable {
 	
 	private Resource resource;
@@ -37,7 +43,7 @@ public class NativeConstraintExecutable extends ConstraintExecutable {
 
 
 	@Override
-	public List<SHACLShape> getScopes() {
+	public List<SHACLShape> getScopeShapes() {
 		List<SHACLShape> results = new LinkedList<SHACLShape>();
 		for(Resource scope : JenaUtil.getResourceProperties(resource, SH.scopeShape)) {
 			results.add(SHACLFactory.asShape(scope));
@@ -46,10 +52,6 @@ public class NativeConstraintExecutable extends ConstraintExecutable {
 	}
 	
 	
-	/**
-	 * Gets the severity, if specified (e.g. sh:Warning).
-	 * @return the severity class, never null
-	 */
 	public Resource getSeverity() {
 		Resource result = JenaUtil.getResourceProperty(resource, SH.severity);
 		return result == null ? SH.Error : result;

@@ -11,6 +11,8 @@ import com.hp.hpl.jena.rdf.model.Resource;
  * A SPINFunctionDriver using sh:sparql to find an executable
  * body for a SHACL function.
  * 
+ * This class currently relies on infrastructure from the SPIN API.
+ * 
  * @author Holger Knublauch
  */
 public class SHACLSPARQLFunctionDriver implements SPINFunctionDriver {

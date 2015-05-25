@@ -13,7 +13,7 @@ import com.hp.hpl.jena.sparql.expr.ExprEvalException;
 import com.hp.hpl.jena.sparql.expr.NodeValue;
 
 /**
- * A cache that remembers previous calls to SHACL functions marked with shacl:cachable.
+ * A cache that remembers previous calls to SHACL functions marked with sh:cachable.
  * 
  * @author Holger Knublauch
  */

@@ -20,7 +20,7 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 /**
  * A simple (non-SPARQL) implementation of the SHACL Core Profile based on Jena.
  * 
- * This is meant to be a demonstrator only at this stage.
+ * This is meant to be a demonstrator only and is not recommended for outside use.
  *  
  * @author Holger Knublauch
  */

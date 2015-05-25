@@ -7,8 +7,8 @@ import com.hp.hpl.jena.sparql.core.Var;
 
 /**
  * Vocabulary for http://www.w3.org/ns/shacl
- *
- * Automatically generated with TopBraid Composer.
+ * 
+ * @author Holger Knublauch
  */
 public class SH {
 
@@ -21,24 +21,16 @@ public class SH {
     public final static String PREFIX = "sh";
 
 
-    public final static Resource Constraint = ResourceFactory.createResource(NS + "Constraint");
-
-    public final static Resource OrConstraint = ResourceFactory.createResource(NS + "OrConstraint");
-
     public final static Resource AbstractPropertyConstraint = ResourceFactory.createResource(NS + "AbstractPropertyConstraint");
-
-    public final static Resource AbstractRule = ResourceFactory.createResource(NS + "AbstractRule");
 
     public final static Resource Argument = ResourceFactory.createResource(NS + "Argument");
 
     public final static Resource BlankNode = ResourceFactory.createResource(NS + "BlankNode");
-
-    public final static Resource NativeConstraint = ResourceFactory.createResource(NS + "NativeConstraint");
+    
+    public final static Resource Constraint = ResourceFactory.createResource(NS + "Constraint");
 
     public final static Resource ConstraintTemplate = ResourceFactory.createResource(NS + "ConstraintTemplate");
-
-    public final static Resource TemplateConstraint = ResourceFactory.createResource(NS + "TemplateConstraint");
-
+    
     public final static Resource ConstraintViolation = ResourceFactory.createResource(NS + "ConstraintViolation");
 
     public final static Resource CountConstraint = ResourceFactory.createResource(NS + "CountConstraint");
@@ -60,27 +52,26 @@ public class SH {
     public final static Resource Literal = ResourceFactory.createResource(NS + "Literal");
 
     public final static Resource Macro = ResourceFactory.createResource(NS + "Macro");
+    
+    public final static Resource NativeConstraint = ResourceFactory.createResource(NS + "NativeConstraint");
+    
+    public final static Resource OrConstraint = ResourceFactory.createResource(NS + "OrConstraint");
 
     public final static Resource PropertyConstraint = ResourceFactory.createResource(NS + "PropertyConstraint");
-
-    public final static Resource Rule = ResourceFactory.createResource(NS + "Rule");
-
-    public final static Resource RuleTemplate = ResourceFactory.createResource(NS + "RuleTemplate");
-
-    public final static Resource RuleTemplates = ResourceFactory.createResource(NS + "RuleTemplates");
 
     public final static Resource Shape = ResourceFactory.createResource(NS + "Shape");
 
     public final static Resource ShapeClass = ResourceFactory.createResource(NS + "ShapeClass");
 
-    public final static Resource ShapesGraph = ResourceFactory.createResource(NS + "ShapesGraph");
-
     public final static Resource Template = ResourceFactory.createResource(NS + "Template");
+    
+    public final static Resource TemplateConstraint = ResourceFactory.createResource(NS + "TemplateConstraint");
 
     public final static Resource Templates = ResourceFactory.createResource(NS + "Templates");
 
     public final static Resource Warning = ResourceFactory.createResource(NS + "Warning");
 
+    
     public final static Property abstract_ = ResourceFactory.createProperty(NS + "abstract");
 
     public final static Property allowedValues = ResourceFactory.createProperty(NS + "allowedValues");
@@ -88,10 +79,6 @@ public class SH {
     public final static Property argument = ResourceFactory.createProperty(NS + "argument");
 
     public final static Property cachable = ResourceFactory.createProperty(NS + "cachable");
-
-    public final static Property check = ResourceFactory.createProperty(NS + "check");
-
-    public final static Property checkAll = ResourceFactory.createProperty(NS + "checkAll");
 
     public final static Property constraint = ResourceFactory.createProperty(NS + "constraint");
 
@@ -109,8 +96,6 @@ public class SH {
 
     public final static Property hasValue = ResourceFactory.createProperty(NS + "hasValue");
     
-    public final static Property ignore = ResourceFactory.createProperty(NS + "ignore");
-
     public final static Property include = ResourceFactory.createProperty(NS + "include");
 
     public final static Property inverse = ResourceFactory.createProperty(NS + "inverse");
@@ -143,13 +128,9 @@ public class SH {
 
     public final static Property property = ResourceFactory.createProperty(NS + "property");
 
-    public final static Resource propertyLabel = ResourceFactory.createResource(NS + "propertyLabel");
-
     public final static Property returnType = ResourceFactory.createProperty(NS + "returnType");
 
     public final static Property root = ResourceFactory.createProperty(NS + "root");
-
-    public final static Property rule = ResourceFactory.createProperty(NS + "rule");
     
     public final static Property scopeClass = ResourceFactory.createProperty(NS + "scopeClass");
     
@@ -172,8 +153,6 @@ public class SH {
     public final static Property valueShape = ResourceFactory.createProperty(NS + "valueShape");
 
     public final static Property valueType = ResourceFactory.createProperty(NS + "valueType");
-
-    public final static Property violation = ResourceFactory.createProperty(NS + "violation");
 
 	
 	public static final Var currentShapeVar = Var.alloc("currentShape");

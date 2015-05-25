@@ -49,8 +49,9 @@ import com.hp.hpl.jena.sparql.util.FmtUtils;
 
 
 /**
- * An ARQ function that delegates its functionality into a user-defined
- * SPIN function. 
+ * An ARQ function that delegates its functionality into a user-defined SHACL function.
+ * 
+ * Use SHACLFunctions to install them from their definitions in a Model.
  * 
  * @author Holger Knublauch
  */
@@ -73,7 +74,7 @@ public class SHACLARQFunction implements com.hp.hpl.jena.sparql.function.Functio
 
 	/**
 	 * Constructs a new SHACLARQFunction based on a given SHACL Function.
-	 * The shaclFunction model be associated with the Model containing
+	 * The shaclFunction must be associated with the Model containing
 	 * the triples of its definition.
 	 * @param shaclFunction  the SHACL function
 	 */
@@ -88,8 +89,6 @@ public class SHACLARQFunction implements com.hp.hpl.jena.sparql.function.Functio
 			queryString = shaclFunction.getSPARQL();
 			arqQuery = ARQFactory.get().createQuery(shaclFunction.getModel(), queryString);
 			
-			// TODO if above three lines never involve writes, then we can move the optimization up 
-			// and the finally block onto the outer try, which would be easier to read.
 			JenaUtil.setGraphReadOptimization(true);
 			try {
 				for(SHACLArgument arg : shaclFunction.getArguments(true)) {
@@ -171,12 +170,11 @@ public class SHACLARQFunction implements com.hp.hpl.jena.sparql.function.Functio
 		//	SPINArgumentChecker.get().check(shaclFunction, bindings);
 		//}
 		
-		
 		Dataset dataset = DatasetImpl.wrap(env.getDataset());
 		
 		if(SPINStatisticsManager.get().isRecording() && SPINStatisticsManager.get().isRecordingSPINFunctions()) {
 			StringBuffer sb = new StringBuffer();
-			sb.append("SPIN Function ");
+			sb.append("SHACL Function ");
 			sb.append(SSE.format(NodeFactory.createURI(uri), model));
 			sb.append("(");
 			for(int i = 0; i < args.size(); i++) {
@@ -264,7 +262,7 @@ public class SHACLARQFunction implements com.hp.hpl.jena.sparql.function.Functio
 						return NodeValue.makeNode(resultNode.asNode());
 					}
 				}
-				throw new ExprEvalException("Empty result set for SPIN function " + queryString);
+				throw new ExprEvalException("Empty result set for SHACL function");
 			}
 			finally {
 				qexec.close();
@@ -278,13 +276,17 @@ public class SHACLARQFunction implements com.hp.hpl.jena.sparql.function.Functio
 	
 	/**
 	 * Gets the names of the declared arguments, in order from left to right.
-	 * @return the arguments
+	 * @return the argument names
 	 */
 	public String[] getArgNames() {
 		return argNames.toArray(new String[0]);
 	}
 	
 	
+	/**
+	 * Gets the properties of the declared arguments, in order from left to right.
+	 * @return the argument property Nodes
+	 */
 	public Node[] getArgPropertyNodes() {
 		return argNodes.toArray(new Node[0]);
 	}
@@ -299,6 +301,10 @@ public class SHACLARQFunction implements com.hp.hpl.jena.sparql.function.Functio
 	}
 	
 	
+	/**
+	 * Gets the underlying SHACLFunction Model object for this ARQ function.
+	 * @return the SHACLFunction
+	 */
 	public SHACLFunction getSHACLFunction() {
 		return shaclFunction;
 	}

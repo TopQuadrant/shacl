@@ -18,6 +18,12 @@ import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 
+/**
+ * A SHACL constraint validator for individual resources - either against all shapes
+ * derived from its Model, or against a specified Shape.
+ * 
+ * @author Holger Knublauch
+ */
 public class ResourceConstraintValidator {
 	
 	private static ResourceConstraintValidator singleton = new ResourceConstraintValidator();
@@ -28,63 +34,6 @@ public class ResourceConstraintValidator {
 	
 	public static void set(ResourceConstraintValidator value) {
 		singleton = value;
-	}
-
-
-	public void addResourceViolations(Dataset dataset, Resource shapesGraph, Node resourceNode, Node shapeNode,
-			List<Property> constraintProperties, Resource minSeverity, Model results,
-			ProgressMonitor monitor) {
-		
-		Resource resource = (Resource) dataset.getDefaultModel().asRDFNode(resourceNode);
-		Model shapesModel = dataset.getNamedModel(shapesGraph.getURI());
-		Resource shape = (Resource) shapesModel.asRDFNode(shapeNode);
-		for(Property constraintProperty : constraintProperties) {
-			for(Resource c : JenaUtil.getResourceProperties(shape, constraintProperty)) {
-				Resource type = JenaUtil.getType(c);
-				if(type == null && c.isAnon()) {
-					type = SHACLUtil.getDefaultTemplateType(c);
-				}
-				if(type != null) {
-					if(SH.NativeConstraint.equals(type)) {
-						SHACLConstraint constraint = SHACLFactory.asNativeConstraint(c);
-						addQueryResults(results, constraint, shape, resource, dataset, shapesGraph, minSeverity, monitor);
-					}
-					else if(JenaUtil.hasIndirectType(type, SH.ConstraintTemplate)) {
-						SHACLConstraint constraint = SHACLFactory.asTemplateConstraint(c);
-						addQueryResults(results, constraint, shape, resource, dataset, shapesGraph, minSeverity, monitor);
-					}
-				}
-			}
-		}
-	}
-
-
-	private void addQueryResults(Model results, 
-			SHACLConstraint constraint,
-			Resource shape,
-			Resource focusNode,
-			Dataset dataset,
-			Resource shapesGraph,
-			Resource minSeverity,
-			ProgressMonitor monitor) {
-		
-		for(ConstraintExecutable executable : constraint.getExecutables()) {
-			
-			Resource severity = executable.getSeverity();
-			if(minSeverity == null || minSeverity.equals(severity) || JenaUtil.hasSuperClass(severity, minSeverity)) {
-				
-				if(executable instanceof NativeConstraintExecutable) {
-					NativeConstraintExecutable e = (NativeConstraintExecutable)executable;
-					ExecutionLanguage lang = ExecutionLanguageSelector.get().getLanguage(e);
-					lang.executeNative(dataset, shape, shapesGraph, results, constraint, focusNode, null, null, e);
-				}
-				else {
-					TemplateConstraintExecutable e = (TemplateConstraintExecutable)executable;
-					ExecutionLanguage lang = ExecutionLanguageSelector.get().getLanguage(e);
-					lang.executeTemplate(dataset, shape, shapesGraph, results, constraint, focusNode, null, null, e);
-				}
-			}
-		}
 	}
 
 	
@@ -138,5 +87,62 @@ public class ResourceConstraintValidator {
 		Model results = JenaUtil.createMemoryModel();
 		addResourceViolations(dataset, shapesGraph, focusNode, shape, SHACLUtil.getAllConstraintProperties(), minSeverity, results, monitor);
 		return results;
+	}
+
+
+	private void addQueryResults(Model results, 
+			SHACLConstraint constraint,
+			Resource shape,
+			Resource focusNode,
+			Dataset dataset,
+			Resource shapesGraph,
+			Resource minSeverity,
+			ProgressMonitor monitor) {
+		
+		for(ConstraintExecutable executable : constraint.getExecutables()) {
+			
+			Resource severity = executable.getSeverity();
+			if(minSeverity == null || minSeverity.equals(severity) || JenaUtil.hasSuperClass(severity, minSeverity)) {
+				
+				if(executable instanceof NativeConstraintExecutable) {
+					NativeConstraintExecutable e = (NativeConstraintExecutable)executable;
+					ExecutionLanguage lang = ExecutionLanguageSelector.get().getLanguage(e);
+					lang.executeNative(dataset, shape, shapesGraph, results, constraint, focusNode, null, null, e);
+				}
+				else {
+					TemplateConstraintExecutable e = (TemplateConstraintExecutable)executable;
+					ExecutionLanguage lang = ExecutionLanguageSelector.get().getLanguage(e);
+					lang.executeTemplate(dataset, shape, shapesGraph, results, constraint, focusNode, null, null, e);
+				}
+			}
+		}
+	}
+
+
+	private void addResourceViolations(Dataset dataset, Resource shapesGraph, Node resourceNode, Node shapeNode,
+			List<Property> constraintProperties, Resource minSeverity, Model results,
+			ProgressMonitor monitor) {
+		
+		Resource resource = (Resource) dataset.getDefaultModel().asRDFNode(resourceNode);
+		Model shapesModel = dataset.getNamedModel(shapesGraph.getURI());
+		Resource shape = (Resource) shapesModel.asRDFNode(shapeNode);
+		for(Property constraintProperty : constraintProperties) {
+			for(Resource c : JenaUtil.getResourceProperties(shape, constraintProperty)) {
+				Resource type = JenaUtil.getType(c);
+				if(type == null && c.isAnon()) {
+					type = SHACLUtil.getDefaultTemplateType(c);
+				}
+				if(type != null) {
+					if(SH.NativeConstraint.equals(type)) {
+						SHACLConstraint constraint = SHACLFactory.asNativeConstraint(c);
+						addQueryResults(results, constraint, shape, resource, dataset, shapesGraph, minSeverity, monitor);
+					}
+					else if(JenaUtil.hasIndirectType(type, SH.ConstraintTemplate)) {
+						SHACLConstraint constraint = SHACLFactory.asTemplateConstraint(c);
+						addQueryResults(results, constraint, shape, resource, dataset, shapesGraph, minSeverity, monitor);
+					}
+				}
+			}
+		}
 	}
 }

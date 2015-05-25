@@ -23,11 +23,23 @@ public abstract class ConstraintExecutable {
 	public abstract Resource getSeverity();
 	
 	
+	/**
+	 * Gets the specified sh:messages, to be used for constructed results.
+	 * @return the messages (may be empty)
+	 */
 	public abstract List<Literal> getMessages();
 	
 	
+	/**
+	 * Gets the specified sh:predicate (if any), to be used for constructed results.
+	 * @return the predicate or null
+	 */
 	public abstract Resource getPredicate();
 	
 	
-	public abstract List<SHACLShape> getScopes();
+	/**
+	 * Gets the specified sh:scopeShapes, to be used as pre-conditions.
+	 * @return the scope shapes
+	 */
+	public abstract List<SHACLShape> getScopeShapes();
 }

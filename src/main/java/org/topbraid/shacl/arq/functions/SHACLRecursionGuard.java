@@ -6,11 +6,11 @@ import java.util.Set;
 import com.hp.hpl.jena.graph.Node;
 
 /**
- * A ThreadLocal structure to prevent infinite loops of resource constraint checking calls.
+ * A ThreadLocal structure to prevent infinite loops of sh:hasShape calls.
  * 
  * @author Holger Knublauch
  */
-public class SHACLRecursionGuard {
+class SHACLRecursionGuard {
 	
 	private static ThreadLocal<Set<Call>> sets = new ThreadLocal<Set<Call>>();
 	

@@ -34,7 +34,8 @@ public class SPARQLEntailment {
 	
 	private Map<String,Engine> engines = new HashMap<String,Engine>();
 	
-	public SPARQLEntailment() {
+	
+	protected SPARQLEntailment() {
 		setEngine(RDFS.getURI(), new Engine() {
 			@Override
 			public Model createModelWithEntailment(Model model) {
@@ -42,10 +43,12 @@ public class SPARQLEntailment {
 			}
 		});
 	}
+
 	
 	public Engine getEngine(String uri) {
 		return engines.get(uri);
 	}
+	
 	
 	public void setEngine(String uri, Engine engine) {
 		engines.put(uri, engine);

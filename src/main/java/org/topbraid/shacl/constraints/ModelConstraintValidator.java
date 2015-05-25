@@ -47,8 +47,11 @@ public class ModelConstraintValidator {
 	/**
 	 * Validates all resources in a given Model.
 	 * @param dataset  the Dataset to validate
+	 * @param shapesGraph  the URI of the shapes graph in the dataset
+	 * @param minSeverity  the minimum severity, e.g. sh:Error or null for all
+	 * @param filtered  true to exclude checking schema-level resources
 	 * @param monitor  an optional ProgressMonitor
-	 * @return a Model containing sh:ConstraintViolations
+	 * @return a Model containing violation results - empty if OK
 	 */
 	public Model validateModel(Dataset dataset, Resource shapesGraph, Resource minSeverity, boolean filtered, ProgressMonitor monitor) throws InterruptedException {
 		

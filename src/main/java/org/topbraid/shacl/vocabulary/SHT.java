@@ -19,8 +19,6 @@ public class SHT {
 	
 	public final static Resource NonWellFormedSchema = ResourceFactory.createResource(NS + "NonWellFormedSchema");
 	
-	public final static Resource WellFormedSchema = ResourceFactory.createResource(NS + "WellFormedSchema");
-	
 	public final static Resource proposed = ResourceFactory.createResource(NS + "proposed");
 	
 	public final static Resource SHACLC = ResourceFactory.createResource(NS + "SHACLC");
@@ -28,6 +26,8 @@ public class SHT {
 	public final static Resource TURTLE = ResourceFactory.createResource(NS + "TURTLE");
 	
 	public final static Resource Validate = ResourceFactory.createResource(NS + "Validate");
+	
+	public final static Resource WellFormedSchema = ResourceFactory.createResource(NS + "WellFormedSchema");
 	
 	public final static Property data = ResourceFactory.createProperty(NS + "data");
 	

@@ -12,10 +12,10 @@ public interface SHACLAbstractPropertyConstraint extends SHACLTemplateCall {
 	
 	
 	/**
-	 * Gets the declared sh:valueType of this argument (if any).
-	 * @return the value type
+	 * Gets the declared sh:valueType or sh:datatype of this argument (if any).
+	 * @return the value type or data type
 	 */
-	Resource getValueType();
+	Resource getValueTypeOrDatatype();
 
 	
 	/**

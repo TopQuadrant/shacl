@@ -3,8 +3,6 @@ package org.topbraid.shacl.constraints.sparql;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.topbraid.shacl.constraints.ConstraintExecutable;
 import org.topbraid.shacl.constraints.ExecutionLanguage;
@@ -38,12 +36,11 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 /**
- * Utilities to operate on SPARQL-based SHACL constraints.
+ * The ExecutionLanguage for SPARQL-based SHACL constraints.
  * 
  * @author Holger Knublauch
  */
@@ -110,16 +107,16 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		}
 		
 		QuerySolutionMap bindings = new QuerySolutionMap();
-		List<SHACLShape> scopes = executable.getScopes();
+		List<SHACLShape> scopes = executable.getScopeShapes();
 		for(Resource scope : JenaUtil.getResourceProperties(shape, SH.scopeShape)) {
 			scopes.add(SHACLFactory.asShape(scope));
 		}
 		if(selectorProperty != null) {
-			query = insertThisAndScopeBindingClause(query, scopes.size(), selectorProperty);
+			query = SPARQLSubstitutions.insertThisAndScopeBindingClause(query, scopes.size(), selectorProperty);
 			bindings.add(SPINUtil.TYPE_CLASS_VAR_NAME, selectorObject);
 		}
 		else if(!scopes.isEmpty()) {
-			query = insertScopeClause(query, scopes.size());
+			query = SPARQLSubstitutions.insertScopeClause(query, scopes.size());
 		}
 
 		if(focusNode != null) {
@@ -175,16 +172,16 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		}
 		
 		QuerySolutionMap bindings = new QuerySolutionMap();
-		List<SHACLShape> scopes = executable.getScopes();
+		List<SHACLShape> scopes = executable.getScopeShapes();
 		for(Resource scope : JenaUtil.getResourceProperties(shape, SH.scopeShape)) {
 			scopes.add(SHACLFactory.asShape(scope));
 		}
 		if(selectorProperty != null) {
-			query = insertThisAndScopeBindingClause(query, scopes.size(), selectorProperty);
+			query = SPARQLSubstitutions.insertThisAndScopeBindingClause(query, scopes.size(), selectorProperty);
 			bindings.add(SPINUtil.TYPE_CLASS_VAR_NAME, selectorObject);
 		}
 		else if(!scopes.isEmpty()) {
-			query = insertScopeClause(query, scopes.size());
+			query = SPARQLSubstitutions.insertScopeClause(query, scopes.size());
 		}
 
 		for(SHACLArgument arg : template.getArguments(false)) {
@@ -241,7 +238,6 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 	private static int executeSelectQuery(Model results, SHACLConstraint constraint,
 			Resource focusNode, ConstraintExecutable executable,
 			QueryExecution qexec) {
-		
 	
 		ResultSet rs = qexec.execSelect();
 		int violationCount = 0;
@@ -259,7 +255,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 			}
 			else {
 				for(Literal defaultMessage : defaultMessages) {
-					vio.addProperty(SH.message, withSubstitutions(defaultMessage, sol));
+					vio.addProperty(SH.message, SPARQLSubstitutions.withSubstitutions(defaultMessage, sol));
 				}
 			}
 			
@@ -300,101 +296,5 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		qexec.close();
 		
 		return violationCount;
-	}
-	
-	
-	// TODO: Algorithm incorrect, e.g. if { is included as a comment
-	private Query insertScopeClause(Query query, int scopeCount) {
-		String str = query.toString();
-		Pattern pattern = Pattern.compile("(?i)WHERE\\s*\\{");
-		Matcher matcher = pattern.matcher(str);
-		if(matcher.find()) {
-			int index = matcher.end();
-			StringBuilder sb = new StringBuilder(str);
-			
-			StringBuffer s = new StringBuffer();
-			for(int i = 0; i < scopeCount; i++) {
-				s.append("{ FILTER <");
-				s.append(SH.hasShape.getURI());
-				s.append(">(?this, ?");
-				s.append(ModelConstraintValidator.SCOPE_VAR_NAME + i);
-				s.append(", ?" + SH.shapesGraphVar.getVarName() + ") }");
-			}
-			
-			sb.insert(index, s.toString());
-			return ARQFactory.get().createQuery(sb.toString());
-		}
-		else {
-			throw new IllegalArgumentException("Cannot find first '{' in query string: " + str);
-		}
-	}
-	
-	
-	// TODO: Algorithm incorrect, e.g. if { is included as a comment
-	private Query insertThisAndScopeBindingClause(Query query, int scopeCount, Property selectorProperty) {
-		String str = query.toString();
-		Pattern pattern = Pattern.compile("(?i)WHERE\\s*\\{");
-		Matcher matcher = pattern.matcher(str);
-		if(matcher.find()) {
-			int index = matcher.end();
-			StringBuilder sb = new StringBuilder(str);
-			
-			// TODO: Maybe we can do a rdfs:subClassOf* traversal here
-			
-			StringBuffer s = new StringBuffer();
-			s.append(" {?this <" + selectorProperty + "> ?");
-			s.append(SPINUtil.TYPE_CLASS_VAR_NAME);
-			for(int i = 0; i < scopeCount; i++) {
-				s.append(" . FILTER <");
-				s.append(SH.hasShape.getURI());
-				s.append(">(?this, ?");
-				s.append(ModelConstraintValidator.SCOPE_VAR_NAME + i);
-				s.append(", ?" + SH.shapesGraphVar.getVarName() + ")");
-			}
-			s.append(" }. ");
-			
-			sb.insert(index, s.toString());
-			return ARQFactory.get().createQuery(sb.toString());
-		}
-		else {
-			throw new IllegalArgumentException("Cannot find first '{' in query string: " + str);
-		}
-	}
-
-
-	private static Literal withSubstitutions(Literal template, QuerySolution bindings) {
-		StringBuffer buffer = new StringBuffer();
-		String labelTemplate = template.getLexicalForm();
-		for(int i = 0; i < labelTemplate.length(); i++) {
-			if(i < labelTemplate.length() - 3 && labelTemplate.charAt(i) == '{' && labelTemplate.charAt(i + 1) == '?') {
-				int varEnd = i + 2;
-				while(varEnd < labelTemplate.length()) {
-					if(labelTemplate.charAt(varEnd) == '}') {
-						String varName = labelTemplate.substring(i + 2, varEnd);
-						RDFNode varValue = bindings.get(varName);
-						if(varValue instanceof Resource) {
-							buffer.append(SPINLabels.get().getLabel((Resource)varValue));
-						}
-						else if(varValue instanceof Literal) {
-							buffer.append(varValue.asNode().getLiteralLexicalForm());
-						}
-						break;
-					}
-					else {
-						varEnd++;
-					}
-				}
-				i = varEnd;
-			}
-			else {
-				buffer.append(labelTemplate.charAt(i));
-			}
-		}
-		if(template.getLanguage().isEmpty()) {
-			return ResourceFactory.createTypedLiteral(buffer.toString());
-		}
-		else {
-			return ResourceFactory.createLangLiteral(buffer.toString(), template.getLanguage());
-		}
 	}
 }

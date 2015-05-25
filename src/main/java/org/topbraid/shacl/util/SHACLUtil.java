@@ -18,6 +18,10 @@ import org.topbraid.spin.util.JenaUtil;
 import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.graph.compose.MultiUnion;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QuerySolutionMap;
+import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -28,7 +32,13 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
 
+/**
+ * Various SHACL-related utility methods that didn't fit elsewhere.
+ * 
+ * @author Holger Knublauch
+ */
 public class SHACLUtil {
 	
 	private final static Set<Resource> classesWithDefaultType = new HashSet<Resource>();
@@ -39,6 +49,26 @@ public class SHACLUtil {
 		classesWithDefaultType.add(SH.PropertyConstraint);
 	}
 	
+	private final static List<Property> constraintProperties = new LinkedList<Property>();
+	static {
+		constraintProperties.add(SH.argument);
+		constraintProperties.add(SH.constraint);
+		constraintProperties.add(SH.inverseProperty);
+		constraintProperties.add(SH.property);
+	}
+	
+	private static Query propertyLabelQuery = ARQFactory.get().createQuery(
+			"PREFIX rdfs: <" + RDFS.getURI() + ">\n" +
+			"PREFIX sh: <" + SH.NS + ">\n" +
+			"SELECT ?label\n" +
+			"WHERE {\n" +
+			"    ?arg2 a ?type .\n" +
+			"    ?type rdfs:subClassOf* ?class .\n" +
+			"    ?shape sh:scopeClass* ?class .\n" +
+			"    ?shape sh:property|sh:argument ?p .\n" +
+			"    ?p sh:predicate ?arg1 .\n" +
+			"    ?p rdfs:label ?label .\n" +
+			"}");
 
 	public static void addDirectPropertiesOfClass(Resource cls, Collection<Property> results) {
 		for(Resource argument : JenaUtil.getResourceProperties(cls, SH.argument)) {
@@ -104,12 +134,7 @@ public class SHACLUtil {
 
 
 	public static List<Property> getAllConstraintProperties() {
-		List<Property> properties = new LinkedList<Property>();
-		properties.add(SH.argument);
-		properties.add(SH.constraint);
-		properties.add(SH.inverseProperty);
-		properties.add(SH.property);
-		return properties;
+		return constraintProperties;
 	}
 	
 	
@@ -175,6 +200,33 @@ public class SHACLUtil {
 		}
 		finally {
 			it.close();
+		}
+		return null;
+	}
+	
+	
+	/**
+	 * Gets any locally-defined label for a given property.
+	 * The labels are expected to be attached to shapes associated with a given
+	 * context resource (instance).
+	 * That context resource may for example be the subject of the current UI form.
+	 * @param property  the property to get the label of
+	 * @param context  the context instance
+	 * @return the local label or null if it should fall back to a global label
+	 */
+	public static String getLocalPropertyLabel(Resource property, Resource context) {
+		QuerySolutionMap binding = new QuerySolutionMap();
+		binding.add("arg1", property);
+		binding.add("arg2", context);
+		QueryExecution qexec = ARQFactory.get().createQueryExecution(propertyLabelQuery, property.getModel(), binding);
+		ResultSet rs = qexec.execSelect();
+		try {
+			if(rs.hasNext()) {
+				return rs.next().get("label").asLiteral().getLexicalForm();
+			}
+		}
+		finally {
+			qexec.close();
 		}
 		return null;
 	}

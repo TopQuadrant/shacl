@@ -1,4 +1,4 @@
-package org.topbraid.shacl.test;
+package org.topbraid.shacl.util;
 
 import java.io.StringWriter;
 
