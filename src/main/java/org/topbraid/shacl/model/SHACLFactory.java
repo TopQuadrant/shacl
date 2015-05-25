@@ -12,9 +12,6 @@ import org.topbraid.shacl.model.impl.SHACLTemplateConstraintImpl;
 import org.topbraid.shacl.model.impl.SHACLTemplateImpl;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.vocabulary.SHACL;
-import org.topbraid.spin.arq.functions.InvokeFunction;
-import org.topbraid.spin.arq.functions.WalkObjectsFunction;
-import org.topbraid.spin.arq.functions.WalkSubjectsFunction;
 import org.topbraid.spin.util.JenaUtil;
 import org.topbraid.spin.util.SimpleImplementation;
 
@@ -43,10 +40,7 @@ public class SHACLFactory {
     	p.add(SHACLTemplateCall.class, new SimpleImplementation(SHACL.Templates.asNode(), SHACLTemplateCallImpl.class));
     	p.add(SHACLTemplateConstraint.class, new SimpleImplementation(SHACL.TemplateConstraint.asNode(), SHACLTemplateConstraintImpl.class));
     	
-		FunctionRegistry.get().put(SHACL.invoke.getURI(), InvokeFunction.class);
 		FunctionRegistry.get().put(SHACL.hasShape.getURI(), SHACLHasShapeFunction.class);
-		FunctionRegistry.get().put(SHACL.walkObjects.getURI(), WalkObjectsFunction.class);
-		FunctionRegistry.get().put(SHACL.walkSubjects.getURI(), WalkSubjectsFunction.class);
     }
 	
 	

@@ -241,7 +241,6 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 	private static int executeSelectQuery(Model results, SHACLConstraint constraint,
 			Resource focusNode, ConstraintExecutable executable,
 			QueryExecution qexec) {
-		
 	
 		ResultSet rs = qexec.execSelect();
 		int violationCount = 0;

@@ -90,7 +90,7 @@ public class ResourceConstraintValidator {
 	
 	/**
 	 * Validates all SHACL constraints for a given resource.
-	 * @param resource  the Resource to validate
+	 * @param testResource  the Resource to validate
 	 * @param monitor  an optional progress monitor
 	 * @return a List of constraint violations
 	 */

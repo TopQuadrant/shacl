@@ -129,8 +129,6 @@ public class SHACL {
 
     public final static Property inverseProperty = ResourceFactory.createProperty(NS + "inverseProperty");
 
-    public final static Resource invoke = ResourceFactory.createResource(NS + "invoke");
-
     public final static Property labelTemplate = ResourceFactory.createProperty(NS + "labelTemplate");
 
     public final static Property maxCount = ResourceFactory.createProperty(NS + "maxCount");
@@ -188,10 +186,6 @@ public class SHACL {
     public final static Property valueType = ResourceFactory.createProperty(NS + "valueType");
 
     public final static Property violation = ResourceFactory.createProperty(NS + "violation");
-
-    public final static Resource walkObjects = ResourceFactory.createResource(NS + "walkObjects");
-
-    public final static Resource walkSubjects = ResourceFactory.createResource(NS + "walkSubjects");
 
 	
 	public static final Var currentShapeVar = Var.alloc("currentShape");
