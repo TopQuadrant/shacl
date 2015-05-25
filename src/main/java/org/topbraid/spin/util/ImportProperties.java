@@ -3,7 +3,7 @@ package org.topbraid.spin.util;
 import java.util.Arrays;
 import java.util.List;
 
-import org.topbraid.shacl.vocabulary.SHACL;
+import org.topbraid.shacl.vocabulary.SH;
 
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.vocabulary.OWL;
@@ -29,8 +29,8 @@ public class ImportProperties {
 	
 	private List<Property> results = Arrays.asList(new Property[] {
 		OWL.imports,
-		SHACL.include,
-		SHACL.shapesGraph
+		SH.include,
+		SH.shapesGraph
 	});
 	
 	

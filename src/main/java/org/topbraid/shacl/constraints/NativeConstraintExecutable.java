@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.topbraid.shacl.model.SHACLFactory;
 import org.topbraid.shacl.model.SHACLShape;
-import org.topbraid.shacl.vocabulary.SHACL;
+import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaUtil;
 
 import com.hp.hpl.jena.rdf.model.Literal;
@@ -22,12 +22,12 @@ public class NativeConstraintExecutable extends ConstraintExecutable {
 	
 	
 	public List<Literal> getMessages() {
-		return JenaUtil.getLiteralProperties(resource, SHACL.message);
+		return JenaUtil.getLiteralProperties(resource, SH.message);
 	}
 	
 	
 	public Resource getPredicate() {
-		return JenaUtil.getResourceProperty(resource, SHACL.predicate);
+		return JenaUtil.getResourceProperty(resource, SH.predicate);
 	}
 	
 	
@@ -39,7 +39,7 @@ public class NativeConstraintExecutable extends ConstraintExecutable {
 	@Override
 	public List<SHACLShape> getScopes() {
 		List<SHACLShape> results = new LinkedList<SHACLShape>();
-		for(Resource scope : JenaUtil.getResourceProperties(resource, SHACL.scopeShape)) {
+		for(Resource scope : JenaUtil.getResourceProperties(resource, SH.scopeShape)) {
 			results.add(SHACLFactory.asShape(scope));
 		}
 		return results;
@@ -51,8 +51,8 @@ public class NativeConstraintExecutable extends ConstraintExecutable {
 	 * @return the severity class, never null
 	 */
 	public Resource getSeverity() {
-		Resource result = JenaUtil.getResourceProperty(resource, SHACL.severity);
-		return result == null ? SHACL.Error : result;
+		Resource result = JenaUtil.getResourceProperty(resource, SH.severity);
+		return result == null ? SH.Error : result;
 	}
 
 

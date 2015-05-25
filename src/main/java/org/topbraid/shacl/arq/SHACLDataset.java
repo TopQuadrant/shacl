@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import org.topbraid.shacl.vocabulary.SHACL;
+import org.topbraid.shacl.vocabulary.SH;
 
 import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.compose.MultiUnion;
@@ -36,7 +36,7 @@ public class SHACLDataset extends DatasetImpl {
 	
 	@Override
 	public boolean containsNamedModel(String uri) {
-		if(SHACL.ShapesGraph.getURI().equals(uri)) {
+		if(SH.ShapesGraph.getURI().equals(uri)) {
 			return true;
 		}
 		else {
@@ -47,7 +47,7 @@ public class SHACLDataset extends DatasetImpl {
 	
 	@Override
 	public Model getNamedModel(String uri) {
-		if(SHACL.ShapesGraph.getURI().equals(uri)) {
+		if(SH.ShapesGraph.getURI().equals(uri)) {
 			return shapesModel;
 		}
 		else {
@@ -70,7 +70,7 @@ public class SHACLDataset extends DatasetImpl {
 		Graph baseGraph = model.getGraph();
 		graphs.add(baseGraph);
 		
-		for(Statement s : model.listStatements(null, SHACL.shapesGraph, (RDFNode)null).toList()) {
+		for(Statement s : model.listStatements(null, SH.shapesGraph, (RDFNode)null).toList()) {
 			if(s.getObject().isURIResource()) {
 				String graphURI = s.getResource().getURI();
 				Model sm = dataset.getNamedModel(graphURI);

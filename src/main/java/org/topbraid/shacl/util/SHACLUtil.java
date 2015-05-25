@@ -11,7 +11,7 @@ import org.topbraid.shacl.model.SHACLArgument;
 import org.topbraid.shacl.model.SHACLConstraintViolation;
 import org.topbraid.shacl.model.SHACLFactory;
 import org.topbraid.shacl.model.SHACLPropertyConstraint;
-import org.topbraid.shacl.vocabulary.SHACL;
+import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.util.JenaUtil;
 
@@ -33,22 +33,22 @@ public class SHACLUtil {
 	
 	private final static Set<Resource> classesWithDefaultType = new HashSet<Resource>();
 	static {
-		classesWithDefaultType.add(SHACL.NativeConstraint);
-		classesWithDefaultType.add(SHACL.Argument);
-		classesWithDefaultType.add(SHACL.InversePropertyConstraint);
-		classesWithDefaultType.add(SHACL.PropertyConstraint);
+		classesWithDefaultType.add(SH.NativeConstraint);
+		classesWithDefaultType.add(SH.Argument);
+		classesWithDefaultType.add(SH.InversePropertyConstraint);
+		classesWithDefaultType.add(SH.PropertyConstraint);
 	}
 	
 
 	public static void addDirectPropertiesOfClass(Resource cls, Collection<Property> results) {
-		for(Resource argument : JenaUtil.getResourceProperties(cls, SHACL.argument)) {
-			Resource predicate = JenaUtil.getPropertyResourceValue(argument, SHACL.predicate);
+		for(Resource argument : JenaUtil.getResourceProperties(cls, SH.argument)) {
+			Resource predicate = JenaUtil.getPropertyResourceValue(argument, SH.predicate);
 			if(predicate != null && predicate.isURIResource() && !results.contains(predicate)) {
 				results.add(JenaUtil.asProperty(predicate));
 			}
 		}
-		for(Resource property : JenaUtil.getResourceProperties(cls, SHACL.property)) {
-			Resource predicate = JenaUtil.getPropertyResourceValue(property, SHACL.predicate);
+		for(Resource property : JenaUtil.getResourceProperties(cls, SH.property)) {
+			Resource predicate = JenaUtil.getPropertyResourceValue(property, SH.predicate);
 			if(predicate != null && predicate.isURIResource() && !results.contains(predicate)) {
 				results.add(JenaUtil.asProperty(predicate));
 			}
@@ -61,7 +61,7 @@ public class SHACLUtil {
 		graphs.add(model);
 		reachedURIs.add(uri);
 		
-		ExtendedIterator<Triple> includes = model.find(null, SHACL.include.asNode(), null);
+		ExtendedIterator<Triple> includes = model.find(null, SH.include.asNode(), null);
 		ExtendedIterator<Triple> imports = model.find(null, OWL.imports.asNode(), null);
 		for(Triple t : includes.andThen(imports).toList()) {
 			if(t.getObject().isURI()) {
@@ -105,10 +105,10 @@ public class SHACLUtil {
 
 	public static List<Property> getAllConstraintProperties() {
 		List<Property> properties = new LinkedList<Property>();
-		properties.add(SHACL.argument);
-		properties.add(SHACL.constraint);
-		properties.add(SHACL.inverseProperty);
-		properties.add(SHACL.property);
+		properties.add(SH.argument);
+		properties.add(SH.constraint);
+		properties.add(SH.inverseProperty);
+		properties.add(SH.property);
 		return properties;
 	}
 	
@@ -116,13 +116,13 @@ public class SHACLUtil {
 	public static List<SHACLConstraintViolation> getAllConstraintViolations(Model model) {
 		List<SHACLConstraintViolation> results = new LinkedList<SHACLConstraintViolation>();
 		// TODO: Not pretty code, not generic
-		for(Resource r : model.listResourcesWithProperty(RDF.type, SHACL.Warning).toList()) {
+		for(Resource r : model.listResourcesWithProperty(RDF.type, SH.Warning).toList()) {
 			results.add(r.as(SHACLConstraintViolation.class));
 		}
-		for(Resource r : model.listResourcesWithProperty(RDF.type, SHACL.Error).toList()) {
+		for(Resource r : model.listResourcesWithProperty(RDF.type, SH.Error).toList()) {
 			results.add(r.as(SHACLConstraintViolation.class));
 		}
-		for(Resource r : model.listResourcesWithProperty(RDF.type, SHACL.FatalError).toList()) {
+		for(Resource r : model.listResourcesWithProperty(RDF.type, SH.FatalError).toList()) {
 			results.add(r.as(SHACLConstraintViolation.class));
 		}
 		return results;
@@ -131,8 +131,8 @@ public class SHACLUtil {
 	
 	public static SHACLArgument getArgumentAtClass(Resource cls, Property predicate) {
 		for(Resource c : JenaUtil.getAllSuperClassesStar(cls)) {
-			for(Resource arg : JenaUtil.getResourceProperties(c, SHACL.argument)) {
-				if(arg.hasProperty(SHACL.predicate, predicate)) {
+			for(Resource arg : JenaUtil.getResourceProperties(c, SH.argument)) {
+				if(arg.hasProperty(SH.predicate, predicate)) {
 					return SHACLFactory.asArgument(arg);
 				}
 			}
@@ -157,17 +157,17 @@ public class SHACLUtil {
 		try {
 			while(it.hasNext()) {
 				Statement s = it.next();
-				if(SHACL.property.equals(s.getPredicate())) {
-					return SHACL.PropertyConstraint.inModel(resource.getModel());
+				if(SH.property.equals(s.getPredicate())) {
+					return SH.PropertyConstraint.inModel(resource.getModel());
 				}
-				else if(SHACL.argument.equals(s.getPredicate())) {
-					return SHACL.Argument.inModel(resource.getModel());
+				else if(SH.argument.equals(s.getPredicate())) {
+					return SH.Argument.inModel(resource.getModel());
 				}
-				else if(SHACL.constraint.equals(s.getPredicate())) {
-					return SHACL.NativeConstraint.inModel(resource.getModel());
+				else if(SH.constraint.equals(s.getPredicate())) {
+					return SH.NativeConstraint.inModel(resource.getModel());
 				}
-				else if(SHACL.inverseProperty.equals(s.getPredicate())) {
-					return SHACL.InversePropertyConstraint.inModel(resource.getModel());
+				else if(SH.inverseProperty.equals(s.getPredicate())) {
+					return SH.InversePropertyConstraint.inModel(resource.getModel());
 				}
 				
 				// TODO: maybe handle other properties
@@ -182,8 +182,8 @@ public class SHACLUtil {
 	
 	public static SHACLPropertyConstraint getPropertyConstraintAtClass(Resource cls, Property predicate) {
 		for(Resource c : JenaUtil.getAllSuperClassesStar(cls)) {
-			for(Resource arg : JenaUtil.getResourceProperties(c, SHACL.property)) {
-				if(arg.hasProperty(SHACL.predicate, predicate)) {
+			for(Resource arg : JenaUtil.getResourceProperties(c, SH.property)) {
+				if(arg.hasProperty(SH.predicate, predicate)) {
 					return SHACLFactory.asPropertyConstraint(arg);
 				}
 			}
@@ -255,7 +255,7 @@ public class SHACLUtil {
 	 */
 	public static boolean exists(Model model) {
     	return model != null &&
-        		SHACL.NS.equals(model.getNsPrefixURI(SHACL.PREFIX)) && 
-        		model.contains(SHACL.NativeConstraint, RDF.type, (RDFNode)null);
+        		SH.NS.equals(model.getNsPrefixURI(SH.PREFIX)) && 
+        		model.contains(SH.NativeConstraint, RDF.type, (RDFNode)null);
 	}
 }

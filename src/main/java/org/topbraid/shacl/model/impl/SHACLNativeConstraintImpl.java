@@ -6,7 +6,7 @@ import java.util.List;
 import org.topbraid.shacl.constraints.ConstraintExecutable;
 import org.topbraid.shacl.constraints.NativeConstraintExecutable;
 import org.topbraid.shacl.model.SHACLNativeConstraint;
-import org.topbraid.shacl.vocabulary.SHACL;
+import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaUtil;
 
 import com.hp.hpl.jena.enhanced.EnhGraph;
@@ -45,12 +45,12 @@ public class SHACLNativeConstraintImpl extends SHACLResourceImpl implements SHAC
 			return comment;
 		}
 		
-		String message = JenaUtil.getStringProperty(this, SHACL.message);
+		String message = JenaUtil.getStringProperty(this, SH.message);
 		if(message != null) {
 			return message;
 		}
 
-		String sparql = JenaUtil.getStringProperty(this, SHACL.sparql);
+		String sparql = JenaUtil.getStringProperty(this, SH.sparql);
 		if(sparql != null) {
 			return sparql;
 		}

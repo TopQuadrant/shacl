@@ -2,7 +2,7 @@ package org.topbraid.shacl.arq.functions;
 
 import org.topbraid.shacl.constraints.ResourceConstraintValidator;
 import org.topbraid.shacl.util.SHACLUtil;
-import org.topbraid.shacl.vocabulary.SHACL;
+import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.AbstractFunction3;
 import org.topbraid.spin.util.JenaUtil;
 
@@ -36,7 +36,7 @@ public class SHACLHasShapeFunction extends AbstractFunction3 {
 				Resource shape = (Resource) dataset.getDefaultModel().asRDFNode(shapeNode);
 				ResourceConstraintValidator.get().addResourceViolations(dataset, shapesGraph, resource.asNode(), shape.asNode(),
 						SHACLUtil.getAllConstraintProperties(),
-						SHACL.Error,
+						SH.Error,
 						results,
 						null);
 				return NodeValue.makeBoolean(results.isEmpty());

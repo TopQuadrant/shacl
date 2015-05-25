@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.topbraid.shacl.vocabulary.SHACL;
+import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.AbstractFunction2;
 import org.topbraid.spin.vocabulary.SPIN;
 import org.topbraid.spin.vocabulary.SPL;
@@ -186,17 +186,17 @@ public class LocalRangeAtClassNativeFunction extends AbstractFunction2 {
 		}		
 		
 		{
-			ExtendedIterator<Triple> it = graph.find(type, SHACL.argument.asNode(), Node.ANY);
+			ExtendedIterator<Triple> it = graph.find(type, SH.argument.asNode(), Node.ANY);
 			while(it.hasNext()) {
 				Node constraint = it.next().getObject();
 				if(constraint.isBlank() || constraint.isURI()) {
-					if(graph.contains(constraint, SHACL.predicate.asNode(), property)) {
-						Node valueType = getObject(constraint, SHACL.valueType.asNode(), graph);
+					if(graph.contains(constraint, SH.predicate.asNode(), property)) {
+						Node valueType = getObject(constraint, SH.valueType.asNode(), graph);
 						if(valueType != null) {
 							it.close();
 							return valueType;
 						}
-						Node datatype = getObject(constraint, SHACL.datatype.asNode(), graph);
+						Node datatype = getObject(constraint, SH.datatype.asNode(), graph);
 						if(datatype != null) {
 							it.close();
 							return datatype;
@@ -207,17 +207,17 @@ public class LocalRangeAtClassNativeFunction extends AbstractFunction2 {
 		}		
 		
 		{
-			ExtendedIterator<Triple> it = graph.find(type, SHACL.property.asNode(), Node.ANY);
+			ExtendedIterator<Triple> it = graph.find(type, SH.property.asNode(), Node.ANY);
 			while(it.hasNext()) {
 				Node constraint = it.next().getObject();
 				if(constraint.isBlank() || constraint.isURI()) {
-					if(graph.contains(constraint, SHACL.predicate.asNode(), property)) {
-						Node valueType = getObject(constraint, SHACL.valueType.asNode(), graph);
+					if(graph.contains(constraint, SH.predicate.asNode(), property)) {
+						Node valueType = getObject(constraint, SH.valueType.asNode(), graph);
 						if(valueType != null) {
 							it.close();
 							return valueType;
 						}
-						Node datatype = getObject(constraint, SHACL.datatype.asNode(), graph);
+						Node datatype = getObject(constraint, SH.datatype.asNode(), graph);
 						if(datatype != null) {
 							it.close();
 							return datatype;

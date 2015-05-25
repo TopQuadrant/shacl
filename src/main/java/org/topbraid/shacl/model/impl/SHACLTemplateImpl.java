@@ -1,7 +1,7 @@
 package org.topbraid.shacl.model.impl;
 
 import org.topbraid.shacl.model.SHACLTemplate;
-import org.topbraid.shacl.vocabulary.SHACL;
+import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaUtil;
 
 import com.hp.hpl.jena.enhanced.EnhGraph;
@@ -21,6 +21,6 @@ public class SHACLTemplateImpl extends SHACLMacroImpl implements SHACLTemplate {
 	
 	@Override
 	public String getLabelTemplate() {
-		return JenaUtil.getStringProperty(this, SHACL.labelTemplate);
+		return JenaUtil.getStringProperty(this, SH.labelTemplate);
 	}
 }

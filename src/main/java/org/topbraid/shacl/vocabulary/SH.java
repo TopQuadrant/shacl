@@ -10,7 +10,7 @@ import com.hp.hpl.jena.sparql.core.Var;
  *
  * Automatically generated with TopBraid Composer.
  */
-public class SHACL {
+public class SH {
 
     public final static String BASE_URI = "http://www.w3.org/ns/shacl";
     
@@ -35,8 +35,6 @@ public class SHACL {
 
     public final static Resource NativeConstraint = ResourceFactory.createResource(NS + "NativeConstraint");
 
-    public final static Resource SPARQLRule = ResourceFactory.createResource(NS + "SPARQLRule");
-
     public final static Resource ConstraintTemplate = ResourceFactory.createResource(NS + "ConstraintTemplate");
 
     public final static Resource TemplateConstraint = ResourceFactory.createResource(NS + "TemplateConstraint");
@@ -55,10 +53,6 @@ public class SHACL {
 
     public final static Resource Graph = ResourceFactory.createResource(NS + "Graph");
 
-    public final static Resource GraphConstraintCheckingTestCase = ResourceFactory.createResource(NS + "GraphConstraintCheckingTestCase");
-
-    public final static Resource InversePath = ResourceFactory.createResource(NS + "InversePath");
-
     public final static Resource InversePropertyConstraint = ResourceFactory.createResource(NS + "InversePropertyConstraint");
 
     public final static Resource IRI = ResourceFactory.createResource(NS + "IRI");
@@ -68,8 +62,6 @@ public class SHACL {
     public final static Resource Macro = ResourceFactory.createResource(NS + "Macro");
 
     public final static Resource PropertyConstraint = ResourceFactory.createResource(NS + "PropertyConstraint");
-
-    public final static Resource ResourceConstraintCheckingTestCase = ResourceFactory.createResource(NS + "ResourceConstraintCheckingTestCase");
 
     public final static Resource Rule = ResourceFactory.createResource(NS + "Rule");
 
@@ -86,10 +78,6 @@ public class SHACL {
     public final static Resource Template = ResourceFactory.createResource(NS + "Template");
 
     public final static Resource Templates = ResourceFactory.createResource(NS + "Templates");
-
-    public final static Resource TestCase = ResourceFactory.createResource(NS + "TestCase");
-
-    public final static Resource UnionConstraintTemplate = ResourceFactory.createResource(NS + "UnionConstraintTemplate");
 
     public final static Resource Warning = ResourceFactory.createResource(NS + "Warning");
 

@@ -10,7 +10,7 @@ import java.util.Set;
 import org.topbraid.shacl.model.SHACLConstraint;
 import org.topbraid.shacl.model.SHACLFactory;
 import org.topbraid.shacl.util.SHACLUtil;
-import org.topbraid.shacl.vocabulary.SHACL;
+import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.progress.ProgressMonitor;
 import org.topbraid.spin.system.SPINLabels;
 import org.topbraid.spin.util.JenaUtil;
@@ -107,10 +107,10 @@ public class ModelConstraintValidator {
 							type = SHACLUtil.getDefaultTemplateType(c);
 						}
 						if(type != null) {
-							if(SHACL.NativeConstraint.equals(type)) {
+							if(SH.NativeConstraint.equals(type)) {
 								list.add(SHACLFactory.asNativeConstraint(c));
 							}
-							else if(JenaUtil.hasIndirectType(type, SHACL.ConstraintTemplate)) {
+							else if(JenaUtil.hasIndirectType(type, SH.ConstraintTemplate)) {
 								list.add(SHACLFactory.asTemplateConstraint(c));
 							}
 						}
@@ -124,13 +124,13 @@ public class ModelConstraintValidator {
 	
 	private void validateConstraintForShape(Dataset dataset, Resource shapesGraph, Resource minSeverity, SHACLConstraint constraint, Resource shape, Model results, ProgressMonitor monitor) {
 
-		boolean hasNodeShape = dataset.getDefaultModel().contains(null, SHACL.nodeShape, shape);
+		boolean hasNodeShape = dataset.getDefaultModel().contains(null, SH.nodeShape, shape);
 		
 		Set<Resource> scopeClasses = new HashSet<Resource>();
 		if(JenaUtil.hasIndirectType(shape, RDFS.Class)) {
 			scopeClasses.add(shape);
 		}
-		scopeClasses.addAll(JenaUtil.getResourceProperties(shape, SHACL.scopeClass));
+		scopeClasses.addAll(JenaUtil.getResourceProperties(shape, SH.scopeClass));
 		
 		for(ConstraintExecutable executable : constraint.getExecutables()) {
 			
@@ -146,12 +146,12 @@ public class ModelConstraintValidator {
 					if(executable instanceof NativeConstraintExecutable) {
 						NativeConstraintExecutable e = (NativeConstraintExecutable)executable;
 						ExecutionLanguage lang = ExecutionLanguageSelector.get().getLanguage(e);
-						lang.executeNative(dataset, shape, shapesGraph, results, constraint, null, SHACL.nodeShape, shape, e);
+						lang.executeNative(dataset, shape, shapesGraph, results, constraint, null, SH.nodeShape, shape, e);
 					}
 					else {
 						TemplateConstraintExecutable e = (TemplateConstraintExecutable)executable;
 						ExecutionLanguage lang = ExecutionLanguageSelector.get().getLanguage(e);
-						lang.executeTemplate(dataset, shape, shapesGraph, results, constraint, null, SHACL.nodeShape, shape, e);
+						lang.executeTemplate(dataset, shape, shapesGraph, results, constraint, null, SH.nodeShape, shape, e);
 					}
 				}
 				

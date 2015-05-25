@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.topbraid.shacl.vocabulary.SHACL;
+import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaUtil;
 
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -35,13 +35,9 @@ public class ModelClassesFilter {
 		SYSTEM_CLASSES.addAll(Arrays.asList(new Resource[] {
 			RDFS.Class,
 			RDFS.Resource,
-			SHACL.ConstraintViolation,
-			SHACL.Graph,
-			SHACL.GraphConstraintCheckingTestCase,
-			SHACL.ResourceConstraintCheckingTestCase,
-			SHACL.NativeConstraint,
-			SHACL.SPARQLRule,
-			SHACL.InversePath
+			SH.ConstraintViolation,
+			SH.Graph,
+			SH.NativeConstraint
 		}));
 	}
 
@@ -52,7 +48,7 @@ public class ModelClassesFilter {
 			return false;
 		}
 		
-		if(JenaUtil.hasIndirectType(cls, SHACL.Macro)) {
+		if(JenaUtil.hasIndirectType(cls, SH.Macro)) {
 			return false;
 		}
 		

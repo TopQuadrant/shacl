@@ -2,7 +2,7 @@ package org.topbraid.shacl.model.impl;
 
 import org.topbraid.shacl.model.SHACLArgument;
 import org.topbraid.shacl.model.SHACLTemplate;
-import org.topbraid.shacl.vocabulary.SHACL;
+import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaUtil;
 
 import com.hp.hpl.jena.enhanced.EnhGraph;
@@ -25,7 +25,7 @@ public class SHACLArgumentImpl extends SHACLAbstractPropertyConstraintImpl imple
 	
 	@Override
 	public RDFNode getDefaultValue() {
-		Statement s = getProperty(SHACL.defaultValue);
+		Statement s = getProperty(SH.defaultValue);
 		if(s != null) {
 			return s.getObject();
 		}
@@ -37,14 +37,14 @@ public class SHACLArgumentImpl extends SHACLAbstractPropertyConstraintImpl imple
 
 	@Override
 	public boolean isOptional() {
-		return JenaUtil.getBooleanProperty(this, SHACL.optional);
+		return JenaUtil.getBooleanProperty(this, SH.optional);
 	}
 	
 	
 	@Override
 	public boolean isOptionalAtTemplate(SHACLTemplate template) {
-		for(Resource arg : JenaUtil.getResourceProperties(template, SHACL.argument)) {
-			if(arg.hasProperty(SHACL.predicate, getPredicate())) {
+		for(Resource arg : JenaUtil.getResourceProperties(template, SH.argument)) {
+			if(arg.hasProperty(SH.predicate, getPredicate())) {
 				return false;
 			}
 		}

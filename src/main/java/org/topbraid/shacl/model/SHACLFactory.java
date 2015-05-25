@@ -11,7 +11,7 @@ import org.topbraid.shacl.model.impl.SHACLTemplateCallImpl;
 import org.topbraid.shacl.model.impl.SHACLTemplateConstraintImpl;
 import org.topbraid.shacl.model.impl.SHACLTemplateImpl;
 import org.topbraid.shacl.util.SHACLUtil;
-import org.topbraid.shacl.vocabulary.SHACL;
+import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaUtil;
 import org.topbraid.spin.util.SimpleImplementation;
 
@@ -30,17 +30,17 @@ public class SHACLFactory {
 
     
 	private static void init(Personality<RDFNode> p) {
-    	p.add(SHACLArgument.class, new SimpleImplementation(SHACL.Argument.asNode(), SHACLArgumentImpl.class));
-    	p.add(SHACLConstraintViolation.class, new SimpleImplementation(SHACL.ConstraintViolation.asNode(), SHACLConstraintViolationImpl.class));
-    	p.add(SHACLFunction.class, new SimpleImplementation(SHACL.Function.asNode(), SHACLFunctionImpl.class));
-    	p.add(SHACLPropertyConstraint.class, new SimpleImplementation(SHACL.PropertyConstraint.asNode(), SHACLPropertyConstraintImpl.class));
-    	p.add(SHACLShape.class, new SimpleImplementation(SHACL.Shape.asNode(), SHACLShapeImpl.class));
-    	p.add(SHACLNativeConstraint.class, new SimpleImplementation(SHACL.NativeConstraint.asNode(), SHACLNativeConstraintImpl.class));
-    	p.add(SHACLTemplate.class, new SimpleImplementation(SHACL.Template.asNode(), SHACLTemplateImpl.class));
-    	p.add(SHACLTemplateCall.class, new SimpleImplementation(SHACL.Templates.asNode(), SHACLTemplateCallImpl.class));
-    	p.add(SHACLTemplateConstraint.class, new SimpleImplementation(SHACL.TemplateConstraint.asNode(), SHACLTemplateConstraintImpl.class));
+    	p.add(SHACLArgument.class, new SimpleImplementation(SH.Argument.asNode(), SHACLArgumentImpl.class));
+    	p.add(SHACLConstraintViolation.class, new SimpleImplementation(SH.ConstraintViolation.asNode(), SHACLConstraintViolationImpl.class));
+    	p.add(SHACLFunction.class, new SimpleImplementation(SH.Function.asNode(), SHACLFunctionImpl.class));
+    	p.add(SHACLPropertyConstraint.class, new SimpleImplementation(SH.PropertyConstraint.asNode(), SHACLPropertyConstraintImpl.class));
+    	p.add(SHACLShape.class, new SimpleImplementation(SH.Shape.asNode(), SHACLShapeImpl.class));
+    	p.add(SHACLNativeConstraint.class, new SimpleImplementation(SH.NativeConstraint.asNode(), SHACLNativeConstraintImpl.class));
+    	p.add(SHACLTemplate.class, new SimpleImplementation(SH.Template.asNode(), SHACLTemplateImpl.class));
+    	p.add(SHACLTemplateCall.class, new SimpleImplementation(SH.Templates.asNode(), SHACLTemplateCallImpl.class));
+    	p.add(SHACLTemplateConstraint.class, new SimpleImplementation(SH.TemplateConstraint.asNode(), SHACLTemplateConstraintImpl.class));
     	
-		FunctionRegistry.get().put(SHACL.hasShape.getURI(), SHACLHasShapeFunction.class);
+		FunctionRegistry.get().put(SH.hasShape.getURI(), SHACLHasShapeFunction.class);
     }
 	
 	
@@ -81,11 +81,11 @@ public class SHACLFactory {
 	
 	public static boolean isSPARQLConstraint(RDFNode node) {
 		if(node != null && node.isAnon()) {
-			if(((Resource)node).hasProperty(RDF.type, SHACL.NativeConstraint)) {
+			if(((Resource)node).hasProperty(RDF.type, SH.NativeConstraint)) {
 				return true;
 			}
 			if(!((Resource)node).hasProperty(RDF.type)) {
-				return SHACL.NativeConstraint.equals(SHACLUtil.getDefaultTemplateType((Resource)node));
+				return SH.NativeConstraint.equals(SHACLUtil.getDefaultTemplateType((Resource)node));
 			}
 		}
 		return false;
@@ -106,7 +106,7 @@ public class SHACLFactory {
 			
 			// Return true if this has sh:Template as its metaclass
 			for(Resource type : JenaUtil.getTypes(resource)) {
-				if(JenaUtil.hasIndirectType(type, SHACL.Template)) {
+				if(JenaUtil.hasIndirectType(type, SH.Template)) {
 					return true;
 				}
 			}
@@ -114,7 +114,7 @@ public class SHACLFactory {
 			// If this is a typeless blank node, check for defaultType of incoming references
 			if(resource.isAnon() && !resource.hasProperty(RDF.type)) {
 				Resource dt = SHACLUtil.getDefaultTemplateType(resource);
-				if(dt != null && !SHACL.NativeConstraint.equals(dt)) {
+				if(dt != null && !SH.NativeConstraint.equals(dt)) {
 					return true;
 				}
 			}

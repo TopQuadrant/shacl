@@ -1,7 +1,7 @@
 package org.topbraid.shacl.model.impl;
 
 import org.topbraid.shacl.model.SHACLAbstractPropertyConstraint;
-import org.topbraid.shacl.vocabulary.SHACL;
+import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaUtil;
 
 import com.hp.hpl.jena.enhanced.EnhGraph;
@@ -31,7 +31,7 @@ public abstract class SHACLAbstractPropertyConstraintImpl extends SHACLTemplateC
 
 	@Override
 	public Property getPredicate() {
-		Resource r = JenaUtil.getResourceProperty(this, SHACL.predicate);
+		Resource r = JenaUtil.getResourceProperty(this, SH.predicate);
 		if(r != null && r.isURIResource()) {
 			return new PropertyImpl(r.asNode(), (EnhGraph)r.getModel());
 		}
@@ -43,7 +43,7 @@ public abstract class SHACLAbstractPropertyConstraintImpl extends SHACLTemplateC
 	
 	@Override
 	public Resource getValueType() {
-		return JenaUtil.getResourceProperty(this, SHACL.valueType);
+		return JenaUtil.getResourceProperty(this, SH.valueType);
 	}
 
 

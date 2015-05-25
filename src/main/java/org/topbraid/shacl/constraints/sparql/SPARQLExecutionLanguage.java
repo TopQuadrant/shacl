@@ -18,7 +18,7 @@ import org.topbraid.shacl.model.SHACLConstraint;
 import org.topbraid.shacl.model.SHACLFactory;
 import org.topbraid.shacl.model.SHACLShape;
 import org.topbraid.shacl.model.SHACLTemplate;
-import org.topbraid.shacl.vocabulary.SHACL;
+import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.statistics.SPINStatistics;
 import org.topbraid.spin.statistics.SPINStatisticsManager;
@@ -58,13 +58,13 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 	
 	@Override
 	public boolean canExecuteNative(NativeConstraintExecutable executable) {
-		return executable.getResource().hasProperty(SHACL.sparql);
+		return executable.getResource().hasProperty(SH.sparql);
 	}
 
 
 	@Override
 	public boolean canExecuteTemplate(TemplateConstraintExecutable executable) {
-		return executable.getTemplate().hasProperty(SHACL.sparql);
+		return executable.getTemplate().hasProperty(SH.sparql);
 	}
 
 
@@ -73,7 +73,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 			Model results, SHACLConstraint constraint,
 			Resource focusNode, Property selectorProperty, Resource selectorObject, NativeConstraintExecutable executable) {
 		
-		Resource entailment = JenaUtil.getResourceProperty(constraint, SHACL.sparqlEntailment);
+		Resource entailment = JenaUtil.getResourceProperty(constraint, SH.sparqlEntailment);
 		dataset = SPARQLEntailment.get().withEntailment(dataset, entailment);
 		if(dataset == null) {
 			addEntailmentError(entailment, constraint, results);
@@ -81,9 +81,9 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		}
 		
 		Resource resource = executable.getResource();
-		String sparql = JenaUtil.getStringProperty(resource, SHACL.sparql);
+		String sparql = JenaUtil.getStringProperty(resource, SH.sparql);
 		if(sparql == null) {
-			String message = "Missing " + SHACL.PREFIX + ":" + SHACL.sparql.getLocalName() + " of " + SPINLabels.get().getLabel(resource);
+			String message = "Missing " + SH.PREFIX + ":" + SH.sparql.getLocalName() + " of " + SPINLabels.get().getLabel(resource);
 			if(resource.isAnon()) {
 				StmtIterator it = resource.getModel().listStatements(null, null, resource);
 				if(it.hasNext()) {
@@ -111,7 +111,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		
 		QuerySolutionMap bindings = new QuerySolutionMap();
 		List<SHACLShape> scopes = executable.getScopes();
-		for(Resource scope : JenaUtil.getResourceProperties(shape, SHACL.scopeShape)) {
+		for(Resource scope : JenaUtil.getResourceProperties(shape, SH.scopeShape)) {
 			scopes.add(SHACLFactory.asShape(scope));
 		}
 		if(selectorProperty != null) {
@@ -123,10 +123,10 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		}
 
 		if(focusNode != null) {
-			bindings.add(SHACL.thisVar.getVarName(), focusNode);
+			bindings.add(SH.thisVar.getVarName(), focusNode);
 		}
-		bindings.add(SHACL.currentShapeVar.getVarName(), shape);
-		bindings.add(SHACL.shapesGraphVar.getVarName(), shapesGraph);
+		bindings.add(SH.currentShapeVar.getVarName(), shape);
+		bindings.add(SH.shapesGraphVar.getVarName(), shapesGraph);
 		for(int i = 0; i < scopes.size(); i++) {
 			bindings.add(ModelConstraintValidator.SCOPE_VAR_NAME + i, scopes.get(i));
 		}
@@ -151,7 +151,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 			Model results, SHACLConstraint constraint,
 			Resource focusNode, Property selectorProperty, Resource selectorObject, TemplateConstraintExecutable executable) {
 		
-		Resource entailment = JenaUtil.getResourceProperty(executable.getTemplate(), SHACL.sparqlEntailment);
+		Resource entailment = JenaUtil.getResourceProperty(executable.getTemplate(), SH.sparqlEntailment);
 		dataset = SPARQLEntailment.get().withEntailment(dataset, entailment);
 		if(dataset == null) {
 			addEntailmentError(entailment, constraint, results);
@@ -159,7 +159,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		}
 
 		SHACLTemplate template = executable.getTemplate();
-		String sparql = JenaUtil.getStringProperty(template, SHACL.sparql);
+		String sparql = JenaUtil.getStringProperty(template, SH.sparql);
 
 		String queryString = ARQFactory.get().createPrefixDeclarations(template.getModel()) + sparql;
 		Query query;
@@ -176,7 +176,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		
 		QuerySolutionMap bindings = new QuerySolutionMap();
 		List<SHACLShape> scopes = executable.getScopes();
-		for(Resource scope : JenaUtil.getResourceProperties(shape, SHACL.scopeShape)) {
+		for(Resource scope : JenaUtil.getResourceProperties(shape, SH.scopeShape)) {
 			scopes.add(SHACLFactory.asShape(scope));
 		}
 		if(selectorProperty != null) {
@@ -200,10 +200,10 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 			}
 		}
 		if(focusNode != null) {
-			bindings.add(SHACL.thisVar.getVarName(), focusNode);
+			bindings.add(SH.thisVar.getVarName(), focusNode);
 		}
-		bindings.add(SHACL.currentShapeVar.getVarName(), shape);
-		bindings.add(SHACL.shapesGraphVar.getVarName(), shapesGraph);
+		bindings.add(SH.currentShapeVar.getVarName(), shape);
+		bindings.add(SH.shapesGraphVar.getVarName(), shapesGraph);
 		for(int i = 0; i < scopes.size(); i++) {
 			bindings.add(ModelConstraintValidator.SCOPE_VAR_NAME + i, scopes.get(i));
 		}
@@ -232,15 +232,16 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 	
 	
 	private void addEntailmentError(Resource entailment, Resource constraint, Model results) {
-		Resource error = results.createResource(SHACL.FatalError);
-		error.addProperty(SHACL.message, "Unsupported SPARQL entailment " + entailment);
-		error.addProperty(SHACL.source, constraint);
+		Resource error = results.createResource(SH.FatalError);
+		error.addProperty(SH.message, "Unsupported SPARQL entailment " + entailment);
+		error.addProperty(SH.source, constraint);
 	}
 
 
 	private static int executeSelectQuery(Model results, SHACLConstraint constraint,
 			Resource focusNode, ConstraintExecutable executable,
 			QueryExecution qexec) {
+		
 	
 		ResultSet rs = qexec.execSelect();
 		int violationCount = 0;
@@ -250,47 +251,47 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 			QuerySolution sol = rs.next();
 			
 			Resource vio = results.createResource(severity);
-			vio.addProperty(SHACL.source, constraint);
+			vio.addProperty(SH.source, constraint);
 			
-			RDFNode selectMessage = sol.get(SHACL.messageVar.getVarName());
+			RDFNode selectMessage = sol.get(SH.messageVar.getVarName());
 			if(selectMessage != null) {
-				vio.addProperty(SHACL.message, selectMessage);
+				vio.addProperty(SH.message, selectMessage);
 			}
 			else {
 				for(Literal defaultMessage : defaultMessages) {
-					vio.addProperty(SHACL.message, withSubstitutions(defaultMessage, sol));
+					vio.addProperty(SH.message, withSubstitutions(defaultMessage, sol));
 				}
 			}
 			
-			RDFNode selectPath = sol.get(SHACL.predicateVar.getVarName());
+			RDFNode selectPath = sol.get(SH.predicateVar.getVarName());
 			if(selectPath instanceof Resource) {
-				vio.addProperty(SHACL.predicate, selectPath);
+				vio.addProperty(SH.predicate, selectPath);
 			}
 			else {
 				Resource path = executable.getPredicate();
 				if(path != null) {
-					vio.addProperty(SHACL.predicate, path);
+					vio.addProperty(SH.predicate, path);
 				}
 			}
 			
-			RDFNode selectObject = sol.get(SHACL.objectVar.getVarName());
+			RDFNode selectObject = sol.get(SH.objectVar.getVarName());
 			if(selectObject != null) {
-				vio.addProperty(SHACL.object, selectObject);
+				vio.addProperty(SH.object, selectObject);
 			}
 			
-			RDFNode selectSubject = sol.get(SHACL.subjectVar.getVarName());
+			RDFNode selectSubject = sol.get(SH.subjectVar.getVarName());
 			if(selectSubject instanceof Resource) {
-				vio.addProperty(SHACL.subject, selectSubject);
+				vio.addProperty(SH.subject, selectSubject);
 			}
 			
-			RDFNode root = sol.get(SHACL.rootVar.getVarName());
+			RDFNode root = sol.get(SH.rootVar.getVarName());
 			if(root != null) {
-				vio.addProperty(SHACL.root, root);
+				vio.addProperty(SH.root, root);
 			}
 			else {
-				root = sol.get(SHACL.thisVar.getVarName());
+				root = sol.get(SH.thisVar.getVarName());
 				if(root != null) {
-					vio.addProperty(SHACL.root, root);
+					vio.addProperty(SH.root, root);
 				}
 			}
 	
@@ -314,10 +315,10 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 			StringBuffer s = new StringBuffer();
 			for(int i = 0; i < scopeCount; i++) {
 				s.append("{ FILTER <");
-				s.append(SHACL.hasShape.getURI());
+				s.append(SH.hasShape.getURI());
 				s.append(">(?this, ?");
 				s.append(ModelConstraintValidator.SCOPE_VAR_NAME + i);
-				s.append(", ?" + SHACL.shapesGraphVar.getVarName() + ") }");
+				s.append(", ?" + SH.shapesGraphVar.getVarName() + ") }");
 			}
 			
 			sb.insert(index, s.toString());
@@ -345,10 +346,10 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 			s.append(SPINUtil.TYPE_CLASS_VAR_NAME);
 			for(int i = 0; i < scopeCount; i++) {
 				s.append(" . FILTER <");
-				s.append(SHACL.hasShape.getURI());
+				s.append(SH.hasShape.getURI());
 				s.append(">(?this, ?");
 				s.append(ModelConstraintValidator.SCOPE_VAR_NAME + i);
-				s.append(", ?" + SHACL.shapesGraphVar.getVarName() + ")");
+				s.append(", ?" + SH.shapesGraphVar.getVarName() + ")");
 			}
 			s.append(" }. ");
 			

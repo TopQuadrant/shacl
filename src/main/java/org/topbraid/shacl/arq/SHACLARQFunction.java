@@ -13,7 +13,7 @@ import org.apache.jena.atlas.io.IndentedWriter;
 import org.topbraid.shacl.entailment.SPARQLEntailment;
 import org.topbraid.shacl.model.SHACLArgument;
 import org.topbraid.shacl.model.SHACLFunction;
-import org.topbraid.shacl.vocabulary.SHACL;
+import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.arq.DatasetWithDifferentDefaultModel;
 import org.topbraid.spin.arq.SPINFunctionFactory;
@@ -81,8 +81,8 @@ public class SHACLARQFunction implements com.hp.hpl.jena.sparql.function.Functio
 		
 		this.shaclFunction = shaclFunction;
 		
-		this.cachable = shaclFunction.hasProperty(SHACL.cachable, JenaDatatypes.TRUE);
-		this.entailment = JenaUtil.getResourceProperty(shaclFunction, SHACL.sparqlEntailment);
+		this.cachable = shaclFunction.hasProperty(SH.cachable, JenaDatatypes.TRUE);
+		this.entailment = JenaUtil.getResourceProperty(shaclFunction, SH.sparqlEntailment);
 		
 		try {
 			queryString = shaclFunction.getSPARQL();

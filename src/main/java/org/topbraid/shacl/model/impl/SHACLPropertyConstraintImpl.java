@@ -1,7 +1,7 @@
 package org.topbraid.shacl.model.impl;
 
 import org.topbraid.shacl.model.SHACLPropertyConstraint;
-import org.topbraid.shacl.vocabulary.SHACL;
+import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaUtil;
 
 import com.hp.hpl.jena.enhanced.EnhGraph;
@@ -22,19 +22,19 @@ public class SHACLPropertyConstraintImpl extends SHACLAbstractPropertyConstraint
 	
 	@Override
 	public Resource getDefaultType() {
-		return JenaUtil.getResourceProperty(this, SHACL.defaultValueType);
+		return JenaUtil.getResourceProperty(this, SH.defaultValueType);
 	}
 
 
 	@Override
 	public Integer getMaxCount() {
-		return JenaUtil.getIntegerProperty(this, SHACL.maxCount);
+		return JenaUtil.getIntegerProperty(this, SH.maxCount);
 	}
 
 
 	@Override
 	public Integer getMinCount() {
-		return JenaUtil.getIntegerProperty(this, SHACL.maxCount);
+		return JenaUtil.getIntegerProperty(this, SH.maxCount);
 	}
 
 

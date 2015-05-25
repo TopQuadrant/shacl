@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.topbraid.shacl.arq.SHACLSPARQLFunctionDriver;
-import org.topbraid.shacl.vocabulary.SHACL;
+import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaDatatypes;
 import org.topbraid.spin.util.JenaUtil;
 import org.topbraid.spin.vocabulary.SPIN;
@@ -41,7 +41,7 @@ public class SPINFunctionDrivers implements SPINFunctionDriver {
 	
 	SPINFunctionDrivers() {
 		register(SPIN.body, new SPINBodyFunctionDriver());
-		register(SHACL.sparql, new SHACLSPARQLFunctionDriver());
+		register(SH.sparql, new SHACLSPARQLFunctionDriver());
 	}
 
 
@@ -102,7 +102,7 @@ public class SPINFunctionDrivers implements SPINFunctionDriver {
 	
 	private SPINFunctionDriver getDirectDriver(Resource spinFunction) {
 		if(!spinFunction.hasProperty(SPIN.abstract_, JenaDatatypes.TRUE) &&
-			!spinFunction.hasProperty(SHACL.abstract_, JenaDatatypes.TRUE)) {
+			!spinFunction.hasProperty(SH.abstract_, JenaDatatypes.TRUE)) {
 			StmtIterator it = spinFunction.listProperties();
 			while(it.hasNext()) {
 				Statement s = it.next();

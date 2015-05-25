@@ -8,7 +8,7 @@ import org.topbraid.shacl.model.SHACLFactory;
 import org.topbraid.shacl.model.SHACLShape;
 import org.topbraid.shacl.model.SHACLTemplate;
 import org.topbraid.shacl.model.SHACLTemplateConstraint;
-import org.topbraid.shacl.vocabulary.SHACL;
+import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaDatatypes;
 import org.topbraid.spin.util.JenaUtil;
 
@@ -34,18 +34,18 @@ public class TemplateConstraintExecutable extends ConstraintExecutable {
 	
 	
 	public List<Literal> getMessages() {
-		return JenaUtil.getLiteralProperties(template, SHACL.message);
+		return JenaUtil.getLiteralProperties(template, SH.message);
 	}
 	
 	
 	public Resource getPredicate() {
-		return JenaUtil.getResourceProperty(template, SHACL.predicate);
+		return JenaUtil.getResourceProperty(template, SH.predicate);
 	}
 
 
 	public List<SHACLShape> getScopes() {
 		List<SHACLShape> results = new LinkedList<SHACLShape>();
-		for(Resource scope : JenaUtil.getResourceProperties(constraint, SHACL.scopeShape)) {
+		for(Resource scope : JenaUtil.getResourceProperties(constraint, SH.scopeShape)) {
 			results.add(SHACLFactory.asShape(scope));
 		}
 		return results;
@@ -57,8 +57,8 @@ public class TemplateConstraintExecutable extends ConstraintExecutable {
 	 * @return the severity class, never null
 	 */
 	public Resource getSeverity() {
-		Resource severity = JenaUtil.getResourceProperty(template, SHACL.severity);
-		return severity == null ? SHACL.Error : severity;
+		Resource severity = JenaUtil.getResourceProperty(template, SH.severity);
+		return severity == null ? SH.Error : severity;
 	}
 	
 	
@@ -74,7 +74,7 @@ public class TemplateConstraintExecutable extends ConstraintExecutable {
 	public boolean isComplete() {
 		for(SHACLArgument arg : template.getArguments(false)) {
 			if(!arg.isOptional() && !constraint.hasProperty(arg.getPredicate()) && arg.getDefaultValue() == null) {
-				if(!(arg.hasProperty(SHACL.optionalWhenInherited, JenaDatatypes.TRUE) && arg.isOptionalAtTemplate(template))) {
+				if(!(arg.hasProperty(SH.optionalWhenInherited, JenaDatatypes.TRUE) && arg.isOptionalAtTemplate(template))) {
 					return false;
 				}
 			}

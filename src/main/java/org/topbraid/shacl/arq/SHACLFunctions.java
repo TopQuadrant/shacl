@@ -1,6 +1,6 @@
 package org.topbraid.shacl.arq;
 
-import org.topbraid.shacl.vocabulary.SHACL;
+import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.SPINFunctionDrivers;
 import org.topbraid.spin.util.JenaUtil;
 
@@ -17,7 +17,7 @@ import com.hp.hpl.jena.sparql.function.FunctionRegistry;
 public class SHACLFunctions {
 
 	public static void registerFunctions(Model model) {
-		Resource shaclFunctionClass = SHACL.Function.inModel(model);
+		Resource shaclFunctionClass = SH.Function.inModel(model);
 		for(Resource resource : JenaUtil.getAllInstances(shaclFunctionClass)) {
 			if(resource.isURIResource()) {
 				registerFunction(resource);

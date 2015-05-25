@@ -7,7 +7,7 @@ import java.util.Set;
 import org.topbraid.shacl.model.SHACLConstraint;
 import org.topbraid.shacl.model.SHACLFactory;
 import org.topbraid.shacl.util.SHACLUtil;
-import org.topbraid.shacl.vocabulary.SHACL;
+import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.progress.ProgressMonitor;
 import org.topbraid.spin.util.JenaUtil;
 
@@ -45,11 +45,11 @@ public class ResourceConstraintValidator {
 					type = SHACLUtil.getDefaultTemplateType(c);
 				}
 				if(type != null) {
-					if(SHACL.NativeConstraint.equals(type)) {
+					if(SH.NativeConstraint.equals(type)) {
 						SHACLConstraint constraint = SHACLFactory.asNativeConstraint(c);
 						addQueryResults(results, constraint, shape, resource, dataset, shapesGraph, minSeverity, monitor);
 					}
-					else if(JenaUtil.hasIndirectType(type, SHACL.ConstraintTemplate)) {
+					else if(JenaUtil.hasIndirectType(type, SH.ConstraintTemplate)) {
 						SHACLConstraint constraint = SHACLFactory.asTemplateConstraint(c);
 						addQueryResults(results, constraint, shape, resource, dataset, shapesGraph, minSeverity, monitor);
 					}
@@ -90,11 +90,14 @@ public class ResourceConstraintValidator {
 	
 	/**
 	 * Validates all SHACL constraints for a given resource.
-	 * @param testResource  the Resource to validate
+	 * @param dataset  the Dataset to operate on
+	 * @param shapesGraph  the URI of the shapes graph (must be in the dataset)
+	 * @param focusNode  the Resource to validate
+	 * @param minSeverity  the minimum severity level or null for all constraints
 	 * @param monitor  an optional progress monitor
 	 * @return a List of constraint violations
 	 */
-	public Model validateResource(Dataset dataset, Resource shapesGraph, Node resourceNode, Resource minSeverity, ProgressMonitor monitor) {
+	public Model validateNode(Dataset dataset, Resource shapesGraph, Node focusNode, Resource minSeverity, ProgressMonitor monitor) {
 		
 		Model results = JenaUtil.createMemoryModel();
 		
@@ -102,21 +105,38 @@ public class ResourceConstraintValidator {
 		
 		List<Property> properties = SHACLUtil.getAllConstraintProperties();
 		
-		Resource resource = (Resource) dataset.getDefaultModel().asRDFNode(resourceNode);
+		Resource resource = (Resource) dataset.getDefaultModel().asRDFNode(focusNode);
 		Set<Resource> shapes = new HashSet<Resource>();
 		for(Resource type : JenaUtil.getAllTypes(resource)) {
-			if(JenaUtil.hasIndirectType(type.inModel(shapesModel), SHACL.Shape)) {
+			if(JenaUtil.hasIndirectType(type.inModel(shapesModel), SH.Shape)) {
 				shapes.add(type);
 			}
-			for(Statement s : shapesModel.listStatements(null, SHACL.scopeClass, type).toList()) {
+			for(Statement s : shapesModel.listStatements(null, SH.scopeClass, type).toList()) {
 				shapes.add(s.getSubject());
 			}
 		}
-		shapes.addAll(JenaUtil.getResourceProperties(resource, SHACL.nodeShape));
+		shapes.addAll(JenaUtil.getResourceProperties(resource, SH.nodeShape));
 		for(Resource shape : shapes) {
-			addResourceViolations(dataset, shapesGraph, resourceNode, shape.asNode(), properties, minSeverity, results, monitor);
+			addResourceViolations(dataset, shapesGraph, focusNode, shape.asNode(), properties, minSeverity, results, monitor);
 		}
 		
+		return results;
+	}
+
+	
+	/**
+	 * Validates a given resource against a given Shape.
+	 * @param dataset  the Dataset to operate on
+	 * @param shapesGraph  the URI of the shapes graph (must be in the dataset)
+	 * @param focusNode  the Resource to validate
+	 * @param shape  the sh:Shape to validate against
+	 * @param minSeverity  the minimum severity level or null for all constraints
+	 * @param monitor  an optional progress monitor
+	 * @return a List of constraint violations
+	 */
+	public Model validateNodeAgainstShape(Dataset dataset, Resource shapesGraph, Node focusNode, Node shape, Resource minSeverity, ProgressMonitor monitor) {
+		Model results = JenaUtil.createMemoryModel();
+		addResourceViolations(dataset, shapesGraph, focusNode, shape, SHACLUtil.getAllConstraintProperties(), minSeverity, results, monitor);
 		return results;
 	}
 }

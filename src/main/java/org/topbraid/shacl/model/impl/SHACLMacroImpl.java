@@ -10,7 +10,7 @@ import java.util.Set;
 
 import org.topbraid.shacl.model.SHACLArgument;
 import org.topbraid.shacl.model.SHACLMacro;
-import org.topbraid.shacl.vocabulary.SHACL;
+import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaUtil;
 
 import com.hp.hpl.jena.enhanced.EnhGraph;
@@ -40,7 +40,7 @@ public class SHACLMacroImpl extends SHACLClassImpl implements SHACLMacro {
 			Set<Resource> classes = JenaUtil.getAllSuperClasses(this);
 			classes.add(this);
 			for(Resource cls : classes) {
-				it = cls.listProperties(SHACL.argument);
+				it = cls.listProperties(SH.argument);
 				while(it.hasNext()) {
 					Resource arg = it.next().getResource();
 					results.add(arg.as(SHACLArgument.class));
@@ -88,6 +88,6 @@ public class SHACLMacroImpl extends SHACLClassImpl implements SHACLMacro {
 	
 	@Override
 	public String getSPARQL() {
-		return JenaUtil.getStringProperty(this, SHACL.sparql);
+		return JenaUtil.getStringProperty(this, SH.sparql);
 	}
 }

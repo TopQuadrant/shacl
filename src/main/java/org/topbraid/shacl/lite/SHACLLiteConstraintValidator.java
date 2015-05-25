@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.topbraid.shacl.vocabulary.SHACL;
+import org.topbraid.shacl.vocabulary.SH;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -63,10 +63,10 @@ public class SHACLLiteConstraintValidator {
 		Set<Resource> shapes = new HashSet<Resource>();
 		addSuperClasses(shape, shapes);
 		for(Resource s : shapes) {
-			for(Statement propertyS : s.listProperties(SHACL.property).toList()) {
+			for(Statement propertyS : s.listProperties(SH.property).toList()) {
 				resultModel.add(validateConstraint(propertyS.getResource(), focusNode));
 			}
-			for(Statement constraintS : s.listProperties(SHACL.constraint).toList()) {
+			for(Statement constraintS : s.listProperties(SH.constraint).toList()) {
 				resultModel.add(validateConstraint(constraintS.getResource(), focusNode));
 			}
 		}
@@ -83,7 +83,7 @@ public class SHACLLiteConstraintValidator {
 		for(Statement s : queryModel.listStatements(null, RDF.type, (RDFNode)null).toList()) {
 			resultModel.add(new SHACLLiteConstraintValidator(queryModel).validateNodeAgainstShape(s.getResource(), s.getSubject()));
 		}
-		for(Statement s : queryModel.listStatements(null, SHACL.nodeShape, (RDFNode)null).toList()) {
+		for(Statement s : queryModel.listStatements(null, SH.nodeShape, (RDFNode)null).toList()) {
 			resultModel.add(new SHACLLiteConstraintValidator(queryModel).validateNodeAgainstShape(s.getResource(), s.getSubject()));
 		}
 		return resultModel;
@@ -100,8 +100,8 @@ public class SHACLLiteConstraintValidator {
 		
 		Model resultModel = ModelFactory.createDefaultModel();
 		
-		if(constraint.hasProperty(RDF.type, SHACL.OrConstraint)) {
-			RDFList list = constraint.getProperty(SHACL.shapes).getResource().as(RDFList.class);
+		if(constraint.hasProperty(RDF.type, SH.OrConstraint)) {
+			RDFList list = constraint.getProperty(SH.shapes).getResource().as(RDFList.class);
 			boolean valid = false;
 			for(RDFNode member : list.iterator().toList()) {
 				if(hasShape(focusNode, member.asResource())) {
@@ -110,15 +110,15 @@ public class SHACLLiteConstraintValidator {
 				}
 			}
 			if(!valid) {
-				Resource error = resultModel.createResource(SHACL.Error);
-				error.addProperty(SHACL.root, focusNode);
-				error.addProperty(SHACL.message, "Resource " + focusNode + " does not match OrConstraint");
+				Resource error = resultModel.createResource(SH.Error);
+				error.addProperty(SH.root, focusNode);
+				error.addProperty(SH.message, "Resource " + focusNode + " does not match OrConstraint");
 			}
 			return resultModel;
 		}
 		
 		// Property constraints
-		Statement predicateS = constraint.getProperty(SHACL.predicate);
+		Statement predicateS = constraint.getProperty(SH.predicate);
 		if(predicateS == null || !predicateS.getObject().isURIResource()) {
 			return resultModel; // Or throw exception
 		}
@@ -126,20 +126,20 @@ public class SHACLLiteConstraintValidator {
 		Property predicate = queryModel.getProperty(predicateS.getResource().getURI());
 		
 		// sh:allowedValues
-		Statement allowedValuesS = constraint.getProperty(SHACL.allowedValues);
+		Statement allowedValuesS = constraint.getProperty(SH.allowedValues);
 		if(allowedValuesS != null && allowedValuesS.getObject().isResource()) {
 			validateAllowedValues(focusNode, predicate, allowedValuesS.getResource(), resultModel);
 		}
 		
 		// sh:hasValue
-		Statement hasValueS = constraint.getProperty(SHACL.hasValue);
+		Statement hasValueS = constraint.getProperty(SH.hasValue);
 		if(hasValueS != null) {
 			validateHasValueConstraint(focusNode, predicate, hasValueS.getObject(), resultModel);
 		}
 		
 		// sh:minCount and sh:maxCount
-		Statement minCountS = constraint.getProperty(SHACL.minCount);
-		Statement maxCountS = constraint.getProperty(SHACL.maxCount);
+		Statement minCountS = constraint.getProperty(SH.minCount);
+		Statement maxCountS = constraint.getProperty(SH.maxCount);
 		if(minCountS != null || maxCountS != null) {
 			validateCountConstraint(
 					focusNode,
@@ -150,13 +150,13 @@ public class SHACLLiteConstraintValidator {
 		}
 		
 		// sh:nodeType
-		Statement nodeTypeS = constraint.getProperty(SHACL.nodeKind);
+		Statement nodeTypeS = constraint.getProperty(SH.nodeKind);
 		if(nodeTypeS != null) {
 			validateNodeTypeConstraint(focusNode, predicate, nodeTypeS.getObject(), resultModel);
 		}
 		
 		// sh:valueShape
-		Statement shapeS = constraint.getProperty(SHACL.valueShape);
+		Statement shapeS = constraint.getProperty(SH.valueShape);
 		if(shapeS != null && shapeS.getObject().isResource()) {
 			validateShapeConstraint(focusNode, predicate, shapeS.getResource(), resultModel);
 		}
@@ -177,13 +177,13 @@ public class SHACLLiteConstraintValidator {
 	
 	// Equivalent of sh:hasNodeType function
 	private boolean hasNodeType(RDFNode node, RDFNode nodeType) {
-		if(SHACL.IRI.equals(nodeType) && node.isURIResource()) {
+		if(SH.IRI.equals(nodeType) && node.isURIResource()) {
 			return true;
 		}
-		else if(SHACL.Literal.equals(nodeType) && node.isLiteral()) {
+		else if(SH.Literal.equals(nodeType) && node.isLiteral()) {
 			return true;
 		}
-		else if(SHACL.BlankNode.equals(nodeType) && node.isAnon()) {
+		else if(SH.BlankNode.equals(nodeType) && node.isAnon()) {
 			return true;
 		}
 		else {
@@ -200,13 +200,13 @@ public class SHACLLiteConstraintValidator {
 	// Validates sh:allowedValues
 	private void validateAllowedValues(Resource focusNode, Property predicate, Resource allowedValues, Model resultModel) {
 		for(Statement s : focusNode.listProperties(predicate).toList()) {
-			if(!allowedValues.hasProperty(SHACL.member, s.getObject())) {
-				Resource error = resultModel.createResource(SHACL.Error);
-				error.addProperty(SHACL.root, focusNode);
-				error.addProperty(SHACL.subject, focusNode);
-				error.addProperty(SHACL.predicate, predicate);
-				error.addProperty(SHACL.object, s.getObject());
-				error.addProperty(SHACL.message, "Value " + s.getObject() + " not among the allowed values set " + allowedValues);
+			if(!allowedValues.hasProperty(SH.member, s.getObject())) {
+				Resource error = resultModel.createResource(SH.Error);
+				error.addProperty(SH.root, focusNode);
+				error.addProperty(SH.subject, focusNode);
+				error.addProperty(SH.predicate, predicate);
+				error.addProperty(SH.object, s.getObject());
+				error.addProperty(SH.message, "Value " + s.getObject() + " not among the allowed values set " + allowedValues);
 			}
 		}		
 	}
@@ -217,11 +217,11 @@ public class SHACLLiteConstraintValidator {
 		int count = focusNode.listProperties(predicate).toList().size();
 		if((minCountNode != null && count < minCountNode.asLiteral().getInt()) ||
 			(maxCountNode != null && count > maxCountNode.asLiteral().getInt())) {
-			Resource error = resultModel.createResource(SHACL.Error);
-			error.addProperty(SHACL.root, focusNode);
-			error.addProperty(SHACL.subject, focusNode);
-			error.addProperty(SHACL.predicate, predicate);
-			error.addProperty(SHACL.message, "Cardinality of " + count + " does not match [" + 
+			Resource error = resultModel.createResource(SH.Error);
+			error.addProperty(SH.root, focusNode);
+			error.addProperty(SH.subject, focusNode);
+			error.addProperty(SH.predicate, predicate);
+			error.addProperty(SH.message, "Cardinality of " + count + " does not match [" + 
 					(minCountNode != null ? minCountNode.asLiteral().getLexicalForm() : "") + ".." +
 					(maxCountNode != null ? maxCountNode.asLiteral().getLexicalForm() : "") + "]");
 		}
@@ -231,11 +231,11 @@ public class SHACLLiteConstraintValidator {
 	// Validates sh:hasValue
 	private void validateHasValueConstraint(Resource focusNode, Property predicate, RDFNode hasValueNode, Model resultModel) {
 		if(!focusNode.hasProperty(predicate, hasValueNode)) {
-			Resource error = resultModel.createResource(SHACL.Error);
-			error.addProperty(SHACL.root, focusNode);
-			error.addProperty(SHACL.subject, focusNode);
-			error.addProperty(SHACL.predicate, predicate);
-			error.addProperty(SHACL.message, "Missing required value " + hasValueNode);
+			Resource error = resultModel.createResource(SH.Error);
+			error.addProperty(SH.root, focusNode);
+			error.addProperty(SH.subject, focusNode);
+			error.addProperty(SH.predicate, predicate);
+			error.addProperty(SH.message, "Missing required value " + hasValueNode);
 		}
 	}
 
@@ -244,12 +244,12 @@ public class SHACLLiteConstraintValidator {
 	private void validateNodeTypeConstraint(Resource focusNode, Property predicate, RDFNode nodeType, Model resultModel) {
 		for(Statement s : focusNode.listProperties(predicate).toList()) {
 			if(!hasNodeType(s.getObject(), nodeType)) {
-				Resource error = resultModel.createResource(SHACL.Error);
-				error.addProperty(SHACL.root, focusNode);
-				error.addProperty(SHACL.subject, focusNode);
-				error.addProperty(SHACL.predicate, predicate);
-				error.addProperty(SHACL.object, s.getObject());
-				error.addProperty(SHACL.message, "Value " + s.getObject() + " does not have node type " + nodeType.asResource().getLocalName());
+				Resource error = resultModel.createResource(SH.Error);
+				error.addProperty(SH.root, focusNode);
+				error.addProperty(SH.subject, focusNode);
+				error.addProperty(SH.predicate, predicate);
+				error.addProperty(SH.object, s.getObject());
+				error.addProperty(SH.message, "Value " + s.getObject() + " does not have node type " + nodeType.asResource().getLocalName());
 			}
 		}
 	}
@@ -259,12 +259,12 @@ public class SHACLLiteConstraintValidator {
 	private void validateShapeConstraint(Resource focusNode, Property predicate, Resource valueShape, Model resultModel) {
 		for(Statement s : focusNode.listProperties(predicate).toList()) {
 			if(!hasShape(s.getResource(), valueShape)) {
-				Resource error = resultModel.createResource(SHACL.Error);
-				error.addProperty(SHACL.root, focusNode);
-				error.addProperty(SHACL.subject, focusNode);
-				error.addProperty(SHACL.predicate, predicate);
-				error.addProperty(SHACL.object, s.getObject());
-				error.addProperty(SHACL.message, "Value " + s.getObject() + " does not have shape " + valueShape.asResource());
+				Resource error = resultModel.createResource(SH.Error);
+				error.addProperty(SH.root, focusNode);
+				error.addProperty(SH.subject, focusNode);
+				error.addProperty(SH.predicate, predicate);
+				error.addProperty(SH.object, s.getObject());
+				error.addProperty(SH.message, "Value " + s.getObject() + " does not have shape " + valueShape.asResource());
 			}
 		}
 	}

@@ -1,7 +1,7 @@
 package org.topbraid.shacl.constraints;
 
 import org.topbraid.shacl.model.SHACLConstraint;
-import org.topbraid.shacl.vocabulary.SHACL;
+import org.topbraid.shacl.vocabulary.SH;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -35,11 +35,11 @@ public class FallbackExecutionLanguage implements ExecutionLanguage {
 			Resource shapesGraph, Model results, SHACLConstraint constraint,
 			Resource focusNode, Property selectorProperty,
 			Resource selectorObject, NativeConstraintExecutable executable) {
-		Resource vio = results.createResource(SHACL.Warning);
-		vio.addProperty(SHACL.message, "No execution language found for constraint");
-		vio.addProperty(SHACL.source, constraint);
+		Resource vio = results.createResource(SH.Warning);
+		vio.addProperty(SH.message, "No execution language found for constraint");
+		vio.addProperty(SH.source, constraint);
 		if(focusNode != null) {
-			vio.addProperty(SHACL.root, focusNode);
+			vio.addProperty(SH.root, focusNode);
 		}
 	}
 
@@ -49,11 +49,11 @@ public class FallbackExecutionLanguage implements ExecutionLanguage {
 			Resource shapesGraph, Model results, SHACLConstraint constraint,
 			Resource focusNode, Property selectorProperty,
 			Resource selectorObject, TemplateConstraintExecutable executable) {
-		Resource vio = results.createResource(SHACL.Warning);
-		vio.addProperty(SHACL.message, "No execution language found for template " + executable.getTemplate());
-		vio.addProperty(SHACL.source, constraint);
+		Resource vio = results.createResource(SH.Warning);
+		vio.addProperty(SH.message, "No execution language found for template " + executable.getTemplate());
+		vio.addProperty(SH.source, constraint);
 		if(focusNode != null) {
-			vio.addProperty(SHACL.root, focusNode);
+			vio.addProperty(SH.root, focusNode);
 		}
 	}
 }

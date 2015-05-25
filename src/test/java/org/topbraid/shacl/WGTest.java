@@ -8,9 +8,12 @@ import junit.framework.TestSuite;
 
 import org.topbraid.shacl.vocabulary.MF;
 import org.topbraid.shacl.vocabulary.SHT;
+import org.topbraid.spin.util.JenaUtil;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.RDFList;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.util.FileUtils;
@@ -42,22 +45,32 @@ public class WGTest extends TestSuite {
 		}
 		
 		for(Resource manifest : model.listSubjectsWithProperty(RDF.type, MF.Manifest).toList()) {
+			
 			for(Statement includeS : manifest.listProperties(MF.include).toList()) {
 				String include = includeS.getResource().getURI();
 				collectTestCases(include);
 			}
-		}
-
-		// TODO: Should only walk through mf:entries
-		for(Resource test : model.listSubjectsWithProperty(RDF.type, SHT.MatchNodeShape).toList()) {
-			addSupportedTest(new MatchNodeTestClass(test));
+			
+			for(Resource list : JenaUtil.getResourceProperties(manifest, MF.entries)) {
+				for(RDFNode member : list.as(RDFList.class).asJavaList()) {
+					if(!member.isLiteral()) {
+						Resource test = (Resource) member;
+						if(test.hasProperty(RDF.type, SHT.MatchNodeShape)) {
+							addTestIfSupported(new MatchNodeTestClass(test));
+						}
+						if(test.hasProperty(RDF.type, SHT.Validate)) {
+							addTestIfSupported(new ValidateTestClass(test));
+						}
+						// TODO: Support other types
+					}
+				}
+			}
 		}
 		
-		// TODO: Other types
 	}
 	
 	
-	private void addSupportedTest(AbstractSHACLTestClass test) {
+	private void addTestIfSupported(AbstractSHACLTestClass test) {
 		if(test.isSupported()) {
 			addTest(test);
 		}

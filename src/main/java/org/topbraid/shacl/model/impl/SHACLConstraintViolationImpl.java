@@ -1,7 +1,7 @@
 package org.topbraid.shacl.model.impl;
 
 import org.topbraid.shacl.model.SHACLConstraintViolation;
-import org.topbraid.shacl.vocabulary.SHACL;
+import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaUtil;
 
 import com.hp.hpl.jena.enhanced.EnhGraph;
@@ -24,25 +24,25 @@ public class SHACLConstraintViolationImpl extends SHACLResourceImpl implements S
 	
 	@Override
 	public String getMessage() {
-		return JenaUtil.getStringProperty(this, SHACL.message);
+		return JenaUtil.getStringProperty(this, SH.message);
 	}
 
 	
 	@Override
 	public Resource getRoot() {
-		return JenaUtil.getResourceProperty(this, SHACL.root);
+		return JenaUtil.getResourceProperty(this, SH.root);
 	}
 
 	
 	@Override
 	public RDFNode getObject() {
-		return JenaUtil.getProperty(this, SHACL.object);
+		return JenaUtil.getProperty(this, SH.object);
 	}
 
 	
 	@Override
 	public Property getPredicate() {
-		Resource value = JenaUtil.getPropertyResourceValue(this, SHACL.predicate);
+		Resource value = JenaUtil.getPropertyResourceValue(this, SH.predicate);
 		if(value != null) {
 			return JenaUtil.asProperty(value);
 		}
@@ -54,12 +54,12 @@ public class SHACLConstraintViolationImpl extends SHACLResourceImpl implements S
 	
 	@Override
 	public Resource getSource() {
-		return JenaUtil.getResourceProperty(this, SHACL.source);
+		return JenaUtil.getResourceProperty(this, SH.source);
 	}
 
 	
 	@Override
 	public Resource getSubject() {
-		return JenaUtil.getResourceProperty(this, SHACL.subject);
+		return JenaUtil.getResourceProperty(this, SH.subject);
 	}
 }
