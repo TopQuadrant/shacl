@@ -24,11 +24,6 @@ rdfs:Resource
 	a sh:ShapeClass ;
 	rdfs:label "Resource" ;
 	sh:property [
-		sh:predicate rdf:type ;
-		sh:valueType rdfs:Class ;
-		rdfs:label "type" ;
-	] ;
-	sh:property [
 		sh:predicate sh:nodeShape ;
 		sh:valueType sh:Shape ;
 		sh:defaultValueType sh:Shape ;    # sh:nodeShape bnodes do not require rdf:type
@@ -91,11 +86,6 @@ rdfs:Class
 	rdfs:subClassOf rdfs:Resource ;
 	rdfs:label "Class" ;
 	rdfs:comment "The class of classes." ;
-	sh:property [
-		sh:predicate rdfs:subClassOf ;
-		sh:valueType rdfs:Class ;
-		rdfs:label "sub-class of" ;
-	] ;
 	sh:property [
 		sh:predicate sh:abstract ;
 		sh:datatype xsd:boolean ;

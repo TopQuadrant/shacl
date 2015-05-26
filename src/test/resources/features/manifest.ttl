@@ -7,14 +7,13 @@
 @prefix dawgt:   <http://www.w3.org/2001/sw/DataAccess/tests/test-dawg#> .
 @prefix dc:     <http://purl.org/dc/elements/1.1/> .
 @prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex:     <http://example.org/> .
+@prefix foaf:   <http://xmlns.com/foaf/0.1/> .
  
 <>
 	a mf:Manifest ;
-	rdfs:comment "SHACL Test suite" ;
-	rdfs:label "SHACL test suite " ;
-	mf:include <example/manifest.ttl> ;
-	mf:include <features/manifest.ttl> ;
-	mf:include <algebra/manifest_compact_syntax.ttl> ; 
-	mf:include <algebra/manifest_turtle_syntax.ttl> ;
-	mf:include <simple/manifest.ttl> ;
+	rdfs:comment "Feature tests" ;
+	rdfs:label "Tests of specific SHACL features" ;
+	mf:include <core/manifest.ttl> ;
+	mf:include <sparql/manifest.ttl> ;
 .

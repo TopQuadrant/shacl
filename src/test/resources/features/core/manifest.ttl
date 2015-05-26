@@ -1,0 +1,256 @@
+@prefix dc:     <http://purl.org/dc/elements/1.1/> .
+@prefix ex:     <http://example.org/> .
+@prefix foaf:   <http://xmlns.com/foaf/0.1/> .
+@prefix mf:     <http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#> .
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh:     <http://www.w3.org/ns/shacl#> .
+@prefix sht:    <http://www.w3.org/ns/shacl/test-suite#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+ 
+<>
+	a mf:Manifest ;
+	rdfs:comment "Tests of Core features" ;
+	rdfs:label "Core Features tests" ;
+	mf:entries ( 
+		<allowedValues-001> 
+		<and-001> 
+		<and-002> 
+		<class-001>
+		<inverseProperty-001> 
+		<not-001>
+		<or-001>
+		<property-001>
+		<recursive-001>
+		<scopeShape-001>
+		<valueShape-001>
+		<xor-001>
+	)
+.
+
+<allowedValues-001>
+	a sht:Validate ;
+	mf:name "Test of a sh:allowedValues" ;
+	mf:action [
+		sht:schema <allowedValues-001.ttl> ; 
+		sht:data <allowedValues-001.ttl> ; 
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidInstance1 ;
+  		sh:subject ex:InvalidInstance1 ;
+  		sh:predicate ex:value ;
+  		sh:object "D" ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
+<and-001>
+	a sht:Validate ;
+	mf:name "Test of a sh:AndConstraint" ;
+	mf:action [
+		sht:schema <and-001.ttl> ; 
+		sht:data <and-001.ttl> ; 
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidRectangle1 ;
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidRectangle2 ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
+<and-002>
+	a sht:Validate ;
+	mf:name "Test of a sh:AndConstraint" ;
+	mf:action [
+		sht:schema <and-002.ttl> ; 
+		sht:data <and-002.ttl> ; 
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidInstance1 ;
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidInstance2 ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
+<class-001>
+	a sht:Validate ;
+	mf:name "Test of a sh:ShapeClass definition" ;
+	mf:action [
+		sht:schema <class-001.ttl> ; 
+		sht:data <class-001.ttl> ; 
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root _:b1 ;
+  		sh:subject _:b1 ;
+  		sh:predicate sh:maxCount ;
+  		sh:object 1.2 ;
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root _:b1 ;
+  		sh:subject _:b1 ;
+  		sh:predicate sh:predicate ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
+<inverseProperty-001>
+	a sht:Validate ;
+	mf:name "Test of a sh:inverseProperty" ;
+	mf:action [
+		sht:schema <inverseProperty-001.ttl> ; 
+		sht:data   <inverseProperty-001.ttl> ; 
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:Father ;
+  		sh:object ex:Father ;
+  		sh:predicate ex:child ;
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:Mother ;
+  		sh:object ex:Mother ;
+  		sh:predicate ex:child ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
+<not-001>
+	a sht:Validate ;
+	mf:name "Test of a sh:NotConstraint" ;
+	mf:action [
+		sht:schema <not-001.ttl> ; 
+		sht:data   <not-001.ttl> ; 
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidInstance1 ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
+<or-001>
+	a sht:Validate ;
+	mf:name "Test of a sh:OrConstraint" ;
+	mf:action [
+		sht:schema <or-001.ttl> ; 
+		sht:data   <or-001.ttl> ; 
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidRectangle1 ;
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidRectangle2 ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
+<property-001>
+	a sht:Validate ;
+	mf:name "Test of a sh:property" ;
+	mf:action [
+		sht:schema <property-001.ttl> ; 
+		sht:data   <property-001.ttl> ; 
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:RectangleWithFloatHeight ;
+  		sh:subject ex:RectangleWithFloatHeight ;
+  		sh:predicate ex:height ;
+  		sh:object 9.2 ;
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:RectangleWithoutHeight ;
+  		sh:subject ex:RectangleWithoutHeight ;
+  		sh:predicate ex:height ;
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:RectangleWithTwoHeights ;
+  		sh:subject ex:RectangleWithTwoHeights ;
+  		sh:predicate ex:height ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
+<recursive-001>
+	a sht:Validate ;
+	mf:name "Test of a sh:valueShape with recursion" ;
+	mf:action [
+		sht:schema <recursive-001.ttl> ; 
+		sht:data   <recursive-001.ttl> ; 
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:Enrico ;
+  		sh:subject ex:Enrico ;
+  		sh:predicate ex:knows ;
+  		sh:object ex:John ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
+<scopeShape-001>
+	a sht:Validate ;
+	mf:name "Test of a sh:scopeShape" ;
+	mf:action [
+		sht:schema <scopeShape-001.ttl> ; 
+		sht:data   <scopeShape-001.ttl> ; 
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidInstance1 ;
+  		sh:subject ex:InvalidInstance1 ;
+  		sh:predicate ex:child ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
+<valueShape-001>
+	a sht:Validate ;
+	mf:name "Test of a sh:valueShape" ;
+	mf:action [
+		sht:schema <valueShape-001.ttl> ; 
+		sht:data   <valueShape-001.ttl> ; 
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:Issue_1 ;
+  		sh:subject ex:Issue_1 ;
+  		sh:predicate ex:assignedTo ;
+  		sh:object ex:Anon ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
+<xor-001>
+	a sht:Validate ;
+	mf:name "Test of a sh:XorConstraint" ;
+	mf:action [
+		sht:schema <xor-001.ttl> ; 
+		sht:data   <xor-001.ttl> ; 
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidInstance1 ;
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidInstance2 ;
+	] ;
+	mf:status sht:proposed ; 
+.

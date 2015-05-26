@@ -7,6 +7,7 @@ import junit.framework.TestCase;
 
 import org.junit.Assert;
 import org.topbraid.shacl.arq.SHACLFunctions;
+import org.topbraid.shacl.util.ModelPrinter;
 import org.topbraid.shacl.vocabulary.MF;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.shacl.vocabulary.SHT;
@@ -24,10 +25,14 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.util.FileUtils;
+import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
 
 abstract class AbstractSHACLTestClass extends TestCase {
 	
 	private Model shaclModel;
+	
+	private Model shapesModel;
 
 	protected Resource testResource;
 	
@@ -45,6 +50,10 @@ abstract class AbstractSHACLTestClass extends TestCase {
 			Assert.assertTrue("Expected no validation results, but found: " + results.size() + " triples", results.isEmpty());
 		}
 		else {
+			results.setNsPrefix(SH.PREFIX, SH.NS);
+			results.setNsPrefix("rdf", RDF.getURI());
+			results.setNsPrefix("rdfs", RDFS.getURI());
+			String printed = ModelPrinter.get().print(results);
 			results.removeAll(null, SH.message, (RDFNode)null);
 			results.removeAll(null, SH.source, (RDFNode)null);
 			Model expected = JenaUtil.createDefaultModel();
@@ -52,7 +61,7 @@ abstract class AbstractSHACLTestClass extends TestCase {
 				expected.add(s.getResource().listProperties());
 			}
 			if(!expected.getGraph().isIsomorphicWith(results.getGraph())) {
-				fail("Mismatching validation results. Expected " + expected.size() + " triples, found " + results.size());
+				fail("Mismatching validation results. Expected " + expected.size() + " triples, found " + results.size() + "\n" + printed);
 			}
 		}
 	}
@@ -71,7 +80,14 @@ abstract class AbstractSHACLTestClass extends TestCase {
 	
 	
 	protected Model getDataModel() throws Exception {
-		return getModelFromAction(SHT.data, SHT.data_format);
+		Resource schema = getAction().getPropertyResourceValue(SHT.schema);
+		Resource data = getAction().getPropertyResourceValue(SHT.data);
+		if(data.equals(schema)) {
+			return getShapesModel();
+		}
+		else {
+			return getModelFromAction(SHT.data, SHT.data_format);
+		}
 	}
 	
 	
@@ -91,13 +107,16 @@ abstract class AbstractSHACLTestClass extends TestCase {
 	
 	
 	protected Model getShapesModel() throws Exception {
-		Model model = getModelFromAction(SHT.schema, SHT.schema_format);
-		MultiUnion multiUnion = new MultiUnion(new Graph[] {
-				model.getGraph(),
-				getSHACLModel().getGraph()
-		});
-		multiUnion.setBaseGraph(model.getGraph());
-		return ModelFactory.createModelForGraph(multiUnion);
+		if(shapesModel == null) {
+			Model model = getModelFromAction(SHT.schema, SHT.schema_format);
+			MultiUnion multiUnion = new MultiUnion(new Graph[] {
+					model.getGraph(),
+					getSHACLModel().getGraph()
+			});
+			multiUnion.setBaseGraph(model.getGraph());
+			shapesModel = ModelFactory.createModelForGraph(multiUnion);
+		}
+		return shapesModel;
 	}
 	
 	

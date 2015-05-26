@@ -6,6 +6,7 @@ Contact: Holger Knublauch (holger@topquadrant.com)
 
 Can be used to perform SHACL constraint checking in any Jena-based Java application.
 This API also serves as a reference implementation developed in parallel to the SHACL spec.
+The code is totally not optimized for performance, just on correctness.
 
 The same code is used in the TopBraid products - which is also why we use this particular Jena version.
 For interoperability with TopBraid, and during the transition period from SPIN to SHACL, this library

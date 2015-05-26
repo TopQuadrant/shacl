@@ -1,0 +1,46 @@
+# baseURI: http://www.w3.org/ns/shacl/test/features/sparql/entailment-001
+
+@prefix ex: <http://example.org/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<>
+	a sh:Graph ;
+	sh:shapesGraph <http://www.w3.org/ns/shacl> ;
+.
+
+
+# Shape Definitions -----------------------------------------------------------
+
+ex:EntailmentExampleShape
+	a sh:Shape ;
+	rdfs:comment "Reports an error for any rdfs:label (or sub-property thereof) that is not in English." ;
+	sh:constraint [
+		sh:message "Labels must be in English" ;
+		sh:sparqlEntailment <http://www.w3.org/ns/entailment/RDFS> ;
+		sh:sparql """
+			SELECT ?this
+			WHERE {
+				?this rdfs:label ?label .
+				FILTER (lang(?label) != "en")
+			}""" 
+	] ;
+.
+
+
+# Data ------------------------------------------------------------------------
+
+ex:label rdfs:subPropertyOf rdfs:label .
+
+ex:ValidInstance1
+	sh:nodeShape ex:EntailmentExampleShape ;
+	ex:label "English"@en ;
+.
+
+ex:InvalidInstance1
+	sh:nodeShape ex:EntailmentExampleShape ;
+	ex:label "English"@en ;
+	ex:label "French"@fr ;
+.
