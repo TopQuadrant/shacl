@@ -1,4 +1,4 @@
-# baseURI: http://www.w3.org/ns/shacl/test/features/core/scopeShape-001
+# baseURI: http://www.w3.org/ns/shacl/test/features/core/filterShape-001
 
 @prefix ex: <http://example.org/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -32,7 +32,7 @@ ex:PersonShape
 	] ;
 	sh:property [
 		a sh:PropertyConstraint ;
-		sh:scopeShape [
+		sh:filterShape [
 			sh:property [
 				sh:predicate ex:gender ;
 				sh:hasValue "male" ;

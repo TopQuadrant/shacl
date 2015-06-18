@@ -65,5 +65,5 @@ ex:Diego ex:knows ex:Alessandro .
 ex:Enrico ex:knows ex:John .
 ex:John ex:knows ex:Maurizio .
 
-ex:Diego sh:nodeShape ex:Polentoni .   # Correct
+ex:Diego sh:nodeShape ex:Polentoni .   # Undefined due to infinite loop (Diego -> Alessandro -> Diego)
 ex:Enrico sh:nodeShape ex:Polentoni .  # Incorrect (Enrico -> John -> Maurizio)

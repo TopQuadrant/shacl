@@ -1,7 +1,7 @@
 # baseURI: http://www.w3.org/ns/shacl
 
 # SHACL - Shapes Constraint Language
-# Draft last edited on 2015-05-25
+# Draft last edited on 2015-06-17
 # Created by the W3C RDF Data Shapes Working Group
 # Editor: Holger Knublauch <holger@topquadrant.com>
 
@@ -59,11 +59,18 @@ sh:Shape
 		rdfs:comment "Declares that a given incoming reference property is relevant for matching resources." ;
 	] ;
 	sh:property [
-		sh:predicate sh:scopeShape ;
+		sh:predicate sh:filterShape ;
 		sh:valueType sh:Shape ;
 		sh:defaultValueType sh:Shape ;
-		rdfs:label "scope" ;
+		rdfs:label "filter shape" ;
 		rdfs:comment "Links a Shape to other Shapes that the tested nodes need to fulfill before the constraints of the shape are evaluated." ;
+	] ;
+	sh:property [
+		sh:predicate sh:scope ;
+		sh:valueType sh:Scope ;
+		sh:defaultValueType sh:NativeScope ;
+		rdfs:label "scope" ;
+		rdfs:comment "Links a Shape to Scopes that produce the focus nodes that the shape applies to." ;
 	] ;
 	sh:property [
 		sh:predicate sh:scopeClass ;
@@ -285,6 +292,7 @@ sh:Functions
 sh:Template
 	a sh:ShapeClass ;
 	rdfs:subClassOf sh:Macro ;
+	rdfs:subClassOf sh:SPARQLExecutable ;
 	rdfs:label "Template" ;
 	rdfs:comment "A macro that acts as an abstraction of a (reusable) SPARQL query. The query can be parameterized by the supplied arguments." ;
 	sh:abstract true ;
@@ -294,23 +302,30 @@ sh:Template
 		rdfs:label "label template" ;
 		rdfs:comment "Outlines how human-readable labels of instances of this template class shall be produced. The values must be strings that can contain {?argName} as placeholders for the actual values of the given argument. There may be multiple values, for different languages." ;
 	] ;
-	sh:property [
-		sh:predicate sh:sparql ;
-		sh:datatype xsd:string ;
-		sh:maxCount 1 ;   # minCount is 0 because there may be abstract templates
-		rdfs:label "SPARQL" ;
-		rdfs:comment "The SPARQL query to execute." ;
-	] ;
 .
 
 sh:Profile
 	a sh:ShapeClass ;
-	rdfs:subClassOf sh:Set ;
+	rdfs:subClassOf rdfs:Resource ;
 	rdfs:label "Profile" ;
-	rdfs:comment "A profile is a collection of templates. Profiles can be used to group together templates with similar complexity. Tools can indicate that they support specific profiles only." ;
+	rdfs:comment "A profile is a collection of constraint templates and scope templates. Profiles can be used to group together templates with similar complexity. Tools can indicate that they support specific profiles only." ;
 	sh:property [
-		sh:predicate sh:member ;
-		sh:valueType sh:Template ; # Narrowed down to templates only
+		sh:predicate sh:constraintTemplate ;
+		sh:valueType sh:ConstraintTemplate ;
+		rdfs:label "constraint template" ;
+		rdfs:comment "A constraint template supported by the profile." ;
+	] ;
+	sh:property [
+		sh:predicate sh:scopeTemplate ;
+		sh:valueType sh:ScopeTemplate ;
+		rdfs:label "scope template" ;
+		rdfs:comment "A scope template supported by the profile." ;
+	] ;
+	sh:property [
+		sh:predicate sh:extends ;
+		sh:valueType sh:Profile ;
+		rdfs:label "extends" ;
+		rdfs:comment "Points at another profile that forms a sub-set of this profile." ;
 	] ;
 .
 
@@ -444,6 +459,113 @@ sh:ResultAnnotation
 .
 
 
+# Execution Support -----------------------------------------------------------
+
+sh:SPARQLExecutable
+	a sh:ShapeClass ;
+	rdfs:subClassOf rdfs:Class ;
+	sh:property [
+		sh:predicate sh:sparql ;
+		sh:datatype xsd:string ;
+		sh:maxCount 1 ;
+		rdfs:label "SPARQL" ;
+		rdfs:comment "The SPARQL query to execute." ;
+	] ;
+	sh:property [
+		sh:predicate sh:sparqlEntailment ;
+		sh:nodeKind sh:IRI ;
+		sh:maxCount 1 ;
+		rdfs:label "SPARQL entailment" ;
+		rdfs:comment "The SPARQL entailment required to execute the SPARQL query." ;
+	] ;
+.
+
+
+# Scope vocabulary ------------------------------------------------------------
+
+sh:Scope
+	a rdfs:Class ;
+	rdfs:subClassOf rdfs:Resource ;
+	rdfs:label "Scope" ;
+	rdfs:comment "An abstract superclass of scopes. Scopes are either template calls or native scopes with an executable body." ;
+	sh:abstract true ;
+.
+
+sh:NativeScope
+	a sh:ShapeClass ;
+	rdfs:subClassOf sh:Scope ;
+	rdfs:subClassOf sh:SPARQLExecutable ;
+	rdfs:label "Native scope" ;
+	rdfs:comment "A scope that has a native executable body attached to it." ;
+.
+
+sh:ScopeTemplate
+	a sh:ShapeClass ;
+	rdfs:subClassOf sh:Template ;
+	rdfs:label "Scope template" ;
+	rdfs:comment "A template that is used to compute a scope." ;
+.
+
+sh:TemplateScope
+	a sh:ScopeTemplate ;
+	rdfs:subClassOf sh:Scope ;
+	rdfs:label "Scope constraint" ;
+	rdfs:comment "A scope that is instantiating a template." ;
+	sh:abstract true ;
+.
+
+sh:InversePropertyScope
+	a sh:ScopeTemplate ;
+	rdfs:subClassOf sh:TemplateScope ;
+	rdfs:label "Inverse property scope" ;
+	rdfs:comment "A scope that includes all objects that have at least one value for a given predicate." ;
+	sh:argument [
+		sh:predicate sh:predicate ;
+		sh:valueType rdf:Property ;
+		rdfs:label "predicate" ;
+		rdfs:comment "The Property to look for." ;
+	] ;
+	sh:sparql """
+		SELECT DISTINCT ?this
+		WHERE {
+			?any ?predicate ?this .
+		}
+		""" ;
+.
+
+sh:PropertyScope
+	a sh:ScopeTemplate ;
+	rdfs:subClassOf sh:TemplateScope ;
+	rdfs:label "Property scope" ;
+	rdfs:comment "A scope that includes all subjects that have at least one value for a given predicate." ;
+	sh:argument [
+		sh:predicate sh:predicate ;
+		sh:valueType rdf:Property ;
+		rdfs:label "predicate" ;
+		rdfs:comment "The Property to look for." ;
+	] ;
+	sh:sparql """
+		SELECT DISTINCT ?this
+		WHERE {
+			?this ?predicate ?any .
+		}
+		""" ;
+.
+
+sh:AllSubjectsScope
+	a sh:ScopeTemplate ;
+	rdfs:subClassOf sh:TemplateScope ;
+	rdfs:label "All subjects scope" ;
+	rdfs:comment "A scope that includes all subjects in the graph." ;
+	sh:sparql """
+		SELECT DISTINCT ?this
+		WHERE {
+			?this ?anyPredicate ?anyObject .
+		}
+		""" ;
+.
+
+
 # Constraint vocabulary -------------------------------------------------------
 
 sh:Constraint
@@ -453,10 +575,10 @@ sh:Constraint
 	rdfs:comment "An abstract superclass of constraints. Constraints are either template calls or \"native\" constraints with an executable body." ;
 	sh:abstract true ;
 	sh:property [
-		sh:predicate sh:scopeShape ;
+		sh:predicate sh:filterShape ;
 		sh:valueType sh:Shape ;
 		sh:defaultValueType sh:Shape ;
-		rdfs:label "scope" ;
+		rdfs:label "filter shape" ;
 		rdfs:comment "Links a constraint to Shapes that the tested nodes need to fulfill before the constraint is evaluated." ;
 	] ;
 .
@@ -464,6 +586,7 @@ sh:Constraint
 sh:NativeConstraint
 	a sh:ShapeClass ;
 	rdfs:subClassOf sh:Constraint ;
+	rdfs:subClassOf sh:SPARQLExecutable ;
 	rdfs:label "Native constraint" ;
 	rdfs:comment "A constraint that has a native executable body attached with it." ;
 	sh:abstract true ;
@@ -498,20 +621,6 @@ sh:NativeConstraint
 		sh:valueType sh:ResultAnnotation ;
 		rdfs:label "result annotation" ;
 		rdfs:comment "Result annotations provide information about additional properties that the constructed constraint violations shall have." ;
-	] ;
-	sh:property [
-		sh:predicate sh:sparql ;
-		sh:datatype xsd:string ;
-		sh:maxCount 1 ;
-		rdfs:label "SPARQL" ;
-		rdfs:comment "The SPARQL SELECT query to execute." ;
-	] ;
-	sh:property [
-		sh:predicate sh:sparqlEntailment ;
-		sh:nodeKind sh:IRI ;
-		sh:maxCount 1 ;
-		rdfs:label "SPARQL entailment" ;
-		rdfs:comment "The SPARQL entailment required to execute the SPARQL query." ;
 	] ;
 .
 
@@ -856,10 +965,50 @@ sh:AbstractNodeKindPropertyConstraint
 		""" ;
 .
 
+sh:AbstractQualifiedValueShapePropertyConstraint
+	a sh:ConstraintTemplate ;
+	rdfs:subClassOf sh:AbstractPropertyConstraint ;
+	rdfs:label "Abstract qualified value shape property constraint" ;
+	rdfs:comment "Enforces a constraint that a certain number of values of the property must have a certain shape." ;
+	sh:abstract true ;
+	sh:private true ;
+	sh:argument [
+		sh:predicate sh:qualifiedValueShape ;
+		sh:optionalWhenInherited true ;
+		sh:valueType sh:Shape ;
+		rdfs:label "qualifier value shape" ;
+		rdfs:comment "The shape that the values must have." ;
+	] ;  
+	sh:argument [
+		sh:predicate sh:qualifiedMinCount ;
+		sh:optionalWhenInherited true ;
+		sh:datatype xsd:integer ;
+		sh:defaultValue 0 ;
+		rdfs:label "qualified min count" ;
+		rdfs:comment "The minimum number of values that must have the shape." ;
+	] ;  
+	sh:argument [
+		sh:predicate sh:qualifiedMaxCount ;
+		sh:optionalWhenInherited true ;
+		sh:datatype xsd:integer ;
+		rdfs:label "qualified max count" ;
+		rdfs:comment "The maximum number of values that must have the shape." ;
+	] ;  
+	sh:message "Violation of qualified value shape constraint {?qualifiedValueShape}: expected [{?qualifiedMinCount}..{?qualifiedMaxCount}], found {?count}" ;
+	sh:sparql """
+		SELECT ?this (?this AS ?subject) ?predicate ?qualifiedValueShape ?qualifiedMinCount ?qualifiedMaxCount ?count ?error
+		WHERE {
+			BIND (sh:valuesWithShapeCount(?this, ?predicate, ?qualifiedValueShape, ?shapesGraph) AS ?count) .
+			BIND (!bound(?count) AS ?error) .
+			FILTER IF(?error, true, ((?count < ?qualifiedMinCount) || (bound(?qualifiedMaxCount) && (?count > ?qualifiedMaxCount)))) .
+		}
+		""" ;
+.
+
 sh:AbstractValueShapePropertyConstraint
 	a sh:ConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
-	rdfs:label "Abstract shape property constraint" ;
+	rdfs:label "Abstract value shape property constraint" ;
 	rdfs:comment "Enforces a constraint that all values of the property must have a certain shape." ;
 	sh:abstract true ;
 	sh:private true ;
@@ -872,10 +1021,12 @@ sh:AbstractValueShapePropertyConstraint
 	] ;  
 	sh:message "Value does not fulfill the constraints of shape {?valueShape}" ;
 	sh:sparql """
-		SELECT ?this (?this AS ?subject) ?predicate ?object ?valueShape
+		SELECT ?this (?this AS ?subject) ?predicate ?object ?valueShape ?error
 		WHERE {
 			?this ?predicate ?object .
-			FILTER (!sh:hasShape(?object, ?valueShape, ?shapesGraph)) .
+			BIND (sh:hasShape(?object, ?valueShape, ?shapesGraph) AS ?hasShape) .
+			BIND (!bound(?hasShape) AS ?error) .
+			FILTER (?error || !?hasShape) .
 		}
 		""" ;
 .
@@ -929,6 +1080,7 @@ sh:PropertyConstraint
 	rdfs:subClassOf sh:AbstractMinInclusivePropertyConstraint ;
 	rdfs:subClassOf sh:AbstractNodeKindPropertyConstraint ;
 	rdfs:subClassOf sh:AbstractPatternPropertyConstraint ;
+	rdfs:subClassOf sh:AbstractQualifiedValueShapePropertyConstraint ;
 	rdfs:subClassOf sh:AbstractValueShapePropertyConstraint ;
 	rdfs:subClassOf sh:AbstractValueTypePropertyConstraint ;
 	rdfs:label "Property constraint" ;
@@ -959,19 +1111,6 @@ sh:PropertyConstraint
 	
 	# TODO: XML Schema also has facets for:
 	#       whiteSpace, fractionDigits and totalDigits
-.
-
-sh:Set
-	a sh:ShapeClass ;
-	rdfs:subClassOf rdfs:Resource ;
-	rdfs:label "Set" ;
-	rdfs:comment "Defines a set of nodes. Subclasses may further restrict the type of the members." ;
-	sh:property [
-		sh:predicate sh:member ;
-		rdfs:label "member" ;
-		rdfs:comment "A member node of the Set." ;
-	] ;
-	# TODO: Maybe add sub-set property?
 .
 
 # Datatype property constraints -----------------------------------------------
@@ -1304,9 +1443,11 @@ sh:NotConstraint
 	sh:labelTemplate "Not constraint: {?shapes}" ;
 	sh:message "Violation of NOT constraint" ;
 	sh:sparql """
-		SELECT *
+		SELECT ?this ?error
 		WHERE {
-			FILTER (sh:hasShape(?this, ?shape, ?shapesGraph)) .
+			BIND (sh:hasShape(?this, ?shape, ?shapesGraph) AS ?hasShape) .
+			BIND (!bound(?hasShape) AS ?error) .
+			FILTER (?error || ?hasShape) .
 		}
 		""" ;
 .
@@ -1325,14 +1466,11 @@ sh:AndConstraint
 	sh:labelTemplate "And constraint: {?shapes}" ;
 	sh:message "Violation of AND constraint" ;
 	sh:sparql """
-		SELECT *
+		SELECT ?this ?error
 		WHERE {
-			FILTER EXISTS {
-				GRAPH ?shapesGraph {
-					?shapes rdf:rest*/rdf:first ?shape .
-				}
-				FILTER (!sh:hasShape(?this, ?shape, ?shapesGraph)) .
-			}
+			BIND (sh:walkShapesList(?shapes, false, ?this, ?shapesGraph) AS ?result) .
+			BIND (!bound(?result) AS ?error) .
+			FILTER COALESCE(?result, true) .
 		}
 		""" ;
 .
@@ -1351,14 +1489,11 @@ sh:OrConstraint
 	sh:labelTemplate "Or constraint: {?shapes}" ;
 	sh:message "Violation of OR constraint" ;
 	sh:sparql """
-		SELECT *
+		SELECT ?this ?error
 		WHERE {
-			FILTER NOT EXISTS {
-				GRAPH ?shapesGraph {
-					?shapes rdf:rest*/rdf:first ?shape .
-				}
-				FILTER sh:hasShape(?this, ?shape, ?shapesGraph) .
-			}
+			BIND (sh:walkShapesList(?shapes, true, ?this, ?shapesGraph) AS ?result) .
+			BIND (!bound(?result) AS ?error) .
+			FILTER COALESCE(!?result, true) .
 		}
 		""" ;
 .
@@ -1377,9 +1512,11 @@ sh:XorConstraint
 	sh:labelTemplate "Xor constraint: {?shapes}" ;
 	sh:message "Violation of XOR constraint" ;
 	sh:sparql """
-		SELECT *
+		SELECT ?this ?error
 		WHERE {
-			FILTER (sh:validShapeCount(?this, ?shapes, ?shapesGraph) != 1) .
+			BIND (sh:validShapeCount(?this, ?shapes, ?shapesGraph) AS ?count)
+			BIND (!bound(?count) AS ?error) .
+			FILTER IF(?error, true, ?count != 1) .
 		}
 		""" ;
 .
@@ -1435,6 +1572,29 @@ sh:hasNodeKind
 				(isBlank(?arg1) && ?arg2 = sh:BlankNode))
 		}
 		""" ;
+.
+
+sh:hasShape
+	a sh:Function ;
+	rdfs:subClassOf sh:Functions ;
+	rdfs:label "has shape" ;
+	rdfs:comment "Validates whether a given resource (?arg1) fulfills all error-level constraints defined for a given shape (?arg2). This creates a (possibly recursive) constraint validator. The function returns an error, i.e. no result, if the validation could not be completed, e.g. due to an unsupported recursion or an unsupported extension language. Therefore the function should not be called inside of FILTER statements directly, but rather with BIND." ;
+	sh:argument [
+		sh:predicate sh:arg1 ;
+		sh:valueType rdfs:Resource ;
+		rdfs:comment "The resource to validate." ;
+	] ;
+	sh:argument [
+		sh:predicate sh:arg2 ;
+		sh:valueType sh:Shape ;
+		rdfs:comment "The shape containing the constraints that need to be validated." ;
+	] ;
+	sh:argument [
+		sh:predicate sh:arg3 ;
+		sh:valueType sh:Graph ;
+		rdfs:comment "The graph containing the shape definitions." ;
+	] ;
+	sh:returnType xsd:boolean ;
 .
 
 sh:hasType
@@ -1522,6 +1682,41 @@ sh:propertyValue
 		""" ;
 .
 
+sh:validShapeCount
+	a sh:Function ;
+	rdfs:subClassOf sh:Functions ;
+	rdfs:label "valid shape count" ;
+	rdfs:comment "Counts the number of shapes from a given rdf:List (?arg2) defined in a given shapes graph (?arg3) where a given focus node (?arg1) returns no error-level constraint violations. The function produces an error if one of the shapes validated to a fatal error." ;
+	sh:argument [
+		sh:predicate sh:arg1 ;
+		sh:valueType rdfs:Resource ;
+		rdfs:comment "The focus node." ;
+	] ;
+	sh:argument [
+		sh:predicate sh:arg2 ;
+		sh:valueType rdf:List ;
+		rdfs:comment "The list of shapes to walk through." ;
+	] ;
+	sh:argument [
+		sh:predicate sh:arg3 ;
+		sh:valueType rdfs:Resource ;
+		rdfs:comment "The shapes graph." ;
+	] ;
+	sh:returnType xsd:integer ;
+	sh:sparql """
+		# The SUM will fail with an error if one of the operands is not a number
+		# (this mechanism is used to propagate errors from sh:hasShape calls)
+		SELECT (SUM(?s) AS ?result)
+		WHERE {
+			GRAPH ?arg3 {
+				?arg2 rdf:rest*/rdf:first ?shape .
+			}
+			BIND (sh:hasShape(?arg1, ?shape, ?arg3) AS ?hasShape) .
+			BIND (IF(bound(?hasShape), IF(?hasShape, 1, 0), 'error') AS ?s) .
+		}
+		""" ;
+.
+
 sh:valueCount
 	a sh:Function ;
 	rdfs:subClassOf sh:Functions ;
@@ -1546,57 +1741,81 @@ sh:valueCount
 		""" ;
 .
 
-sh:hasShape
+sh:valuesWithShapeCount
 	a sh:Function ;
 	rdfs:subClassOf sh:Functions ;
-	rdfs:label "has shape" ;
-	rdfs:comment "Validates whether a given resource (?arg1) fulfills all error-level constraints defined for a given shape (?arg2). This creates a (possibly recursive) constraint validator." ;
+	rdfs:label "values with shape count" ;
+	rdfs:comment "Counts the number of values from a given subject (?arg1) / predicate (?arg2) combination that do not produce any error-level constraint violations for a given shape (?arg3) in a given shapes graph (?arg4). The function produces an error if one of the shapes validated to a fatal error." ;
 	sh:argument [
 		sh:predicate sh:arg1 ;
 		sh:valueType rdfs:Resource ;
-		rdfs:comment "The resource to validate." ;
+		rdfs:comment "The subject to count the values of." ;
 	] ;
 	sh:argument [
 		sh:predicate sh:arg2 ;
+		sh:valueType rdf:Property ;
+		rdfs:comment "The property to count the values of." ;
+	] ;
+	sh:argument [
+		sh:predicate sh:arg3 ;
 		sh:valueType sh:Shape ;
-		rdfs:comment "The shape containing the constraints that need to be validated." ;
+		rdfs:comment "The shape to validate." ;
 	] ;
 	sh:argument [
-		sh:predicate sh:arg3 ;
-		sh:valueType sh:Graph ;
-		rdfs:comment "The graph containing the shape definitions." ;
-	] ;
-	sh:returnType xsd:boolean ;
-.
-
-sh:validShapeCount
-	a sh:Function ;
-	rdfs:subClassOf sh:Functions ;
-	rdfs:label "valid shape count" ;
-	rdfs:comment "Counts the number of shapes from a given rdf:List (?arg2) defined in a given shapes graph (?arg3) where a given focus node (?arg1) returns no error-level constraint violations." ;
-	sh:argument [
-		sh:predicate sh:arg1 ;
+		sh:predicate sh:arg4 ;
 		sh:valueType rdfs:Resource ;
-		rdfs:comment "The focus node." ;
-	] ;
-	sh:argument [
-		sh:predicate sh:arg2 ;
-		sh:valueType rdf:List ;
-		rdfs:comment "The list of shapes to walk through." ;
-	] ;
-	sh:argument [
-		sh:predicate sh:arg3 ;
-		sh:valueType rdfs:Resource ;
-		rdfs:comment "The current shapes graph." ;
+		rdfs:comment "The shapes graph." ;
 	] ;
 	sh:returnType xsd:integer ;
 	sh:sparql """
-		SELECT (COUNT(*) AS ?result)
+		# The SUM will fail with an error if one of the operands is not a number
+		# (this mechanism is used to propagate errors from sh:hasShape calls)
+		SELECT (SUM(?s) AS ?result)
 		WHERE {
-			GRAPH ?arg3 {
-				?arg2 rdf:rest*/rdf:first ?shape .
+			?arg1 ?arg2 ?value .
+			BIND (sh:hasShape(?value, ?arg3, ?arg4) AS ?hasShape) .
+			BIND (IF(bound(?hasShape), IF(?hasShape, 1, 0), 'error') AS ?s) .
+		}
+		""" ;
+.
+
+sh:walkShapesList
+	a sh:Function ;
+	rdfs:subClassOf sh:Functions ;
+	rdfs:label "walk shapes list" ;
+	rdfs:comment "Walks a given rdf:List of shapes (?arg1) recursively until it encounters a shape where sh:hasShape returns a provide boolean value (?arg2) for a given focus node (?arg3) using the given shapes graph (?arg4). Returns true if the list has reached such a node, false if it has reached the end of the list. Returns an error if one of the calls to sh:hasShape has produced a fatal error." ;
+	sh:argument [
+		sh:predicate sh:arg1 ;
+		sh:valueType rdf:List ;
+		rdfs:comment "The current rdf:List node in the recursion." ;
+	] ;
+	sh:argument [
+		sh:predicate sh:arg2 ;
+		sh:datatype xsd:boolean ;
+		rdfs:comment "The value to match sh:hasShape against." ;
+	] ;
+	sh:argument [
+		sh:predicate sh:arg3 ;
+		sh:valueType rdfs:Resource ;
+		rdfs:comment "The focus node to validate." ;
+	] ;
+	sh:argument [
+		sh:predicate sh:arg4 ;
+		sh:valueType rdfs:Resource ;
+		rdfs:comment "The shapes graph." ;
+	] ;
+	sh:returnType xsd:boolean ;
+	sh:sparql """
+		SELECT ?result
+		WHERE {
+			GRAPH ?arg4 {
+				OPTIONAL {
+					?arg1 rdf:first ?shape .
+					?arg1 rdf:rest ?rest .
+				}
 			}
-			FILTER (sh:hasShape(?arg1, ?shape, ?arg3)) .
+			BIND (IF(bound(?shape), sh:hasShape(?arg3, ?shape, ?arg4), !?arg2) AS ?hasShape) .
+			BIND (IF(?hasShape = ?arg2, true, IF(bound(?rest), sh:walkShapesList(?rest, ?arg2, ?arg3, ?arg4), false)) AS ?result) .
 		}
 		""" ;
 .
@@ -1632,10 +1851,10 @@ sh:datatype a rdf:Property ; rdfs:label "datatype" .
 sh:defaultValue a rdf:Property ; rdfs:label "default value" .
 sh:defaultValueType a rdf:Property ; rdfs:label "default value type" .
 sh:detail a rdf:Property ; rdfs:label "detail" .
+sh:filterShape a rdf:Property ; rdfs:label "filter shape" .
 sh:final a rdf:Property ; rdfs:label "final" .
 sh:fractionDigits a rdf:Property ; rdfs:label "fraction digits" .
-sh:graph a rdf:Property ; rdfs:label "graph" .
-sh:ignore a rdf:Property ; rdfs:label "ignore" .
+sh:hasValue a rdf:Property ; rdfs:label "has value" .
 sh:include a rdf:Property ; rdfs:label "include" .
 sh:inverseProperty a rdf:Property ; rdfs:label "inverse property" .
 sh:labelTemplate a rdf:Property ; rdfs:label "label template" .
@@ -1662,7 +1881,7 @@ sh:property a rdf:Property ; rdfs:label "property" .
 sh:resultAnnotation a rdf:Property ; rdfs:label "result annotation" .
 sh:returnType a rdf:Property ; rdfs:label "return type" .
 sh:root a rdf:Property ; rdfs:label "root" .
-sh:scopeShape a rdf:Property ; rdfs:label "scope shape" .
+sh:scope a rdf:Property ; rdfs:label "scope" .
 sh:severity a rdf:Property ; rdfs:label "severity" .
 sh:shapesGraph a rdf:Property ; rdfs:label "shapes graph" .
 sh:sparql	a rdf:Property ; rdfs:label "SPARQL" .

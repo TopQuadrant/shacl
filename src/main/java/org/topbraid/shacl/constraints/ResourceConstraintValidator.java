@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.topbraid.shacl.model.SHACLConstraint;
 import org.topbraid.shacl.model.SHACLFactory;
+import org.topbraid.shacl.model.SHACLTemplateCall;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.progress.ProgressMonitor;
@@ -15,6 +16,7 @@ import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 
@@ -36,6 +38,40 @@ public class ResourceConstraintValidator {
 		singleton = value;
 	}
 
+
+	/**
+	 * Gets a Set of all Shapes that should be evaluated for a given resource.
+	 * @param resource  the resource to get the shapes for
+	 * @param dataset  the Dataset containing the resource
+	 * @param shapesModel  the shapes Model
+	 * @return a Set of shape resources
+	 */
+	public Set<Resource> getShapesForResource(Resource resource, Dataset dataset, Model shapesModel) {
+		Set<Resource> shapes = new HashSet<Resource>();
+
+		// sh:nodeShape
+		shapes.addAll(JenaUtil.getResourceProperties(resource, SH.nodeShape));
+		
+		// rdf:type / sh:scopeClass
+		for(Resource type : JenaUtil.getAllTypes(resource)) {
+			if(JenaUtil.hasIndirectType(type.inModel(shapesModel), SH.Shape)) {
+				shapes.add(type);
+			}
+			for(Statement s : shapesModel.listStatements(null, SH.scopeClass, type).toList()) {
+				shapes.add(s.getSubject());
+			}
+		}
+		
+		// sh:scope
+		for(Statement s : shapesModel.listStatements(null, SH.scope, (RDFNode)null).toList()) {
+			if(isInScope(resource, dataset, s.getResource())) {
+				shapes.add(s.getSubject());
+			}
+		}
+		
+		return shapes;
+	}
+
 	
 	/**
 	 * Validates all SHACL constraints for a given resource.
@@ -55,16 +91,7 @@ public class ResourceConstraintValidator {
 		List<Property> properties = SHACLUtil.getAllConstraintProperties();
 		
 		Resource resource = (Resource) dataset.getDefaultModel().asRDFNode(focusNode);
-		Set<Resource> shapes = new HashSet<Resource>();
-		for(Resource type : JenaUtil.getAllTypes(resource)) {
-			if(JenaUtil.hasIndirectType(type.inModel(shapesModel), SH.Shape)) {
-				shapes.add(type);
-			}
-			for(Statement s : shapesModel.listStatements(null, SH.scopeClass, type).toList()) {
-				shapes.add(s.getSubject());
-			}
-		}
-		shapes.addAll(JenaUtil.getResourceProperties(resource, SH.nodeShape));
+		Set<Resource> shapes = getShapesForResource(resource, dataset, shapesModel);
 		for(Resource shape : shapes) {
 			addResourceViolations(dataset, shapesGraph, focusNode, shape.asNode(), properties, minSeverity, results, monitor);
 		}
@@ -103,17 +130,8 @@ public class ResourceConstraintValidator {
 			
 			Resource severity = executable.getSeverity();
 			if(minSeverity == null || minSeverity.equals(severity) || JenaUtil.hasSuperClass(severity, minSeverity)) {
-				
-				if(executable instanceof NativeConstraintExecutable) {
-					NativeConstraintExecutable e = (NativeConstraintExecutable)executable;
-					ExecutionLanguage lang = ExecutionLanguageSelector.get().getLanguage(e);
-					lang.executeNative(dataset, shape, shapesGraph, results, constraint, focusNode, null, null, e);
-				}
-				else {
-					TemplateConstraintExecutable e = (TemplateConstraintExecutable)executable;
-					ExecutionLanguage lang = ExecutionLanguageSelector.get().getLanguage(e);
-					lang.executeTemplate(dataset, shape, shapesGraph, results, constraint, focusNode, null, null, e);
-				}
+				ExecutionLanguage lang = ExecutionLanguageSelector.get().getLanguageForConstraint(executable);
+				lang.executeConstraint(dataset, shape, shapesGraph, constraint, executable, focusNode, results);
 			}
 		}
 	}
@@ -144,5 +162,17 @@ public class ResourceConstraintValidator {
 				}
 			}
 		}
+	}
+	
+	
+	private boolean isInScope(Resource focusNode, Dataset dataset, Resource scope) {
+		SHACLTemplateCall templateCall = null;
+		Resource executable = scope;
+		if(SHACLFactory.isTemplateCall(scope)) {
+			templateCall = SHACLFactory.asTemplateCall(scope);
+			executable = templateCall.getTemplate();
+		}
+		ExecutionLanguage lang = ExecutionLanguageSelector.get().getLanguageForScope(executable);
+		return lang.isNodeInScope(focusNode, dataset, executable, templateCall);
 	}
 }

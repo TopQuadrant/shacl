@@ -106,46 +106,50 @@ public abstract class DelegatingDataset implements Dataset {
 
 			@Override
 			public void addGraph(Node arg0, Graph arg1) {
-				
 			}
 
 			@Override
 			public void removeGraph(Node arg0) {
-
 			}
-
 		};
 	}
 
+	
 	@Override
 	public void close() {
 		delegate.close();
 	}
 
+	
 	@Override
 	public boolean containsNamedModel(String uri) {
 		return delegate.containsNamedModel(uri);
 	}
 
+	
 	@Override
 	public Model getDefaultModel() {
 		return delegate.getDefaultModel();
 	}
 	
+	
 	public Dataset getDelegate() {
 		return delegate;
 	}
 
+	
 	@Override
 	public Lock getLock() {
 		return delegate.getLock();
 	}
 
+	
 	@Override
 	public Model getNamedModel(String uri) {
 		return delegate.getNamedModel(uri);
 	}
 
+	
 	@Override
 	public Iterator<String> listNames() {
 		return delegate.listNames();

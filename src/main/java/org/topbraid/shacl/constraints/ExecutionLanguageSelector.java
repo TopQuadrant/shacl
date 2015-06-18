@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.topbraid.shacl.constraints.sparql.SPARQLExecutionLanguage;
 
+import com.hp.hpl.jena.rdf.model.Resource;
+
 /**
  * Selects a suitable execution language for a given executable.
  * 
@@ -37,9 +39,9 @@ public class ExecutionLanguageSelector {
 	}
 	
 	
-	public ExecutionLanguage getLanguage(NativeConstraintExecutable executable) {
+	public ExecutionLanguage getLanguageForConstraint(ConstraintExecutable executable) {
 		for(ExecutionLanguage lang : languages) {
-			if(lang.canExecuteNative(executable)) {
+			if(lang.canExecuteConstraint(executable)) {
 				return lang;
 			}
 		}
@@ -47,9 +49,9 @@ public class ExecutionLanguageSelector {
 	}
 	
 	
-	public ExecutionLanguage getLanguage(TemplateConstraintExecutable executable) {
+	public ExecutionLanguage getLanguageForScope(Resource executable) {
 		for(ExecutionLanguage lang : languages) {
-			if(lang.canExecuteTemplate(executable)) {
+			if(lang.canExecuteScope(executable)) {
 				return lang;
 			}
 		}

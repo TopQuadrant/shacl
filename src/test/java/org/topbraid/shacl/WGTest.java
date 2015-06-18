@@ -6,6 +6,7 @@ import java.net.URI;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import org.topbraid.shacl.constraints.FatalErrorLog;
 import org.topbraid.shacl.vocabulary.MF;
 import org.topbraid.shacl.vocabulary.SHT;
 import org.topbraid.spin.util.JenaUtil;
@@ -28,6 +29,12 @@ public class WGTest extends TestSuite {
 	
 	
     public static Test suite() throws Exception {
+    	FatalErrorLog.set(new FatalErrorLog() {
+			@Override
+			public void log(String message) {
+				// Suppress
+			}
+    	});
         return new WGTest();
     }
 	

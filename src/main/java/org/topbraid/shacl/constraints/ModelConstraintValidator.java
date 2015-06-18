@@ -1,11 +1,9 @@
 package org.topbraid.shacl.constraints;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.topbraid.shacl.model.SHACLConstraint;
 import org.topbraid.shacl.model.SHACLFactory;
@@ -21,7 +19,6 @@ import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 /**
@@ -31,7 +28,7 @@ import com.hp.hpl.jena.vocabulary.RDFS;
  */
 public class ModelConstraintValidator {
 	
-	public static final String SCOPE_VAR_NAME = "SCOPE_SHAPE";
+	public static final String FILTER_VAR_NAME = "FILTER_SHAPE";
 
 	private static ModelConstraintValidator singleton = new ModelConstraintValidator();
 	
@@ -66,7 +63,7 @@ public class ModelConstraintValidator {
 		}
 		
 		List<Property> constraintProperties = SHACLUtil.getAllConstraintProperties();
-		Map<Resource,List<SHACLConstraint>> map = buildShape2ConstraintsMap(shapesModel, constraintProperties, filtered);
+		Map<Resource,List<SHACLConstraint>> map = buildShape2ConstraintsMap(shapesModel, dataset.getDefaultModel(), constraintProperties, filtered);
 		if(monitor != null) {
 			monitor.subTask("");
 		}
@@ -92,17 +89,17 @@ public class ModelConstraintValidator {
 	}
 	
 	
-	private Map<Resource,List<SHACLConstraint>> buildShape2ConstraintsMap(Model shapesModel, List<Property> constraintProperties, boolean filtered) {
+	private Map<Resource,List<SHACLConstraint>> buildShape2ConstraintsMap(Model shapesModel, Model dataModel, List<Property> constraintProperties, boolean filtered) {
 		Map<Resource,List<SHACLConstraint>> map = new HashMap<Resource,List<SHACLConstraint>>();
 		for(Property constraintProperty : constraintProperties) {
 			for(Statement s : shapesModel.listStatements(null, constraintProperty, (RDFNode)null).toList()) {
 				if(s.getObject().isResource()) {
-					Resource cls = s.getSubject();
-					if(!filtered || ModelClassesFilter.get().accept(cls)) {
-						List<SHACLConstraint> list = map.get(cls);
+					Resource shape = s.getSubject();
+					if((!filtered || ModelClassesFilter.get().accept(shape)) && hasScope(shape, dataModel)) {
+						List<SHACLConstraint> list = map.get(shape);
 						if(list == null) {
 							list = new LinkedList<SHACLConstraint>();
-							map.put(cls, list);
+							map.put(shape, list);
 						}
 						Resource c = s.getResource(); 
 						Resource type = JenaUtil.getType(c);
@@ -125,59 +122,35 @@ public class ModelConstraintValidator {
 	}
 	
 	
-	private void validateConstraintForShape(Dataset dataset, Resource shapesGraph, Resource minSeverity, SHACLConstraint constraint, Resource shape, Model results, ProgressMonitor monitor) {
-
-		boolean hasNodeShape = dataset.getDefaultModel().contains(null, SH.nodeShape, shape);
-		
-		Set<Resource> scopeClasses = new HashSet<Resource>();
+	// Used to filter out scopeless shapes that are only used as part of other shapes
+	private boolean hasScope(Resource shape, Model dataModel) {
 		if(JenaUtil.hasIndirectType(shape, RDFS.Class)) {
-			scopeClasses.add(shape);
+			return true;
 		}
-		scopeClasses.addAll(JenaUtil.getResourceProperties(shape, SH.scopeClass));
-		
+		else if(shape.hasProperty(SH.scope)) {
+			return true;
+		}
+		else if(shape.hasProperty(SH.scopeClass)) {
+			return true;
+		}
+		else if(dataModel.contains(null, SH.nodeShape, shape)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	
+	private void validateConstraintForShape(Dataset dataset, Resource shapesGraph, Resource minSeverity, SHACLConstraint constraint, Resource shape, Model results, ProgressMonitor monitor) {
 		for(ConstraintExecutable executable : constraint.getExecutables()) {
-			
 			Resource severity = executable.getSeverity();
 			if(minSeverity == null || minSeverity.equals(severity) || JenaUtil.hasSuperClass(severity, minSeverity)) {
-				
-				// Execute for all resources with matching sh:nodeShape
-				if(hasNodeShape) {
-					
-					if(monitor != null) {
-						monitor.subTask("Validating sh:nodeShape at Shape " + SPINLabels.get().getLabel(shape));
-					}
-					if(executable instanceof NativeConstraintExecutable) {
-						NativeConstraintExecutable e = (NativeConstraintExecutable)executable;
-						ExecutionLanguage lang = ExecutionLanguageSelector.get().getLanguage(e);
-						lang.executeNative(dataset, shape, shapesGraph, results, constraint, null, SH.nodeShape, shape, e);
-					}
-					else {
-						TemplateConstraintExecutable e = (TemplateConstraintExecutable)executable;
-						ExecutionLanguage lang = ExecutionLanguageSelector.get().getLanguage(e);
-						lang.executeTemplate(dataset, shape, shapesGraph, results, constraint, null, SH.nodeShape, shape, e);
-					}
+				if(monitor != null) {
+					monitor.subTask("Validating Shape " + SPINLabels.get().getLabel(shape));
 				}
-				
-				for(Resource cls : scopeClasses) {
-					for(Resource c : JenaUtil.getAllSubClassesStar(cls)) {
-						if(dataset.getDefaultModel().contains(null, RDF.type, c)) {
-							
-							if(monitor != null) {
-								monitor.subTask("Validating at Class " + SPINLabels.get().getLabel(c));
-							}
-							if(executable instanceof NativeConstraintExecutable) {
-								NativeConstraintExecutable e = (NativeConstraintExecutable)executable;
-								ExecutionLanguage lang = ExecutionLanguageSelector.get().getLanguage(e);
-								lang.executeNative(dataset, shape, shapesGraph, results, constraint, null, RDF.type, c, e);
-							}
-							else {
-								TemplateConstraintExecutable e = (TemplateConstraintExecutable)executable;
-								ExecutionLanguage lang = ExecutionLanguageSelector.get().getLanguage(e);
-								lang.executeTemplate(dataset, shape, shapesGraph, results, constraint, null, RDF.type, c, e);
-							}
-						}
-					}
-				}
+				ExecutionLanguage lang = ExecutionLanguageSelector.get().getLanguageForConstraint(executable);
+				lang.executeConstraint(dataset, shape, shapesGraph, constraint, executable, null, results);
 			}
 		}
 	}

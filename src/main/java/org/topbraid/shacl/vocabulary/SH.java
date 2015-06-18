@@ -55,6 +55,8 @@ public class SH {
     
     public final static Resource NativeConstraint = ResourceFactory.createResource(NS + "NativeConstraint");
     
+    public final static Resource NativeScope = ResourceFactory.createResource(NS + "NativeScope");
+    
     public final static Resource OrConstraint = ResourceFactory.createResource(NS + "OrConstraint");
 
     public final static Resource PropertyConstraint = ResourceFactory.createResource(NS + "PropertyConstraint");
@@ -87,6 +89,8 @@ public class SH {
     public final static Property defaultValue = ResourceFactory.createProperty(NS + "defaultValue");
 
     public final static Property defaultValueType = ResourceFactory.createProperty(NS + "defaultValueType");
+    
+    public final static Property filterShape = ResourceFactory.createProperty(NS + "filterShape");
 
     public final static Property graph = ResourceFactory.createProperty(NS + "graph");
 
@@ -132,9 +136,9 @@ public class SH {
 
     public final static Property root = ResourceFactory.createProperty(NS + "root");
     
-    public final static Property scopeClass = ResourceFactory.createProperty(NS + "scopeClass");
+    public final static Property scope = ResourceFactory.createProperty(NS + "scope");
     
-    public final static Property scopeShape = ResourceFactory.createProperty(NS + "scopeShape");
+    public final static Property scopeClass = ResourceFactory.createProperty(NS + "scopeClass");
     
     public final static Property severity = ResourceFactory.createProperty(NS + "severity");
     

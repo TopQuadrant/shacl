@@ -9,10 +9,10 @@ import org.topbraid.shacl.model.SHACLShape;
 import org.topbraid.shacl.model.SHACLTemplate;
 import org.topbraid.shacl.model.SHACLTemplateConstraint;
 import org.topbraid.shacl.vocabulary.SH;
+import org.topbraid.spin.system.SPINLabels;
 import org.topbraid.spin.util.JenaDatatypes;
 import org.topbraid.spin.util.JenaUtil;
 
-import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 /**
@@ -28,43 +28,23 @@ public class TemplateConstraintExecutable extends ConstraintExecutable {
 	
 	
 	public TemplateConstraintExecutable(SHACLTemplateConstraint constraint, SHACLTemplate template) {
+		super(template);
 		this.constraint = constraint;
 		this.template = template;
 	}
 	
 	
-	public SHACLTemplateConstraint getConstraint() {
+	public SHACLTemplateConstraint getTemplateCall() {
 		return constraint;
 	}
-	
-	
-	public List<Literal> getMessages() {
-		return JenaUtil.getLiteralProperties(template, SH.message);
-	}
-	
-	
-	public Resource getPredicate() {
-		return JenaUtil.getResourceProperty(template, SH.predicate);
-	}
 
 
-	public List<SHACLShape> getScopeShapes() {
+	public List<SHACLShape> getFilterShapes() {
 		List<SHACLShape> results = new LinkedList<SHACLShape>();
-		for(Resource scope : JenaUtil.getResourceProperties(constraint, SH.scopeShape)) {
+		for(Resource scope : JenaUtil.getResourceProperties(constraint, SH.filterShape)) {
 			results.add(SHACLFactory.asShape(scope));
 		}
 		return results;
-	}
-
-	
-	public Resource getSeverity() {
-		Resource severity = JenaUtil.getResourceProperty(template, SH.severity);
-		return severity == null ? SH.Error : severity;
-	}
-	
-	
-	public SHACLTemplate getTemplate() {
-		return template;
 	}
 	
 	
@@ -85,6 +65,6 @@ public class TemplateConstraintExecutable extends ConstraintExecutable {
 
 
 	public String toString() {
-		return "TemplateConstraintExecutable of type " + template.getURI();
+		return SPINLabels.get().getLabel(template);
 	}
 }

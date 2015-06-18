@@ -1,25 +1,27 @@
 package org.topbraid.shacl.constraints;
 
 import org.topbraid.shacl.model.SHACLConstraint;
+import org.topbraid.shacl.model.SHACLTemplateCall;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 /**
- * A processor that can execute ConstraintExecutables.
+ * A processor that can execute constraint and scope executables.
  * The default implementation uses SPARQL, based on sh:sparql.
  * 
  * @author Holger Knublauch
  */
 public interface ExecutionLanguage {
 	
-	boolean canExecuteNative(NativeConstraintExecutable executable);
+	boolean canExecuteConstraint(ConstraintExecutable executable);
 	
-	boolean canExecuteTemplate(TemplateConstraintExecutable executable);
+	boolean canExecuteScope(Resource executable);
 	
-	void executeNative(Dataset dataset, Resource shape, Resource shapesGraph, Model results, SHACLConstraint constraint, Resource focusNode, Property selectorProperty, Resource selectorObject, NativeConstraintExecutable executable);
+	void executeConstraint(Dataset dataset, Resource shape, Resource shapesGraph, SHACLConstraint constraint, ConstraintExecutable executable, Resource focusNode, Model results);
+
+	Iterable<Resource> executeScope(Dataset dataset, Resource executable, SHACLTemplateCall templateCall);
 	
-	void executeTemplate(Dataset dataset, Resource shape, Resource shapesGraph, Model results, SHACLConstraint constraint, Resource focusNode, Property selectorProperty, Resource selectorObject, TemplateConstraintExecutable executable);
+	boolean isNodeInScope(Resource focusNode, Dataset dataset, Resource executable, SHACLTemplateCall templateCall);
 }

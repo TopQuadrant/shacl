@@ -61,7 +61,7 @@ abstract class AbstractSHACLTestClass extends TestCase {
 				expected.add(s.getResource().listProperties());
 			}
 			if(!expected.getGraph().isIsomorphicWith(results.getGraph())) {
-				fail("Mismatching validation results. Expected " + expected.size() + " triples, found " + results.size() + "\n" + printed);
+				fail("Mismatching validation results for " + testResource + ". Expected " + expected.size() + " triples, found " + results.size() + "\n" + printed);
 			}
 		}
 	}

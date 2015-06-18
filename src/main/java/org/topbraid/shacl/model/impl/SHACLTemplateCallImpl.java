@@ -12,6 +12,7 @@ import org.topbraid.spin.util.JenaUtil;
 
 import com.hp.hpl.jena.enhanced.EnhGraph;
 import com.hp.hpl.jena.graph.Node;
+import com.hp.hpl.jena.query.QuerySolutionMap;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -65,5 +66,22 @@ public class SHACLTemplateCallImpl extends SHACLResourceImpl implements SHACLTem
 			}
 		}
 		return map;
+	}
+
+
+	@Override
+	public void addBindings(QuerySolutionMap bindings) {
+		for(SHACLArgument arg : getTemplate().getArguments(false)) {
+			Statement s = getProperty(arg.getPredicate());
+			if(s != null) {
+				bindings.add(arg.getVarName(), s.getObject());
+			}
+			else {
+				RDFNode defaultValue = arg.getDefaultValue();
+				if(defaultValue != null) {
+					bindings.add(arg.getVarName(), defaultValue);
+				}
+			}
+		}
 	}
 }

@@ -17,12 +17,14 @@
 		<and-001> 
 		<and-002> 
 		<class-001>
+		<filterShape-001>
 		<inverseProperty-001> 
 		<not-001>
 		<or-001>
 		<property-001>
 		<recursive-001>
-		<scopeShape-001>
+		<recursive-002>
+		<recursive-003>
 		<valueShape-001>
 		<xor-001>
 	)
@@ -81,6 +83,24 @@
 	mf:status sht:proposed ; 
 .
 
+<and-003>
+	a sht:Validate ;
+	mf:name "Test of a sh:AndConstraint" ;
+	mf:action [
+		sht:schema <and-003.ttl> ; 
+		sht:data <and-003.ttl> ; 
+	] ;
+	mf:result [
+		a sh:FatalError ;
+  		sh:root ex:InvalidInstance1 ;
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidInstance2 ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
 <class-001>
 	a sht:Validate ;
 	mf:name "Test of a sh:ShapeClass definition" ;
@@ -100,6 +120,22 @@
   		sh:root _:b1 ;
   		sh:subject _:b1 ;
   		sh:predicate sh:predicate ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
+<filterShape-001>
+	a sht:Validate ;
+	mf:name "Test of a sh:filterShape" ;
+	mf:action [
+		sht:schema <filterShape-001.ttl> ; 
+		sht:data   <filterShape-001.ttl> ; 
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidInstance1 ;
+  		sh:subject ex:InvalidInstance1 ;
+  		sh:predicate ex:child ;
 	] ;
 	mf:status sht:proposed ; 
 .
@@ -187,12 +223,35 @@
 	mf:status sht:proposed ; 
 .
 
+<qualifiedValueShape-001>
+	a sht:Validate ;
+	mf:name "Test of a sh:qualifiedValueShape" ;
+	mf:action [
+		sht:schema <qualifiedValueShape-001.ttl> ; 
+		sht:data   <qualifiedValueShape-001.ttl> ; 
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:Observation1 ;
+  		sh:subject ex:Observation1 ;
+  		sh:predicate ex:related ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
 <recursive-001>
 	a sht:Validate ;
 	mf:name "Test of a sh:valueShape with recursion" ;
 	mf:action [
 		sht:schema <recursive-001.ttl> ; 
 		sht:data   <recursive-001.ttl> ; 
+	] ;
+	mf:result [
+		a sh:FatalError ;
+  		sh:root ex:Diego ;
+  		sh:subject ex:Diego ;
+  		sh:predicate ex:knows ;
+  		sh:object ex:Alessandro ;
 	] ;
 	mf:result [
 		a sh:Error ;
@@ -204,18 +263,29 @@
 	mf:status sht:proposed ; 
 .
 
-<scopeShape-001>
+<recursive-002>
 	a sht:Validate ;
-	mf:name "Test of a sh:scopeShape" ;
+	mf:name "Test of a sh:valueShape with recursion" ;
 	mf:action [
-		sht:schema <scopeShape-001.ttl> ; 
-		sht:data   <scopeShape-001.ttl> ; 
+		sht:schema <recursive-002.ttl> ; 
+		sht:data   <recursive-002.ttl> ; 
 	] ;
 	mf:result [
-		a sh:Error ;
-  		sh:root ex:InvalidInstance1 ;
-  		sh:subject ex:InvalidInstance1 ;
-  		sh:predicate ex:child ;
+		a sh:FatalError ;
+  		sh:root ex:Instance ;
+  		sh:subject ex:Instance ;
+  		sh:predicate ex:property ;
+  		sh:object ex:Instance ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
+<recursive-003>
+	a sht:Validate ;
+	mf:name "Test of a sh:valueShape with recursion" ;
+	mf:action [
+		sht:schema <recursive-003.ttl> ; 
+		sht:data   <recursive-003.ttl> ; 
 	] ;
 	mf:status sht:proposed ; 
 .

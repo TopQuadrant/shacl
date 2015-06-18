@@ -3,6 +3,9 @@ package org.topbraid.shacl.constraints;
 import java.util.List;
 
 import org.topbraid.shacl.model.SHACLShape;
+import org.topbraid.shacl.model.SHACLTemplateCall;
+import org.topbraid.shacl.vocabulary.SH;
+import org.topbraid.spin.util.JenaUtil;
 
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -15,31 +18,53 @@ import com.hp.hpl.jena.rdf.model.Resource;
  */
 public abstract class ConstraintExecutable {
 	
+	private Resource resource;
+	
+	
+	public ConstraintExecutable(Resource resource) {
+		this.resource = resource;
+	}
+	
 	
 	/**
-	 * Gets the severity level (e.g. sh:Warning).
-	 * @return the level class, never null
+	 * Gets the specified sh:filterShapes, to be used as pre-conditions.
+	 * @return the filter shapes
 	 */
-	public abstract Resource getSeverity();
+	public abstract List<SHACLShape> getFilterShapes();
 	
 	
 	/**
 	 * Gets the specified sh:messages, to be used for constructed results.
 	 * @return the messages (may be empty)
 	 */
-	public abstract List<Literal> getMessages();
+	public List<Literal> getMessages() {
+		return JenaUtil.getLiteralProperties(getResource(), SH.message);
+	}
 	
 	
 	/**
 	 * Gets the specified sh:predicate (if any), to be used for constructed results.
 	 * @return the predicate or null
 	 */
-	public abstract Resource getPredicate();
+	public Resource getPredicate() {
+		return JenaUtil.getResourceProperty(getResource(), SH.predicate);
+	}
 	
+	
+	public Resource getResource() {
+		return resource;
+	}
+
 	
 	/**
-	 * Gets the specified sh:scopeShapes, to be used as pre-conditions.
-	 * @return the scope shapes
+	 * Gets the severity level (e.g. sh:Warning).
+	 * @return the level class, never null
 	 */
-	public abstract List<SHACLShape> getScopeShapes();
+	public Resource getSeverity() {
+		Resource result = JenaUtil.getResourceProperty(getResource(), SH.severity);
+		return result == null ? SH.Error : result;
+	}
+	
+	
+	public abstract SHACLTemplateCall getTemplateCall();
 }

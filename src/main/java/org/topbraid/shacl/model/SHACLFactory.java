@@ -1,6 +1,6 @@
 package org.topbraid.shacl.model;
 
-import org.topbraid.shacl.arq.functions.SHACLHasShapeFunction;
+import org.topbraid.shacl.arq.functions.HasShapeFunction;
 import org.topbraid.shacl.model.impl.SHACLArgumentImpl;
 import org.topbraid.shacl.model.impl.SHACLConstraintViolationImpl;
 import org.topbraid.shacl.model.impl.SHACLFunctionImpl;
@@ -40,7 +40,7 @@ public class SHACLFactory {
     	p.add(SHACLTemplateCall.class, new SimpleImplementation(SH.Templates.asNode(), SHACLTemplateCallImpl.class));
     	p.add(SHACLTemplateConstraint.class, new SimpleImplementation(SH.TemplateConstraint.asNode(), SHACLTemplateConstraintImpl.class));
     	
-		FunctionRegistry.get().put(SH.hasShape.getURI(), SHACLHasShapeFunction.class);
+		FunctionRegistry.get().put(SH.hasShape.getURI(), HasShapeFunction.class);
     }
 	
 	

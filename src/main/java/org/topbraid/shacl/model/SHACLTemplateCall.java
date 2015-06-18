@@ -2,10 +2,15 @@ package org.topbraid.shacl.model;
 
 import java.util.Map;
 
+import com.hp.hpl.jena.query.QuerySolutionMap;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 
 public interface SHACLTemplateCall extends SHACLResource {
+	
+	
+	void addBindings(QuerySolutionMap bindings);
 
+	
 	SHACLTemplate getTemplate();
 
 	

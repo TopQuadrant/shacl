@@ -1,28 +1,28 @@
 package org.topbraid.shacl.constraints.sparql;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.topbraid.shacl.constraints.ConstraintExecutable;
 import org.topbraid.shacl.constraints.ExecutionLanguage;
+import org.topbraid.shacl.constraints.FatalErrorLog;
 import org.topbraid.shacl.constraints.ModelConstraintValidator;
-import org.topbraid.shacl.constraints.NativeConstraintExecutable;
 import org.topbraid.shacl.constraints.SHACLException;
-import org.topbraid.shacl.constraints.TemplateConstraintExecutable;
 import org.topbraid.shacl.entailment.SPARQLEntailment;
-import org.topbraid.shacl.model.SHACLArgument;
 import org.topbraid.shacl.model.SHACLConstraint;
 import org.topbraid.shacl.model.SHACLFactory;
 import org.topbraid.shacl.model.SHACLShape;
-import org.topbraid.shacl.model.SHACLTemplate;
+import org.topbraid.shacl.model.SHACLTemplateCall;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.statistics.SPINStatistics;
 import org.topbraid.spin.statistics.SPINStatisticsManager;
 import org.topbraid.spin.system.SPINLabels;
+import org.topbraid.spin.util.JenaDatatypes;
 import org.topbraid.spin.util.JenaUtil;
-import org.topbraid.spin.util.SPINUtil;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.Query;
@@ -33,9 +33,9 @@ import com.hp.hpl.jena.query.QuerySolutionMap;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 
@@ -54,23 +54,23 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
  
 	
 	@Override
-	public boolean canExecuteNative(NativeConstraintExecutable executable) {
+	public boolean canExecuteConstraint(ConstraintExecutable executable) {
 		return executable.getResource().hasProperty(SH.sparql);
 	}
 
-
+	
 	@Override
-	public boolean canExecuteTemplate(TemplateConstraintExecutable executable) {
-		return executable.getTemplate().hasProperty(SH.sparql);
+	public boolean canExecuteScope(Resource executable) {
+		return executable.hasProperty(SH.sparql);
 	}
 
 
 	@Override
-	public void executeNative(Dataset dataset, Resource shape, Resource shapesGraph,
-			Model results, SHACLConstraint constraint,
-			Resource focusNode, Property selectorProperty, Resource selectorObject, NativeConstraintExecutable executable) {
+	public void executeConstraint(Dataset dataset, Resource shape, Resource shapesGraph,
+			SHACLConstraint constraint, ConstraintExecutable executable,
+			Resource focusNode, Model results) {
 		
-		Resource entailment = JenaUtil.getResourceProperty(constraint, SH.sparqlEntailment);
+		Resource entailment = JenaUtil.getResourceProperty(executable.getResource(), SH.sparqlEntailment);
 		dataset = SPARQLEntailment.get().withEntailment(dataset, entailment);
 		if(dataset == null) {
 			addEntailmentError(entailment, constraint, results);
@@ -107,16 +107,21 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		}
 		
 		QuerySolutionMap bindings = new QuerySolutionMap();
-		List<SHACLShape> scopes = executable.getScopeShapes();
-		for(Resource scope : JenaUtil.getResourceProperties(shape, SH.scopeShape)) {
-			scopes.add(SHACLFactory.asShape(scope));
+		SHACLTemplateCall templateCall = executable.getTemplateCall();
+		if(templateCall != null) {
+			templateCall.addBindings(bindings);
 		}
-		if(selectorProperty != null) {
-			query = SPARQLSubstitutions.insertThisAndScopeBindingClause(query, scopes.size(), selectorProperty);
-			bindings.add(SPINUtil.TYPE_CLASS_VAR_NAME, selectorObject);
+		List<SHACLShape> filters = executable.getFilterShapes();
+		for(Resource filter : JenaUtil.getResourceProperties(shape, SH.filterShape)) {
+			filters.add(SHACLFactory.asShape(filter));
 		}
-		else if(!scopes.isEmpty()) {
-			query = SPARQLSubstitutions.insertScopeClause(query, scopes.size());
+		if(focusNode == null) {
+			if(shape.isURIResource()) {
+				query = SPARQLSubstitutions.insertScopeAndFilterClauses(query, filters.size(), shape, dataset);
+			}
+		}
+		else if(!filters.isEmpty()) {
+			query = SPARQLSubstitutions.insertFilterClause(query, filters.size());
 		}
 
 		if(focusNode != null) {
@@ -124,8 +129,8 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		}
 		bindings.add(SH.currentShapeVar.getVarName(), shape);
 		bindings.add(SH.shapesGraphVar.getVarName(), shapesGraph);
-		for(int i = 0; i < scopes.size(); i++) {
-			bindings.add(ModelConstraintValidator.SCOPE_VAR_NAME + i, scopes.get(i));
+		for(int i = 0; i < filters.size(); i++) {
+			bindings.add(ModelConstraintValidator.FILTER_VAR_NAME + i, filters.get(i));
 		}
 		
 		QueryExecution qexec = ARQFactory.get().createQueryExecution(query, dataset, bindings);
@@ -135,84 +140,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		if(SPINStatisticsManager.get().isRecording()) {
 			long endTime = System.currentTimeMillis();
 			long duration = endTime - startTime;
-			String label = "SHACL SPARQL Constraint (" + violationCount + " violations)";
-			SPINStatistics stats = new SPINStatistics(label, sparql, duration, startTime, 
-					focusNode != null ? focusNode.asNode() : resource.asNode());
-			SPINStatisticsManager.get().add(Collections.singletonList(stats));
-		}
-	}
-
-
-	@Override
-	public void executeTemplate(Dataset dataset, Resource shape, Resource shapesGraph,
-			Model results, SHACLConstraint constraint,
-			Resource focusNode, Property selectorProperty, Resource selectorObject, TemplateConstraintExecutable executable) {
-		
-		Resource entailment = JenaUtil.getResourceProperty(executable.getTemplate(), SH.sparqlEntailment);
-		dataset = SPARQLEntailment.get().withEntailment(dataset, entailment);
-		if(dataset == null) {
-			addEntailmentError(entailment, constraint, results);
-			return;
-		}
-
-		SHACLTemplate template = executable.getTemplate();
-		String sparql = JenaUtil.getStringProperty(template, SH.sparql);
-
-		String queryString = ARQFactory.get().createPrefixDeclarations(template.getModel()) + sparql;
-		Query query;
-		try {
-			query = ARQFactory.get().createQuery(queryString);
-		}
-		catch(QueryParseException ex) {
-			throw new SHACLException("Invalid SPARQL constraint (" + ex.getLocalizedMessage() + "):\n" + queryString);
-		}
-
-		if(!query.isSelectType()) {
-			throw new IllegalArgumentException("SHACL constraints must be SELECT queries");
-		}
-		
-		QuerySolutionMap bindings = new QuerySolutionMap();
-		List<SHACLShape> scopes = executable.getScopeShapes();
-		for(Resource scope : JenaUtil.getResourceProperties(shape, SH.scopeShape)) {
-			scopes.add(SHACLFactory.asShape(scope));
-		}
-		if(selectorProperty != null) {
-			query = SPARQLSubstitutions.insertThisAndScopeBindingClause(query, scopes.size(), selectorProperty);
-			bindings.add(SPINUtil.TYPE_CLASS_VAR_NAME, selectorObject);
-		}
-		else if(!scopes.isEmpty()) {
-			query = SPARQLSubstitutions.insertScopeClause(query, scopes.size());
-		}
-
-		for(SHACLArgument arg : template.getArguments(false)) {
-			Statement s = constraint.getProperty(arg.getPredicate());
-			if(s != null) {
-				bindings.add(arg.getVarName(), s.getObject());
-			}
-			else {
-				RDFNode defaultValue = arg.getDefaultValue();
-				if(defaultValue != null) {
-					bindings.add(arg.getVarName(), defaultValue);
-				}
-			}
-		}
-		if(focusNode != null) {
-			bindings.add(SH.thisVar.getVarName(), focusNode);
-		}
-		bindings.add(SH.currentShapeVar.getVarName(), shape);
-		bindings.add(SH.shapesGraphVar.getVarName(), shapesGraph);
-		for(int i = 0; i < scopes.size(); i++) {
-			bindings.add(ModelConstraintValidator.SCOPE_VAR_NAME + i, scopes.get(i));
-		}
-		
-		QueryExecution qexec = ARQFactory.get().createQueryExecution(query, dataset, bindings);
-
-		long startTime = System.currentTimeMillis();
-		int violationCount = executeSelectQuery(results, constraint, focusNode, executable, qexec);
-		if(SPINStatisticsManager.get().isRecording()) {
-			long endTime = System.currentTimeMillis();
-			long duration = endTime - startTime;
-			String label = SPINLabels.get().getLabel(template) + " (" + violationCount + " violations)";
+			String label = executable + " (" + violationCount + " violations)";
 			Iterator<String> varNames = bindings.varNames();
 			if(varNames.hasNext()) {
 				sparql += "\nBindings:";
@@ -222,7 +150,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 				}
 			}
 			SPINStatistics stats = new SPINStatistics(label, sparql, duration, startTime, 
-					focusNode != null ? focusNode.asNode() : template.asNode());
+					focusNode != null ? focusNode.asNode() : resource.asNode());
 			SPINStatisticsManager.get().add(Collections.singletonList(stats));
 		}
 	}
@@ -241,15 +169,29 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 	
 		ResultSet rs = qexec.execSelect();
 		int violationCount = 0;
-		Resource severity = executable.getSeverity();
 		List<Literal> defaultMessages = executable.getMessages();
 		while(rs.hasNext()) {
 			QuerySolution sol = rs.next();
 			
+			Resource severity = executable.getSeverity();
+			RDFNode selectMessage = sol.get(SH.messageVar.getVarName());
+			if(JenaDatatypes.TRUE.equals(sol.get("error"))) {
+				severity = SH.FatalError;
+				String message = "Constraint " + SPINLabels.get().getLabel(executable.getResource());
+				if(executable.getTemplateCall() != null) {
+					message += " of type " + SPINLabels.get().getLabel(executable.getTemplateCall().getTemplate());
+				}
+				message += " has produced ?error";
+				if(focusNode != null) {
+					message += " for focus node " + SPINLabels.get().getLabel(focusNode);
+				}
+				FatalErrorLog.get().log(message);
+				selectMessage = ResourceFactory.createTypedLiteral("Fatal Error: Could not validate shape");
+			}
+			
 			Resource vio = results.createResource(severity);
 			vio.addProperty(SH.source, constraint);
 			
-			RDFNode selectMessage = sol.get(SH.messageVar.getVarName());
 			if(selectMessage != null) {
 				vio.addProperty(SH.message, selectMessage);
 			}
@@ -296,5 +238,85 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		qexec.close();
 		
 		return violationCount;
+	}
+
+	
+	@Override
+	public Iterable<Resource> executeScope(Dataset dataset, Resource executable, SHACLTemplateCall templateCall) {
+		
+		Resource entailment = JenaUtil.getResourceProperty(executable, SH.sparqlEntailment);
+		dataset = SPARQLEntailment.get().withEntailment(dataset, entailment);
+		if(dataset == null) {
+			throw new SHACLException("Unsupported SPARQL entailment " + entailment);
+		}
+
+		String sparql = JenaUtil.getStringProperty(executable, SH.sparql);
+		String queryString = ARQFactory.get().createPrefixDeclarations(executable.getModel()) + sparql;
+		Query query;
+		try {
+			query = ARQFactory.get().createQuery(queryString);
+		}
+		catch(QueryParseException ex) {
+			throw new SHACLException("Invalid SPARQL scope (" + ex.getLocalizedMessage() + "):\n" + queryString);
+		}
+		
+		QueryExecution qexec = ARQFactory.get().createQueryExecution(query, dataset);
+
+		if(templateCall != null) {
+			QuerySolutionMap bindings = new QuerySolutionMap();
+			templateCall.addBindings(bindings);
+			qexec.setInitialBinding(bindings);
+		}
+
+		Set<Resource> results = new HashSet<Resource>();
+		ResultSet rs = qexec.execSelect();
+		List<String> varNames = rs.getResultVars();
+		while(rs.hasNext()) {
+			QuerySolution qs = rs.next();
+			for(String varName : varNames) {
+				RDFNode value = qs.get(varName);
+				if(value instanceof Resource) {
+					results.add((Resource)value);
+				}
+			}
+		}
+		qexec.close();
+		return results;
+	}
+
+	
+	@Override
+	public boolean isNodeInScope(Resource focusNode, Dataset dataset, Resource executable, SHACLTemplateCall templateCall) {
+
+		// If sh:sparql exists only, then we expect run the query with ?this pre-bound
+		String sparql = JenaUtil.getStringProperty(executable, SH.sparql);
+		String queryString = ARQFactory.get().createPrefixDeclarations(executable.getModel()) + sparql;
+		Query query;
+		try {
+			query = ARQFactory.get().createQuery(queryString);
+		}
+		catch(QueryParseException ex) {
+			throw new SHACLException("Invalid SPARQL scope (" + ex.getLocalizedMessage() + "):\n" + queryString);
+		}
+
+		QuerySolutionMap bindings = new QuerySolutionMap();
+		bindings.add(SH.thisVar.getVarName(), focusNode);
+		if(templateCall != null) {
+			templateCall.addBindings(bindings);
+		}
+		QueryExecution qexec = ARQFactory.get().createQueryExecution(query, dataset, bindings);
+		ResultSet rs = qexec.execSelect();
+		boolean hasNext = rs.hasNext();
+		qexec.close();
+		return hasNext;
+
+		/* Alternative: a stupid brute-force algorithm
+		Iterator<Resource> it = getResourcesInScope(dataset, executable, templateCall).iterator();
+		while(it.hasNext()) {
+			if(focusNode.equals(it.next())) {
+				return true;
+			}
+		}
+		return false;*/
 	}
 }
