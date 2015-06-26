@@ -1,4 +1,4 @@
-# baseURI: http://www.w3.org/ns/shacl/test/features/core/inverseProperty-001
+# baseURI: http://www.w3.org/ns/shacl/test/features/core/scopeShape-001
 
 @prefix ex: <http://example.org/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -14,37 +14,45 @@
 # Shapes ----------------------------------------------------------------------
 
 ex:Person
-	a sh:ShapeClass ;
+	a rdfs:Class ;
 	rdfs:subClassOf rdfs:Resource ;
+.
+
+ex:PersonShape
+	a sh:Shape ;
+	sh:scopeClass ex:Person ;
 	sh:property [
-		sh:predicate ex:child ;
-		sh:valueClass ex:Person ;
-		rdfs:label "child" ;
+		sh:predicate ex:gender ;
+		sh:allowedValues ( "male" "female" ) ;
 	] ;
-	sh:inverseProperty [
+	sh:property [
+		a sh:PropertyConstraint ;
 		sh:predicate ex:child ;
 		sh:valueClass ex:Person ;
-		sh:minCount 2 ;
-		sh:maxCount 2 ;
-		rdfs:label "parent" ;
+	] ;
+	sh:property [
+		a sh:PropertyConstraint ;
+		sh:scopeShape [
+			sh:property [
+				sh:predicate ex:gender ;
+				sh:hasValue "male" ;
+			]
+		] ;
+		sh:predicate ex:child ;
+		sh:maxCount 0 ;
 	] ;
 .
 
 # Instances -------------------------------------------------------------------
 
-# Invalid: has no parents
-ex:Father
+ex:ValidInstance1
 	a ex:Person ;
-	ex:child ex:Child ;
+	ex:gender "female" ;
+	ex:child ex:InvalidInstance1 ;
 .
 
-# Invalid: has no parents
-ex:Mother
+ex:InvalidInstance1
 	a ex:Person ;
-	ex:child ex:Child ;
-.
-
-# Valid: two incoming child links
-ex:Child
-	a ex:Person ;
+	ex:gender "male" ;
+	ex:child ex:ValidInstance1 ;
 .

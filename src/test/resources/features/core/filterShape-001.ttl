@@ -28,7 +28,7 @@ ex:PersonShape
 	sh:property [
 		a sh:PropertyConstraint ;
 		sh:predicate ex:child ;
-		sh:valueType ex:Person ;
+		sh:valueClass ex:Person ;
 	] ;
 	sh:property [
 		a sh:PropertyConstraint ;

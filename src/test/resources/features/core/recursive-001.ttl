@@ -19,12 +19,12 @@ ex:Person
 	rdfs:subClassOf rdfs:Resource ;
 	sh:property [
 		sh:predicate ex:livesIn ;
-		sh:valueType ex:Region ;
+		sh:valueClass ex:Region ;
 		rdfs:label "lives in" ;
 	] ;
 	sh:property [
 		sh:predicate ex:knows ;
-		sh:valueType ex:Person ;
+		sh:valueClass ex:Person ;
 		rdfs:label "knows" ;
 	] ;
 .

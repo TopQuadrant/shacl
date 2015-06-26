@@ -89,6 +89,10 @@ public class SH {
     public final static Property defaultValue = ResourceFactory.createProperty(NS + "defaultValue");
 
     public final static Property defaultValueType = ResourceFactory.createProperty(NS + "defaultValueType");
+
+    public final static Property directValueType = ResourceFactory.createProperty(NS + "directValueType");
+
+    public final static Property entailment = ResourceFactory.createProperty(NS + "entailment");
     
     public final static Property filterShape = ResourceFactory.createProperty(NS + "filterShape");
 
@@ -150,13 +154,11 @@ public class SH {
 
     public final static Property sparql = ResourceFactory.createProperty(NS + "sparql");
 
-    public final static Property sparqlEntailment = ResourceFactory.createProperty(NS + "sparqlEntailment");
-
     public final static Property subject = ResourceFactory.createProperty(NS + "subject");
+
+    public final static Property valueClass = ResourceFactory.createProperty(NS + "valueClass");
     
     public final static Property valueShape = ResourceFactory.createProperty(NS + "valueShape");
-
-    public final static Property valueType = ResourceFactory.createProperty(NS + "valueType");
 
 	
 	public static final Var currentShapeVar = Var.alloc("currentShape");

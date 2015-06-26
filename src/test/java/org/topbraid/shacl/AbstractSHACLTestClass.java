@@ -45,15 +45,15 @@ abstract class AbstractSHACLTestClass extends TestCase {
 
 
 	protected void compareResults(Model results) {
+		String printed = ModelPrinter.get().print(results);
 		Statement resultS = testResource.getProperty(MF.result);
 		if(resultS == null || JenaDatatypes.TRUE.equals(resultS.getObject())) {
-			Assert.assertTrue("Expected no validation results, but found: " + results.size() + " triples", results.isEmpty());
+			Assert.assertTrue("Expected no validation results for " + testResource + ", but found: " + results.size() + " triples:\n" + printed, results.isEmpty());
 		}
 		else {
 			results.setNsPrefix(SH.PREFIX, SH.NS);
 			results.setNsPrefix("rdf", RDF.getURI());
 			results.setNsPrefix("rdfs", RDFS.getURI());
-			String printed = ModelPrinter.get().print(results);
 			results.removeAll(null, SH.message, (RDFNode)null);
 			results.removeAll(null, SH.source, (RDFNode)null);
 			Model expected = JenaUtil.createDefaultModel();

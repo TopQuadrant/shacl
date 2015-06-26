@@ -20,13 +20,13 @@ ex:Issue
 	rdfs:label "Issue" ;
   	sh:property [
 		sh:predicate ex:submittedBy ;
-		sh:valueType ex:Person ;
+		sh:valueClass ex:Person ;
 		sh:minCount 1 ;
 		rdfs:label "submitted by" ;
     ] ;
 	sh:property [
 		sh:predicate ex:assignedTo ;
-      	sh:valueType ex:Person ;
+      	sh:valueClass ex:Person ;
 		sh:valueShape [
 			rdfs:comment "All assignees must have an email and a last name." ;
 			sh:property [

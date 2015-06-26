@@ -11,7 +11,6 @@ import org.topbraid.shacl.constraints.ExecutionLanguage;
 import org.topbraid.shacl.constraints.FatalErrorLog;
 import org.topbraid.shacl.constraints.ModelConstraintValidator;
 import org.topbraid.shacl.constraints.SHACLException;
-import org.topbraid.shacl.entailment.SPARQLEntailment;
 import org.topbraid.shacl.model.SHACLConstraint;
 import org.topbraid.shacl.model.SHACLFactory;
 import org.topbraid.shacl.model.SHACLShape;
@@ -69,13 +68,6 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 	public void executeConstraint(Dataset dataset, Resource shape, Resource shapesGraph,
 			SHACLConstraint constraint, ConstraintExecutable executable,
 			Resource focusNode, Model results) {
-		
-		Resource entailment = JenaUtil.getResourceProperty(executable.getResource(), SH.sparqlEntailment);
-		dataset = SPARQLEntailment.get().withEntailment(dataset, entailment);
-		if(dataset == null) {
-			addEntailmentError(entailment, constraint, results);
-			return;
-		}
 		
 		Resource resource = executable.getResource();
 		String sparql = JenaUtil.getStringProperty(resource, SH.sparql);
@@ -153,13 +145,6 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 					focusNode != null ? focusNode.asNode() : resource.asNode());
 			SPINStatisticsManager.get().add(Collections.singletonList(stats));
 		}
-	}
-	
-	
-	private void addEntailmentError(Resource entailment, Resource constraint, Model results) {
-		Resource error = results.createResource(SH.FatalError);
-		error.addProperty(SH.message, "Unsupported SPARQL entailment " + entailment);
-		error.addProperty(SH.source, constraint);
 	}
 
 
@@ -243,12 +228,6 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 	
 	@Override
 	public Iterable<Resource> executeScope(Dataset dataset, Resource executable, SHACLTemplateCall templateCall) {
-		
-		Resource entailment = JenaUtil.getResourceProperty(executable, SH.sparqlEntailment);
-		dataset = SPARQLEntailment.get().withEntailment(dataset, entailment);
-		if(dataset == null) {
-			throw new SHACLException("Unsupported SPARQL entailment " + entailment);
-		}
 
 		String sparql = JenaUtil.getStringProperty(executable, SH.sparql);
 		String queryString = ARQFactory.get().createPrefixDeclarations(executable.getModel()) + sparql;

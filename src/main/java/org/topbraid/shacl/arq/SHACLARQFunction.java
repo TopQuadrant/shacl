@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.jena.atlas.io.IndentedWriter;
-import org.topbraid.shacl.entailment.SPARQLEntailment;
 import org.topbraid.shacl.model.SHACLArgument;
 import org.topbraid.shacl.model.SHACLFunction;
 import org.topbraid.shacl.vocabulary.SH;
@@ -33,7 +32,6 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.sparql.core.DatasetImpl;
 import com.hp.hpl.jena.sparql.core.Substitute;
 import com.hp.hpl.jena.sparql.engine.binding.Binding;
@@ -65,8 +63,6 @@ public class SHACLARQFunction implements com.hp.hpl.jena.sparql.function.Functio
 	
 	private boolean cachable;
 	
-	private Resource entailment;
-	
 	private String queryString;
 	
 	private SHACLFunction shaclFunction;
@@ -83,7 +79,6 @@ public class SHACLARQFunction implements com.hp.hpl.jena.sparql.function.Functio
 		this.shaclFunction = shaclFunction;
 		
 		this.cachable = shaclFunction.hasProperty(SH.cachable, JenaDatatypes.TRUE);
-		this.entailment = JenaUtil.getResourceProperty(shaclFunction, SH.sparqlEntailment);
 		
 		try {
 			queryString = shaclFunction.getSPARQL();
@@ -125,16 +120,6 @@ public class SHACLARQFunction implements com.hp.hpl.jena.sparql.function.Functio
 		Model model = activeGraph != null ? 
 				ModelFactory.createModelForGraph(activeGraph) :
 				ModelFactory.createDefaultModel();
-				
-		if(entailment != null) {
-			SPARQLEntailment.Engine engine = SPARQLEntailment.get().getEngine(entailment.getURI());
-			if(engine != null) {
-				model = engine.createModelWithEntailment(model);
-			}
-			else {
-				throw new UnsupportedOperationException("Unsupported SPARQL entailment " + entailment);
-			}
-		}
 		
 		QuerySolutionMap bindings = new QuerySolutionMap();
 		

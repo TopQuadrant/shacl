@@ -13,23 +13,8 @@
 	rdfs:comment "Tests of SPARQL features" ;
 	rdfs:label "SPARQL Features tests" ;
 	mf:entries ( 
-		<entailment-001> 
 		<global-001> 
 	)
-.
-
-<entailment-001>
-	a sht:Validate ;
-	mf:name "Test for a SPARQL constraint with RDFS entailment" ;
-	mf:action [
-		sht:schema <entailment-001.ttl> ; 
-		sht:data <entailment-001.ttl> ; 
-	] ;
-	mf:result [
-		a sh:Error ;
-  		sh:root ex:InvalidInstance1 ;
-	] ;
-	mf:status sht:proposed ; 
 .
 
 <global-001>
