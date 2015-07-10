@@ -14,6 +14,7 @@
 	rdfs:label "SPARQL Features tests" ;
 	mf:entries ( 
 		<global-001> 
+		<template-001> 
 	)
 .
 
@@ -27,6 +28,44 @@
 	mf:result [
 		a sh:Error ;
   		sh:root rdfs:Resource ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
+<template-001>
+	a sht:Validate ;
+	mf:name "Test for a template" ;
+	mf:action [
+		sht:schema <template-001.ttl> ; 
+		sht:data <template-001.ttl> ; 
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidInstance1 ;
+  		sh:subject ex:InvalidInstance1 ;
+  		sh:predicate rdfs:label ;
+  		sh:object "English"@en ;
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidInstance1 ;
+  		sh:subject ex:InvalidInstance1 ;
+  		sh:predicate rdfs:label ;
+  		sh:object "British"@en ;
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidInstance2 ;
+  		sh:subject ex:InvalidInstance2 ;
+  		sh:predicate rdfs:label ;
+  		sh:object "English"@en ;
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidInstance2 ;
+  		sh:subject ex:InvalidInstance2 ;
+  		sh:predicate rdfs:label ;
+  		sh:object "British"@en ;
 	] ;
 	mf:status sht:proposed ; 
 .

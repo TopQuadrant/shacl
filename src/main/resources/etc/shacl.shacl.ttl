@@ -1,7 +1,7 @@
 # baseURI: http://www.w3.org/ns/shacl
 
 # SHACL - Shapes Constraint Language
-# Draft last edited on 2015-06-26
+# Draft last edited on 2015-07-10
 # Created by the W3C RDF Data Shapes Working Group
 # Editor: Holger Knublauch <holger@topquadrant.com>
 
@@ -96,18 +96,21 @@ rdfs:Class
 	sh:property [
 		sh:predicate sh:abstract ;
 		sh:datatype xsd:boolean ;
+		sh:maxCount 1 ;
 		rdfs:label "abstract" ;
 		rdfs:comment "True to indicate that this class is not expected to have direct instances." ;
 	] ;
 	sh:property [
 		sh:predicate sh:final ;
 		sh:datatype xsd:boolean ;
+		sh:maxCount 1 ;
 		rdfs:label "final" ;
 		rdfs:comment "True to indicate that this class is not expected to have subclasses." ;
 	] ;
 	sh:property [
 		sh:predicate sh:private ;
 		sh:datatype xsd:boolean ;
+		sh:maxCount 1 ;
 		rdfs:label "private" ;
 		rdfs:comment "True to indicate that this class is only meant to be used inside of the graph that it has been defined in. This is often used to discourage instantiation outside of controlled scenarios. User interfaces may hide private classes from selection widgets." ;
 	] ;
@@ -741,11 +744,11 @@ sh:AbstractArgumentMaxCountConstraint
 		""" ;
 .
 
-sh:AbstractArgumentValueShapeConstraint
+sh:AbstractArgumentValueClassConstraint
 	a sh:ConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
-	rdfs:label "Abstract argument value shape constraint" ;
-	rdfs:comment "Enforces a constraint that the value of an argument must be of a certain type. For resources this will accept instances of subclasses. For literals this will accept strings with language tags instead of xsd:string." ;
+	rdfs:label "Abstract argument value class constraint" ;
+	rdfs:comment "Enforces a constraint that the value of an argument must be of a certain type. This will accept instances of subclasses." ;
 	sh:abstract true ;
 	sh:private true ;
 	sh:argument [
@@ -807,7 +810,7 @@ sh:Argument
 	rdfs:subClassOf sh:AbstractOptionalArgumentConstraint ;
 	rdfs:subClassOf sh:AbstractArgumentDatatypeConstraint ;
 	rdfs:subClassOf sh:AbstractArgumentMaxCountConstraint ;
-	rdfs:subClassOf sh:AbstractArgumentValueShapeConstraint ;
+	rdfs:subClassOf sh:AbstractArgumentValueClassConstraint ;
 	# TODO: Should we support node kinds here too?
 	rdfs:label "Argument" ;
 	rdfs:comment "Declares an argument that gets mapped to a variable in the parameterized SPARQL query." ;
@@ -1025,32 +1028,6 @@ sh:AbstractQualifiedValueShapePropertyConstraint
 		""" ;
 .
 
-sh:AbstractValueShapePropertyConstraint
-	a sh:ConstraintTemplate ;
-	rdfs:subClassOf sh:AbstractPropertyConstraint ;
-	rdfs:label "Abstract value shape property constraint" ;
-	rdfs:comment "Enforces a constraint that all values of the property must have a certain shape." ;
-	sh:abstract true ;
-	sh:private true ;
-	sh:argument [
-		sh:predicate sh:valueShape ;
-		sh:optionalWhenInherited true ;
-		sh:valueClass sh:Shape ;
-		rdfs:label "value shape" ;
-		rdfs:comment "The shape that the values must have." ;
-	] ;  
-	sh:message "Value does not fulfill the constraints of shape {?valueShape}" ;
-	sh:sparql """
-		SELECT ?this (?this AS ?subject) ?predicate ?object ?valueShape ?error
-		WHERE {
-			?this ?predicate ?object .
-			BIND (sh:hasShape(?object, ?valueShape, ?shapesGraph) AS ?hasShape) .
-			BIND (!bound(?hasShape) AS ?error) .
-			FILTER (?error || !?hasShape) .
-		}
-		""" ;
-.
-
 sh:AbstractValueClassPropertyConstraint
 	a sh:ConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
@@ -1081,6 +1058,32 @@ sh:AbstractValueClassPropertyConstraint
 			?this ?predicate ?object .
 			FILTER (!sh:hasType(?object, ?valueClass)) .
 			FILTER (!bound(?defaultValueType) || !isBlank(?object) || EXISTS { ?object a ?anyType }) .
+		}
+		""" ;
+.
+
+sh:AbstractValueShapePropertyConstraint
+	a sh:ConstraintTemplate ;
+	rdfs:subClassOf sh:AbstractPropertyConstraint ;
+	rdfs:label "Abstract value shape property constraint" ;
+	rdfs:comment "Enforces a constraint that all values of the property must have a certain shape." ;
+	sh:abstract true ;
+	sh:private true ;
+	sh:argument [
+		sh:predicate sh:valueShape ;
+		sh:optionalWhenInherited true ;
+		sh:valueClass sh:Shape ;
+		rdfs:label "value shape" ;
+		rdfs:comment "The shape that the values must have." ;
+	] ;  
+	sh:message "Value does not fulfill the constraints of shape {?valueShape}" ;
+	sh:sparql """
+		SELECT ?this (?this AS ?subject) ?predicate ?object ?valueShape ?error
+		WHERE {
+			?this ?predicate ?object .
+			BIND (sh:hasShape(?object, ?valueShape, ?shapesGraph) AS ?hasShape) .
+			BIND (!bound(?hasShape) AS ?error) .
+			FILTER (?error || !?hasShape) .
 		}
 		""" ;
 .
@@ -1410,10 +1413,37 @@ sh:AbstractValueClassInversePropertyConstraint
 		""" ;
 .
 
+sh:AbstractValueShapeInversePropertyConstraint
+	a sh:ConstraintTemplate ;
+	rdfs:subClassOf sh:AbstractPropertyConstraint ;
+	rdfs:label "Abstract value shape inverse property constraint" ;
+	rdfs:comment "Enforces a constraint that all inverse values of the property must have a certain shape." ;
+	sh:abstract true ;
+	sh:private true ;
+	sh:argument [
+		sh:predicate sh:valueShape ;
+		sh:optionalWhenInherited true ;
+		sh:valueClass sh:Shape ;
+		rdfs:label "value shape" ;
+		rdfs:comment "The shape that the inverse values must have." ;
+	] ;  
+	sh:message "Inverse value does not fulfill the constraints of shape {?valueShape}" ;
+	sh:sparql """
+		SELECT ?this (?this AS ?object) ?predicate ?subject ?valueShape ?error
+		WHERE {
+			?subject ?predicate ?this .
+			BIND (sh:hasShape(?subject, ?valueShape, ?shapesGraph) AS ?hasShape) .
+			BIND (!bound(?hasShape) AS ?error) .
+			FILTER (?error || !?hasShape) .
+		}
+		""" ;
+.
+
 sh:InversePropertyConstraint
 	a sh:ConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractCountInversePropertyConstraint ;
 	rdfs:subClassOf sh:AbstractValueClassInversePropertyConstraint ;
+	rdfs:subClassOf sh:AbstractValueShapeInversePropertyConstraint ;
 	rdfs:label "Inverse property constraint" ;
 	rdfs:comment "Declares the structural constraints for an incoming property at the associated class. The supported arguments are inherited from the superclasses." ;
 	sh:labelTemplate "Inverse property {?predicate} : {?valueClass} [{?minCount}..{?maxCount}]" ;
@@ -1466,7 +1496,7 @@ sh:NotConstraint
 	sh:sparql """
 		SELECT ?this ?error
 		WHERE {
-			BIND (sh:hasShape(?this, ?shape, ?shapesGraph) AS ?hasShape) .
+			BIND (sh:hasShape(?this, ?shape, ?shapesGraph, true) AS ?hasShape) .
 			BIND (!bound(?hasShape) AS ?error) .
 			FILTER (?error || ?hasShape) .
 		}
@@ -1615,6 +1645,12 @@ sh:hasShape
 		sh:valueClass sh:Graph ;
 		rdfs:comment "The graph containing the shape definitions." ;
 	] ;
+	sh:argument [
+		sh:predicate sh:arg4 ;
+		sh:datatype xsd:boolean ;
+		sh:optional true ;
+		rdfs:comment "If set to true then any recursive occurrence of the same resource against the same shape will fail (result=undefined)." ;
+	] ;
 	sh:returnType xsd:boolean ;
 .
 
@@ -1732,7 +1768,7 @@ sh:validShapeCount
 			GRAPH ?arg3 {
 				?arg2 rdf:rest*/rdf:first ?shape .
 			}
-			BIND (sh:hasShape(?arg1, ?shape, ?arg3) AS ?hasShape) .
+			BIND (sh:hasShape(?arg1, ?shape, ?arg3, true) AS ?hasShape) .
 			BIND (IF(bound(?hasShape), IF(?hasShape, 1, 0), 'error') AS ?s) .
 		}
 		""" ;
@@ -1794,7 +1830,7 @@ sh:valuesWithShapeCount
 		SELECT (SUM(?s) AS ?result)
 		WHERE {
 			?arg1 ?arg2 ?value .
-			BIND (sh:hasShape(?value, ?arg3, ?arg4) AS ?hasShape) .
+			BIND (sh:hasShape(?value, ?arg3, ?arg4, true) AS ?hasShape) .
 			BIND (IF(bound(?hasShape), IF(?hasShape, 1, 0), 'error') AS ?s) .
 		}
 		""" ;
@@ -1835,7 +1871,7 @@ sh:walkShapesList
 					?arg1 rdf:rest ?rest .
 				}
 			}
-			BIND (IF(bound(?shape), sh:hasShape(?arg3, ?shape, ?arg4), !?arg2) AS ?hasShape) .
+			BIND (IF(bound(?shape), sh:hasShape(?arg3, ?shape, ?arg4, true), !?arg2) AS ?hasShape) .
 			BIND (IF(?hasShape = ?arg2, true, IF(bound(?rest), sh:walkShapesList(?rest, ?arg2, ?arg3, ?arg4), false)) AS ?result) .
 		}
 		""" ;
