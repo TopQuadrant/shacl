@@ -20,7 +20,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 /**
- * Default implementation of SHACLModule.
+ * Default implementation of SHACLMacro.
  * 
  * @author Holger Knublauch
  */

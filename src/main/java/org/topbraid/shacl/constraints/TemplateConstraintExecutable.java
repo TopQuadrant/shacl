@@ -49,7 +49,7 @@ public class TemplateConstraintExecutable extends ConstraintExecutable {
 	
 	
 	/**
-	 * Checks if all non-optional argument are present.
+	 * Checks if all non-optional arguments are present.
 	 * @return true  if complete
 	 */
 	public boolean isComplete() {

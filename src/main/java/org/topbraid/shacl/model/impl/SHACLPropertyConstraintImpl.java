@@ -21,7 +21,7 @@ public class SHACLPropertyConstraintImpl extends SHACLAbstractPropertyConstraint
 	
 	
 	@Override
-	public Resource getDefaultType() {
+	public Resource getDefaultValueType() {
 		return JenaUtil.getResourceProperty(this, SH.defaultValueType);
 	}
 

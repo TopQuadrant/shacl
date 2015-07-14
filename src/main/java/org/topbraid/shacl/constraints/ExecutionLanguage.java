@@ -1,5 +1,7 @@
 package org.topbraid.shacl.constraints;
 
+import java.net.URI;
+
 import org.topbraid.shacl.model.SHACLConstraint;
 import org.topbraid.shacl.model.SHACLTemplateCall;
 
@@ -19,7 +21,7 @@ public interface ExecutionLanguage {
 	
 	boolean canExecuteScope(Resource executable);
 	
-	void executeConstraint(Dataset dataset, Resource shape, Resource shapesGraph, SHACLConstraint constraint, ConstraintExecutable executable, Resource focusNode, Model results);
+	void executeConstraint(Dataset dataset, Resource shape, URI shapesGraphURI, SHACLConstraint constraint, ConstraintExecutable executable, Resource focusNode, Model results);
 
 	Iterable<Resource> executeScope(Dataset dataset, Resource executable, SHACLTemplateCall templateCall);
 	

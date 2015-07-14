@@ -9,7 +9,7 @@ import java.util.Map;
 
 
 /**
- * Instances of sh:Module (or subclasses thereof).
+ * Instances of sh:Macro (or subclasses thereof).
  * 
  * @author Holger Knublauch
  */
@@ -32,8 +32,7 @@ public interface SHACLMacro extends SHACLClass {
 	
 	
 	/**
-	 * Gets the body (if defined).  The result will be type cast into the
-	 * most specific subclass of Command if possible.
+	 * Gets the SPARQL body (if defined).
 	 * @return the body or null
 	 */
 	String getSPARQL();

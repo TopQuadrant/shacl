@@ -1,5 +1,6 @@
 package org.topbraid.shacl.constraints;
 
+import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -76,24 +77,24 @@ public class ResourceConstraintValidator {
 	/**
 	 * Validates all SHACL constraints for a given resource.
 	 * @param dataset  the Dataset to operate on
-	 * @param shapesGraph  the URI of the shapes graph (must be in the dataset)
-	 * @param focusNode  the Resource to validate
+	 * @param shapesGraphURI  the URI of the shapes graph (must be in the dataset)
+	 * @param focusNode  the resource to validate
 	 * @param minSeverity  the minimum severity level or null for all constraints
 	 * @param monitor  an optional progress monitor
-	 * @return a List of constraint violations
+	 * @return a Model with constraint violations
 	 */
-	public Model validateNode(Dataset dataset, Resource shapesGraph, Node focusNode, Resource minSeverity, ProgressMonitor monitor) {
+	public Model validateNode(Dataset dataset, URI shapesGraphURI, Node focusNode, Resource minSeverity, ProgressMonitor monitor) {
 		
 		Model results = JenaUtil.createMemoryModel();
 		
-		Model shapesModel = dataset.getNamedModel(shapesGraph.getURI());
+		Model shapesModel = dataset.getNamedModel(shapesGraphURI.toString());
 		
 		List<Property> properties = SHACLUtil.getAllConstraintProperties();
 		
 		Resource resource = (Resource) dataset.getDefaultModel().asRDFNode(focusNode);
 		Set<Resource> shapes = getShapesForResource(resource, dataset, shapesModel);
 		for(Resource shape : shapes) {
-			addResourceViolations(dataset, shapesGraph, focusNode, shape.asNode(), properties, minSeverity, results, monitor);
+			addResourceViolations(dataset, shapesGraphURI, focusNode, shape.asNode(), properties, minSeverity, results, monitor);
 		}
 		
 		return results;
@@ -103,16 +104,16 @@ public class ResourceConstraintValidator {
 	/**
 	 * Validates a given resource against a given Shape.
 	 * @param dataset  the Dataset to operate on
-	 * @param shapesGraph  the URI of the shapes graph (must be in the dataset)
-	 * @param focusNode  the Resource to validate
+	 * @param shapesGraphURI  the URI of the shapes graph (must be in the dataset)
+	 * @param focusNode  the resource to validate
 	 * @param shape  the sh:Shape to validate against
 	 * @param minSeverity  the minimum severity level or null for all constraints
 	 * @param monitor  an optional progress monitor
-	 * @return a List of constraint violations
+	 * @return a Model with constraint violations
 	 */
-	public Model validateNodeAgainstShape(Dataset dataset, Resource shapesGraph, Node focusNode, Node shape, Resource minSeverity, ProgressMonitor monitor) {
+	public Model validateNodeAgainstShape(Dataset dataset, URI shapesGraphURI, Node focusNode, Node shape, Resource minSeverity, ProgressMonitor monitor) {
 		Model results = JenaUtil.createMemoryModel();
-		addResourceViolations(dataset, shapesGraph, focusNode, shape, SHACLUtil.getAllConstraintProperties(), minSeverity, results, monitor);
+		addResourceViolations(dataset, shapesGraphURI, focusNode, shape, SHACLUtil.getAllConstraintProperties(), minSeverity, results, monitor);
 		return results;
 	}
 
@@ -122,7 +123,7 @@ public class ResourceConstraintValidator {
 			Resource shape,
 			Resource focusNode,
 			Dataset dataset,
-			Resource shapesGraph,
+			URI shapesGraphURI,
 			Resource minSeverity,
 			ProgressMonitor monitor) {
 		
@@ -131,18 +132,18 @@ public class ResourceConstraintValidator {
 			Resource severity = executable.getSeverity();
 			if(minSeverity == null || minSeverity.equals(severity) || JenaUtil.hasSuperClass(severity, minSeverity)) {
 				ExecutionLanguage lang = ExecutionLanguageSelector.get().getLanguageForConstraint(executable);
-				lang.executeConstraint(dataset, shape, shapesGraph, constraint, executable, focusNode, results);
+				lang.executeConstraint(dataset, shape, shapesGraphURI, constraint, executable, focusNode, results);
 			}
 		}
 	}
 
 
-	private void addResourceViolations(Dataset dataset, Resource shapesGraph, Node resourceNode, Node shapeNode,
+	private void addResourceViolations(Dataset dataset, URI shapesGraphURI, Node resourceNode, Node shapeNode,
 			List<Property> constraintProperties, Resource minSeverity, Model results,
 			ProgressMonitor monitor) {
 		
 		Resource resource = (Resource) dataset.getDefaultModel().asRDFNode(resourceNode);
-		Model shapesModel = dataset.getNamedModel(shapesGraph.getURI());
+		Model shapesModel = dataset.getNamedModel(shapesGraphURI.toString());
 		Resource shape = (Resource) shapesModel.asRDFNode(shapeNode);
 		for(Property constraintProperty : constraintProperties) {
 			for(Resource c : JenaUtil.getResourceProperties(shape, constraintProperty)) {
@@ -153,11 +154,11 @@ public class ResourceConstraintValidator {
 				if(type != null) {
 					if(SH.NativeConstraint.equals(type)) {
 						SHACLConstraint constraint = SHACLFactory.asNativeConstraint(c);
-						addQueryResults(results, constraint, shape, resource, dataset, shapesGraph, minSeverity, monitor);
+						addQueryResults(results, constraint, shape, resource, dataset, shapesGraphURI, minSeverity, monitor);
 					}
 					else if(JenaUtil.hasIndirectType(type, SH.ConstraintTemplate)) {
 						SHACLConstraint constraint = SHACLFactory.asTemplateConstraint(c);
-						addQueryResults(results, constraint, shape, resource, dataset, shapesGraph, minSeverity, monitor);
+						addQueryResults(results, constraint, shape, resource, dataset, shapesGraphURI, minSeverity, monitor);
 					}
 				}
 			}

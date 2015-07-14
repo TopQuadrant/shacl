@@ -28,7 +28,9 @@ import com.hp.hpl.jena.sparql.util.FmtUtils;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 /**
- * Collects various dodgy helper algorithms by the SPARQL execution language. 
+ * Collects various dodgy helper algorithms currently used by the SPARQL execution language.
+ * 
+ * TODO: These should likely operate on clones of the Query syntax tree instead of query strings.
  *
  * @author Holger Knublauch
  */
@@ -153,6 +155,7 @@ class SPARQLSubstitutions {
 			scopes.add("        " + varName + " <" + RDFS.subClassOf + ">* <" + cls + "> .\n            ?this a " + varName + " .\n");
 		}
 		
+		// TODO: This needs to be generalized to also work with scopes that are not SPARQL queries
 		for(Resource scope : JenaUtil.getResourceProperties(shape, SH.scope)) {
 			scopes.add(createScope(scope));
 		}

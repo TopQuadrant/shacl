@@ -6,10 +6,10 @@ import com.hp.hpl.jena.rdf.model.Resource;
 public interface SHACLPropertyConstraint extends SHACLAbstractPropertyConstraint {
 	
 	/**
-	 * Gets the declared sh:defaultType.
+	 * Gets the declared sh:defaultValueType.
 	 * @return the default type or null
 	 */
-	Resource getDefaultType();
+	Resource getDefaultValueType();
 	
 	
 	Integer getMaxCount();

@@ -14,7 +14,7 @@ import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 /**
- * Default implementation of sh:NativeConstraint.
+ * Default implementation of SHACLNativeConstraint.
  * 
  * @author Holger Knublauch
  */

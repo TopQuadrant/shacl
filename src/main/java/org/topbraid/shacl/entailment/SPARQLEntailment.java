@@ -12,8 +12,10 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 /**
- * Singleton to support sh:sparqlEntailment.
+ * Singleton to support sh:entailment.
  * Extensions may install their own Engines.
+ * 
+ * TODO: This is currently unused and needs to be re-wired with the rest of the engine.
  * 
  * @author Holger Knublauch
  */

@@ -1,5 +1,7 @@
 package org.topbraid.shacl.arq.functions;
 
+import java.net.URI;
+
 import org.topbraid.shacl.constraints.FatalErrorLog;
 import org.topbraid.shacl.constraints.ResourceConstraintValidator;
 import org.topbraid.shacl.vocabulary.SH;
@@ -49,11 +51,10 @@ public class HasShapeFunction extends AbstractFunction4 {
 				try {
 					Model model = ModelFactory.createModelForGraph(env.getActiveGraph());
 					Resource resource = (Resource) model.asRDFNode(resourceNode);
-					Resource shapesGraph = (Resource) model.asRDFNode(shapesGraphNode);
 					Dataset dataset = DatasetImpl.wrap(env.getDataset());
 					Resource shape = (Resource) dataset.getDefaultModel().asRDFNode(shapeNode);
 					Model results = ResourceConstraintValidator.get().validateNodeAgainstShape(
-							dataset, shapesGraph, resource.asNode(), shape.asNode(), SH.Error, null);
+							dataset, URI.create(shapesGraphNode.getURI()), resource.asNode(), shape.asNode(), SH.Error, null);
 					if(results.contains(null, RDF.type, SH.FatalError)) {
 						throw new ExprEvalException("Propagating fatal error from nested shapes");
 					}

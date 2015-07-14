@@ -42,6 +42,6 @@ public class NativeConstraintExecutable extends ConstraintExecutable {
 
 
 	public String toString() {
-		return "SHACL SPARQL Constraint";
+		return "Native SHACL Constraint";
 	}
 }

@@ -1,5 +1,6 @@
 package org.topbraid.shacl.constraints;
 
+import java.net.URI;
 import java.util.Collections;
 
 import org.topbraid.shacl.model.SHACLConstraint;
@@ -13,7 +14,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 /**
  * An ExecutionLanguage that serves as fall-back, if a constraint or template does not define
  * any valid executable property such as sh:sparql.
- * This will simply report a warning that the constraint could not be evaluated.
+ * This will simply report a fatal error that the constraint could not be evaluated.
  * 
  * @author Holger Knublauch
  */
@@ -34,9 +35,9 @@ public class FallbackExecutionLanguage implements ExecutionLanguage {
 
 	@Override
 	public void executeConstraint(Dataset dataset, Resource shape,
-			Resource shapesGraph, SHACLConstraint constraint, ConstraintExecutable executable,
+			URI shapesGraphURI, SHACLConstraint constraint, ConstraintExecutable executable,
 			Resource focusNode, Model results) {
-		Resource vio = results.createResource(SH.Warning);
+		Resource vio = results.createResource(SH.FatalError);
 		vio.addProperty(SH.message, "No execution language found for constraint");
 		vio.addProperty(SH.source, constraint);
 		if(focusNode != null) {

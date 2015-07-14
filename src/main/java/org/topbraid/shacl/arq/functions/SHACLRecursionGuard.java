@@ -45,19 +45,19 @@ class SHACLRecursionGuard {
 		
 		private Node resource;
 		
-		private Node matchType;
+		private Node shape;
 		
 		
-		Call(Node resource, Node matchType) {
+		Call(Node resource, Node shape) {
 			this.resource = resource;
-			this.matchType = matchType;
+			this.shape = shape;
 		}
 		
 
 		@Override
 		public boolean equals(Object other) {
 			if(other instanceof Call) {
-				return ((Call)other).resource.equals(resource) && ((Call)other).matchType.equals(matchType);
+				return ((Call)other).resource.equals(resource) && ((Call)other).shape.equals(shape);
 			}
 			else {
 				return false;
@@ -67,12 +67,12 @@ class SHACLRecursionGuard {
 		
 		@Override
 		public int hashCode() {
-			return resource.hashCode() + matchType.hashCode();
+			return resource.hashCode() + shape.hashCode();
 		}
 		
 		
 		public String toString() {
-			return "(" + resource + ", " + matchType + ")";
+			return "(" + resource + ", " + shape + ")";
 		}
 	}
 }

@@ -1,5 +1,6 @@
 package org.topbraid.shacl.constraints.sparql;
 
+import java.net.URI;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -65,7 +66,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 
 
 	@Override
-	public void executeConstraint(Dataset dataset, Resource shape, Resource shapesGraph,
+	public void executeConstraint(Dataset dataset, Resource shape, URI shapesGraphURI,
 			SHACLConstraint constraint, ConstraintExecutable executable,
 			Resource focusNode, Model results) {
 		
@@ -120,7 +121,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 			bindings.add(SH.thisVar.getVarName(), focusNode);
 		}
 		bindings.add(SH.currentShapeVar.getVarName(), shape);
-		bindings.add(SH.shapesGraphVar.getVarName(), shapesGraph);
+		bindings.add(SH.shapesGraphVar.getVarName(), ResourceFactory.createResource(shapesGraphURI.toString()));
 		for(int i = 0; i < filters.size(); i++) {
 			bindings.add(ModelConstraintValidator.FILTER_VAR_NAME + i, filters.get(i));
 		}

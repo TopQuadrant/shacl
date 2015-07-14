@@ -49,7 +49,7 @@ import com.hp.hpl.jena.sparql.util.FmtUtils;
 /**
  * An ARQ function that delegates its functionality into a user-defined SHACL function.
  * 
- * Use SHACLFunctions to install them from their definitions in a Model.
+ * Use the SHACLFunctions class to install them from their definitions in a Model.
  * 
  * @author Holger Knublauch
  */

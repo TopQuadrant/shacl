@@ -1,5 +1,6 @@
 package org.topbraid.shacl.constraints;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,7 +23,10 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 /**
- * An engine that can validate all constraints defined for a given Model.
+ * An engine that can validate all constraints defined for a given Model,
+ * where the Model is expected to be the default graph of a given Dataset.
+ * The engine will look at SHACL declarations inside of the Model to figure
+ * out which shapes to validate.
  * 
  * @author Holger Knublauch
  */
@@ -42,21 +46,22 @@ public class ModelConstraintValidator {
 
 	
 	/**
-	 * Validates all resources in a given Model.
+	 * Validates all resources in a given Model, which is expected to be the default
+	 * graph of a given Dataset.
 	 * @param dataset  the Dataset to validate
-	 * @param shapesGraph  the URI of the shapes graph in the dataset
+	 * @param shapesGraphURI  the URI of the shapes graph in the dataset
 	 * @param minSeverity  the minimum severity, e.g. sh:Error or null for all
 	 * @param filtered  true to exclude checking schema-level resources
 	 * @param monitor  an optional ProgressMonitor
 	 * @return a Model containing violation results - empty if OK
 	 */
-	public Model validateModel(Dataset dataset, Resource shapesGraph, Resource minSeverity, boolean filtered, ProgressMonitor monitor) throws InterruptedException {
+	public Model validateModel(Dataset dataset, URI shapesGraphURI, Resource minSeverity, boolean filtered, ProgressMonitor monitor) throws InterruptedException {
 		
 		if(dataset.getDefaultModel() == null) {
 			throw new IllegalArgumentException("Dataset requires a default model");
 		}
 		
-		Model shapesModel = dataset.getNamedModel(shapesGraph.getURI());
+		Model shapesModel = dataset.getNamedModel(shapesGraphURI.toString());
 		
 		if(monitor != null) {
 			monitor.subTask("Preparing execution plan");
@@ -75,7 +80,7 @@ public class ModelConstraintValidator {
 		Model results = JenaUtil.createMemoryModel();
 		for(Resource shape : map.keySet()) {
 			for(SHACLConstraint constraint : map.get(shape)) {
-				validateConstraintForShape(dataset, shapesGraph, minSeverity, constraint, shape, results, monitor);
+				validateConstraintForShape(dataset, shapesGraphURI, minSeverity, constraint, shape, results, monitor);
 				if(monitor != null) {
 					monitor.worked(1);
 					if(monitor.isCanceled()) {
@@ -142,7 +147,7 @@ public class ModelConstraintValidator {
 	}
 	
 	
-	private void validateConstraintForShape(Dataset dataset, Resource shapesGraph, Resource minSeverity, SHACLConstraint constraint, Resource shape, Model results, ProgressMonitor monitor) {
+	private void validateConstraintForShape(Dataset dataset, URI shapesGraphURI, Resource minSeverity, SHACLConstraint constraint, Resource shape, Model results, ProgressMonitor monitor) {
 		for(ConstraintExecutable executable : constraint.getExecutables()) {
 			Resource severity = executable.getSeverity();
 			if(minSeverity == null || minSeverity.equals(severity) || JenaUtil.hasSuperClass(severity, minSeverity)) {
@@ -150,7 +155,7 @@ public class ModelConstraintValidator {
 					monitor.subTask("Validating Shape " + SPINLabels.get().getLabel(shape));
 				}
 				ExecutionLanguage lang = ExecutionLanguageSelector.get().getLanguageForConstraint(executable);
-				lang.executeConstraint(dataset, shape, shapesGraph, constraint, executable, null, results);
+				lang.executeConstraint(dataset, shape, shapesGraphURI, constraint, executable, null, results);
 			}
 		}
 	}

@@ -69,7 +69,7 @@ abstract class AbstractSHACLTestClass extends TestCase {
 	
 	protected Dataset createDataset() throws Exception {
 		Dataset result = ARQFactory.get().getDataset(getDataModel());
-		result.addNamedModel(getShapesGraphURI().getURI(), getShapesModel());
+		result.addNamedModel(getShapesGraphURI().toString(), getShapesModel());
 		return result;
 	}
 	
@@ -101,8 +101,8 @@ abstract class AbstractSHACLTestClass extends TestCase {
 	}
 	
 	
-	protected Resource getShapesGraphURI() {
-		return getAction().getPropertyResourceValue(SHT.schema);
+	protected URI getShapesGraphURI() {
+		return URI.create(getAction().getPropertyResourceValue(SHT.schema).getURI());
 	}
 	
 	
