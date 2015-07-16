@@ -1,0 +1,95 @@
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix mf:      <http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#> .
+@prefix qt:      <http://www.w3.org/2001/sw/DataAccess/tests/test-query#> .
+@prefix sh:      <http://www.w3.org/ns/shacl#> .
+@prefix sht:     <http://www.w3.org/ns/shacl/test-suite#> .
+@prefix dawgt:   <http://www.w3.org/2001/sw/DataAccess/tests/test-dawg#> .
+@prefix dc:     <http://purl.org/dc/elements/1.1/> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix :      <http://example.org/> .
+ 
+<> a mf:Manifest ;
+   rdfs:label "Manifest Example file" ;
+   rdfs:comment "Manifest example file" ;
+   dc:creator "Jose Labra";
+   dc:date "2015-05-21"^^<xsd:date> ;
+   mf:entries (
+     <entry1> 
+     <entry2> 
+	 <entry3>
+	 <entry4>
+	 <entry5>
+	 <entry6>
+   ) .
+
+<entry1> a sht:Validate ;
+   mf:name "Validate simple RDF data with a Schema using compact syntax" ;
+   mf:action [
+     sht:schema <example-schema.shc> ; 
+     sht:schema-format sht:SHACLC   ; 
+ 	 sht:data <example-data.ttl> ; 
+ 	 sht:data-format sht:TURTLE ;
+	 ] ;
+   mf:result true ;
+   mf:status sht:proposed 
+   .
+
+<entry2> a sht:Validate ;
+   mf:name "Validate simple RDF data with a Schema using Turtle syntax" ;
+   mf:action [
+     sht:schema <example-schema.ttl> ; 
+     sht:schema-format sht:TURTLE   ; 
+ 	 sht:data <example-data.ttl> ; 
+ 	 sht:data-format sht:TURTLE ;
+	 ] ;
+   mf:result true ;
+   mf:status sht:proposed 
+   .
+
+<entry3> a sht:MatchNodeShape ;
+   mf:name "Match a node with a shape" ;
+   mf:action [
+     sht:schema <example-schema.shc> ; 
+     sht:schema-format sht:SHACLC   ; 
+ 	 sht:data <example-data.ttl> ; 
+ 	 sht:data-format sht:TURTLE ;
+ 	 sht:node :x ;
+ 	 sht:shape :Shape1
+	 ] ;
+   mf:result true ;
+   mf:status sht:proposed 
+   .
+
+<entry4> a sht:WellFormedSchema ;
+   mf:name "Check schema syntax positive" ;
+   mf:action [
+     sht:schema <example-schema.shc> ; 
+     sht:schema-format sht:SHACLC   ; 
+	 ] ;
+   mf:result true ;
+   mf:status sht:proposed 
+   .
+	
+<entry5> a sht:NonWellFormedSchema ;
+   mf:name "Check schema syntax negative" ;
+   mf:action [
+     sht:schema <example-schema-bad-syntax.shc> ; 
+     sht:schema-format sht:SHACLC   ; 
+	 ] ;
+   mf:result false ;
+   mf:status sht:proposed 
+   .
+
+<entry6> a sht:ConvertSchemaSyntax ;
+   mf:name "Convert schema syntax " ;
+   mf:action [
+     sht:schema <example-schema.shc> ; 
+     sht:schema-format sht:SHACLC   ; 
+	 sht:schema-output-format sht:TURTLE ;
+     sht:schema-output <example-schema.ttl>	 
+	 ] ;
+   mf:result true ;
+   mf:status sht:proposed 
+   .
+   

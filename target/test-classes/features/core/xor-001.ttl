@@ -1,0 +1,72 @@
+# baseURI: http://www.w3.org/ns/shacl/test/features/core/xor-001
+
+@prefix ex: <http://example.org/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<>
+	a sh:Graph ;
+	sh:shapesGraph <http://www.w3.org/ns/shacl> ;
+.
+
+
+# Shapes ----------------------------------------------------------------------
+
+ex:GivenAndFamilyNameXorFullNameShape
+	a sh:Shape ;
+	sh:constraint [
+		a sh:XorConstraint ;
+		sh:shapes (
+			[
+				sh:property [
+					sh:predicate ex:givenName ;
+					sh:minCount 1 ;
+				] ;
+				sh:property [
+					sh:predicate ex:familyName ;
+					sh:minCount 1 ;
+				]
+			]
+			[
+				sh:property [
+					sh:predicate ex:fullName ;
+					sh:minCount 1 ;
+				]
+			]
+		)
+	] ;
+.
+
+# Instances -------------------------------------------------------------------
+
+ex:ValidInstance1
+	sh:nodeShape ex:GivenAndFamilyNameXorFullNameShape ;
+  	ex:givenName "John" ;
+  	ex:familyName "Doe" ;
+.
+
+ex:ValidInstance2
+	sh:nodeShape ex:GivenAndFamilyNameXorFullNameShape ;
+  	ex:fullName "John Doe" ;
+.
+
+ex:ValidInstance3
+	sh:nodeShape ex:GivenAndFamilyNameXorFullNameShape ;
+	ex:givenName "John" ;
+  	ex:fullName "John Doe" ;
+.
+
+# Invalid: neither
+ex:InvalidInstance1
+	sh:nodeShape ex:GivenAndFamilyNameXorFullNameShape ;
+.
+
+# Invalid: both
+ex:InvalidInstance2
+	sh:nodeShape ex:GivenAndFamilyNameXorFullNameShape ;
+	ex:givenName "John" ;
+  	ex:familyName "Doe" ;
+  	ex:fullName "John Doe" ;
+.

@@ -8,8 +8,10 @@ import junit.framework.TestCase;
 
 import org.topbraid.shacl.arq.SHACLFunctions;
 import org.topbraid.shacl.constraints.ModelConstraintValidator;
+import org.topbraid.shacl.util.ModelPrinter;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.ARQFactory;
+import org.topbraid.spin.model.TriplePath;
 import org.topbraid.spin.util.JenaUtil;
 
 import com.hp.hpl.jena.graph.Graph;
@@ -17,9 +19,10 @@ import com.hp.hpl.jena.graph.compose.MultiUnion;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.sparql.syntax.ElementPathBlock;
 import com.hp.hpl.jena.util.FileUtils;
 
-public class ValidateSquareExampleTest extends TestCase {
+public class PropertyPathTest extends TestCase {
 
 	/**
 	 * Loads the SHACL Square example file and validates all constraints.
@@ -50,11 +53,14 @@ public class ValidateSquareExampleTest extends TestCase {
 		Dataset dataset = ARQFactory.get().getDataset(dataModel);
 		dataset.addNamedModel(shapesGraphURI.toString(), shapesModel);
 		
-		// Run the validator and print results
-		Model results = ModelConstraintValidator.get().validateModel(dataset, shapesGraphURI, null, false, null);
-		// System.out.println(ModelPrinter.get().print(results));
+	    TriplePath testPath = new TriplePath(this,)
 		
-		// Expecting 2 constraint violations (7 triples each)
-		assertEquals(14, results.size());
+		
+//		// Run the validator and print results
+//		Model results = ModelConstraintValidator.get().validateModel(dataset, shapesGraphURI, null, false, null);
+//		 System.out.println(ModelPrinter.get().print(results));
+//
+//		// Expecting 2 constraint violations (7 triples each)
+//		assertEquals(14, results.size());
 	}
 }

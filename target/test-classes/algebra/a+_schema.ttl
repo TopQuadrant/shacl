@@ -1,0 +1,10 @@
+@prefix sh:    <http://www.w3.org/ns/shacl/core#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+ 
+<begin>  a           sh:OpenShape ;
+        sh:property  [ a                 sh:PropertyConstraint ;
+                       sh:allowedValues  ( 1 ) ;
+                       sh:minCount       1 ;
+                       sh:predicate      <a>
+                     ] ;
+        sh:schema    [ a  sh:Schema ] .

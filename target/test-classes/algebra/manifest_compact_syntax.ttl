@@ -1,0 +1,2423 @@
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix mf:     <http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#> .
+@prefix qt:     <http://www.w3.org/2001/sw/DataAccess/tests/test-query#> .
+@prefix sh:     <http://www.w3.org/ns/shacl#> .
+@prefix ex:     <http://example.org/> .
+@prefix : 		<http://www.w3.org/2001/sw/DataAccess/tests/data-r2/algebra/manifest#> .
+@prefix dawgt:   <http://www.w3.org/2001/sw/DataAccess/tests/test-dawg#> .
+
+
+<>  rdf:type mf:Manifest ;
+    rdfs:comment "SHACL test suite" ;
+    rdfs:label "SHACL test suite" ;
+    mf:entries
+    ( 
+      :ab-ab
+        :ab-0
+        :ab-a
+        :ab-b
+        :ab-_B
+        :aqbq-a
+        :aqbq-b
+        :aqbq-a_B
+        :aqb-0
+        :aqb-_B
+        :abq-0
+        :ab-_A_B
+        :ab-_Ab
+        :ab-_A
+        :abq-_A
+        :a_or_b-a
+        :a_or_b-b
+        :a_or_b-_Ab
+        :a_or_b-a_B
+        :a_or_b-0
+        :a_or_b-ab
+        :a_or_b-_A
+        :a_or_b-_B
+        :a_or_b-_A_B
+        :aq_or_bq-0
+        :aq_or_bq-a
+        :aq_or_bq-b
+        :aq_or_bq-ab
+        :a_or_bq-0
+        :a_or_bq-_A
+        :aq_or_b-0
+        :aq_or_b-_B
+        :(a_or_b)c-ab
+        :(a_or_b)cq-ab
+        :(a_or_b)cq-abc
+        :(a_or_b)cq-ab_C
+        :a(b_or_c)-bc
+        :aq(b_or_c)-abc
+        :aq(b_or_c)-_Abc
+        :aq(b_or_c)-bc
+        :(a_or_b)(c_or_d)-abcd
+        :(a_or_b)_or_c-ab
+        :(a_or_b)_or_cq-ab
+        :(a_or_b)_or_cq-abc
+        :(a_or_b)_or_cq-ab_C
+        :a_or_(b_or_c)-bc
+        :aq_or_(b_or_c)-abc
+        :aq_or_(b_or_c)-_Abc
+        :aq_or_(b_or_c)-bc
+        :(a_or_b)_or_(c_or_d)-abcd
+        :(a_or_b)q-ab
+        :(aqbq)q-0
+        :(a)q-0
+        :(a)q-a
+        :(a)q-_A
+        :a-a
+        :a-_A
+        :a-b
+        :aq-0
+        :aq-a
+        :aq-aa
+        :a+-a
+        :a+-aa
+        :a+-0
+        :a*-a
+        :a*-aa
+        :a*-aaa
+        :a*-ab
+        :(a+)q-0
+        :(a+)q-a
+        :(a+)q-aa
+        :ab-ac
+        :ab-a_B
+        :abc-abc
+        :abc-a
+        :abc-b
+        :abc-c
+        :abc-ab
+        :abc-ac
+        :abc-bc
+        :(ab)c-abc
+        :(ab)c-a
+        :(ab)c-b
+        :(ab)c-c
+        :(ab)c-ab
+        :(ab)c-ac
+        :(ab)c-bc
+        :a+bc-abc
+        :a+bc-aabc
+        :a+bc-bc
+        :aqbq-_Ab
+        :a_or_b_or_c-a
+        :a_or_b_or_c-b
+        :a_or_b_or_c-c
+        :a_or_b_or_c-_A_Bc
+        :a_or_b_or_c-a_B_C
+        :a_or_b_or_c-0
+        :a_or_b_or_c-ab
+        :a_or_b_or_c-ac
+        :a_or_b_or_c-bc
+        :a_or_b_or_c-abc
+        :a_or_b_or_c-ab_C
+        :(a)qb-b
+        :(a)qb-ab
+        :(a)qb-a
+        :a(b)q-a
+        :a(b)q-ab
+        :a(b)q-b
+        :(ab)q-0
+        :(ab)q-ab
+        :(ab)q-a
+        :(ab)q-b
+        :a+(b)c-abc
+        :a+(b)c-aabc
+        :a+(b)c-bc
+        :(aqbq)q-a
+        :(aqbq)q-b
+        :(aqbq)q-ab
+        :(aqb)q-0
+        :(aqb)q-b
+        :(aqb)q-ab
+        :(aqb)q-a
+        :(abq)q-0
+        :(abq)q-a
+        :(abq)q-ab
+        :(abq)q-b
+        :a_or_(b)-a
+        :a_or_(b)-b
+        :a_or_(b)-0
+        :a_or_(b)-ab
+        :(a_or_b)-a
+        :(a_or_b)-b
+        :(a_or_b)-0
+        :(a_or_b)-ab
+        :a(b_or_c)-ab
+        :a(b_or_c)-ac
+        :a(b_or_c)-a
+        :a(b_or_c)-abc
+        :((ab)qc)q-0
+        :((ab)qc)q-c
+        :((ab)qc)q-abc
+        :((ab)qc)q-a
+        :((ab)qc)q-b
+        :((ab)qc)q-ab
+        :((abq)qc)q-0
+        :((abq)qc)q-c
+        :((abq)qc)q-ac
+        :((abq)qc)q-abc
+        :((abq)qc)q-a
+        :((abq)qc)q-b
+        :((abq)qc)q-ab
+        :((abq)qc)q-bc
+        :((aqb)qc)q-0
+        :((aqb)qc)q-c
+        :((aqb)qc)q-bc
+        :((aqb)qc)q-abc
+        :((aqb)qc)q-a
+        :((aqb)qc)q-b
+        :((aqb)qc)q-ab
+        :((aqb)qc)q-ac
+	) .
+
+:ab-ab a mf:ShExEvaluationTest ;
+    mf:name "ab ab" ;    
+    mf:action [
+    qt:schema <algebra/ab_schema.shc> ;
+    qt:data <algebra/ab.ttl>
+   ] ;
+   mf:result true .
+
+:ab-0 a mf:ShExEvaluationTest ;
+    mf:name "ab 0" ;    mf:action [
+        qt:schema <algebra/algebra/ab_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result false .
+
+:ab-a a mf:ShExEvaluationTest ;
+    mf:name "ab a" ;    mf:action [
+        qt:schema <algebra/algebra/ab_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result false .
+
+:ab-b a mf:ShExEvaluationTest ;
+    mf:name "ab b" ;    mf:action [
+        qt:schema <algebra/ab_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result false .
+
+:ab-_B a mf:ShExEvaluationTest ;
+    mf:name "ab _B" ;    mf:action [
+        qt:schema <algebra/ab_schema.shc> ;
+        qt:data <algebra/_B.ttl>
+    ] ;
+    mf:result false .
+
+:aqbq-a a mf:ShExEvaluationTest ;
+    mf:name "aqbq a" ;    mf:action [
+        qt:schema <algebra/aqbq_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result true .
+
+:aqbq-b a mf:ShExEvaluationTest ;
+    mf:name "aqbq b" ;    mf:action [
+        qt:schema <algebra/aqbq_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result true .
+
+:aqbq-a_B a mf:ShExEvaluationTest ;
+    mf:name "aqbq a_B" ;    mf:action [
+        qt:schema <algebra/aqbq_schema.shc> ;
+        qt:data <algebra/a_B.ttl>
+    ] ;
+    mf:result false .
+
+:aqb-0 a mf:ShExEvaluationTest ;
+    mf:name "aqb 0" ;    mf:action [
+        qt:schema <algebra/aqb_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result false .
+
+:aqb-_B a mf:ShExEvaluationTest ;
+    mf:name "aqb _B" ;    mf:action [
+        qt:schema <algebra/aqb_schema.shc> ;
+        qt:data <algebra/_B.ttl>
+    ] ;
+    mf:result false .
+
+:abq-0 a mf:ShExEvaluationTest ;
+    mf:name "abq 0" ;    mf:action [
+        qt:schema <algebra/abq_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result false .
+
+:ab-_A_B a mf:ShExEvaluationTest ;
+    mf:name "ab _A_B" ;    mf:action [
+        qt:schema <algebra/ab_schema.shc> ;
+        qt:data <algebra/_A_B.ttl>
+    ] ;
+    mf:result false .
+
+:ab-_Ab a mf:ShExEvaluationTest ;
+    mf:name "ab _Ab" ;    mf:action [
+        qt:schema <algebra/ab_schema.shc> ;
+        qt:data <algebra/_Ab.ttl>
+    ] ;
+    mf:result false .
+
+:ab-_A a mf:ShExEvaluationTest ;
+    mf:name "ab _A" ;    mf:action [
+        qt:schema <algebra/ab_schema.shc> ;
+        qt:data <algebra/_A.ttl>
+    ] ;
+    mf:result false .
+
+:abq-_A a mf:ShExEvaluationTest ;
+    mf:name "abq _A" ;    mf:action [
+        qt:schema <algebra/abq_schema.shc> ;
+        qt:data <algebra/_A.ttl>
+    ] ;
+    mf:result false .
+
+:a_or_b-a a mf:ShExEvaluationTest ;
+    mf:name "a_or_b a" ;    mf:action [
+        qt:schema <algebra/a_or_b_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result true .
+
+:a_or_b-b a mf:ShExEvaluationTest ;
+    mf:name "a_or_b b" ;    mf:action [
+        qt:schema <algebra/a_or_b_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result true .
+
+:a_or_b-_Ab a mf:ShExEvaluationTest ;
+    mf:name "a_or_b _Ab" ;    mf:action [
+        qt:schema <algebra/a_or_b_schema.shc> ;
+        qt:data <algebra/_Ab.ttl>
+    ] ;
+    mf:result true .
+
+:a_or_b-a_B a mf:ShExEvaluationTest ;
+    mf:name "a_or_b a_B" ;    mf:action [
+        qt:schema <algebra/a_or_b_schema.shc> ;
+        qt:data <algebra/a_B.ttl>
+    ] ;
+    mf:result true .
+
+:a_or_b-0 a mf:ShExEvaluationTest ;
+    mf:name "a_or_b 0" ;    mf:action [
+        qt:schema <algebra/a_or_b_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result false .
+
+:a_or_b-ab a mf:ShExEvaluationTest ;
+    mf:name "a_or_b ab" ;    mf:action [
+        qt:schema <algebra/a_or_b_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result false .
+
+:a_or_b-_A a mf:ShExEvaluationTest ;
+    mf:name "a_or_b _A" ;    mf:action [
+        qt:schema <algebra/a_or_b_schema.shc> ;
+        qt:data <algebra/_A.ttl>
+    ] ;
+    mf:result false .
+
+:a_or_b-_B a mf:ShExEvaluationTest ;
+    mf:name "a_or_b _B" ;    mf:action [
+        qt:schema <algebra/a_or_b_schema.shc> ;
+        qt:data <algebra/_B.ttl>
+    ] ;
+    mf:result false .
+
+:a_or_b-_A_B a mf:ShExEvaluationTest ;
+    mf:name "a_or_b _A_B" ;    mf:action [
+        qt:schema <algebra/a_or_b_schema.shc> ;
+        qt:data <algebra/_A_B.ttl>
+    ] ;
+    mf:result false .
+
+:aq_or_bq-0 a mf:ShExEvaluationTest ;
+    mf:name "aq_or_bq 0" ;    mf:action [
+        qt:schema <algebra/aq_or_bq_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result true .
+
+:aq_or_bq-a a mf:ShExEvaluationTest ;
+    mf:name "aq_or_bq a" ;    mf:action [
+        qt:schema <algebra/aq_or_bq_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result true .
+
+:aq_or_bq-b a mf:ShExEvaluationTest ;
+    mf:name "aq_or_bq b" ;    mf:action [
+        qt:schema <algebra/aq_or_bq_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result true .
+
+:aq_or_bq-ab a mf:ShExEvaluationTest ;
+    mf:name "aq_or_bq ab" ;    mf:action [
+        qt:schema <algebra/aq_or_bq_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result false .
+
+:a_or_bq-0 a mf:ShExEvaluationTest ;
+    mf:name "a_or_bq 0" ;    mf:action [
+        qt:schema <algebra/a_or_bq_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result true .
+
+:a_or_bq-_A a mf:ShExEvaluationTest ;
+    mf:name "a_or_bq _A" ;    mf:action [
+        qt:schema <algebra/a_or_bq_schema.shc> ;
+        qt:data <algebra/_A.ttl>
+    ] ;
+    mf:result true .
+
+:aq_or_b-0 a mf:ShExEvaluationTest ;
+    mf:name "aq_or_b 0" ;    mf:action [
+        qt:schema <algebra/aq_or_b_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result true .
+
+:aq_or_b-_B a mf:ShExEvaluationTest ;
+    mf:name "aq_or_b _B" ;    mf:action [
+        qt:schema <algebra/aq_or_b_schema.shc> ;
+        qt:data <algebra/_B.ttl>
+    ] ;
+    mf:result true .
+
+:(a_or_b)c-ab a mf:ShExEvaluationTest ;
+    mf:name "(a_or_b)c ab" ;    mf:action [
+        qt:schema <algebra/(a_or_b)c_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result false .
+
+:(a_or_b)cq-ab a mf:ShExEvaluationTest ;
+    mf:name "(a_or_b)cq ab" ;    mf:action [
+        qt:schema <algebra/(a_or_b)cq_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result false .
+
+:(a_or_b)cq-abc a mf:ShExEvaluationTest ;
+    mf:name "(a_or_b)cq abc" ;    mf:action [
+        qt:schema <algebra/(a_or_b)cq_schema.shc> ;
+        qt:data <algebra/abc.ttl>
+    ] ;
+    mf:result false .
+
+:(a_or_b)cq-ab_C a mf:ShExEvaluationTest ;
+    mf:name "(a_or_b)cq ab_C" ;    mf:action [
+        qt:schema <algebra/(a_or_b)cq_schema.shc> ;
+        qt:data <algebra/ab_C.ttl>
+    ] ;
+    mf:result false .
+
+:a(b_or_c)-bc a mf:ShExEvaluationTest ;
+    mf:name "a(b_or_c) bc" ;    mf:action [
+        qt:schema <algebra/a(b_or_c)_schema.shc> ;
+        qt:data <algebra/bc.ttl>
+    ] ;
+    mf:result false .
+
+:aq(b_or_c)-abc a mf:ShExEvaluationTest ;
+    mf:name "aq(b_or_c) abc" ;    mf:action [
+        qt:schema <algebra/aq(b_or_c)_schema.shc> ;
+        qt:data <algebra/abc.ttl>
+    ] ;
+    mf:result false .
+
+:aq(b_or_c)-_Abc a mf:ShExEvaluationTest ;
+    mf:name "aq(b_or_c) _Abc" ;    mf:action [
+        qt:schema <algebra/aq(b_or_c)_schema.shc> ;
+        qt:data <algebra/_Abc.ttl>
+    ] ;
+    mf:result false .
+
+:aq(b_or_c)-bc a mf:ShExEvaluationTest ;
+    mf:name "aq(b_or_c) bc" ;    mf:action [
+        qt:schema <algebra/aq(b_or_c)_schema.shc> ;
+        qt:data <algebra/bc.ttl>
+    ] ;
+    mf:result false .
+
+:(a_or_b)(c_or_d)-abcd a mf:ShExEvaluationTest ;
+    mf:name "(a_or_b)(c_or_d) abcd" ;    mf:action [
+        qt:schema <algebra/(a_or_b)(c_or_d)_schema.shc> ;
+        qt:data <algebra/abcd.ttl>
+    ] ;
+    mf:result false .
+
+:(a_or_b)_or_c-ab a mf:ShExEvaluationTest ;
+    mf:name "(a_or_b)_or_c ab" ;    mf:action [
+        qt:schema <algebra/(a_or_b)_or_c_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result false .
+
+:(a_or_b)_or_cq-ab a mf:ShExEvaluationTest ;
+    mf:name "(a_or_b)_or_cq ab" ;    mf:action [
+        qt:schema <algebra/(a_or_b)_or_cq_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result false .
+
+:(a_or_b)_or_cq-abc a mf:ShExEvaluationTest ;
+    mf:name "(a_or_b)_or_cq abc" ;    mf:action [
+        qt:schema <algebra/(a_or_b)_or_cq_schema.shc> ;
+        qt:data <algebra/abc.ttl>
+    ] ;
+    mf:result false .
+
+:(a_or_b)_or_cq-ab_C a mf:ShExEvaluationTest ;
+    mf:name "(a_or_b)_or_cq ab_C" ;    mf:action [
+        qt:schema <algebra/(a_or_b)_or_cq_schema.shc> ;
+        qt:data <algebra/ab_C.ttl>
+    ] ;
+    mf:result false .
+
+:a_or_(b_or_c)-bc a mf:ShExEvaluationTest ;
+    mf:name "a_or_(b_or_c) bc" ;    mf:action [
+        qt:schema <algebra/a_or_(b_or_c)_schema.shc> ;
+        qt:data <algebra/bc.ttl>
+    ] ;
+    mf:result false .
+
+:aq_or_(b_or_c)-abc a mf:ShExEvaluationTest ;
+    mf:name "aq_or_(b_or_c) abc" ;    mf:action [
+        qt:schema <algebra/aq_or_(b_or_c)_schema.shc> ;
+        qt:data <algebra/abc.ttl>
+    ] ;
+    mf:result false .
+
+:aq_or_(b_or_c)-_Abc a mf:ShExEvaluationTest ;
+    mf:name "aq_or_(b_or_c) _Abc" ;    mf:action [
+        qt:schema <algebra/aq_or_(b_or_c)_schema.shc> ;
+        qt:data <algebra/_Abc.ttl>
+    ] ;
+    mf:result false .
+
+:aq_or_(b_or_c)-bc a mf:ShExEvaluationTest ;
+    mf:name "aq_or_(b_or_c) bc" ;    mf:action [
+        qt:schema <algebra/aq_or_(b_or_c)_schema.shc> ;
+        qt:data <algebra/bc.ttl>
+    ] ;
+    mf:result false .
+
+:(a_or_b)_or_(c_or_d)-abcd a mf:ShExEvaluationTest ;
+    mf:name "(a_or_b)_or_(c_or_d) abcd" ;    mf:action [
+        qt:schema <algebra/(a_or_b)_or_(c_or_d)_schema.shc> ;
+        qt:data <algebra/abcd.ttl>
+    ] ;
+    mf:result false .
+
+:(a_or_b)q-ab a mf:ShExEvaluationTest ;
+    mf:name "(a_or_b)q ab" ;    mf:action [
+        qt:schema <algebra/(a_or_b)q_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result false .
+
+:(aqbq)q-0 a mf:ShExEvaluationTest ;
+    mf:name "(aqbq)q 0" ;    mf:action [
+        qt:schema <algebra/(aqbq)q_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result true .
+
+:(a)q-0 a mf:ShExEvaluationTest ;
+    mf:name "(a)q 0" ;    mf:action [
+        qt:schema <algebra/(a)q_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result true .
+
+:(a)q-a a mf:ShExEvaluationTest ;
+    mf:name "(a)q a" ;    mf:action [
+        qt:schema <algebra/(a)q_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result true .
+
+:(a)q-_A a mf:ShExEvaluationTest ;
+    mf:name "(a)q _A" ;    mf:action [
+        qt:schema <algebra/(a)q_schema.shc> ;
+        qt:data <algebra/_A.ttl>
+    ] ;
+    mf:result false .
+
+:a-a a mf:ShExEvaluationTest ;
+    mf:name "a a" ;    mf:action [
+        qt:schema <algebra/a_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result true .
+
+:a-_A a mf:ShExEvaluationTest ;
+    mf:name "a _A" ;    mf:action [
+        qt:schema <algebra/a_schema.shc> ;
+        qt:data <algebra/_A.ttl>
+    ] ;
+    mf:result false .
+
+:a-b a mf:ShExEvaluationTest ;
+    mf:name "a b" ;    mf:action [
+        qt:schema <algebra/a_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result false .
+
+:aq-0 a mf:ShExEvaluationTest ;
+    mf:name "aq 0" ;    mf:action [
+        qt:schema <algebra/aq_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result true .
+
+:aq-a a mf:ShExEvaluationTest ;
+    mf:name "aq a" ;    mf:action [
+        qt:schema <algebra/aq_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result true .
+
+:aq-aa a mf:ShExEvaluationTest ;
+    mf:name "aq aa" ;    mf:action [
+        qt:schema <algebra/aq_schema.shc> ;
+        qt:data <algebra/aa.ttl>
+    ] ;
+    mf:result false .
+
+:a+-a a mf:ShExEvaluationTest ;
+    mf:name "a+ a" ;    mf:action [
+        qt:schema <algebra/a+_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result true .
+
+:a+-aa a mf:ShExEvaluationTest ;
+    mf:name "a+ aa" ;    mf:action [
+        qt:schema <algebra/a+_schema.shc> ;
+        qt:data <algebra/aa.ttl>
+    ] ;
+    mf:result true .
+
+:a+-0 a mf:ShExEvaluationTest ;
+    mf:name "a+ 0" ;    mf:action [
+        qt:schema <algebra/a+_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result false .
+
+:a*-a a mf:ShExEvaluationTest ;
+    mf:name "a* a" ;    mf:action [
+        qt:schema <algebra/a*_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result true .
+
+:a*-aa a mf:ShExEvaluationTest ;
+    mf:name "a* aa" ;    mf:action [
+        qt:schema <algebra/a*_schema.shc> ;
+        qt:data <algebra/aa.ttl>
+    ] ;
+    mf:result true .
+
+:a*-aaa a mf:ShExEvaluationTest ;
+    mf:name "a* aaa" ;    mf:action [
+        qt:schema <algebra/a*_schema.shc> ;
+        qt:data <algebra/aaa.ttl>
+    ] ;
+    mf:result true .
+
+:a*-ab a mf:ShExEvaluationTest ;
+    mf:name "a* ab" ;    mf:action [
+        qt:schema <algebra/a*_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result false .
+
+:(a+)q-0 a mf:ShExEvaluationTest ;
+    mf:name "(a+)q 0" ;    mf:action [
+        qt:schema <algebra/(a+)q_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result true .
+
+:(a+)q-a a mf:ShExEvaluationTest ;
+    mf:name "(a+)q a" ;    mf:action [
+        qt:schema <algebra/(a+)q_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result true .
+
+:(a+)q-aa a mf:ShExEvaluationTest ;
+    mf:name "(a+)q aa" ;    mf:action [
+        qt:schema <algebra/(a+)q_schema.shc> ;
+        qt:data <algebra/aa.ttl>
+    ] ;
+    mf:result true .
+
+:ab-ac a mf:ShExEvaluationTest ;
+    mf:name "ab ac" ;    mf:action [
+        qt:schema <algebra/ab_schema.shc> ;
+        qt:data <algebra/ac.ttl>
+    ] ;
+    mf:result false .
+
+:ab-a_B a mf:ShExEvaluationTest ;
+    mf:name "ab a_B" ;    mf:action [
+        qt:schema <algebra/ab_schema.shc> ;
+        qt:data <algebra/a_B.ttl>
+    ] ;
+    mf:result false .
+
+:abc-abc a mf:ShExEvaluationTest ;
+    mf:name "abc abc" ;    mf:action [
+        qt:schema <algebra/abc_schema.shc> ;
+        qt:data <algebra/abc.ttl>
+    ] ;
+    mf:result true .
+
+:abc-a a mf:ShExEvaluationTest ;
+    mf:name "abc a" ;    mf:action [
+        qt:schema <algebra/abc_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result false .
+
+:abc-b a mf:ShExEvaluationTest ;
+    mf:name "abc b" ;    mf:action [
+        qt:schema <algebra/abc_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result false .
+
+:abc-c a mf:ShExEvaluationTest ;
+    mf:name "abc c" ;    mf:action [
+        qt:schema <algebra/abc_schema.shc> ;
+        qt:data <algebra/c.ttl>
+    ] ;
+    mf:result false .
+
+:abc-ab a mf:ShExEvaluationTest ;
+    mf:name "abc ab" ;    mf:action [
+        qt:schema <algebra/abc_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result false .
+
+:abc-ac a mf:ShExEvaluationTest ;
+    mf:name "abc ac" ;    mf:action [
+        qt:schema <algebra/abc_schema.shc> ;
+        qt:data <algebra/ac.ttl>
+    ] ;
+    mf:result false .
+
+:abc-bc a mf:ShExEvaluationTest ;
+    mf:name "abc bc" ;    mf:action [
+        qt:schema <algebra/abc_schema.shc> ;
+        qt:data <algebra/bc.ttl>
+    ] ;
+    mf:result false .
+
+:(ab)c-abc a mf:ShExEvaluationTest ;
+    mf:name "(ab)c abc" ;    mf:action [
+        qt:schema <algebra/(ab)c_schema.shc> ;
+        qt:data <algebra/abc.ttl>
+    ] ;
+    mf:result true .
+
+:(ab)c-a a mf:ShExEvaluationTest ;
+    mf:name "(ab)c a" ;    mf:action [
+        qt:schema <algebra/(ab)c_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result false .
+
+:(ab)c-b a mf:ShExEvaluationTest ;
+    mf:name "(ab)c b" ;    mf:action [
+        qt:schema <algebra/(ab)c_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result false .
+
+:(ab)c-c a mf:ShExEvaluationTest ;
+    mf:name "(ab)c c" ;    mf:action [
+        qt:schema <algebra/(ab)c_schema.shc> ;
+        qt:data <algebra/c.ttl>
+    ] ;
+    mf:result false .
+
+:(ab)c-ab a mf:ShExEvaluationTest ;
+    mf:name "(ab)c ab" ;    mf:action [
+        qt:schema <algebra/(ab)c_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result false .
+
+:(ab)c-ac a mf:ShExEvaluationTest ;
+    mf:name "(ab)c ac" ;    mf:action [
+        qt:schema <algebra/(ab)c_schema.shc> ;
+        qt:data <algebra/ac.ttl>
+    ] ;
+    mf:result false .
+
+:(ab)c-bc a mf:ShExEvaluationTest ;
+    mf:name "(ab)c bc" ;    mf:action [
+        qt:schema <algebra/(ab)c_schema.shc> ;
+        qt:data <algebra/bc.ttl>
+    ] ;
+    mf:result false .
+
+:a+bc-abc a mf:ShExEvaluationTest ;
+    mf:name "a+bc abc" ;    mf:action [
+        qt:schema <algebra/a+bc_schema.shc> ;
+        qt:data <algebra/abc.ttl>
+    ] ;
+    mf:result true .
+
+:a+bc-aabc a mf:ShExEvaluationTest ;
+    mf:name "a+bc aabc" ;    mf:action [
+        qt:schema <algebra/a+bc_schema.shc> ;
+        qt:data <algebra/aabc.ttl>
+    ] ;
+    mf:result true .
+
+:a+bc-bc a mf:ShExEvaluationTest ;
+    mf:name "a+bc bc" ;    mf:action [
+        qt:schema <algebra/a+bc_schema.shc> ;
+        qt:data <algebra/bc.ttl>
+    ] ;
+    mf:result false .
+
+:aqbq-_Ab a mf:ShExEvaluationTest ;
+    mf:name "aqbq _Ab" ;    mf:action [
+        qt:schema <algebra/aqbq_schema.shc> ;
+        qt:data <algebra/_Ab.ttl>
+    ] ;
+    mf:result false .
+
+:a_or_b_or_c-a a mf:ShExEvaluationTest ;
+    mf:name "a_or_b_or_c a" ;    mf:action [
+        qt:schema <algebra/a_or_b_or_c_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result true .
+
+:a_or_b_or_c-b a mf:ShExEvaluationTest ;
+    mf:name "a_or_b_or_c b" ;    mf:action [
+        qt:schema <algebra/a_or_b_or_c_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result true .
+
+:a_or_b_or_c-c a mf:ShExEvaluationTest ;
+    mf:name "a_or_b_or_c c" ;    mf:action [
+        qt:schema <algebra/a_or_b_or_c_schema.shc> ;
+        qt:data <algebra/c.ttl>
+    ] ;
+    mf:result true .
+
+:a_or_b_or_c-_A_Bc a mf:ShExEvaluationTest ;
+    mf:name "a_or_b_or_c _A_Bc" ;    mf:action [
+        qt:schema <algebra/a_or_b_or_c_schema.shc> ;
+        qt:data <algebra/_A_Bc.ttl>
+    ] ;
+    mf:result true .
+
+:a_or_b_or_c-a_B_C a mf:ShExEvaluationTest ;
+    mf:name "a_or_b_or_c a_B_C" ;    mf:action [
+        qt:schema <algebra/a_or_b_or_c_schema.shc> ;
+        qt:data <algebra/a_B_C.ttl>
+    ] ;
+    mf:result true .
+
+:a_or_b_or_c-0 a mf:ShExEvaluationTest ;
+    mf:name "a_or_b_or_c 0" ;    mf:action [
+        qt:schema <algebra/a_or_b_or_c_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result false .
+
+:a_or_b_or_c-ab a mf:ShExEvaluationTest ;
+    mf:name "a_or_b_or_c ab" ;    mf:action [
+        qt:schema <algebra/a_or_b_or_c_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result false .
+
+:a_or_b_or_c-ac a mf:ShExEvaluationTest ;
+    mf:name "a_or_b_or_c ac" ;    mf:action [
+        qt:schema <algebra/a_or_b_or_c_schema.shc> ;
+        qt:data <algebra/ac.ttl>
+    ] ;
+    mf:result false .
+
+:a_or_b_or_c-bc a mf:ShExEvaluationTest ;
+    mf:name "a_or_b_or_c bc" ;    mf:action [
+        qt:schema <algebra/a_or_b_or_c_schema.shc> ;
+        qt:data <algebra/bc.ttl>
+    ] ;
+    mf:result false .
+
+:a_or_b_or_c-abc a mf:ShExEvaluationTest ;
+    mf:name "a_or_b_or_c abc" ;    mf:action [
+        qt:schema <algebra/a_or_b_or_c_schema.shc> ;
+        qt:data <algebra/abc.ttl>
+    ] ;
+    mf:result false .
+
+:a_or_b_or_c-ab_C a mf:ShExEvaluationTest ;
+    mf:name "a_or_b_or_c ab_C" ;    mf:action [
+        qt:schema <algebra/a_or_b_or_c_schema.shc> ;
+        qt:data <algebra/ab_C.ttl>
+    ] ;
+    mf:result false .
+
+:(a)qb-b a mf:ShExEvaluationTest ;
+    mf:name "(a)qb b" ;    mf:action [
+        qt:schema <algebra/(a)qb_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result true .
+
+:(a)qb-ab a mf:ShExEvaluationTest ;
+    mf:name "(a)qb ab" ;    mf:action [
+        qt:schema <algebra/(a)qb_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result true .
+
+:(a)qb-a a mf:ShExEvaluationTest ;
+    mf:name "(a)qb a" ;    mf:action [
+        qt:schema <algebra/(a)qb_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result false .
+
+:a(b)q-a a mf:ShExEvaluationTest ;
+    mf:name "a(b)q a" ;    mf:action [
+        qt:schema <algebra/a(b)q_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result true .
+
+:a(b)q-ab a mf:ShExEvaluationTest ;
+    mf:name "a(b)q ab" ;    mf:action [
+        qt:schema <algebra/a(b)q_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result true .
+
+:a(b)q-b a mf:ShExEvaluationTest ;
+    mf:name "a(b)q b" ;    mf:action [
+        qt:schema <algebra/a(b)q_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result false .
+
+:(ab)q-0 a mf:ShExEvaluationTest ;
+    mf:name "(ab)q 0" ;    mf:action [
+        qt:schema <algebra/(ab)q_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result true .
+
+:(ab)q-ab a mf:ShExEvaluationTest ;
+    mf:name "(ab)q ab" ;    mf:action [
+        qt:schema <algebra/(ab)q_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result true .
+
+:(ab)q-a a mf:ShExEvaluationTest ;
+    mf:name "(ab)q a" ;    mf:action [
+        qt:schema <algebra/(ab)q_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result false .
+
+:(ab)q-b a mf:ShExEvaluationTest ;
+    mf:name "(ab)q b" ;    mf:action [
+        qt:schema <algebra/(ab)q_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result false .
+
+:a+(b)c-abc a mf:ShExEvaluationTest ;
+    mf:name "a+(b)c abc" ;    mf:action [
+        qt:schema <algebra/a+(b)c_schema.shc> ;
+        qt:data <algebra/abc.ttl>
+    ] ;
+    mf:result true .
+
+:a+(b)c-aabc a mf:ShExEvaluationTest ;
+    mf:name "a+(b)c aabc" ;    mf:action [
+        qt:schema <algebra/a+(b)c_schema.shc> ;
+        qt:data <algebra/aabc.ttl>
+    ] ;
+    mf:result true .
+
+:a+(b)c-bc a mf:ShExEvaluationTest ;
+    mf:name "a+(b)c bc" ;    mf:action [
+        qt:schema <algebra/a+(b)c_schema.shc> ;
+        qt:data <algebra/bc.ttl>
+    ] ;
+    mf:result false .
+
+:(aqbq)q-a a mf:ShExEvaluationTest ;
+    mf:name "(aqbq)q a" ;    mf:action [
+        qt:schema <algebra/(aqbq)q_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result true .
+
+:(aqbq)q-b a mf:ShExEvaluationTest ;
+    mf:name "(aqbq)q b" ;    mf:action [
+        qt:schema <algebra/(aqbq)q_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result true .
+
+:(aqbq)q-ab a mf:ShExEvaluationTest ;
+    mf:name "(aqbq)q ab" ;    mf:action [
+        qt:schema <algebra/(aqbq)q_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result true .
+
+:(aqb)q-0 a mf:ShExEvaluationTest ;
+    mf:name "(aqb)q 0" ;    mf:action [
+        qt:schema <algebra/(aqb)q_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result true .
+
+:(aqb)q-b a mf:ShExEvaluationTest ;
+    mf:name "(aqb)q b" ;    mf:action [
+        qt:schema <algebra/(aqb)q_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result true .
+
+:(aqb)q-ab a mf:ShExEvaluationTest ;
+    mf:name "(aqb)q ab" ;    mf:action [
+        qt:schema <algebra/(aqb)q_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result true .
+
+:(aqb)q-a a mf:ShExEvaluationTest ;
+    mf:name "(aqb)q a" ;    mf:action [
+        qt:schema <algebra/(aqb)q_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result false .
+
+:(abq)q-0 a mf:ShExEvaluationTest ;
+    mf:name "(abq)q 0" ;    mf:action [
+        qt:schema <algebra/(abq)q_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result true .
+
+:(abq)q-a a mf:ShExEvaluationTest ;
+    mf:name "(abq)q a" ;    mf:action [
+        qt:schema <algebra/(abq)q_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result true .
+
+:(abq)q-ab a mf:ShExEvaluationTest ;
+    mf:name "(abq)q ab" ;    mf:action [
+        qt:schema <algebra/(abq)q_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result true .
+
+:(abq)q-b a mf:ShExEvaluationTest ;
+    mf:name "(abq)q b" ;    mf:action [
+        qt:schema <algebra/(abq)q_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result false .
+
+:a_or_(b)-a a mf:ShExEvaluationTest ;
+    mf:name "a_or_(b) a" ;    mf:action [
+        qt:schema <algebra/a_or_(b)_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result true .
+
+:a_or_(b)-b a mf:ShExEvaluationTest ;
+    mf:name "a_or_(b) b" ;    mf:action [
+        qt:schema <algebra/a_or_(b)_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result true .
+
+:a_or_(b)-0 a mf:ShExEvaluationTest ;
+    mf:name "a_or_(b) 0" ;    mf:action [
+        qt:schema <algebra/a_or_(b)_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result false .
+
+:a_or_(b)-ab a mf:ShExEvaluationTest ;
+    mf:name "a_or_(b) ab" ;    mf:action [
+        qt:schema <algebra/a_or_(b)_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result false .
+
+:(a_or_b)-a a mf:ShExEvaluationTest ;
+    mf:name "(a_or_b) a" ;    mf:action [
+        qt:schema <algebra/(a_or_b)_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result true .
+
+:(a_or_b)-b a mf:ShExEvaluationTest ;
+    mf:name "(a_or_b) b" ;    mf:action [
+        qt:schema <algebra/(a_or_b)_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result true .
+
+:(a_or_b)-0 a mf:ShExEvaluationTest ;
+    mf:name "(a_or_b) 0" ;    mf:action [
+        qt:schema <algebra/(a_or_b)_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result false .
+
+:(a_or_b)-ab a mf:ShExEvaluationTest ;
+    mf:name "(a_or_b) ab" ;    mf:action [
+        qt:schema <algebra/(a_or_b)_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result false .
+
+:a(b_or_c)-ab a mf:ShExEvaluationTest ;
+    mf:name "a(b_or_c) ab" ;    mf:action [
+        qt:schema <algebra/a(b_or_c)_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result true .
+
+:a(b_or_c)-ac a mf:ShExEvaluationTest ;
+    mf:name "a(b_or_c) ac" ;    mf:action [
+        qt:schema <algebra/a(b_or_c)_schema.shc> ;
+        qt:data <algebra/ac.ttl>
+    ] ;
+    mf:result true .
+
+:a(b_or_c)-a a mf:ShExEvaluationTest ;
+    mf:name "a(b_or_c) a" ;    mf:action [
+        qt:schema <algebra/a(b_or_c)_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result false .
+
+:a(b_or_c)-abc a mf:ShExEvaluationTest ;
+    mf:name "a(b_or_c) abc" ;    mf:action [
+        qt:schema <algebra/a(b_or_c)_schema.shc> ;
+        qt:data <algebra/abc.ttl>
+    ] ;
+    mf:result false .
+
+:((ab)qc)q-0 a mf:ShExEvaluationTest ;
+    mf:name "((ab)qc)q 0" ;    mf:action [
+        qt:schema <algebra/((ab)qc)q_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result true .
+
+:((ab)qc)q-c a mf:ShExEvaluationTest ;
+    mf:name "((ab)qc)q c" ;    mf:action [
+        qt:schema <algebra/((ab)qc)q_schema.shc> ;
+        qt:data <algebra/c.ttl>
+    ] ;
+    mf:result true .
+
+:((ab)qc)q-abc a mf:ShExEvaluationTest ;
+    mf:name "((ab)qc)q abc" ;    mf:action [
+        qt:schema <algebra/((ab)qc)q_schema.shc> ;
+        qt:data <algebra/abc.ttl>
+    ] ;
+    mf:result true .
+
+:((ab)qc)q-a a mf:ShExEvaluationTest ;
+    mf:name "((ab)qc)q a" ;    mf:action [
+        qt:schema <algebra/((ab)qc)q_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result false .
+
+:((ab)qc)q-b a mf:ShExEvaluationTest ;
+    mf:name "((ab)qc)q b" ;    mf:action [
+        qt:schema <algebra/((ab)qc)q_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result false .
+
+:((ab)qc)q-ab a mf:ShExEvaluationTest ;
+    mf:name "((ab)qc)q ab" ;    mf:action [
+        qt:schema <algebra/((ab)qc)q_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result false .
+
+:((abq)qc)q-0 a mf:ShExEvaluationTest ;
+    mf:name "((abq)qc)q 0" ;    mf:action [
+        qt:schema <algebra/((abq)qc)q_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result true .
+
+:((abq)qc)q-c a mf:ShExEvaluationTest ;
+    mf:name "((abq)qc)q c" ;    mf:action [
+        qt:schema <algebra/((abq)qc)q_schema.shc> ;
+        qt:data <algebra/c.ttl>
+    ] ;
+    mf:result true .
+
+:((abq)qc)q-ac a mf:ShExEvaluationTest ;
+    mf:name "((abq)qc)q ac" ;    mf:action [
+        qt:schema <algebra/((abq)qc)q_schema.shc> ;
+        qt:data <algebra/ac.ttl>
+    ] ;
+    mf:result true .
+
+:((abq)qc)q-abc a mf:ShExEvaluationTest ;
+    mf:name "((abq)qc)q abc" ;    mf:action [
+        qt:schema <algebra/((abq)qc)q_schema.shc> ;
+        qt:data <algebra/abc.ttl>
+    ] ;
+    mf:result true .
+
+:((abq)qc)q-a a mf:ShExEvaluationTest ;
+    mf:name "((abq)qc)q a" ;    mf:action [
+        qt:schema <algebra/((abq)qc)q_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result false .
+
+:((abq)qc)q-b a mf:ShExEvaluationTest ;
+    mf:name "((abq)qc)q b" ;    mf:action [
+        qt:schema <algebra/((abq)qc)q_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result false .
+
+:((abq)qc)q-ab a mf:ShExEvaluationTest ;
+    mf:name "((abq)qc)q ab" ;    mf:action [
+        qt:schema <algebra/((abq)qc)q_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result false .
+
+:((abq)qc)q-bc a mf:ShExEvaluationTest ;
+    mf:name "((abq)qc)q bc" ;    mf:action [
+        qt:schema <algebra/((abq)qc)q_schema.shc> ;
+        qt:data <algebra/bc.ttl>
+    ] ;
+    mf:result false .
+
+:((aqb)qc)q-0 a mf:ShExEvaluationTest ;
+    mf:name "((aqb)qc)q 0" ;    mf:action [
+        qt:schema <algebra/((aqb)qc)q_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result true .
+
+:((aqb)qc)q-c a mf:ShExEvaluationTest ;
+    mf:name "((aqb)qc)q c" ;    mf:action [
+        qt:schema <algebra/((aqb)qc)q_schema.shc> ;
+        qt:data <algebra/c.ttl>
+    ] ;
+    mf:result true .
+
+:((aqb)qc)q-bc a mf:ShExEvaluationTest ;
+    mf:name "((aqb)qc)q bc" ;    mf:action [
+        qt:schema <algebra/((aqb)qc)q_schema.shc> ;
+        qt:data <algebra/bc.ttl>
+    ] ;
+    mf:result true .
+
+:((aqb)qc)q-abc a mf:ShExEvaluationTest ;
+    mf:name "((aqb)qc)q abc" ;    mf:action [
+        qt:schema <algebra/((aqb)qc)q_schema.shc> ;
+        qt:data <algebra/abc.ttl>
+    ] ;
+    mf:result true .
+
+:((aqb)qc)q-a a mf:ShExEvaluationTest ;
+    mf:name "((aqb)qc)q a" ;    mf:action [
+        qt:schema <algebra/((aqb)qc)q_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result false .
+
+:((aqb)qc)q-b a mf:ShExEvaluationTest ;
+    mf:name "((aqb)qc)q b" ;    mf:action [
+        qt:schema <algebra/((aqb)qc)q_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result false .
+
+:((aqb)qc)q-ab a mf:ShExEvaluationTest ;
+    mf:name "((aqb)qc)q ab" ;    mf:action [
+        qt:schema <algebra/((aqb)qc)q_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result false .
+
+:((aqb)qc)q-ac a mf:ShExEvaluationTest ;
+    mf:name "((aqb)qc)q ac" ;    mf:action [
+        qt:schema <algebra/((aqb)qc)q_schema.shc> ;
+        qt:data <algebra/ac.ttl>
+    ] ;
+    mf:result false .
+
+#--------------------------------------- TURTLE format ---
+
+:ab-ab a mf:ShExEvaluationTest ;
+    mf:name "ab ab" ;    
+    mf:action [
+    qt:schema <algebra/ab_schema.shc> ;
+    qt:data <algebra/ab.ttl>
+   ] ;
+   mf:result true .
+
+:ab-0 a mf:ShExEvaluationTest ;
+    mf:name "ab 0" ;    mf:action [
+        qt:schema <algebra/algebra/ab_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result false .
+
+:ab-a a mf:ShExEvaluationTest ;
+    mf:name "ab a" ;    mf:action [
+        qt:schema <algebra/algebra/ab_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result false .
+
+:ab-b a mf:ShExEvaluationTest ;
+    mf:name "ab b" ;    mf:action [
+        qt:schema <algebra/ab_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result false .
+
+:ab-_B a mf:ShExEvaluationTest ;
+    mf:name "ab _B" ;    mf:action [
+        qt:schema <algebra/ab_schema.shc> ;
+        qt:data <algebra/_B.ttl>
+    ] ;
+    mf:result false .
+
+:aqbq-a a mf:ShExEvaluationTest ;
+    mf:name "aqbq a" ;    mf:action [
+        qt:schema <algebra/aqbq_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result true .
+
+:aqbq-b a mf:ShExEvaluationTest ;
+    mf:name "aqbq b" ;    mf:action [
+        qt:schema <algebra/aqbq_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result true .
+
+:aqbq-a_B a mf:ShExEvaluationTest ;
+    mf:name "aqbq a_B" ;    mf:action [
+        qt:schema <algebra/aqbq_schema.shc> ;
+        qt:data <algebra/a_B.ttl>
+    ] ;
+    mf:result false .
+
+:aqb-0 a mf:ShExEvaluationTest ;
+    mf:name "aqb 0" ;    mf:action [
+        qt:schema <algebra/aqb_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result false .
+
+:aqb-_B a mf:ShExEvaluationTest ;
+    mf:name "aqb _B" ;    mf:action [
+        qt:schema <algebra/aqb_schema.shc> ;
+        qt:data <algebra/_B.ttl>
+    ] ;
+    mf:result false .
+
+:abq-0 a mf:ShExEvaluationTest ;
+    mf:name "abq 0" ;    mf:action [
+        qt:schema <algebra/abq_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result false .
+
+:ab-_A_B a mf:ShExEvaluationTest ;
+    mf:name "ab _A_B" ;    mf:action [
+        qt:schema <algebra/ab_schema.shc> ;
+        qt:data <algebra/_A_B.ttl>
+    ] ;
+    mf:result false .
+
+:ab-_Ab a mf:ShExEvaluationTest ;
+    mf:name "ab _Ab" ;    mf:action [
+        qt:schema <algebra/ab_schema.shc> ;
+        qt:data <algebra/_Ab.ttl>
+    ] ;
+    mf:result false .
+
+:ab-_A a mf:ShExEvaluationTest ;
+    mf:name "ab _A" ;    mf:action [
+        qt:schema <algebra/ab_schema.shc> ;
+        qt:data <algebra/_A.ttl>
+    ] ;
+    mf:result false .
+
+:abq-_A a mf:ShExEvaluationTest ;
+    mf:name "abq _A" ;    mf:action [
+        qt:schema <algebra/abq_schema.shc> ;
+        qt:data <algebra/_A.ttl>
+    ] ;
+    mf:result false .
+
+:a_or_b-a a mf:ShExEvaluationTest ;
+    mf:name "a_or_b a" ;    mf:action [
+        qt:schema <algebra/a_or_b_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result true .
+
+:a_or_b-b a mf:ShExEvaluationTest ;
+    mf:name "a_or_b b" ;    mf:action [
+        qt:schema <algebra/a_or_b_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result true .
+
+:a_or_b-_Ab a mf:ShExEvaluationTest ;
+    mf:name "a_or_b _Ab" ;    mf:action [
+        qt:schema <algebra/a_or_b_schema.shc> ;
+        qt:data <algebra/_Ab.ttl>
+    ] ;
+    mf:result true .
+
+:a_or_b-a_B a mf:ShExEvaluationTest ;
+    mf:name "a_or_b a_B" ;    mf:action [
+        qt:schema <algebra/a_or_b_schema.shc> ;
+        qt:data <algebra/a_B.ttl>
+    ] ;
+    mf:result true .
+
+:a_or_b-0 a mf:ShExEvaluationTest ;
+    mf:name "a_or_b 0" ;    mf:action [
+        qt:schema <algebra/a_or_b_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result false .
+
+:a_or_b-ab a mf:ShExEvaluationTest ;
+    mf:name "a_or_b ab" ;    mf:action [
+        qt:schema <algebra/a_or_b_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result false .
+
+:a_or_b-_A a mf:ShExEvaluationTest ;
+    mf:name "a_or_b _A" ;    mf:action [
+        qt:schema <algebra/a_or_b_schema.shc> ;
+        qt:data <algebra/_A.ttl>
+    ] ;
+    mf:result false .
+
+:a_or_b-_B a mf:ShExEvaluationTest ;
+    mf:name "a_or_b _B" ;    mf:action [
+        qt:schema <algebra/a_or_b_schema.shc> ;
+        qt:data <algebra/_B.ttl>
+    ] ;
+    mf:result false .
+
+:a_or_b-_A_B a mf:ShExEvaluationTest ;
+    mf:name "a_or_b _A_B" ;    mf:action [
+        qt:schema <algebra/a_or_b_schema.shc> ;
+        qt:data <algebra/_A_B.ttl>
+    ] ;
+    mf:result false .
+
+:aq_or_bq-0 a mf:ShExEvaluationTest ;
+    mf:name "aq_or_bq 0" ;    mf:action [
+        qt:schema <algebra/aq_or_bq_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result true .
+
+:aq_or_bq-a a mf:ShExEvaluationTest ;
+    mf:name "aq_or_bq a" ;    mf:action [
+        qt:schema <algebra/aq_or_bq_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result true .
+
+:aq_or_bq-b a mf:ShExEvaluationTest ;
+    mf:name "aq_or_bq b" ;    mf:action [
+        qt:schema <algebra/aq_or_bq_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result true .
+
+:aq_or_bq-ab a mf:ShExEvaluationTest ;
+    mf:name "aq_or_bq ab" ;    mf:action [
+        qt:schema <algebra/aq_or_bq_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result false .
+
+:a_or_bq-0 a mf:ShExEvaluationTest ;
+    mf:name "a_or_bq 0" ;    mf:action [
+        qt:schema <algebra/a_or_bq_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result true .
+
+:a_or_bq-_A a mf:ShExEvaluationTest ;
+    mf:name "a_or_bq _A" ;    mf:action [
+        qt:schema <algebra/a_or_bq_schema.shc> ;
+        qt:data <algebra/_A.ttl>
+    ] ;
+    mf:result true .
+
+:aq_or_b-0 a mf:ShExEvaluationTest ;
+    mf:name "aq_or_b 0" ;    mf:action [
+        qt:schema <algebra/aq_or_b_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result true .
+
+:aq_or_b-_B a mf:ShExEvaluationTest ;
+    mf:name "aq_or_b _B" ;    mf:action [
+        qt:schema <algebra/aq_or_b_schema.shc> ;
+        qt:data <algebra/_B.ttl>
+    ] ;
+    mf:result true .
+
+:(a_or_b)c-ab a mf:ShExEvaluationTest ;
+    mf:name "(a_or_b)c ab" ;    mf:action [
+        qt:schema <algebra/(a_or_b)c_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result false .
+
+:(a_or_b)cq-ab a mf:ShExEvaluationTest ;
+    mf:name "(a_or_b)cq ab" ;    mf:action [
+        qt:schema <algebra/(a_or_b)cq_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result false .
+
+:(a_or_b)cq-abc a mf:ShExEvaluationTest ;
+    mf:name "(a_or_b)cq abc" ;    mf:action [
+        qt:schema <algebra/(a_or_b)cq_schema.shc> ;
+        qt:data <algebra/abc.ttl>
+    ] ;
+    mf:result false .
+
+:(a_or_b)cq-ab_C a mf:ShExEvaluationTest ;
+    mf:name "(a_or_b)cq ab_C" ;    mf:action [
+        qt:schema <algebra/(a_or_b)cq_schema.shc> ;
+        qt:data <algebra/ab_C.ttl>
+    ] ;
+    mf:result false .
+
+:a(b_or_c)-bc a mf:ShExEvaluationTest ;
+    mf:name "a(b_or_c) bc" ;    mf:action [
+        qt:schema <algebra/a(b_or_c)_schema.shc> ;
+        qt:data <algebra/bc.ttl>
+    ] ;
+    mf:result false .
+
+:aq(b_or_c)-abc a mf:ShExEvaluationTest ;
+    mf:name "aq(b_or_c) abc" ;    mf:action [
+        qt:schema <algebra/aq(b_or_c)_schema.shc> ;
+        qt:data <algebra/abc.ttl>
+    ] ;
+    mf:result false .
+
+:aq(b_or_c)-_Abc a mf:ShExEvaluationTest ;
+    mf:name "aq(b_or_c) _Abc" ;    mf:action [
+        qt:schema <algebra/aq(b_or_c)_schema.shc> ;
+        qt:data <algebra/_Abc.ttl>
+    ] ;
+    mf:result false .
+
+:aq(b_or_c)-bc a mf:ShExEvaluationTest ;
+    mf:name "aq(b_or_c) bc" ;    mf:action [
+        qt:schema <algebra/aq(b_or_c)_schema.shc> ;
+        qt:data <algebra/bc.ttl>
+    ] ;
+    mf:result false .
+
+:(a_or_b)(c_or_d)-abcd a mf:ShExEvaluationTest ;
+    mf:name "(a_or_b)(c_or_d) abcd" ;    mf:action [
+        qt:schema <algebra/(a_or_b)(c_or_d)_schema.shc> ;
+        qt:data <algebra/abcd.ttl>
+    ] ;
+    mf:result false .
+
+:(a_or_b)_or_c-ab a mf:ShExEvaluationTest ;
+    mf:name "(a_or_b)_or_c ab" ;    mf:action [
+        qt:schema <algebra/(a_or_b)_or_c_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result false .
+
+:(a_or_b)_or_cq-ab a mf:ShExEvaluationTest ;
+    mf:name "(a_or_b)_or_cq ab" ;    mf:action [
+        qt:schema <algebra/(a_or_b)_or_cq_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result false .
+
+:(a_or_b)_or_cq-abc a mf:ShExEvaluationTest ;
+    mf:name "(a_or_b)_or_cq abc" ;    mf:action [
+        qt:schema <algebra/(a_or_b)_or_cq_schema.shc> ;
+        qt:data <algebra/abc.ttl>
+    ] ;
+    mf:result false .
+
+:(a_or_b)_or_cq-ab_C a mf:ShExEvaluationTest ;
+    mf:name "(a_or_b)_or_cq ab_C" ;    mf:action [
+        qt:schema <algebra/(a_or_b)_or_cq_schema.shc> ;
+        qt:data <algebra/ab_C.ttl>
+    ] ;
+    mf:result false .
+
+:a_or_(b_or_c)-bc a mf:ShExEvaluationTest ;
+    mf:name "a_or_(b_or_c) bc" ;    mf:action [
+        qt:schema <algebra/a_or_(b_or_c)_schema.shc> ;
+        qt:data <algebra/bc.ttl>
+    ] ;
+    mf:result false .
+
+:aq_or_(b_or_c)-abc a mf:ShExEvaluationTest ;
+    mf:name "aq_or_(b_or_c) abc" ;    mf:action [
+        qt:schema <algebra/aq_or_(b_or_c)_schema.shc> ;
+        qt:data <algebra/abc.ttl>
+    ] ;
+    mf:result false .
+
+:aq_or_(b_or_c)-_Abc a mf:ShExEvaluationTest ;
+    mf:name "aq_or_(b_or_c) _Abc" ;    mf:action [
+        qt:schema <algebra/aq_or_(b_or_c)_schema.shc> ;
+        qt:data <algebra/_Abc.ttl>
+    ] ;
+    mf:result false .
+
+:aq_or_(b_or_c)-bc a mf:ShExEvaluationTest ;
+    mf:name "aq_or_(b_or_c) bc" ;    mf:action [
+        qt:schema <algebra/aq_or_(b_or_c)_schema.shc> ;
+        qt:data <algebra/bc.ttl>
+    ] ;
+    mf:result false .
+
+:(a_or_b)_or_(c_or_d)-abcd a mf:ShExEvaluationTest ;
+    mf:name "(a_or_b)_or_(c_or_d) abcd" ;    mf:action [
+        qt:schema <algebra/(a_or_b)_or_(c_or_d)_schema.shc> ;
+        qt:data <algebra/abcd.ttl>
+    ] ;
+    mf:result false .
+
+:(a_or_b)q-ab a mf:ShExEvaluationTest ;
+    mf:name "(a_or_b)q ab" ;    mf:action [
+        qt:schema <algebra/(a_or_b)q_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result false .
+
+:(aqbq)q-0 a mf:ShExEvaluationTest ;
+    mf:name "(aqbq)q 0" ;    mf:action [
+        qt:schema <algebra/(aqbq)q_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result true .
+
+:(a)q-0 a mf:ShExEvaluationTest ;
+    mf:name "(a)q 0" ;    mf:action [
+        qt:schema <algebra/(a)q_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result true .
+
+:(a)q-a a mf:ShExEvaluationTest ;
+    mf:name "(a)q a" ;    mf:action [
+        qt:schema <algebra/(a)q_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result true .
+
+:(a)q-_A a mf:ShExEvaluationTest ;
+    mf:name "(a)q _A" ;    mf:action [
+        qt:schema <algebra/(a)q_schema.shc> ;
+        qt:data <algebra/_A.ttl>
+    ] ;
+    mf:result false .
+
+:a-a a mf:ShExEvaluationTest ;
+    mf:name "a a" ;    mf:action [
+        qt:schema <algebra/a_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result true .
+
+:a-_A a mf:ShExEvaluationTest ;
+    mf:name "a _A" ;    mf:action [
+        qt:schema <algebra/a_schema.shc> ;
+        qt:data <algebra/_A.ttl>
+    ] ;
+    mf:result false .
+
+:a-b a mf:ShExEvaluationTest ;
+    mf:name "a b" ;    mf:action [
+        qt:schema <algebra/a_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result false .
+
+:aq-0 a mf:ShExEvaluationTest ;
+    mf:name "aq 0" ;    mf:action [
+        qt:schema <algebra/aq_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result true .
+
+:aq-a a mf:ShExEvaluationTest ;
+    mf:name "aq a" ;    mf:action [
+        qt:schema <algebra/aq_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result true .
+
+:aq-aa a mf:ShExEvaluationTest ;
+    mf:name "aq aa" ;    mf:action [
+        qt:schema <algebra/aq_schema.shc> ;
+        qt:data <algebra/aa.ttl>
+    ] ;
+    mf:result false .
+
+:a+-a a mf:ShExEvaluationTest ;
+    mf:name "a+ a" ;    mf:action [
+        qt:schema <algebra/a+_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result true .
+
+:a+-aa a mf:ShExEvaluationTest ;
+    mf:name "a+ aa" ;    mf:action [
+        qt:schema <algebra/a+_schema.shc> ;
+        qt:data <algebra/aa.ttl>
+    ] ;
+    mf:result true .
+
+:a+-0 a mf:ShExEvaluationTest ;
+    mf:name "a+ 0" ;    mf:action [
+        qt:schema <algebra/a+_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result false .
+
+:a*-a a mf:ShExEvaluationTest ;
+    mf:name "a* a" ;    mf:action [
+        qt:schema <algebra/a*_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result true .
+
+:a*-aa a mf:ShExEvaluationTest ;
+    mf:name "a* aa" ;    mf:action [
+        qt:schema <algebra/a*_schema.shc> ;
+        qt:data <algebra/aa.ttl>
+    ] ;
+    mf:result true .
+
+:a*-aaa a mf:ShExEvaluationTest ;
+    mf:name "a* aaa" ;    mf:action [
+        qt:schema <algebra/a*_schema.shc> ;
+        qt:data <algebra/aaa.ttl>
+    ] ;
+    mf:result true .
+
+:a*-ab a mf:ShExEvaluationTest ;
+    mf:name "a* ab" ;    mf:action [
+        qt:schema <algebra/a*_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result false .
+
+:(a+)q-0 a mf:ShExEvaluationTest ;
+    mf:name "(a+)q 0" ;    mf:action [
+        qt:schema <algebra/(a+)q_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result true .
+
+:(a+)q-a a mf:ShExEvaluationTest ;
+    mf:name "(a+)q a" ;    mf:action [
+        qt:schema <algebra/(a+)q_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result true .
+
+:(a+)q-aa a mf:ShExEvaluationTest ;
+    mf:name "(a+)q aa" ;    mf:action [
+        qt:schema <algebra/(a+)q_schema.shc> ;
+        qt:data <algebra/aa.ttl>
+    ] ;
+    mf:result true .
+
+:ab-ac a mf:ShExEvaluationTest ;
+    mf:name "ab ac" ;    mf:action [
+        qt:schema <algebra/ab_schema.shc> ;
+        qt:data <algebra/ac.ttl>
+    ] ;
+    mf:result false .
+
+:ab-a_B a mf:ShExEvaluationTest ;
+    mf:name "ab a_B" ;    mf:action [
+        qt:schema <algebra/ab_schema.shc> ;
+        qt:data <algebra/a_B.ttl>
+    ] ;
+    mf:result false .
+
+:abc-abc a mf:ShExEvaluationTest ;
+    mf:name "abc abc" ;    mf:action [
+        qt:schema <algebra/abc_schema.shc> ;
+        qt:data <algebra/abc.ttl>
+    ] ;
+    mf:result true .
+
+:abc-a a mf:ShExEvaluationTest ;
+    mf:name "abc a" ;    mf:action [
+        qt:schema <algebra/abc_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result false .
+
+:abc-b a mf:ShExEvaluationTest ;
+    mf:name "abc b" ;    mf:action [
+        qt:schema <algebra/abc_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result false .
+
+:abc-c a mf:ShExEvaluationTest ;
+    mf:name "abc c" ;    mf:action [
+        qt:schema <algebra/abc_schema.shc> ;
+        qt:data <algebra/c.ttl>
+    ] ;
+    mf:result false .
+
+:abc-ab a mf:ShExEvaluationTest ;
+    mf:name "abc ab" ;    mf:action [
+        qt:schema <algebra/abc_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result false .
+
+:abc-ac a mf:ShExEvaluationTest ;
+    mf:name "abc ac" ;    mf:action [
+        qt:schema <algebra/abc_schema.shc> ;
+        qt:data <algebra/ac.ttl>
+    ] ;
+    mf:result false .
+
+:abc-bc a mf:ShExEvaluationTest ;
+    mf:name "abc bc" ;    mf:action [
+        qt:schema <algebra/abc_schema.shc> ;
+        qt:data <algebra/bc.ttl>
+    ] ;
+    mf:result false .
+
+:(ab)c-abc a mf:ShExEvaluationTest ;
+    mf:name "(ab)c abc" ;    mf:action [
+        qt:schema <algebra/(ab)c_schema.shc> ;
+        qt:data <algebra/abc.ttl>
+    ] ;
+    mf:result true .
+
+:(ab)c-a a mf:ShExEvaluationTest ;
+    mf:name "(ab)c a" ;    mf:action [
+        qt:schema <algebra/(ab)c_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result false .
+
+:(ab)c-b a mf:ShExEvaluationTest ;
+    mf:name "(ab)c b" ;    mf:action [
+        qt:schema <algebra/(ab)c_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result false .
+
+:(ab)c-c a mf:ShExEvaluationTest ;
+    mf:name "(ab)c c" ;    mf:action [
+        qt:schema <algebra/(ab)c_schema.shc> ;
+        qt:data <algebra/c.ttl>
+    ] ;
+    mf:result false .
+
+:(ab)c-ab a mf:ShExEvaluationTest ;
+    mf:name "(ab)c ab" ;    mf:action [
+        qt:schema <algebra/(ab)c_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result false .
+
+:(ab)c-ac a mf:ShExEvaluationTest ;
+    mf:name "(ab)c ac" ;    mf:action [
+        qt:schema <algebra/(ab)c_schema.shc> ;
+        qt:data <algebra/ac.ttl>
+    ] ;
+    mf:result false .
+
+:(ab)c-bc a mf:ShExEvaluationTest ;
+    mf:name "(ab)c bc" ;    mf:action [
+        qt:schema <algebra/(ab)c_schema.shc> ;
+        qt:data <algebra/bc.ttl>
+    ] ;
+    mf:result false .
+
+:a+bc-abc a mf:ShExEvaluationTest ;
+    mf:name "a+bc abc" ;    mf:action [
+        qt:schema <algebra/a+bc_schema.shc> ;
+        qt:data <algebra/abc.ttl>
+    ] ;
+    mf:result true .
+
+:a+bc-aabc a mf:ShExEvaluationTest ;
+    mf:name "a+bc aabc" ;    mf:action [
+        qt:schema <algebra/a+bc_schema.shc> ;
+        qt:data <algebra/aabc.ttl>
+    ] ;
+    mf:result true .
+
+:a+bc-bc a mf:ShExEvaluationTest ;
+    mf:name "a+bc bc" ;    mf:action [
+        qt:schema <algebra/a+bc_schema.shc> ;
+        qt:data <algebra/bc.ttl>
+    ] ;
+    mf:result false .
+
+:aqbq-_Ab a mf:ShExEvaluationTest ;
+    mf:name "aqbq _Ab" ;    mf:action [
+        qt:schema <algebra/aqbq_schema.shc> ;
+        qt:data <algebra/_Ab.ttl>
+    ] ;
+    mf:result false .
+
+:a_or_b_or_c-a a mf:ShExEvaluationTest ;
+    mf:name "a_or_b_or_c a" ;    mf:action [
+        qt:schema <algebra/a_or_b_or_c_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result true .
+
+:a_or_b_or_c-b a mf:ShExEvaluationTest ;
+    mf:name "a_or_b_or_c b" ;    mf:action [
+        qt:schema <algebra/a_or_b_or_c_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result true .
+
+:a_or_b_or_c-c a mf:ShExEvaluationTest ;
+    mf:name "a_or_b_or_c c" ;    mf:action [
+        qt:schema <algebra/a_or_b_or_c_schema.shc> ;
+        qt:data <algebra/c.ttl>
+    ] ;
+    mf:result true .
+
+:a_or_b_or_c-_A_Bc a mf:ShExEvaluationTest ;
+    mf:name "a_or_b_or_c _A_Bc" ;    mf:action [
+        qt:schema <algebra/a_or_b_or_c_schema.shc> ;
+        qt:data <algebra/_A_Bc.ttl>
+    ] ;
+    mf:result true .
+
+:a_or_b_or_c-a_B_C a mf:ShExEvaluationTest ;
+    mf:name "a_or_b_or_c a_B_C" ;    mf:action [
+        qt:schema <algebra/a_or_b_or_c_schema.shc> ;
+        qt:data <algebra/a_B_C.ttl>
+    ] ;
+    mf:result true .
+
+:a_or_b_or_c-0 a mf:ShExEvaluationTest ;
+    mf:name "a_or_b_or_c 0" ;    mf:action [
+        qt:schema <algebra/a_or_b_or_c_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result false .
+
+:a_or_b_or_c-ab a mf:ShExEvaluationTest ;
+    mf:name "a_or_b_or_c ab" ;    mf:action [
+        qt:schema <algebra/a_or_b_or_c_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result false .
+
+:a_or_b_or_c-ac a mf:ShExEvaluationTest ;
+    mf:name "a_or_b_or_c ac" ;    mf:action [
+        qt:schema <algebra/a_or_b_or_c_schema.shc> ;
+        qt:data <algebra/ac.ttl>
+    ] ;
+    mf:result false .
+
+:a_or_b_or_c-bc a mf:ShExEvaluationTest ;
+    mf:name "a_or_b_or_c bc" ;    mf:action [
+        qt:schema <algebra/a_or_b_or_c_schema.shc> ;
+        qt:data <algebra/bc.ttl>
+    ] ;
+    mf:result false .
+
+:a_or_b_or_c-abc a mf:ShExEvaluationTest ;
+    mf:name "a_or_b_or_c abc" ;    mf:action [
+        qt:schema <algebra/a_or_b_or_c_schema.shc> ;
+        qt:data <algebra/abc.ttl>
+    ] ;
+    mf:result false .
+
+:a_or_b_or_c-ab_C a mf:ShExEvaluationTest ;
+    mf:name "a_or_b_or_c ab_C" ;    mf:action [
+        qt:schema <algebra/a_or_b_or_c_schema.shc> ;
+        qt:data <algebra/ab_C.ttl>
+    ] ;
+    mf:result false .
+
+:(a)qb-b a mf:ShExEvaluationTest ;
+    mf:name "(a)qb b" ;    mf:action [
+        qt:schema <algebra/(a)qb_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result true .
+
+:(a)qb-ab a mf:ShExEvaluationTest ;
+    mf:name "(a)qb ab" ;    mf:action [
+        qt:schema <algebra/(a)qb_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result true .
+
+:(a)qb-a a mf:ShExEvaluationTest ;
+    mf:name "(a)qb a" ;    mf:action [
+        qt:schema <algebra/(a)qb_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result false .
+
+:a(b)q-a a mf:ShExEvaluationTest ;
+    mf:name "a(b)q a" ;    mf:action [
+        qt:schema <algebra/a(b)q_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result true .
+
+:a(b)q-ab a mf:ShExEvaluationTest ;
+    mf:name "a(b)q ab" ;    mf:action [
+        qt:schema <algebra/a(b)q_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result true .
+
+:a(b)q-b a mf:ShExEvaluationTest ;
+    mf:name "a(b)q b" ;    mf:action [
+        qt:schema <algebra/a(b)q_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result false .
+
+:(ab)q-0 a mf:ShExEvaluationTest ;
+    mf:name "(ab)q 0" ;    mf:action [
+        qt:schema <algebra/(ab)q_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result true .
+
+:(ab)q-ab a mf:ShExEvaluationTest ;
+    mf:name "(ab)q ab" ;    mf:action [
+        qt:schema <algebra/(ab)q_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result true .
+
+:(ab)q-a a mf:ShExEvaluationTest ;
+    mf:name "(ab)q a" ;    mf:action [
+        qt:schema <algebra/(ab)q_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result false .
+
+:(ab)q-b a mf:ShExEvaluationTest ;
+    mf:name "(ab)q b" ;    mf:action [
+        qt:schema <algebra/(ab)q_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result false .
+
+:a+(b)c-abc a mf:ShExEvaluationTest ;
+    mf:name "a+(b)c abc" ;    mf:action [
+        qt:schema <algebra/a+(b)c_schema.shc> ;
+        qt:data <algebra/abc.ttl>
+    ] ;
+    mf:result true .
+
+:a+(b)c-aabc a mf:ShExEvaluationTest ;
+    mf:name "a+(b)c aabc" ;    mf:action [
+        qt:schema <algebra/a+(b)c_schema.shc> ;
+        qt:data <algebra/aabc.ttl>
+    ] ;
+    mf:result true .
+
+:a+(b)c-bc a mf:ShExEvaluationTest ;
+    mf:name "a+(b)c bc" ;    mf:action [
+        qt:schema <algebra/a+(b)c_schema.shc> ;
+        qt:data <algebra/bc.ttl>
+    ] ;
+    mf:result false .
+
+:(aqbq)q-a a mf:ShExEvaluationTest ;
+    mf:name "(aqbq)q a" ;    mf:action [
+        qt:schema <algebra/(aqbq)q_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result true .
+
+:(aqbq)q-b a mf:ShExEvaluationTest ;
+    mf:name "(aqbq)q b" ;    mf:action [
+        qt:schema <algebra/(aqbq)q_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result true .
+
+:(aqbq)q-ab a mf:ShExEvaluationTest ;
+    mf:name "(aqbq)q ab" ;    mf:action [
+        qt:schema <algebra/(aqbq)q_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result true .
+
+:(aqb)q-0 a mf:ShExEvaluationTest ;
+    mf:name "(aqb)q 0" ;    mf:action [
+        qt:schema <algebra/(aqb)q_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result true .
+
+:(aqb)q-b a mf:ShExEvaluationTest ;
+    mf:name "(aqb)q b" ;    mf:action [
+        qt:schema <algebra/(aqb)q_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result true .
+
+:(aqb)q-ab a mf:ShExEvaluationTest ;
+    mf:name "(aqb)q ab" ;    mf:action [
+        qt:schema <algebra/(aqb)q_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result true .
+
+:(aqb)q-a a mf:ShExEvaluationTest ;
+    mf:name "(aqb)q a" ;    mf:action [
+        qt:schema <algebra/(aqb)q_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result false .
+
+:(abq)q-0 a mf:ShExEvaluationTest ;
+    mf:name "(abq)q 0" ;    mf:action [
+        qt:schema <algebra/(abq)q_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result true .
+
+:(abq)q-a a mf:ShExEvaluationTest ;
+    mf:name "(abq)q a" ;    mf:action [
+        qt:schema <algebra/(abq)q_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result true .
+
+:(abq)q-ab a mf:ShExEvaluationTest ;
+    mf:name "(abq)q ab" ;    mf:action [
+        qt:schema <algebra/(abq)q_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result true .
+
+:(abq)q-b a mf:ShExEvaluationTest ;
+    mf:name "(abq)q b" ;    mf:action [
+        qt:schema <algebra/(abq)q_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result false .
+
+:a_or_(b)-a a mf:ShExEvaluationTest ;
+    mf:name "a_or_(b) a" ;    mf:action [
+        qt:schema <algebra/a_or_(b)_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result true .
+
+:a_or_(b)-b a mf:ShExEvaluationTest ;
+    mf:name "a_or_(b) b" ;    mf:action [
+        qt:schema <algebra/a_or_(b)_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result true .
+
+:a_or_(b)-0 a mf:ShExEvaluationTest ;
+    mf:name "a_or_(b) 0" ;    mf:action [
+        qt:schema <algebra/a_or_(b)_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result false .
+
+:a_or_(b)-ab a mf:ShExEvaluationTest ;
+    mf:name "a_or_(b) ab" ;    mf:action [
+        qt:schema <algebra/a_or_(b)_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result false .
+
+:(a_or_b)-a a mf:ShExEvaluationTest ;
+    mf:name "(a_or_b) a" ;    mf:action [
+        qt:schema <algebra/(a_or_b)_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result true .
+
+:(a_or_b)-b a mf:ShExEvaluationTest ;
+    mf:name "(a_or_b) b" ;    mf:action [
+        qt:schema <algebra/(a_or_b)_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result true .
+
+:(a_or_b)-0 a mf:ShExEvaluationTest ;
+    mf:name "(a_or_b) 0" ;    mf:action [
+        qt:schema <algebra/(a_or_b)_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result false .
+
+:(a_or_b)-ab a mf:ShExEvaluationTest ;
+    mf:name "(a_or_b) ab" ;    mf:action [
+        qt:schema <algebra/(a_or_b)_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result false .
+
+:a(b_or_c)-ab a mf:ShExEvaluationTest ;
+    mf:name "a(b_or_c) ab" ;    mf:action [
+        qt:schema <algebra/a(b_or_c)_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result true .
+
+:a(b_or_c)-ac a mf:ShExEvaluationTest ;
+    mf:name "a(b_or_c) ac" ;    mf:action [
+        qt:schema <algebra/a(b_or_c)_schema.shc> ;
+        qt:data <algebra/ac.ttl>
+    ] ;
+    mf:result true .
+
+:a(b_or_c)-a a mf:ShExEvaluationTest ;
+    mf:name "a(b_or_c) a" ;    mf:action [
+        qt:schema <algebra/a(b_or_c)_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result false .
+
+:a(b_or_c)-abc a mf:ShExEvaluationTest ;
+    mf:name "a(b_or_c) abc" ;    mf:action [
+        qt:schema <algebra/a(b_or_c)_schema.shc> ;
+        qt:data <algebra/abc.ttl>
+    ] ;
+    mf:result false .
+
+:((ab)qc)q-0 a mf:ShExEvaluationTest ;
+    mf:name "((ab)qc)q 0" ;    mf:action [
+        qt:schema <algebra/((ab)qc)q_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result true .
+
+:((ab)qc)q-c a mf:ShExEvaluationTest ;
+    mf:name "((ab)qc)q c" ;    mf:action [
+        qt:schema <algebra/((ab)qc)q_schema.shc> ;
+        qt:data <algebra/c.ttl>
+    ] ;
+    mf:result true .
+
+:((ab)qc)q-abc a mf:ShExEvaluationTest ;
+    mf:name "((ab)qc)q abc" ;    mf:action [
+        qt:schema <algebra/((ab)qc)q_schema.shc> ;
+        qt:data <algebra/abc.ttl>
+    ] ;
+    mf:result true .
+
+:((ab)qc)q-a a mf:ShExEvaluationTest ;
+    mf:name "((ab)qc)q a" ;    mf:action [
+        qt:schema <algebra/((ab)qc)q_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result false .
+
+:((ab)qc)q-b a mf:ShExEvaluationTest ;
+    mf:name "((ab)qc)q b" ;    mf:action [
+        qt:schema <algebra/((ab)qc)q_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result false .
+
+:((ab)qc)q-ab a mf:ShExEvaluationTest ;
+    mf:name "((ab)qc)q ab" ;    mf:action [
+        qt:schema <algebra/((ab)qc)q_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result false .
+
+:((abq)qc)q-0 a mf:ShExEvaluationTest ;
+    mf:name "((abq)qc)q 0" ;    mf:action [
+        qt:schema <algebra/((abq)qc)q_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result true .
+
+:((abq)qc)q-c a mf:ShExEvaluationTest ;
+    mf:name "((abq)qc)q c" ;    mf:action [
+        qt:schema <algebra/((abq)qc)q_schema.shc> ;
+        qt:data <algebra/c.ttl>
+    ] ;
+    mf:result true .
+
+:((abq)qc)q-ac a mf:ShExEvaluationTest ;
+    mf:name "((abq)qc)q ac" ;    mf:action [
+        qt:schema <algebra/((abq)qc)q_schema.shc> ;
+        qt:data <algebra/ac.ttl>
+    ] ;
+    mf:result true .
+
+:((abq)qc)q-abc a mf:ShExEvaluationTest ;
+    mf:name "((abq)qc)q abc" ;    mf:action [
+        qt:schema <algebra/((abq)qc)q_schema.shc> ;
+        qt:data <algebra/abc.ttl>
+    ] ;
+    mf:result true .
+
+:((abq)qc)q-a a mf:ShExEvaluationTest ;
+    mf:name "((abq)qc)q a" ;    mf:action [
+        qt:schema <algebra/((abq)qc)q_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result false .
+
+:((abq)qc)q-b a mf:ShExEvaluationTest ;
+    mf:name "((abq)qc)q b" ;    mf:action [
+        qt:schema <algebra/((abq)qc)q_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result false .
+
+:((abq)qc)q-ab a mf:ShExEvaluationTest ;
+    mf:name "((abq)qc)q ab" ;    mf:action [
+        qt:schema <algebra/((abq)qc)q_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result false .
+
+:((abq)qc)q-bc a mf:ShExEvaluationTest ;
+    mf:name "((abq)qc)q bc" ;    mf:action [
+        qt:schema <algebra/((abq)qc)q_schema.shc> ;
+        qt:data <algebra/bc.ttl>
+    ] ;
+    mf:result false .
+
+:((aqb)qc)q-0 a mf:ShExEvaluationTest ;
+    mf:name "((aqb)qc)q 0" ;    mf:action [
+        qt:schema <algebra/((aqb)qc)q_schema.shc> ;
+        qt:data <algebra/0.ttl>
+    ] ;
+    mf:result true .
+
+:((aqb)qc)q-c a mf:ShExEvaluationTest ;
+    mf:name "((aqb)qc)q c" ;    mf:action [
+        qt:schema <algebra/((aqb)qc)q_schema.shc> ;
+        qt:data <algebra/c.ttl>
+    ] ;
+    mf:result true .
+
+:((aqb)qc)q-bc a mf:ShExEvaluationTest ;
+    mf:name "((aqb)qc)q bc" ;    mf:action [
+        qt:schema <algebra/((aqb)qc)q_schema.shc> ;
+        qt:data <algebra/bc.ttl>
+    ] ;
+    mf:result true .
+
+:((aqb)qc)q-abc a mf:ShExEvaluationTest ;
+    mf:name "((aqb)qc)q abc" ;    mf:action [
+        qt:schema <algebra/((aqb)qc)q_schema.shc> ;
+        qt:data <algebra/abc.ttl>
+    ] ;
+    mf:result true .
+
+:((aqb)qc)q-a a mf:ShExEvaluationTest ;
+    mf:name "((aqb)qc)q a" ;    mf:action [
+        qt:schema <algebra/((aqb)qc)q_schema.shc> ;
+        qt:data <algebra/a.ttl>
+    ] ;
+    mf:result false .
+
+:((aqb)qc)q-b a mf:ShExEvaluationTest ;
+    mf:name "((aqb)qc)q b" ;    mf:action [
+        qt:schema <algebra/((aqb)qc)q_schema.shc> ;
+        qt:data <algebra/b.ttl>
+    ] ;
+    mf:result false .
+
+:((aqb)qc)q-ab a mf:ShExEvaluationTest ;
+    mf:name "((aqb)qc)q ab" ;    mf:action [
+        qt:schema <algebra/((aqb)qc)q_schema.shc> ;
+        qt:data <algebra/ab.ttl>
+    ] ;
+    mf:result false .
+
+:((aqb)qc)q-ac a mf:ShExEvaluationTest ;
+    mf:name "((aqb)qc)q ac" ;    mf:action [
+        qt:schema <algebra/((aqb)qc)q_schema.shc> ;
+        qt:data <algebra/ac.ttl>
+    ] ;
+    mf:result false .
+
+
+
