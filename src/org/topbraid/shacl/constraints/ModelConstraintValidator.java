@@ -118,6 +118,7 @@ public class ModelConstraintValidator {
 							else if(JenaUtil.hasIndirectType(type, SH.ConstraintTemplate)) {
 								list.add(SHACLFactory.asTemplateConstraint(c));
 							}
+							// TODO add property constraint if
 						}
 					}
 				}

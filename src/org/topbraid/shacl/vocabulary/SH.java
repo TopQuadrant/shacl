@@ -23,6 +23,8 @@ public class SH {
 
     public final static Resource AbstractPropertyConstraint = ResourceFactory.createResource(NS + "AbstractPropertyConstraint");
 
+    public final static Resource AltPath = ResourceFactory.createResource(NS + "AltPath");
+    
     public final static Resource Argument = ResourceFactory.createResource(NS + "Argument");
 
     public final static Resource BlankNode = ResourceFactory.createResource(NS + "BlankNode");
@@ -53,14 +55,24 @@ public class SH {
 
     public final static Resource Macro = ResourceFactory.createResource(NS + "Macro");
     
+    public final static Resource ModPath = ResourceFactory.createResource(NS + "ModPath");
+    
     public final static Resource NativeConstraint = ResourceFactory.createResource(NS + "NativeConstraint");
     
     public final static Resource NativeScope = ResourceFactory.createResource(NS + "NativeScope");
     
     public final static Resource OrConstraint = ResourceFactory.createResource(NS + "OrConstraint");
 
+    public final static Resource Path = ResourceFactory.createResource(NS + "Path");
+    
     public final static Resource PropertyConstraint = ResourceFactory.createResource(NS + "PropertyConstraint");
 
+    public final static Resource ReverseLinkPath = ResourceFactory.createResource(NS + "ReverseLinkPath");
+
+    public final static Resource ReversePath = ResourceFactory.createResource(NS + "ReversePath");
+    
+    public final static Resource SeqPath = ResourceFactory.createResource(NS + "SeqPath");
+    
     public final static Resource Shape = ResourceFactory.createResource(NS + "Shape");
 
     public final static Resource ShapeClass = ResourceFactory.createResource(NS + "ShapeClass");
@@ -132,6 +144,10 @@ public class SH {
 
     public final static Property optionalWhenInherited = ResourceFactory.createProperty(NS + "optionalWhenInherited");
 
+    public final static Property path1 = ResourceFactory.createProperty(NS + "path1");
+    
+    public final static Property path2 = ResourceFactory.createProperty(NS + "path2");
+    
     public final static Property predicate = ResourceFactory.createProperty(NS + "predicate");
 
     public final static Property property = ResourceFactory.createProperty(NS + "property");

@@ -55,6 +55,7 @@ public class SHACLUtil {
 		constraintProperties.add(SH.constraint);
 		constraintProperties.add(SH.inverseProperty);
 		constraintProperties.add(SH.property);
+		// TODO add pathConstraint
 	}
 	
 	private static Query propertyLabelQuery = ARQFactory.get().createQuery(

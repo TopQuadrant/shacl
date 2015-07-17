@@ -34,7 +34,7 @@ public class SHACLPropertyConstraintImpl extends SHACLAbstractPropertyConstraint
 
 	@Override
 	public Integer getMinCount() {
-		return JenaUtil.getIntegerProperty(this, SH.maxCount);
+		return JenaUtil.getIntegerProperty(this, SH.minCount);
 	}
 
 

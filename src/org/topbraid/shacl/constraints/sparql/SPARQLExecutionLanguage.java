@@ -64,7 +64,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		return executable.hasProperty(SH.sparql);
 	}
 
-
+	// TODO add option for property paths
 	@Override
 	public void executeConstraint(Dataset dataset, Resource shape, URI shapesGraphURI,
 			SHACLConstraint constraint, ConstraintExecutable executable,

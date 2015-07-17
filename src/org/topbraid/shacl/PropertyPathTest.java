@@ -53,7 +53,7 @@ public class PropertyPathTest extends TestCase {
 		Dataset dataset = ARQFactory.get().getDataset(dataModel);
 		dataset.addNamedModel(shapesGraphURI.toString(), shapesModel);
 		
-	    TriplePath testPath = new TriplePath(this,)
+
 		
 		
 //		// Run the validator and print results
