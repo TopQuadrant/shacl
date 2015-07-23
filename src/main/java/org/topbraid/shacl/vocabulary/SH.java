@@ -61,6 +61,8 @@ public class SH {
 
     public final static Resource PropertyConstraint = ResourceFactory.createResource(NS + "PropertyConstraint");
 
+    public final static Resource Scope = ResourceFactory.createResource(NS + "Scope");
+
     public final static Resource Shape = ResourceFactory.createResource(NS + "Shape");
 
     public final static Resource ShapeClass = ResourceFactory.createResource(NS + "ShapeClass");
@@ -68,6 +70,8 @@ public class SH {
     public final static Resource Template = ResourceFactory.createResource(NS + "Template");
     
     public final static Resource TemplateConstraint = ResourceFactory.createResource(NS + "TemplateConstraint");
+    
+    public final static Resource TemplateScope = ResourceFactory.createResource(NS + "TemplateScope");
 
     public final static Resource Templates = ResourceFactory.createResource(NS + "Templates");
 
@@ -95,6 +99,8 @@ public class SH {
     public final static Property entailment = ResourceFactory.createProperty(NS + "entailment");
     
     public final static Property filterShape = ResourceFactory.createProperty(NS + "filterShape");
+    
+    public final static Property final_ = ResourceFactory.createProperty(NS + "final");
 
     public final static Property graph = ResourceFactory.createProperty(NS + "graph");
 
@@ -133,6 +139,8 @@ public class SH {
     public final static Property optionalWhenInherited = ResourceFactory.createProperty(NS + "optionalWhenInherited");
 
     public final static Property predicate = ResourceFactory.createProperty(NS + "predicate");
+    
+    public final static Property private_ = ResourceFactory.createProperty(NS + "private");
 
     public final static Property property = ResourceFactory.createProperty(NS + "property");
 

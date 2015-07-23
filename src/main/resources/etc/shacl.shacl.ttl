@@ -1,7 +1,7 @@
 # baseURI: http://www.w3.org/ns/shacl
 
 # SHACL - Shapes Constraint Language
-# Draft last edited on 2015-07-10
+# Draft last edited on 2015-07-23
 # Created by the W3C RDF Data Shapes Working Group
 # Editor: Holger Knublauch <holger@topquadrant.com>
 
@@ -21,15 +21,8 @@
 # Declaration of the required RDFS terms --------------------------------------
 
 rdfs:Resource
-	a sh:ShapeClass ;
+	a rdfs:Class ;
 	rdfs:label "Resource" ;
-	sh:property [
-		sh:predicate sh:nodeShape ;
-		sh:valueClass sh:Shape ;
-		sh:defaultValueType sh:Shape ;    # sh:nodeShape bnodes do not require rdf:type
-		rdfs:label "node shape" ;
-		rdfs:comment "Links a resource with the shapes that it is supposed to have." ;
-	] ;
 .
 
 sh:Shape
@@ -512,6 +505,19 @@ sh:TemplateScope
 	sh:abstract true ;
 .
 
+sh:AllSubjectsScope
+	a sh:ScopeTemplate ;
+	rdfs:subClassOf sh:TemplateScope ;
+	rdfs:label "All subjects scope" ;
+	rdfs:comment "A scope that includes all subjects in the graph." ;
+	sh:sparql """
+		SELECT DISTINCT ?this
+		WHERE {
+			?this ?anyPredicate ?anyObject .
+		}
+		""" ;
+.
+
 sh:InversePropertyScope
 	a sh:ScopeTemplate ;
 	rdfs:subClassOf sh:TemplateScope ;
@@ -550,19 +556,6 @@ sh:PropertyScope
 		""" ;
 .
 
-sh:AllSubjectsScope
-	a sh:ScopeTemplate ;
-	rdfs:subClassOf sh:TemplateScope ;
-	rdfs:label "All subjects scope" ;
-	rdfs:comment "A scope that includes all subjects in the graph." ;
-	sh:sparql """
-		SELECT DISTINCT ?this
-		WHERE {
-			?this ?anyPredicate ?anyObject .
-		}
-		""" ;
-.
-
 
 # Constraint vocabulary -------------------------------------------------------
 
@@ -587,7 +580,6 @@ sh:NativeConstraint
 	rdfs:subClassOf sh:SPARQLExecutable ;
 	rdfs:label "Native constraint" ;
 	rdfs:comment "A constraint that has a native executable body attached with it." ;
-	sh:abstract true ;
 	sh:property [
 		sh:predicate sh:severity ;
 		sh:maxCount 1 ;
@@ -626,7 +618,7 @@ sh:ConstraintTemplate
 	a sh:ShapeClass ;
 	rdfs:subClassOf sh:Template ;
 	rdfs:label "Constraint template" ;
-	rdfs:comment "A template backed by a SPARQL query that is used for constraint validation." ;
+	rdfs:comment "A template that is used for constraint validation." ;
 	sh:property [
 		sh:predicate sh:severity ;
 		sh:maxCount 1 ;
@@ -1095,7 +1087,6 @@ sh:PropertyConstraint
 	rdfs:subClassOf sh:AbstractDatatypePropertyConstraint ;
 	rdfs:subClassOf sh:AbstractDirectValueTypePropertyConstraint ;
 	rdfs:subClassOf sh:AbstractHasValuePropertyConstraint ;
-	rdfs:subClassOf sh:AbstractLengthPropertyConstraint ;
 	rdfs:subClassOf sh:AbstractMaxExclusivePropertyConstraint ;
 	rdfs:subClassOf sh:AbstractMaxLengthPropertyConstraint ;
 	rdfs:subClassOf sh:AbstractMaxInclusivePropertyConstraint ;
@@ -1146,31 +1137,6 @@ sh:AbstractDatatypeFacetPropertyConstraint
 	rdfs:comment "Abstract base class for datatype-related constraints." ;
 	sh:abstract true ;
 	sh:private true ;
-.
-
-sh:AbstractLengthPropertyConstraint
-	a sh:ConstraintTemplate ;
-	rdfs:subClassOf sh:AbstractDatatypeFacetPropertyConstraint ;
-	rdfs:label "Abstract length property constraint" ;
-	rdfs:comment "Specifies the exact length of literal values." ;
-	sh:abstract true ;
-	sh:private true ;
-	sh:argument [
-		sh:predicate sh:length ;
-		sh:optionalWhenInherited true ;
-		sh:datatype xsd:integer ;
-		rdfs:label "length" ;
-		rdfs:comment "The length permitted for values of this property." ;
-	] ;
-	sh:message "Values must be exactly {?length} characters long, but found value with {?objectLength} characters." ;
-	sh:sparql """
-		SELECT ?this (?this AS ?subject) ?predicate ?object ?length ?objectLength
-		WHERE {
-			?this ?predicate ?object .
-			BIND (STRLEN(str(?object)) AS ?objectLength) .
-			FILTER (?objectLength != ?length) .
-		} 
-		""" ;
 .
 
 sh:AbstractMaxLengthPropertyConstraint
@@ -1629,7 +1595,7 @@ sh:hasShape
 	a sh:Function ;
 	rdfs:subClassOf sh:Functions ;
 	rdfs:label "has shape" ;
-	rdfs:comment "Validates whether a given resource (?arg1) fulfills all error-level constraints defined for a given shape (?arg2). This creates a (possibly recursive) constraint validator. The function returns an error, i.e. no result, if the validation could not be completed, e.g. due to an unsupported recursion or an unsupported extension language. Therefore the function should not be called inside of FILTER statements directly, but rather with BIND." ;
+	rdfs:comment "Validates whether a given resource (?arg1) fulfills all error-level constraints defined for a given shape (?arg2). This creates a (possibly recursive) constraint validator equivalent to the validateNodeAgainstShape operation. The function returns an error, i.e. no result, if the validation could not be completed, e.g. due to an unsupported recursion or an unsupported extension language. Therefore the function should not be called inside of FILTER statements directly, but rather with BIND." ;
 	sh:argument [
 		sh:predicate sh:arg1 ;
 		sh:valueClass rdfs:Resource ;
@@ -1880,6 +1846,16 @@ sh:walkShapesList
 
 # System Property declarations (mainly for RDF compliance) --------------------
 
+# sh:nodeShape could alternatively be attached via sh:property to rdfs:Resource,
+# if validation is required.  However this would make it show up on all forms etc,
+# leading to a lot of extra filtering work.
+sh:nodeShape
+	a rdf:Property ;
+	rdfs:label "node shape" ;
+	rdfs:comment "Links a resource with the shapes that it is supposed to have." ;
+	rdfs:range sh:Shape ;
+.
+
 rdf:type a rdf:Property ; rdfs:label "type" .
 rdfs:comment a rdf:Property ; rdfs:label "comment" .
 rdfs:label a rdf:Property ;	rdfs:label "label" .
@@ -1917,7 +1893,6 @@ sh:hasValue a rdf:Property ; rdfs:label "has value" .
 sh:include a rdf:Property ; rdfs:label "include" .
 sh:inverseProperty a rdf:Property ; rdfs:label "inverse property" .
 sh:labelTemplate a rdf:Property ; rdfs:label "label template" .
-sh:length	a rdf:Property ; rdfs:label "length" .
 sh:maxCount a rdf:Property ; rdfs:label "max count" .
 sh:maxExclusive a rdf:Property ; rdfs:label "max exclusive" .
 sh:maxLength a rdf:Property ; rdfs:label "max length" .
@@ -1929,7 +1904,6 @@ sh:minLength a rdf:Property ; rdfs:label "min length" .
 sh:minExclusive a rdf:Property ; rdfs:label "min exclusive" .
 sh:minInclusive a rdf:Property ; rdfs:label "min inclusive" .
 sh:nodeKind a rdf:Property ; rdfs:label "node kind" .
-sh:nodeShape a rdf:Property ; rdfs:label "node shape" .
 sh:object a rdf:Property ; rdfs:label "object" .
 sh:optional a rdf:Property ; rdfs:label "optional" .
 sh:optionalWhenInherited a rdf:Property ; rdfs:label "optional when inherited" .
@@ -1941,6 +1915,7 @@ sh:resultAnnotation a rdf:Property ; rdfs:label "result annotation" .
 sh:returnType a rdf:Property ; rdfs:label "return type" .
 sh:root a rdf:Property ; rdfs:label "root" .
 sh:scope a rdf:Property ; rdfs:label "scope" .
+sh:scopeClass a rdf:Property ; rdfs:label "scope class" .
 sh:severity a rdf:Property ; rdfs:label "severity" .
 sh:shapesGraph a rdf:Property ; rdfs:label "shapes graph" .
 sh:sparql	a rdf:Property ; rdfs:label "SPARQL" .
