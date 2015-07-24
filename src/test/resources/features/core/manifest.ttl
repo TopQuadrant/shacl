@@ -22,8 +22,14 @@
 		<filterShape-002>
 		<filterShape-003>
 		<inverseProperty-001> 
+		<length-001> 
+		<maxExclusive-001> 
+		<maxInclusive-001> 
+		<minExclusive-001> 
+		<minInclusive-001> 
 		<not-001>
 		<or-001>
+		<pattern-001> 
 		<property-001>
 		<recursive-001>
 		<recursive-002>
@@ -224,6 +230,154 @@
 	mf:status sht:proposed ; 
 .
 
+<length-001>
+	a sht:Validate ;
+	mf:name "Test of a sh:minLength and sh:maxLength" ;
+	mf:action [
+		sht:schema <length-001.ttl> ; 
+		sht:data   <length-001.ttl> ; 
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidResource1 ;
+  		sh:subject ex:InvalidResource1 ;
+  		sh:predicate ex:property ;
+  		sh:object "" ;
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidResource2 ;
+  		sh:subject ex:InvalidResource2 ;
+  		sh:predicate ex:property ;
+  		sh:object "abcdef" ;
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidResource3 ;
+  		sh:subject ex:InvalidResource3 ;
+  		sh:predicate ex:property ;
+  		sh:object 123456 ;
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidResource4 ;
+  		sh:subject ex:InvalidResource4 ;
+  		sh:predicate ex:property ;
+  		sh:object [] ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
+<maxExclusive-001>
+	a sht:Validate ;
+	mf:name "Test of a sh:maxExclusive" ;
+	mf:action [
+		sht:schema <maxExclusive-001.ttl> ; 
+		sht:data   <maxExclusive-001.ttl> ; 
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidResource1 ;
+  		sh:subject ex:InvalidResource1 ;
+  		sh:predicate ex:property ;
+  		sh:object 1 ;
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidResource2 ;
+  		sh:subject ex:InvalidResource2 ;
+  		sh:predicate ex:property ;
+  		sh:object 2 ;
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidResource3 ;
+  		sh:subject ex:InvalidResource3 ;
+  		sh:predicate ex:property ;
+  		sh:object "a" ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
+<maxInclusive-001>
+	a sht:Validate ;
+	mf:name "Test of a sh:maxInclusive" ;
+	mf:action [
+		sht:schema <maxInclusive-001.ttl> ; 
+		sht:data   <maxInclusive-001.ttl> ; 
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidResource1 ;
+  		sh:subject ex:InvalidResource1 ;
+  		sh:predicate ex:property ;
+  		sh:object 2 ;
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidResource2 ;
+  		sh:subject ex:InvalidResource2 ;
+  		sh:predicate ex:property ;
+  		sh:object "a" ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
+<minExclusive-001>
+	a sht:Validate ;
+	mf:name "Test of a sh:minExclusive" ;
+	mf:action [
+		sht:schema <minExclusive-001.ttl> ; 
+		sht:data   <minExclusive-001.ttl> ; 
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidResource1 ;
+  		sh:subject ex:InvalidResource1 ;
+  		sh:predicate ex:property ;
+  		sh:object 1 ;
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidResource2 ;
+  		sh:subject ex:InvalidResource2 ;
+  		sh:predicate ex:property ;
+  		sh:object 0 ;
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidResource3 ;
+  		sh:subject ex:InvalidResource3 ;
+  		sh:predicate ex:property ;
+  		sh:object "a" ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
+<minInclusive-001>
+	a sht:Validate ;
+	mf:name "Test of a sh:minInclusive" ;
+	mf:action [
+		sht:schema <minInclusive-001.ttl> ; 
+		sht:data   <minInclusive-001.ttl> ; 
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidResource1 ;
+  		sh:subject ex:InvalidResource1 ;
+  		sh:predicate ex:property ;
+  		sh:object 0 ;
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidResource2 ;
+  		sh:subject ex:InvalidResource2 ;
+  		sh:predicate ex:property ;
+  		sh:object "a" ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
 <not-001>
 	a sht:Validate ;
 	mf:name "Test of a sh:NotConstraint" ;
@@ -252,6 +406,37 @@
 	mf:result [
 		a sh:Error ;
   		sh:root ex:InvalidRectangle2 ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
+<pattern-001>
+	a sht:Validate ;
+	mf:name "Test of a sh:pattern" ;
+	mf:action [
+		sht:schema <pattern-001.ttl> ; 
+		sht:data   <pattern-001.ttl> ; 
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidResource1 ;
+  		sh:subject ex:InvalidResource1 ;
+  		sh:predicate ex:property ;
+  		sh:object "The 123" ;
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidResource2 ;
+  		sh:subject ex:InvalidResource2 ;
+  		sh:predicate ex:property ;
+  		sh:object "132" ;
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidResource3 ;
+  		sh:subject ex:InvalidResource3 ;
+  		sh:predicate ex:property ;
+  		sh:object [] ;
 	] ;
 	mf:status sht:proposed ; 
 .
