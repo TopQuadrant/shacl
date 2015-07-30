@@ -17,6 +17,8 @@
 		<and-001> 
 		<and-002> 
 		<class-001>
+		<datatype-001>
+		<datatype-002>
 		<directValueType-001>
 		<filterShape-001>
 		<filterShape-002>
@@ -136,6 +138,47 @@
   		sh:root _:b1 ;
   		sh:subject _:b1 ;
   		sh:predicate sh:predicate ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
+<datatype-001>
+	a sht:Validate ;
+	mf:name "Test of a sh:datatype definition with xsd:string" ;
+	mf:action [
+		sht:schema <datatype-001.ttl> ; 
+		sht:data <datatype-001.ttl> ; 
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidInstance1 ;
+  		sh:subject ex:InvalidInstance1 ;
+  		sh:predicate ex:value ;
+  		sh:object "A"@en ;
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidInstance2 ;
+  		sh:subject ex:InvalidInstance2 ;
+  		sh:predicate ex:value ;
+  		sh:object 42 ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
+<datatype-002>
+	a sht:Validate ;
+	mf:name "Test of a sh:datatype definition with sh:text" ;
+	mf:action [
+		sht:schema <datatype-002.ttl> ; 
+		sht:data <datatype-002.ttl> ; 
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:root ex:InvalidInstance1 ;
+  		sh:subject ex:InvalidInstance1 ;
+  		sh:predicate ex:value ;
+  		sh:object 42 ;
 	] ;
 	mf:status sht:proposed ; 
 .

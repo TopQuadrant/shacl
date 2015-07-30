@@ -1,7 +1,7 @@
 # baseURI: http://www.w3.org/ns/shacl
 
 # SHACL - Shapes Constraint Language
-# Draft last edited on 2015-07-24
+# Draft last edited on 2015-07-31
 # Created by the W3C RDF Data Shapes Working Group
 # Editor: Holger Knublauch <holger@topquadrant.com>
 
@@ -107,22 +107,6 @@ rdfs:Class
 		rdfs:label "private" ;
 		rdfs:comment "True to indicate that this class is only meant to be used inside of the graph that it has been defined in. This is often used to discourage instantiation outside of controlled scenarios. User interfaces may hide private classes from selection widgets." ;
 	] ;
-	sh:constraint [
-		sh:severity sh:Warning ;
-		sh:message "Each named class should have at least one (other) named superclass" ;
-		sh:predicate rdfs:subClassOf ;
-		sh:sparql """
-			SELECT ?this (?this AS ?subject) 
-			WHERE {
-				FILTER isIRI(?this) .
-				FILTER (?this != rdfs:Resource && ?this != rdfs:Literal) .
-				FILTER NOT EXISTS {
-					?this rdfs:subClassOf ?superClass .
-					FILTER (isIRI(?superClass) && ?superClass != ?this)
-				}
-			}
-			""" ;
-	] ;
 .
 
 rdfs:Datatype
@@ -144,6 +128,13 @@ rdf:Property
 	rdfs:subClassOf rdfs:Resource ;
 	rdfs:label "Property" ;
 	rdfs:comment "The class of RDF properties." ;
+.
+
+sh:text
+	a rdfs:Datatype ;
+	rdfs:subClassOf rdfs:Literal ;
+	rdfs:label "text" ;
+	rdfs:comment "The union of xsd:string and rdf:langString, to be used in cases where a property can either be a string or a string with a language tag. This type should never be used directly as the type of literals." ;
 .
 
 # Just a suggestion of commonly used datatypes - more should be added
@@ -505,6 +496,20 @@ sh:TemplateScope
 	sh:abstract true ;
 .
 
+sh:AllObjectsScope
+	a sh:ScopeTemplate ;
+	rdfs:subClassOf sh:TemplateScope ;
+	rdfs:label "All objects scope" ;
+	rdfs:comment "A scope that includes all objects in the graph, except literals." ;
+	sh:sparql """
+		SELECT DISTINCT ?this
+		WHERE {
+			?anySubject ?anyPredicate ?this .
+			FILTER (!isLiteral(?this)) .
+		}
+		""" ;
+.
+
 sh:AllSubjectsScope
 	a sh:ScopeTemplate ;
 	rdfs:subClassOf sh:TemplateScope ;
@@ -527,7 +532,7 @@ sh:InversePropertyScope
 		sh:predicate sh:predicate ;
 		sh:valueClass rdf:Property ;
 		rdfs:label "predicate" ;
-		rdfs:comment "The Property to look for." ;
+		rdfs:comment "The property to look for." ;
 	] ;
 	sh:sparql """
 		SELECT DISTINCT ?this
@@ -696,7 +701,7 @@ sh:AbstractArgumentDatatypeConstraint
 	a sh:ConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
 	rdfs:label "Abstract argument datatype constraint" ;
-	rdfs:comment "Enforces a constraint that the value of an argument must be a literal of a certain datatype. This will accept strings with language tags instead of xsd:string." ;
+	rdfs:comment "Enforces a constraint that the value of an argument must be a literal of a certain datatype. sh:text is recommended if the values shall be either strings or string with language tags." ;
 	sh:abstract true ;
 	sh:argument [
 		sh:predicate sh:datatype ;
@@ -890,7 +895,7 @@ sh:AbstractDatatypePropertyConstraint
 		sh:nodeKind sh:IRI ;
 		sh:valueClass rdfs:Datatype ;
 		rdfs:label "datatype" ;
-		rdfs:comment "The datatype that all values of the property must have, based on the semantics defined by the function sh:hasDatatype." ;
+		rdfs:comment "The datatype that all values of the property must have. sh:text is recommended if the values shall be either strings or string with language tags." ;
 	] ;
 	sh:message "Values must have datatype {?datatype}" ;
 	sh:sparql """
@@ -1071,7 +1076,7 @@ sh:AbstractLengthPropertyConstraint
 	a sh:ConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
 	rdfs:label "Abstract length property constraint" ;
-	rdfs:comment "Specifies the min and max length of values." ;
+	rdfs:comment "Specifies the minimum and maximum string length of values." ;
 	sh:abstract true ;
 	sh:argument [
 		sh:predicate sh:minLength ;
@@ -1079,7 +1084,7 @@ sh:AbstractLengthPropertyConstraint
 		sh:optionalWhenInherited true ;
 		sh:datatype xsd:integer ;
 		rdfs:label "min length" ;
-		rdfs:comment "The min length permitted for values of this property." ;
+		rdfs:comment "The minimum string length permitted for values of this property." ;
 	] ;
 	sh:argument [
 		sh:predicate sh:maxLength ;
@@ -1087,12 +1092,14 @@ sh:AbstractLengthPropertyConstraint
 		sh:optionalWhenInherited true ;
 		sh:datatype xsd:integer ;
 		rdfs:label "max length" ;
-		rdfs:comment "The max length permitted for values of this property." ;
+		rdfs:comment "The maximum string length permitted for values of this property." ;
 	] ;
 	sh:message "Invalid string length: {?objectLength} characters." ;
 	sh:sparql """
 		SELECT ?this (?this AS ?subject) ?predicate ?object ?objectLength
 		WHERE {
+			# TODO: The FILTER can be removed once the spec makes sure that inherited templates without
+			#       any bound arguments will be skipped
 			{ FILTER (bound(?minLength) || bound(?maxLength)) }
 			?this ?predicate ?object .
 			BIND (STRLEN(str(?object)) AS ?objectLength) .
@@ -1494,7 +1501,7 @@ sh:hasDatatype
 	a sh:Function ;
 	rdfs:subClassOf sh:Functions ;
 	rdfs:label "has datatype" ;
-	rdfs:comment "Checks whether a given node (?arg1) is a literal with a given datatype (?arg2). If the datatype is xsd:string, then the function will also accept literals with a language tag." ;
+	rdfs:comment "Checks whether a given node (?arg1) is a literal with a given datatype (?arg2). If the datatype is sh:text, then the function will either accept xsd:string or rdf:langString." ;
 	sh:argument [
 		sh:predicate sh:arg1 ;
 		rdfs:comment "The node to check the datatype of." ;
@@ -1511,7 +1518,7 @@ sh:hasDatatype
 				FILTER isLiteral(?arg1) .
 			} .
 			BIND (datatype(?arg1) AS ?datatype) .
-			FILTER ((?datatype = ?arg2) || (rdf:langString = ?datatype && ?arg2 = xsd:string)) .
+			FILTER ((?datatype = ?arg2) || (?arg2 = sh:text && ?datatype IN (rdf:langString, xsd:string))) .
 		}
 		""" ;
 .
@@ -1829,12 +1836,14 @@ sh:cachable a rdf:Property ; rdfs:label "cachable" .
 sh:check a rdf:Property ; rdfs:label "check" .
 sh:checkAll a rdf:Property ; rdfs:label "check all" .
 sh:constraint a rdf:Property ; rdfs:label "constraint" .
+sh:constraintTemplate a rdf:Property ; rdfs:label "constraint template" .
 sh:datatype a rdf:Property ; rdfs:label "datatype" .
 sh:defaultValue a rdf:Property ; rdfs:label "default value" .
 sh:defaultValueType a rdf:Property ; rdfs:label "default value type" .
 sh:directValueType a rdf:Property ; rdfs:label "direct value type" .
 sh:detail a rdf:Property ; rdfs:label "detail" .
 sh:entailment a rdf:Property ; rdfs:label "entailment" .
+sh:extends a rdf:Property ; rdfs:label "extends" .
 sh:filterShape a rdf:Property ; rdfs:label "filter shape" .
 sh:final a rdf:Property ; rdfs:label "final" .
 sh:fractionDigits a rdf:Property ; rdfs:label "fraction digits" .
@@ -1860,14 +1869,21 @@ sh:pattern a rdf:Property ; rdfs:label "pattern" .
 sh:predicate a rdf:Property ; rdfs:label "predicate" .
 sh:private a rdf:Property ; rdfs:label "private" .
 sh:property a rdf:Property ; rdfs:label "property" .
+sh:qualifiedMaxCount a rdf:Property ; rdfs:label "qualified max count" .
+sh:qualifiedMinCount a rdf:Property ; rdfs:label "qualified min count" .
+sh:qualifiedValueShape a rdf:Property ; rdfs:label "qualified value shape" .
 sh:resultAnnotation a rdf:Property ; rdfs:label "result annotation" .
 sh:returnType a rdf:Property ; rdfs:label "return type" .
 sh:root a rdf:Property ; rdfs:label "root" .
 sh:scope a rdf:Property ; rdfs:label "scope" .
 sh:scopeClass a rdf:Property ; rdfs:label "scope class" .
+sh:scopeTemplate a rdf:Property ; rdfs:label "scope template" .
 sh:severity a rdf:Property ; rdfs:label "severity" .
+sh:shape a rdf:Property ; rdfs:label "shape" .
+sh:shapes a rdf:Property ; rdfs:label "shapes" .
 sh:shapesGraph a rdf:Property ; rdfs:label "shapes graph" .
-sh:sparql	a rdf:Property ; rdfs:label "SPARQL" .
+sh:source a rdf:Property ; rdfs:label "source" .
+sh:sparql a rdf:Property ; rdfs:label "SPARQL" .
 sh:subject a rdf:Property ; rdfs:label "subject" .
 sh:totalDigits a rdf:Property ; rdfs:label "total digits" .
 sh:uriStart a rdf:Property ; rdfs:label "URI start" .
