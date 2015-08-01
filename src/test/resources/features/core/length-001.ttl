@@ -1,0 +1,74 @@
+# baseURI: http://www.w3.org/ns/shacl/test/features/core/length-001
+
+@prefix ex: <http://example.org/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<>
+	a sh:Graph ;
+	sh:shapesGraph <http://www.w3.org/ns/shacl> ;
+.
+
+
+# Shapes ----------------------------------------------------------------------
+
+ex:MyShape
+	a sh:Shape ;
+	sh:property [
+		sh:predicate ex:property ;
+		sh:minLength 1 ;
+		sh:maxLength 5 ;
+	] ;
+.
+
+
+# Instances -------------------------------------------------------------------
+
+# Valid
+ex:ValidResource1
+	sh:nodeShape ex:MyShape ;
+	ex:property "a" ;
+.
+
+# Valid
+ex:ValidResource2
+	sh:nodeShape ex:MyShape ;
+	ex:property "abcde" ;
+.
+
+# Valid
+ex:ValidResource3
+	sh:nodeShape ex:MyShape ;
+	ex:property 12345 ;
+.
+
+# Valid
+ex:ValidResource4
+	sh:nodeShape ex:MyShape ;
+	ex:property <urn:a> ;
+.
+
+# Invalid: too short
+ex:InvalidResource1
+	sh:nodeShape ex:MyShape ;
+	ex:property "" ;
+.
+
+# Invalid: too long
+ex:InvalidResource2
+	sh:nodeShape ex:MyShape ;
+	ex:property "abcdef" ;
+.
+
+# Invalid: too long
+ex:InvalidResource3
+	sh:nodeShape ex:MyShape ;
+	ex:property 123456 ;
+.
+
+# Invalid: blank nodes don't have any length
+ex:InvalidResource4
+	sh:nodeShape ex:MyShape ;
+	ex:property [ ] ;
+.

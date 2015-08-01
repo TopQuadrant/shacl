@@ -44,6 +44,7 @@ public class SHACLUtil {
 	private final static Set<Resource> classesWithDefaultType = new HashSet<Resource>();
 	static {
 		classesWithDefaultType.add(SH.NativeConstraint);
+		classesWithDefaultType.add(SH.NativeScope);
 		classesWithDefaultType.add(SH.Argument);
 		classesWithDefaultType.add(SH.InversePropertyConstraint);
 		classesWithDefaultType.add(SH.PropertyConstraint);
@@ -191,6 +192,9 @@ public class SHACLUtil {
 				}
 				else if(SH.constraint.equals(s.getPredicate())) {
 					return SH.NativeConstraint.inModel(resource.getModel());
+				}
+				else if(SH.scope.equals(s.getPredicate())) {
+					return SH.NativeScope.inModel(resource.getModel());
 				}
 				else if(SH.inverseProperty.equals(s.getPredicate())) {
 					return SH.InversePropertyConstraint.inModel(resource.getModel());

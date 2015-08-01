@@ -5,11 +5,13 @@ import org.topbraid.shacl.model.impl.SHACLArgumentImpl;
 import org.topbraid.shacl.model.impl.SHACLConstraintViolationImpl;
 import org.topbraid.shacl.model.impl.SHACLFunctionImpl;
 import org.topbraid.shacl.model.impl.SHACLNativeConstraintImpl;
+import org.topbraid.shacl.model.impl.SHACLNativeScopeImpl;
 import org.topbraid.shacl.model.impl.SHACLPropertyConstraintImpl;
 import org.topbraid.shacl.model.impl.SHACLShapeImpl;
 import org.topbraid.shacl.model.impl.SHACLTemplateCallImpl;
 import org.topbraid.shacl.model.impl.SHACLTemplateConstraintImpl;
 import org.topbraid.shacl.model.impl.SHACLTemplateImpl;
+import org.topbraid.shacl.model.impl.SHACLTemplateScopeImpl;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaUtil;
@@ -36,9 +38,11 @@ public class SHACLFactory {
     	p.add(SHACLPropertyConstraint.class, new SimpleImplementation(SH.PropertyConstraint.asNode(), SHACLPropertyConstraintImpl.class));
     	p.add(SHACLShape.class, new SimpleImplementation(SH.Shape.asNode(), SHACLShapeImpl.class));
     	p.add(SHACLNativeConstraint.class, new SimpleImplementation(SH.NativeConstraint.asNode(), SHACLNativeConstraintImpl.class));
+    	p.add(SHACLNativeScope.class, new SimpleImplementation(SH.NativeScope.asNode(), SHACLNativeScopeImpl.class));
     	p.add(SHACLTemplate.class, new SimpleImplementation(SH.Template.asNode(), SHACLTemplateImpl.class));
     	p.add(SHACLTemplateCall.class, new SimpleImplementation(SH.Templates.asNode(), SHACLTemplateCallImpl.class));
     	p.add(SHACLTemplateConstraint.class, new SimpleImplementation(SH.TemplateConstraint.asNode(), SHACLTemplateConstraintImpl.class));
+    	p.add(SHACLTemplateScope.class, new SimpleImplementation(SH.TemplateScope.asNode(), SHACLTemplateScopeImpl.class));
     	
 		FunctionRegistry.get().put(SH.hasShape.getURI(), HasShapeFunction.class);
     }
@@ -51,6 +55,11 @@ public class SHACLFactory {
 	
 	public static SHACLNativeConstraint asNativeConstraint(RDFNode node) {
 		return node.as(SHACLNativeConstraint.class);
+	}
+	
+	
+	public static SHACLNativeScope asNativeScope(RDFNode node) {
+		return node.as(SHACLNativeScope.class);
 	}
 	
 	
@@ -79,13 +88,26 @@ public class SHACLFactory {
 	}
 	
 	
-	public static boolean isSPARQLConstraint(RDFNode node) {
+	public static boolean isNativeConstraint(RDFNode node) {
 		if(node != null && node.isAnon()) {
 			if(((Resource)node).hasProperty(RDF.type, SH.NativeConstraint)) {
 				return true;
 			}
 			if(!((Resource)node).hasProperty(RDF.type)) {
 				return SH.NativeConstraint.equals(SHACLUtil.getDefaultTemplateType((Resource)node));
+			}
+		}
+		return false;
+	}
+	
+	
+	public static boolean isNativeScope(RDFNode node) {
+		if(node != null && node.isAnon()) {
+			if(((Resource)node).hasProperty(RDF.type, SH.NativeScope)) {
+				return true;
+			}
+			if(!((Resource)node).hasProperty(RDF.type)) {
+				return SH.NativeScope.equals(SHACLUtil.getDefaultTemplateType((Resource)node));
 			}
 		}
 		return false;
@@ -114,7 +136,7 @@ public class SHACLFactory {
 			// If this is a typeless blank node, check for defaultType of incoming references
 			if(resource.isAnon() && !resource.hasProperty(RDF.type)) {
 				Resource dt = SHACLUtil.getDefaultTemplateType(resource);
-				if(dt != null && !SH.NativeConstraint.equals(dt)) {
+				if(dt != null && !SH.NativeConstraint.equals(dt) && !SH.NativeScope.equals(dt)) {
 					return true;
 				}
 			}
