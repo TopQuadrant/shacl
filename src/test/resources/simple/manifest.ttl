@@ -60,7 +60,7 @@
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidWithoutName ;
+  		sh:focusNode ex:InvalidWithoutName ;
 		sh:subject ex:InvalidWithoutName ;
 		sh:predicate foaf:name ;
 	] ;

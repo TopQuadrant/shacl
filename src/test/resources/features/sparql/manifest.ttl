@@ -27,7 +27,7 @@
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root rdfs:Resource ;
+  		sh:focusNode rdfs:Resource ;
 	] ;
 	mf:status sht:proposed ; 
 .
@@ -41,28 +41,28 @@
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidInstance1 ;
+  		sh:focusNode ex:InvalidInstance1 ;
   		sh:subject ex:InvalidInstance1 ;
   		sh:predicate rdfs:label ;
   		sh:object "English"@en ;
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidInstance1 ;
+  		sh:focusNode ex:InvalidInstance1 ;
   		sh:subject ex:InvalidInstance1 ;
   		sh:predicate rdfs:label ;
   		sh:object "British"@en ;
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidInstance2 ;
+  		sh:focusNode ex:InvalidInstance2 ;
   		sh:subject ex:InvalidInstance2 ;
   		sh:predicate rdfs:label ;
   		sh:object "English"@en ;
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidInstance2 ;
+  		sh:focusNode ex:InvalidInstance2 ;
   		sh:subject ex:InvalidInstance2 ;
   		sh:predicate rdfs:label ;
   		sh:object "British"@en ;

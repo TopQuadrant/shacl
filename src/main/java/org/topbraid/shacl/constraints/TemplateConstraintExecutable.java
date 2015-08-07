@@ -34,6 +34,18 @@ public class TemplateConstraintExecutable extends ConstraintExecutable {
 	}
 	
 	
+	@Override
+	public Resource getSeverity() {
+		Resource override = JenaUtil.getResourceProperty(constraint, SH.severity);
+		if(override != null) {
+			return override;
+		}
+		else {
+			return super.getSeverity();
+		}
+	}
+
+
 	public SHACLTemplateConstraint getTemplateCall() {
 		return constraint;
 	}

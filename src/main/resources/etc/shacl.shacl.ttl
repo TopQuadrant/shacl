@@ -1,7 +1,7 @@
 # baseURI: http://www.w3.org/ns/shacl
 
 # SHACL - Shapes Constraint Language
-# Draft last edited on 2015-07-31
+# Draft last edited on 2015-08-07
 # Created by the W3C RDF Data Shapes Working Group
 # Editor: Holger Knublauch <holger@topquadrant.com>
 
@@ -368,17 +368,25 @@ sh:Result
 		rdfs:comment "The object of triples involved in this result." ;
 	] ;
 	sh:property [
-		sh:predicate sh:root ;
+		sh:predicate sh:focusNode ;
 		sh:valueClass rdfs:Resource ;
 		sh:maxCount 1 ;
-		rdfs:label "root" ;
-		rdfs:comment "The root resource of the result (often: the focus node)." ;
+		rdfs:label "focus node" ;
+		rdfs:comment "The focus node evaluated when the result was produced." ;
 	] ;
 	sh:property [
-		sh:predicate sh:source ;
+		sh:predicate sh:sourceConstraint ;
 		sh:valueClass sh:Constraint ;
-		rdfs:label "source" ;
-		rdfs:comment "The Constraint that caused this. This property gets filled in automatically by the constraint validation engine." ;
+		sh:maxCount 1 ;
+		rdfs:label "source constraint" ;
+		rdfs:comment "The Constraint that caused this result." ;
+	] ;
+	sh:property [
+		sh:predicate sh:sourceShape ;
+		sh:valueClass sh:Shape ;
+		sh:maxCount 1 ;
+		rdfs:label "source shape" ;
+		rdfs:comment "The Shape that caused this result." ;
 	] ;
 .
 
@@ -577,6 +585,13 @@ sh:Constraint
 		rdfs:label "filter shape" ;
 		rdfs:comment "Links a constraint to Shapes that the tested nodes need to fulfill before the constraint is evaluated." ;
 	] ;
+	sh:property [
+		sh:predicate sh:severity ;
+		sh:maxCount 1 ;
+		sh:valueClass sh:ResultClass ;
+		rdfs:label "severity" ;
+		rdfs:comment "Specifies the severity to use for any constraint violation produced by this constraint. Defaults to sh:Error for native constraints. For template constraints it uses the severity of the template by default." ;
+	] ;
 .
 
 sh:NativeConstraint
@@ -585,13 +600,6 @@ sh:NativeConstraint
 	rdfs:subClassOf sh:SPARQLExecutable ;
 	rdfs:label "Native constraint" ;
 	rdfs:comment "A constraint that has a native executable body attached with it." ;
-	sh:property [
-		sh:predicate sh:severity ;
-		sh:maxCount 1 ;
-		sh:valueClass sh:ResultClass ;
-		rdfs:label "severity" ;
-		rdfs:comment "Specifies the default rdf:type to produce for any constraint violation." ;
-	] ;
 	sh:property [
 		sh:predicate sh:message ;
 		sh:datatype xsd:string ;
@@ -1833,8 +1841,6 @@ sh:arg8 a rdf:Property ; rdfs:label "arg8" .
 sh:arg9 a rdf:Property ; rdfs:label "arg9" .
 sh:argument a rdf:Property ; rdfs:label "argument" .
 sh:cachable a rdf:Property ; rdfs:label "cachable" .
-sh:check a rdf:Property ; rdfs:label "check" .
-sh:checkAll a rdf:Property ; rdfs:label "check all" .
 sh:constraint a rdf:Property ; rdfs:label "constraint" .
 sh:constraintTemplate a rdf:Property ; rdfs:label "constraint template" .
 sh:datatype a rdf:Property ; rdfs:label "datatype" .
@@ -1846,7 +1852,7 @@ sh:entailment a rdf:Property ; rdfs:label "entailment" .
 sh:extends a rdf:Property ; rdfs:label "extends" .
 sh:filterShape a rdf:Property ; rdfs:label "filter shape" .
 sh:final a rdf:Property ; rdfs:label "final" .
-sh:fractionDigits a rdf:Property ; rdfs:label "fraction digits" .
+sh:focusNode a rdf:Property ; rdfs:label "focus node" .
 sh:hasValue a rdf:Property ; rdfs:label "has value" .
 sh:include a rdf:Property ; rdfs:label "include" .
 sh:inverseProperty a rdf:Property ; rdfs:label "inverse property" .
@@ -1874,7 +1880,6 @@ sh:qualifiedMinCount a rdf:Property ; rdfs:label "qualified min count" .
 sh:qualifiedValueShape a rdf:Property ; rdfs:label "qualified value shape" .
 sh:resultAnnotation a rdf:Property ; rdfs:label "result annotation" .
 sh:returnType a rdf:Property ; rdfs:label "return type" .
-sh:root a rdf:Property ; rdfs:label "root" .
 sh:scope a rdf:Property ; rdfs:label "scope" .
 sh:scopeClass a rdf:Property ; rdfs:label "scope class" .
 sh:scopeTemplate a rdf:Property ; rdfs:label "scope template" .
@@ -1882,13 +1887,10 @@ sh:severity a rdf:Property ; rdfs:label "severity" .
 sh:shape a rdf:Property ; rdfs:label "shape" .
 sh:shapes a rdf:Property ; rdfs:label "shapes" .
 sh:shapesGraph a rdf:Property ; rdfs:label "shapes graph" .
-sh:source a rdf:Property ; rdfs:label "source" .
+sh:sourceConstraint a rdf:Property ; rdfs:label "source constraint" .
+sh:sourceShape a rdf:Property ; rdfs:label "source shape" .
 sh:sparql a rdf:Property ; rdfs:label "SPARQL" .
 sh:subject a rdf:Property ; rdfs:label "subject" .
-sh:totalDigits a rdf:Property ; rdfs:label "total digits" .
-sh:uriStart a rdf:Property ; rdfs:label "URI start" .
 sh:valueClass a rdf:Property ; rdfs:label "value class" .
 sh:valueShape a rdf:Property ; rdfs:label "value shape" .
 sh:value a rdf:Property ; rdfs:label "value" .
-sh:violation a rdf:Property ;	rdfs:label "violation" .
-sh:whiteSpace a rdf:Property ; rdfs:label "whiteSpace" .   # maybe needed

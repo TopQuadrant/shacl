@@ -6,13 +6,16 @@ import com.hp.hpl.jena.rdf.model.Resource;
 
 public interface SHACLConstraintViolation extends SHACLResource {
 	
-	Resource getSource();
-	
-	
 	String getMessage();
 	
 	
-	Resource getRoot();
+	Resource getFocusNode();
+
+	
+	Resource getSourceConstraint();
+
+	
+	Resource getSourceShape();
 	
 	
 	Resource getSubject();

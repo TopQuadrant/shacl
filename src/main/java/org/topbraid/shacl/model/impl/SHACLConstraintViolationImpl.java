@@ -23,14 +23,14 @@ public class SHACLConstraintViolationImpl extends SHACLResourceImpl implements S
 
 	
 	@Override
-	public String getMessage() {
-		return JenaUtil.getStringProperty(this, SH.message);
+	public Resource getFocusNode() {
+		return JenaUtil.getResourceProperty(this, SH.focusNode);
 	}
 
 	
 	@Override
-	public Resource getRoot() {
-		return JenaUtil.getResourceProperty(this, SH.root);
+	public String getMessage() {
+		return JenaUtil.getStringProperty(this, SH.message);
 	}
 
 	
@@ -53,8 +53,14 @@ public class SHACLConstraintViolationImpl extends SHACLResourceImpl implements S
 
 	
 	@Override
-	public Resource getSource() {
-		return JenaUtil.getResourceProperty(this, SH.source);
+	public Resource getSourceConstraint() {
+		return JenaUtil.getResourceProperty(this, SH.sourceConstraint);
+	}
+
+	
+	@Override
+	public Resource getSourceShape() {
+		return JenaUtil.getResourceProperty(this, SH.sourceShape);
 	}
 
 	

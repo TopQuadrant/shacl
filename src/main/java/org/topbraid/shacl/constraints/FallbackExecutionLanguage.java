@@ -39,9 +39,10 @@ public class FallbackExecutionLanguage implements ExecutionLanguage {
 			Resource focusNode, Model results) {
 		Resource vio = results.createResource(SH.FatalError);
 		vio.addProperty(SH.message, "No execution language found for constraint");
-		vio.addProperty(SH.source, constraint);
+		vio.addProperty(SH.sourceConstraint, constraint);
+		vio.addProperty(SH.sourceShape, shape);
 		if(focusNode != null) {
-			vio.addProperty(SH.root, focusNode);
+			vio.addProperty(SH.focusNode, focusNode);
 		}
 	}
 

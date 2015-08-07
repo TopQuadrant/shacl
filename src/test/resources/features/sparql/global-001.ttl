@@ -13,7 +13,7 @@
 		sh:constraint [
 			sh:message "Failure of global SPARQL constraint" ;
 			sh:sparql """
-				SELECT (rdfs:Resource AS ?root)
+				SELECT (rdfs:Resource AS ?this)
 				WHERE {
 				}
 			""" ;

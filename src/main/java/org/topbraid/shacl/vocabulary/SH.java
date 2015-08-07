@@ -102,6 +102,8 @@ public class SH {
     
     public final static Property final_ = ResourceFactory.createProperty(NS + "final");
 
+    public final static Property focusNode = ResourceFactory.createProperty(NS + "focusNode");
+
     public final static Property graph = ResourceFactory.createProperty(NS + "graph");
 
     public final static Resource hasShape = ResourceFactory.createResource(NS + "hasShape");
@@ -145,8 +147,6 @@ public class SH {
     public final static Property property = ResourceFactory.createProperty(NS + "property");
 
     public final static Property returnType = ResourceFactory.createProperty(NS + "returnType");
-
-    public final static Property root = ResourceFactory.createProperty(NS + "root");
     
     public final static Property scope = ResourceFactory.createProperty(NS + "scope");
     
@@ -158,7 +158,9 @@ public class SH {
 
     public final static Property shapesGraph = ResourceFactory.createProperty(NS + "shapesGraph");
 
-    public final static Property source = ResourceFactory.createProperty(NS + "source");
+    public final static Property sourceConstraint = ResourceFactory.createProperty(NS + "sourceConstraint");
+
+    public final static Property sourceShape = ResourceFactory.createProperty(NS + "sourceShape");
 
     public final static Property sparql = ResourceFactory.createProperty(NS + "sparql");
 
@@ -176,8 +178,6 @@ public class SH {
 	public static final Var objectVar = Var.alloc(object.getLocalName());
 
 	public static final Var predicateVar = Var.alloc(predicate.getLocalName());
-
-	public static final Var rootVar = Var.alloc(root.getLocalName());
 
 	public static final Var severityVar = Var.alloc(severity.getLocalName());
 	

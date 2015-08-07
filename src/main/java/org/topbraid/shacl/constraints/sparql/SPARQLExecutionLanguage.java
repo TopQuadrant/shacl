@@ -129,7 +129,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		QueryExecution qexec = ARQFactory.get().createQueryExecution(query, dataset, bindings);
 
 		long startTime = System.currentTimeMillis();
-		int violationCount = executeSelectQuery(results, constraint, focusNode, executable, qexec);
+		int violationCount = executeSelectQuery(results, constraint, shape, focusNode, executable, qexec);
 		if(SPINStatisticsManager.get().isRecording()) {
 			long endTime = System.currentTimeMillis();
 			long duration = endTime - startTime;
@@ -149,7 +149,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 	}
 
 
-	private static int executeSelectQuery(Model results, SHACLConstraint constraint,
+	private static int executeSelectQuery(Model results, SHACLConstraint constraint, Resource shape,
 			Resource focusNode, ConstraintExecutable executable,
 			QueryExecution qexec) {
 	
@@ -176,7 +176,8 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 			}
 			
 			Resource vio = results.createResource(severity);
-			vio.addProperty(SH.source, constraint);
+			vio.addProperty(SH.sourceConstraint, constraint);
+			vio.addProperty(SH.sourceShape, shape);
 			
 			if(selectMessage != null) {
 				vio.addProperty(SH.message, selectMessage);
@@ -208,15 +209,9 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 				vio.addProperty(SH.subject, selectSubject);
 			}
 			
-			RDFNode root = sol.get(SH.rootVar.getVarName());
-			if(root != null) {
-				vio.addProperty(SH.root, root);
-			}
-			else {
-				root = sol.get(SH.thisVar.getVarName());
-				if(root != null) {
-					vio.addProperty(SH.root, root);
-				}
+			RDFNode thisValue = sol.get(SH.thisVar.getVarName());
+			if(thisValue != null) {
+				vio.addProperty(SH.focusNode, thisValue);
 			}
 	
 			violationCount++;

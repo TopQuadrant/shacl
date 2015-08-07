@@ -57,7 +57,7 @@
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidInstance1 ;
+  		sh:focusNode ex:InvalidInstance1 ;
   		sh:subject ex:InvalidInstance1 ;
   		sh:predicate ex:value ;
   		sh:object "D" ;
@@ -74,11 +74,11 @@
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidRectangle1 ;
+  		sh:focusNode ex:InvalidRectangle1 ;
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidRectangle2 ;
+  		sh:focusNode ex:InvalidRectangle2 ;
 	] ;
 	mf:status sht:proposed ; 
 .
@@ -92,11 +92,11 @@
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidInstance1 ;
+  		sh:focusNode ex:InvalidInstance1 ;
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidInstance2 ;
+  		sh:focusNode ex:InvalidInstance2 ;
 	] ;
 	mf:status sht:proposed ; 
 .
@@ -110,11 +110,11 @@
 	] ;
 	mf:result [
 		a sh:FatalError ;
-  		sh:root ex:InvalidInstance1 ;
+  		sh:focusNode ex:InvalidInstance1 ;
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidInstance2 ;
+  		sh:focusNode ex:InvalidInstance2 ;
 	] ;
 	mf:status sht:proposed ; 
 .
@@ -128,14 +128,14 @@
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root _:b1 ;
+  		sh:focusNode _:b1 ;
   		sh:subject _:b1 ;
   		sh:predicate sh:maxCount ;
   		sh:object 1.2 ;
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root _:b1 ;
+  		sh:focusNode _:b1 ;
   		sh:subject _:b1 ;
   		sh:predicate sh:predicate ;
 	] ;
@@ -151,14 +151,14 @@
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidInstance1 ;
+  		sh:focusNode ex:InvalidInstance1 ;
   		sh:subject ex:InvalidInstance1 ;
   		sh:predicate ex:value ;
   		sh:object "A"@en ;
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidInstance2 ;
+  		sh:focusNode ex:InvalidInstance2 ;
   		sh:subject ex:InvalidInstance2 ;
   		sh:predicate ex:value ;
   		sh:object 42 ;
@@ -175,7 +175,7 @@
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidInstance1 ;
+  		sh:focusNode ex:InvalidInstance1 ;
   		sh:subject ex:InvalidInstance1 ;
   		sh:predicate ex:value ;
   		sh:object 42 ;
@@ -192,14 +192,14 @@
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidInstance1 ;
+  		sh:focusNode ex:InvalidInstance1 ;
   		sh:subject ex:InvalidInstance1 ;
   		sh:predicate ex:value ;
   		sh:object ex:SubInstance ;
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidInstance2 ;
+  		sh:focusNode ex:InvalidInstance2 ;
   		sh:subject ex:InvalidInstance2 ;
   		sh:predicate ex:value ;
   		sh:object ex:InvalidInstance2 ;
@@ -216,7 +216,7 @@
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidInstance1 ;
+  		sh:focusNode ex:InvalidInstance1 ;
   		sh:subject ex:InvalidInstance1 ;
   		sh:predicate ex:child ;
 	] ;
@@ -232,7 +232,7 @@
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidExampleInstance ;
+  		sh:focusNode ex:InvalidExampleInstance ;
 	] ;
 	mf:status sht:proposed ; 
 .
@@ -246,7 +246,7 @@
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidExampleInstance ;
+  		sh:focusNode ex:InvalidExampleInstance ;
 	] ;
 	mf:status sht:proposed ; 
 .
@@ -260,13 +260,13 @@
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:Father ;
+  		sh:focusNode ex:Father ;
   		sh:object ex:Father ;
   		sh:predicate ex:child ;
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:Mother ;
+  		sh:focusNode ex:Mother ;
   		sh:object ex:Mother ;
   		sh:predicate ex:child ;
 	] ;
@@ -282,28 +282,28 @@
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidResource1 ;
+  		sh:focusNode ex:InvalidResource1 ;
   		sh:subject ex:InvalidResource1 ;
   		sh:predicate ex:property ;
   		sh:object "" ;
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidResource2 ;
+  		sh:focusNode ex:InvalidResource2 ;
   		sh:subject ex:InvalidResource2 ;
   		sh:predicate ex:property ;
   		sh:object "abcdef" ;
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidResource3 ;
+  		sh:focusNode ex:InvalidResource3 ;
   		sh:subject ex:InvalidResource3 ;
   		sh:predicate ex:property ;
   		sh:object 123456 ;
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidResource4 ;
+  		sh:focusNode ex:InvalidResource4 ;
   		sh:subject ex:InvalidResource4 ;
   		sh:predicate ex:property ;
   		sh:object [] ;
@@ -320,21 +320,21 @@
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidResource1 ;
+  		sh:focusNode ex:InvalidResource1 ;
   		sh:subject ex:InvalidResource1 ;
   		sh:predicate ex:property ;
   		sh:object 1 ;
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidResource2 ;
+  		sh:focusNode ex:InvalidResource2 ;
   		sh:subject ex:InvalidResource2 ;
   		sh:predicate ex:property ;
   		sh:object 2 ;
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidResource3 ;
+  		sh:focusNode ex:InvalidResource3 ;
   		sh:subject ex:InvalidResource3 ;
   		sh:predicate ex:property ;
   		sh:object "a" ;
@@ -351,14 +351,14 @@
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidResource1 ;
+  		sh:focusNode ex:InvalidResource1 ;
   		sh:subject ex:InvalidResource1 ;
   		sh:predicate ex:property ;
   		sh:object 2 ;
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidResource2 ;
+  		sh:focusNode ex:InvalidResource2 ;
   		sh:subject ex:InvalidResource2 ;
   		sh:predicate ex:property ;
   		sh:object "a" ;
@@ -375,21 +375,21 @@
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidResource1 ;
+  		sh:focusNode ex:InvalidResource1 ;
   		sh:subject ex:InvalidResource1 ;
   		sh:predicate ex:property ;
   		sh:object 1 ;
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidResource2 ;
+  		sh:focusNode ex:InvalidResource2 ;
   		sh:subject ex:InvalidResource2 ;
   		sh:predicate ex:property ;
   		sh:object 0 ;
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidResource3 ;
+  		sh:focusNode ex:InvalidResource3 ;
   		sh:subject ex:InvalidResource3 ;
   		sh:predicate ex:property ;
   		sh:object "a" ;
@@ -406,14 +406,14 @@
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidResource1 ;
+  		sh:focusNode ex:InvalidResource1 ;
   		sh:subject ex:InvalidResource1 ;
   		sh:predicate ex:property ;
   		sh:object 0 ;
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidResource2 ;
+  		sh:focusNode ex:InvalidResource2 ;
   		sh:subject ex:InvalidResource2 ;
   		sh:predicate ex:property ;
   		sh:object "a" ;
@@ -430,7 +430,7 @@
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidInstance1 ;
+  		sh:focusNode ex:InvalidInstance1 ;
 	] ;
 	mf:status sht:proposed ; 
 .
@@ -444,11 +444,11 @@
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidRectangle1 ;
+  		sh:focusNode ex:InvalidRectangle1 ;
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidRectangle2 ;
+  		sh:focusNode ex:InvalidRectangle2 ;
 	] ;
 	mf:status sht:proposed ; 
 .
@@ -462,21 +462,21 @@
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidResource1 ;
+  		sh:focusNode ex:InvalidResource1 ;
   		sh:subject ex:InvalidResource1 ;
   		sh:predicate ex:property ;
   		sh:object "The 123" ;
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidResource2 ;
+  		sh:focusNode ex:InvalidResource2 ;
   		sh:subject ex:InvalidResource2 ;
   		sh:predicate ex:property ;
   		sh:object "132" ;
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidResource3 ;
+  		sh:focusNode ex:InvalidResource3 ;
   		sh:subject ex:InvalidResource3 ;
   		sh:predicate ex:property ;
   		sh:object [] ;
@@ -493,20 +493,20 @@
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:RectangleWithFloatHeight ;
+  		sh:focusNode ex:RectangleWithFloatHeight ;
   		sh:subject ex:RectangleWithFloatHeight ;
   		sh:predicate ex:height ;
   		sh:object 9.2 ;
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:RectangleWithoutHeight ;
+  		sh:focusNode ex:RectangleWithoutHeight ;
   		sh:subject ex:RectangleWithoutHeight ;
   		sh:predicate ex:height ;
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:RectangleWithTwoHeights ;
+  		sh:focusNode ex:RectangleWithTwoHeights ;
   		sh:subject ex:RectangleWithTwoHeights ;
   		sh:predicate ex:height ;
 	] ;
@@ -522,7 +522,7 @@
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:Observation1 ;
+  		sh:focusNode ex:Observation1 ;
   		sh:subject ex:Observation1 ;
   		sh:predicate ex:related ;
 	] ;
@@ -538,7 +538,7 @@
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:Enrico ;
+  		sh:focusNode ex:Enrico ;
   		sh:subject ex:Enrico ;
   		sh:predicate ex:knows ;
   		sh:object ex:John ;
@@ -565,7 +565,7 @@
 	] ;
 	mf:result [
 		a sh:FatalError ;
-  		sh:root ex:Instance1 ;
+  		sh:focusNode ex:Instance1 ;
   		sh:subject ex:Instance1 ;
   		sh:predicate ex:someProperty ;
   		sh:object ex:Instance2 ;
@@ -592,7 +592,7 @@
 	] ;
 	mf:result [
 		a sh:FatalError ;
-  		sh:root ex:a ;
+  		sh:focusNode ex:a ;
 	] ;
 	mf:status sht:proposed ; 
 .
@@ -606,14 +606,14 @@
 	] ;
 	mf:result [
 		a sh:FatalError ;
-  		sh:root ex:a ;
+  		sh:focusNode ex:a ;
   		sh:subject ex:a ;
   		sh:predicate ex:p ;
   		sh:object ex:b ;
 	] ;
 	mf:result [
 		a sh:FatalError ;
-  		sh:root ex:a ;
+  		sh:focusNode ex:a ;
   		sh:subject ex:a ;
   		sh:predicate ex:p ;
   		sh:object ex:c ;
@@ -630,11 +630,11 @@
 	] ;
 	mf:result [
 		a sh:FatalError ;
-  		sh:root ex:a ;
+  		sh:focusNode ex:a ;
 	] ;
 	mf:result [
 		a sh:FatalError ;
-  		sh:root ex:b ;
+  		sh:focusNode ex:b ;
 	] ;
 	mf:status sht:proposed ; 
 .
@@ -648,7 +648,7 @@
 	] ;
 	mf:result [
 		a sh:FatalError ;
-  		sh:root ex:a ;
+  		sh:focusNode ex:a ;
 	] ;
 	mf:status sht:proposed ; 
 .
@@ -672,7 +672,7 @@
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidInstance1 ;
+  		sh:focusNode ex:InvalidInstance1 ;
   		sh:subject ex:InvalidInstance1 ;
   		sh:predicate ex:value ;
   		sh:object ex:InvalidInstance1 ;
@@ -689,7 +689,7 @@
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:Issue_1 ;
+  		sh:focusNode ex:Issue_1 ;
   		sh:subject ex:Issue_1 ;
   		sh:predicate ex:assignedTo ;
   		sh:object ex:Anon ;
@@ -706,11 +706,11 @@
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidInstance1 ;
+  		sh:focusNode ex:InvalidInstance1 ;
 	] ;
 	mf:result [
 		a sh:Error ;
-  		sh:root ex:InvalidInstance2 ;
+  		sh:focusNode ex:InvalidInstance2 ;
 	] ;
 	mf:status sht:proposed ; 
 .
