@@ -8,6 +8,9 @@ import java.util.Map;
 
 import org.topbraid.shacl.model.SHACLConstraint;
 import org.topbraid.shacl.model.SHACLFactory;
+import org.topbraid.shacl.model.SHACLRule;
+import org.topbraid.shacl.rules.RuleExecutable;
+import org.topbraid.shacl.util.ModelPrinter;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.progress.ProgressMonitor;
@@ -67,8 +70,19 @@ public class ModelConstraintValidator {
 			monitor.subTask("Preparing execution plan");
 		}
 		
+		List<Property> ruleProperties = SHACLUtil.getAllRuleProperties();
+		Map<Resource,List<SHACLRule>> rulemap = buildShape2RulesMap(shapesModel, dataset.getDefaultModel(), ruleProperties, filtered);
+		if(monitor != null) {
+			monitor.subTask("");
+		}
+		
+		if(monitor != null) {
+			monitor.beginTask("Validating rules for " + rulemap.size() + " shapes...", rulemap.size());
+		}
+		
 		List<Property> constraintProperties = SHACLUtil.getAllConstraintProperties();
 		Map<Resource,List<SHACLConstraint>> map = buildShape2ConstraintsMap(shapesModel, dataset.getDefaultModel(), constraintProperties, filtered);
+
 		if(monitor != null) {
 			monitor.subTask("");
 		}
@@ -78,6 +92,12 @@ public class ModelConstraintValidator {
 		}
 		
 		Model results = JenaUtil.createMemoryModel();
+
+		for(Resource shape : rulemap.keySet()) {
+			for(SHACLRule rule : rulemap.get(shape)) {
+				executeRuleForShape(dataset, shapesGraphURI, rule, shape, results, monitor, map);
+			}
+		}
 		for(Resource shape : map.keySet()) {
 			for(SHACLConstraint constraint : map.get(shape)) {
 				validateConstraintForShape(dataset, shapesGraphURI, minSeverity, constraint, shape, results, monitor);
@@ -89,7 +109,7 @@ public class ModelConstraintValidator {
 				}
 			}
 		}
-		
+
 		return results;
 	}
 	
@@ -117,6 +137,39 @@ public class ModelConstraintValidator {
 							}
 							else if(JenaUtil.hasIndirectType(type, SH.ConstraintTemplate)) {
 								list.add(SHACLFactory.asTemplateConstraint(c));
+							}
+							// TODO add property constraint if
+						}
+					}
+				}
+			}
+		}
+		return map;
+	}
+	
+	private Map<Resource,List<SHACLRule>> buildShape2RulesMap(Model shapesModel, Model dataModel, List<Property> ruleProperties, boolean filtered) {
+		Map<Resource,List<SHACLRule>> map = new HashMap<Resource,List<SHACLRule>>();
+		for(Property ruleProperty : ruleProperties) {
+			for(Statement s : shapesModel.listStatements(null, ruleProperty, (RDFNode)null).toList()) {
+				if(s.getObject().isResource()) {
+					Resource shape = s.getSubject();
+					if((!filtered || ModelClassesFilter.get().accept(shape)) && hasScope(shape, dataModel)) {
+						List<SHACLRule> list = map.get(shape);
+						if(list == null) {
+							list = new LinkedList<SHACLRule>();
+							map.put(shape, list);
+						}
+						Resource c = s.getResource(); 
+						Resource type = JenaUtil.getType(c);
+						if(type == null && c.isAnon()) {
+							type = SHACLUtil.getDefaultTemplateType(c);
+						}
+						if(type != null) {
+							if(SH.NativeRule.equals(type)) {
+								list.add(SHACLFactory.asNativeRule(c));
+							}
+							else if(JenaUtil.hasIndirectType(type, SH.RuleTemplate)) {
+								list.add(SHACLFactory.asTemplateRule(c));
 							}
 							// TODO add property constraint if
 						}
@@ -158,6 +211,20 @@ public class ModelConstraintValidator {
 				ExecutionLanguage lang = ExecutionLanguageSelector.get().getLanguageForConstraint(executable);
 				lang.executeConstraint(dataset, shape, shapesGraphURI, constraint, executable, null, results);
 			}
+		}
+	}
+	
+	private void executeRuleForShape(Dataset dataset, URI shapesGraphURI, SHACLRule rule, Resource shape, Model results, ProgressMonitor monitor, Map<Resource,List<SHACLConstraint>> map) {
+		for(RuleExecutable executable : rule.getExecutables()) {
+			
+			//if(minSeverity == null || minSeverity.equals(severity) || JenaUtil.hasSuperClass(severity, minSeverity)) {
+				if(monitor != null) {
+					monitor.subTask("Executing Rules for Shape " + SPINLabels.get().getLabel(shape));
+				}
+				ExecutionLanguage lang = ExecutionLanguageSelector.get().getLanguageForRule(executable);
+				lang.executeRule(dataset, shape, shapesGraphURI, rule, executable, null, results, map);
+				
+			//}
 		}
 	}
 }

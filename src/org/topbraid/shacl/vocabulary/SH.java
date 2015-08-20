@@ -59,6 +59,8 @@ public class SH {
     
     public final static Resource NativeConstraint = ResourceFactory.createResource(NS + "NativeConstraint");
     
+    public final static Resource NativeRule = ResourceFactory.createResource(NS + "NativeRule");
+    
     public final static Resource NativeScope = ResourceFactory.createResource(NS + "NativeScope");
     
     public final static Resource OrConstraint = ResourceFactory.createResource(NS + "OrConstraint");
@@ -71,6 +73,10 @@ public class SH {
 
     public final static Resource ReversePath = ResourceFactory.createResource(NS + "ReversePath");
     
+    public final static Resource Rule = ResourceFactory.createResource(NS + "Rule");
+
+    public final static Resource RuleTemplate = ResourceFactory.createResource(NS + "RuleTemplate");
+    
     public final static Resource SeqPath = ResourceFactory.createResource(NS + "SeqPath");
     
     public final static Resource Scope = ResourceFactory.createResource(NS + "Scope");
@@ -82,6 +88,8 @@ public class SH {
     public final static Resource Template = ResourceFactory.createResource(NS + "Template");
     
     public final static Resource TemplateConstraint = ResourceFactory.createResource(NS + "TemplateConstraint");
+    
+    public final static Resource TemplateRule = ResourceFactory.createResource(NS + "TemplateRule");
     
     public final static Resource TemplateScope = ResourceFactory.createResource(NS + "TemplateScope");
 
@@ -163,6 +171,10 @@ public class SH {
     public final static Property returnType = ResourceFactory.createProperty(NS + "returnType");
 
     public final static Property root = ResourceFactory.createProperty(NS + "root");
+    
+    public final static Property rule = ResourceFactory.createProperty(NS + "rule");
+    
+    public final static Property salience = ResourceFactory.createProperty(NS + "salience");
     
     public final static Property scope = ResourceFactory.createProperty(NS + "scope");
     

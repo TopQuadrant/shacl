@@ -8,9 +8,13 @@ import java.util.List;
 import java.util.Set;
 
 import org.topbraid.shacl.model.SHACLArgument;
+import org.topbraid.shacl.model.SHACLConstraint;
 import org.topbraid.shacl.model.SHACLConstraintViolation;
 import org.topbraid.shacl.model.SHACLFactory;
+import org.topbraid.shacl.model.SHACLNativeConstraint;
 import org.topbraid.shacl.model.SHACLPropertyConstraint;
+import org.topbraid.shacl.model.SHACLResource;
+import org.topbraid.shacl.model.SHACLRule;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.util.JenaUtil;
@@ -18,6 +22,7 @@ import org.topbraid.spin.util.JenaUtil;
 import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.graph.compose.MultiUnion;
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QuerySolutionMap;
@@ -44,6 +49,7 @@ public class SHACLUtil {
 	private final static Set<Resource> classesWithDefaultType = new HashSet<Resource>();
 	static {
 		classesWithDefaultType.add(SH.NativeConstraint);
+		classesWithDefaultType.add(SH.NativeRule);
 		classesWithDefaultType.add(SH.NativeScope);
 		classesWithDefaultType.add(SH.Argument);
 		classesWithDefaultType.add(SH.InversePropertyConstraint);
@@ -56,6 +62,12 @@ public class SHACLUtil {
 		constraintProperties.add(SH.constraint);
 		constraintProperties.add(SH.inverseProperty);
 		constraintProperties.add(SH.property);
+		// TODO add pathConstraint
+	}
+	
+	private final static List<Property> ruleProperties = new LinkedList<Property>();
+	static {
+		ruleProperties.add(SH.rule);
 		// TODO add pathConstraint
 	}
 	
@@ -139,6 +151,10 @@ public class SHACLUtil {
 		return constraintProperties;
 	}
 	
+	public static List<Property> getAllRuleProperties() {
+		return ruleProperties;
+	}
+	
 	
 	public static List<SHACLConstraintViolation> getAllConstraintViolations(Model model) {
 		List<SHACLConstraintViolation> results = new LinkedList<SHACLConstraintViolation>();
@@ -193,6 +209,9 @@ public class SHACLUtil {
 				else if(SH.constraint.equals(s.getPredicate())) {
 					return SH.NativeConstraint.inModel(resource.getModel());
 				}
+				else if(SH.rule.equals(s.getPredicate())) {
+					return SH.NativeRule.inModel(resource.getModel());
+				}
 				else if(SH.scope.equals(s.getPredicate())) {
 					return SH.NativeScope.inModel(resource.getModel());
 				}
@@ -201,6 +220,7 @@ public class SHACLUtil {
 				}
 				
 				// TODO: maybe handle other properties
+				// TODO: handle rule template calls
 			}
 		}
 		finally {
@@ -258,6 +278,78 @@ public class SHACLUtil {
 		}
 		return null;
 	}
+	
+	public static List<SHACLResource> getAllConstraintsAtClass(Resource cls) {
+		List<SHACLResource> results = new LinkedList<SHACLResource>();
+		for(Resource c : JenaUtil.getAllSuperClassesStar(cls)) {
+			for(Resource arg : JenaUtil.getResourceProperties(c, SH.property)) {
+				results.add(arg.as(SHACLPropertyConstraint.class));
+			}
+			for(Resource arg : JenaUtil.getResourceProperties(c, SH.constraint)) {
+				results.add(arg.as(SHACLNativeConstraint.class));
+			}
+			for(Resource arg : JenaUtil.getResourceProperties(c, SH.inverseProperty)) {
+				results.add(arg.as(SHACLPropertyConstraint.class));
+			}
+		}
+		return results;
+	}
+	
+	
+	public static List<SHACLResource> getAllConstraintsAtInstance(Model m, Resource instance) {
+		List<SHACLResource> constraints = new LinkedList<SHACLResource>();
+		Resource instance2 = m.getResource(instance.getURI());
+
+		for(Resource type : JenaUtil.getTypes(instance2)) {
+			constraints.addAll(getAllConstraintsAtClass(type));
+		}
+		if(constraints != null) {
+			return constraints;
+		}
+		return null;
+	}
+	
+	
+	public static List<SHACLRule> getAllRules(Model model) {
+		List<SHACLRule> results = new LinkedList<SHACLRule>();
+		// TODO: Not pretty code, not generic
+		for(Resource r : model.listResourcesWithProperty(RDF.type, SH.Rule).toList()) {
+			results.add(r.as(SHACLRule.class));
+		}
+		for(Resource r : model.listResourcesWithProperty(RDF.type, SH.NativeRule).toList()) {
+			results.add(r.as(SHACLRule.class));
+		}
+		for(Resource r : model.listResourcesWithProperty(RDF.type, SH.TemplateRule).toList()) {
+			results.add(r.as(SHACLRule.class));
+		}
+		return results;
+	}
+	
+	public static List<SHACLRule> getRulesAtClass(Resource cls) {
+		List<SHACLRule> results = new LinkedList<SHACLRule>();
+		for(Resource c : JenaUtil.getAllSuperClassesStar(cls)) {
+			for(Resource arg : JenaUtil.getResourceProperties(c, SH.rule)) {
+				if(SHACLFactory.isNativeRule(arg))
+					results.add(SHACLFactory.asNativeRule(arg));
+				else if(SHACLFactory.isTemplateCall(arg))
+					results.add(SHACLFactory.asTemplateRule(arg));
+			}
+		}
+		return results;
+	}
+	
+	
+	public static List<SHACLRule> getRulesAtInstance(Resource instance, Property predicate) {
+		List<SHACLRule> results = new LinkedList<SHACLRule>();
+		for(Resource type : JenaUtil.getTypes(instance)) {
+			results.addAll(getRulesAtClass(type));
+			if(results != null) {
+				return results;
+			}
+		}
+		return null;
+	}
+	
 	
 	
 	/**

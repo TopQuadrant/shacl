@@ -1,0 +1,176 @@
+# baseURI: http://topbraid.org/examples/shaclsquare
+# imports: http://www.w3.org/ns/shacl
+
+# An example SHACL model about rectangles and squares, demonstrating all major
+# features of SHACL with simple examples.
+
+# Contact: Holger Knublauch (holger@topquadrant.com)
+
+@prefix arg: <http://www.w3.org/ns/shacl/arg#> .
+@prefix ex: <http://topbraid.org/examples/shaclsquare#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <http://schema.org/>
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+# The sh:Graph ----------------------------------------------------------------
+
+<http://topbraid.org/examples/shaclsquare>
+	a sh:Graph ;
+	sh:shapesGraph <http://www.w3.org/ns/shacl> ;
+	rdfs:label "SHACL Square Example" ;
+	rdfs:comment "A simple example model demonstrating some key features of SHACL. Have a look at the ex:computeArea function, the rule attached to ex:Rectangle and the constraint attached to ex:Square." ;
+.
+
+
+# Classes ---------------------------------------------------------------------
+
+ex:Rectangle
+	a sh:ShapeClass ;
+	rdfs:subClassOf rdfs:Resource ;
+	rdfs:label "Rectangle" ;
+	sh:property [
+		sh:predicate ex:height ;
+		sh:datatype xsd:integer ;
+		sh:minCount 1 ;
+		sh:maxCount 1 ;
+		rdfs:label "height" ;
+		rdfs:comment "The height of the Rectangle." ;
+	] ;
+	sh:property [
+		sh:predicate ex:width ;
+		sh:datatype xsd:integer ;
+		sh:minCount 1 ;
+		sh:maxCount 1 ;
+		rdfs:label "width" ;
+		rdfs:comment "The width of the Rectangle." ;
+	] ;
+	sh:property [
+		sh:predicate ex:creator ;
+		sh:maxCount 1 ;
+		sh:valueShape [
+			sh:property [
+				sh:predicate schema:email ;
+				sh:minCount 1 ;
+			] ;
+		] ;
+		sh:valueClass schema:Person ;
+		rdfs:label "creator" ;
+		rdfs:comment "The creator of the Rectangle." ;
+	] ;
+	sh:constraint [
+		a ex:PositivePropertyValueConstraint ;
+		arg:property ex:height ;
+	] ;
+	sh:constraint [
+		a ex:PositivePropertyValueConstraint ;
+		arg:property ex:width ;
+	] ;
+.
+
+ex:Square
+	a sh:ShapeClass ;
+	rdfs:label "Square" ;
+	rdfs:subClassOf ex:Rectangle ;
+	sh:constraint [
+		sh:message "Width and height of a Square must be equal" ;
+		sh:predicate ex:width ;
+		sh:sparql """
+			SELECT ?this (?this AS ?subject) (?width AS ?object)
+			WHERE {
+				?this ex:width ?width .
+				?this ex:height ?height .
+				FILTER (?width != ?height) .
+			}
+			""" ;
+	] ;
+.
+
+schema:Person
+	a sh:ShapeClass ;
+	rdfs:label "Person" ;
+	rdfs:subClassOf rdfs:Resource ;
+	sh:property [
+		sh:predicate schema:email ;
+		sh:datatype xsd:string ;
+		rdfs:label "email" ;
+		rdfs:comment "Zero or more email addresses of the person." ;
+	] ;
+.
+
+  
+# Example Instances -----------------------------------------------------------
+  
+ex:InvalidSquare
+	a ex:Square ;
+	ex:creator ex:PersonWithoutEmail ;
+	ex:height 8 ;
+	ex:width 9 ;
+	rdfs:label "Invalid square" ;
+.
+  
+ex:TestRectangle
+	a ex:Rectangle ;
+	ex:creator ex:PersonWithEmail ;
+	ex:height 6 ;
+	ex:width 7 ;
+	rdfs:label "Test rectangle" ;
+.
+
+ex:PersonWithoutEmail
+	a schema:Person ;
+.
+
+ex:PersonWithEmail
+	a schema:Person ;
+	schema:email "john@example.com" ;
+.
+
+
+# Templates -------------------------------------------------------------------
+  
+ex:PositivePropertyValueConstraint
+	a sh:ConstraintTemplate ;
+	rdfs:subClassOf sh:TemplateConstraint ;
+	rdfs:label "Positive property value constraint" ;
+	rdfs:comment "A template that can be used to define a SHACL constraint on a given property (arg:property) to make sure that the values of that property are > 0." ;
+	sh:labelTemplate "Values of property {?property} must be > 0" ;
+	sh:argument [
+		sh:predicate arg:property ;
+		sh:valueClass rdf:Property ;
+		rdfs:label "property" ;
+		rdfs:comment "The property to constrain (e.g. ex:width or ex:height)." ;
+	] ;
+	sh:message "Property {?property} must only have positive values, but found {?object}" ;
+	sh:sparql """
+		SELECT ?this (?this AS ?subject) (?property AS ?predicate) ?object ?property
+		WHERE {
+			?this ?property ?object .
+			FILTER (?object <= 0) .
+		}
+		""" ;
+.
+  
+# Functions -------------------------------------------------------------------
+  
+ex:computeArea
+	a sh:Function ;
+	rdfs:subClassOf sh:Functions ;
+	rdfs:label "compute area" ;
+	rdfs:comment "Computes the area of a given rectangle (?arg1) as the product of its width and height." ;
+	sh:argument [
+		sh:predicate sh:arg1 ;
+		sh:valueClass ex:Rectangle ;
+		rdfs:comment "The rectangle whose area to compute." ;
+	] ;
+	sh:sparql """
+		SELECT ((?width * ?height) AS ?result)
+		WHERE {
+			?arg1 ex:width ?width .
+			?arg1 ex:height ?height .
+		}
+		""" ;
+	sh:returnType xsd:integer ;
+.

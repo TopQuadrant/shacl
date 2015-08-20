@@ -5,12 +5,14 @@ import org.topbraid.shacl.model.impl.SHACLArgumentImpl;
 import org.topbraid.shacl.model.impl.SHACLConstraintViolationImpl;
 import org.topbraid.shacl.model.impl.SHACLFunctionImpl;
 import org.topbraid.shacl.model.impl.SHACLNativeConstraintImpl;
+import org.topbraid.shacl.model.impl.SHACLNativeRuleImpl;
 import org.topbraid.shacl.model.impl.SHACLNativeScopeImpl;
 import org.topbraid.shacl.model.impl.SHACLPropertyConstraintImpl;
 import org.topbraid.shacl.model.impl.SHACLShapeImpl;
 import org.topbraid.shacl.model.impl.SHACLTemplateCallImpl;
 import org.topbraid.shacl.model.impl.SHACLTemplateConstraintImpl;
 import org.topbraid.shacl.model.impl.SHACLTemplateImpl;
+import org.topbraid.shacl.model.impl.SHACLTemplateRuleImpl;
 import org.topbraid.shacl.model.impl.SHACLTemplateScopeImpl;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.vocabulary.SH;
@@ -38,10 +40,12 @@ public class SHACLFactory {
     	p.add(SHACLPropertyConstraint.class, new SimpleImplementation(SH.PropertyConstraint.asNode(), SHACLPropertyConstraintImpl.class));
     	p.add(SHACLShape.class, new SimpleImplementation(SH.Shape.asNode(), SHACLShapeImpl.class));
     	p.add(SHACLNativeConstraint.class, new SimpleImplementation(SH.NativeConstraint.asNode(), SHACLNativeConstraintImpl.class));
+    	p.add(SHACLNativeRule.class, new SimpleImplementation(SH.NativeRule.asNode(), SHACLNativeRuleImpl.class));
     	p.add(SHACLNativeScope.class, new SimpleImplementation(SH.NativeScope.asNode(), SHACLNativeScopeImpl.class));
     	p.add(SHACLTemplate.class, new SimpleImplementation(SH.Template.asNode(), SHACLTemplateImpl.class));
     	p.add(SHACLTemplateCall.class, new SimpleImplementation(SH.Templates.asNode(), SHACLTemplateCallImpl.class));
     	p.add(SHACLTemplateConstraint.class, new SimpleImplementation(SH.TemplateConstraint.asNode(), SHACLTemplateConstraintImpl.class));
+    	p.add(SHACLTemplateRule.class, new SimpleImplementation(SH.TemplateRule.asNode(), SHACLTemplateRuleImpl.class));
     	p.add(SHACLTemplateScope.class, new SimpleImplementation(SH.TemplateScope.asNode(), SHACLTemplateScopeImpl.class));
     	
 		FunctionRegistry.get().put(SH.hasShape.getURI(), HasShapeFunction.class);
@@ -55,6 +59,10 @@ public class SHACLFactory {
 	
 	public static SHACLNativeConstraint asNativeConstraint(RDFNode node) {
 		return node.as(SHACLNativeConstraint.class);
+	}
+	
+	public static SHACLNativeRule asNativeRule(RDFNode node) {
+		return node.as(SHACLNativeRule.class);
 	}
 	
 	
@@ -87,6 +95,10 @@ public class SHACLFactory {
 		return node.as(SHACLTemplateConstraint.class);
 	}
 	
+	public static SHACLTemplateRule asTemplateRule(RDFNode node) {
+		return node.as(SHACLTemplateRule.class);
+	}
+	
 	
 	public static boolean isNativeConstraint(RDFNode node) {
 		if(node != null && node.isAnon()) {
@@ -95,6 +107,18 @@ public class SHACLFactory {
 			}
 			if(!((Resource)node).hasProperty(RDF.type)) {
 				return SH.NativeConstraint.equals(SHACLUtil.getDefaultTemplateType((Resource)node));
+			}
+		}
+		return false;
+	}
+	
+	public static boolean isNativeRule(RDFNode node) {
+		if(node != null && node.isAnon()) {
+			if(((Resource)node).hasProperty(RDF.type, SH.NativeRule)) {
+				return true;
+			}
+			if(!((Resource)node).hasProperty(RDF.type)) {
+				return SH.NativeRule.equals(SHACLUtil.getDefaultTemplateType((Resource)node));
 			}
 		}
 		return false;
@@ -136,7 +160,7 @@ public class SHACLFactory {
 			// If this is a typeless blank node, check for defaultType of incoming references
 			if(resource.isAnon() && !resource.hasProperty(RDF.type)) {
 				Resource dt = SHACLUtil.getDefaultTemplateType(resource);
-				if(dt != null && !SH.NativeConstraint.equals(dt) && !SH.NativeScope.equals(dt)) {
+				if(dt != null && !SH.NativeConstraint.equals(dt) && !SH.NativeScope.equals(dt) && !SH.NativeRule.equals(dt)) {
 					return true;
 				}
 			}

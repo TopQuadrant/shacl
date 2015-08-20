@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.topbraid.shacl.constraints.sparql.SPARQLExecutionLanguage;
+import org.topbraid.shacl.rules.RuleExecutable;
 
 import com.hp.hpl.jena.rdf.model.Resource;
 
@@ -47,6 +48,16 @@ public class ExecutionLanguageSelector {
 		}
 		return null;
 	}
+	
+	public ExecutionLanguage getLanguageForRule(RuleExecutable executable) {
+		for(ExecutionLanguage lang : languages) {
+			if(lang.canExecuteRule(executable)) {
+				return lang;
+			}
+		}
+		return null;
+	}
+	
 	
 	
 	public ExecutionLanguage getLanguageForScope(Resource executable) {

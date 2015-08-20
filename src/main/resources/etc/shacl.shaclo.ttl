@@ -1,7 +1,7 @@
 # baseURI: http://www.w3.org/ns/shacl
 
 # SHACL - Shapes Constraint Language
-# Draft last edited on 2015-08-07
+# Draft last edited on 2015-07-31
 # Created by the W3C RDF Data Shapes Working Group
 # Editor: Holger Knublauch <holger@topquadrant.com>
 
@@ -36,13 +36,6 @@ sh:Shape
 		sh:defaultValueType sh:NativeConstraint ;    # NativeConstraint bnodes do not require rdf:type
 		rdfs:label "constraint" ;
 		rdfs:comment "Defines arbitrary constraints on the matching resources. Use sh:property for structural property declarations." ;
-	] ;
-	sh:property [
-		sh:predicate sh:rule ;
-		sh:valueClass sh:Rule ;
-		sh:defaultValueType sh:NativeRule ;    # NativeRule bnodes do not require rdf:type
-		rdfs:label "rule" ;
-		rdfs:comment "Defines arbitrary rules for the matching resources. Use sh:property for structural property declarations." ;
 	] ;
 	sh:property [
 		sh:predicate sh:property ;
@@ -375,25 +368,17 @@ sh:Result
 		rdfs:comment "The object of triples involved in this result." ;
 	] ;
 	sh:property [
-		sh:predicate sh:focusNode ;
+		sh:predicate sh:root ;
 		sh:valueClass rdfs:Resource ;
 		sh:maxCount 1 ;
-		rdfs:label "focus node" ;
-		rdfs:comment "The focus node evaluated when the result was produced." ;
+		rdfs:label "root" ;
+		rdfs:comment "The root resource of the result (often: the focus node)." ;
 	] ;
 	sh:property [
-		sh:predicate sh:sourceConstraint ;
+		sh:predicate sh:source ;
 		sh:valueClass sh:Constraint ;
-		sh:maxCount 1 ;
-		rdfs:label "source constraint" ;
-		rdfs:comment "The Constraint that caused this result." ;
-	] ;
-	sh:property [
-		sh:predicate sh:sourceShape ;
-		sh:valueClass sh:Shape ;
-		sh:maxCount 1 ;
-		rdfs:label "source shape" ;
-		rdfs:comment "The Shape that caused this result." ;
+		rdfs:label "source" ;
+		rdfs:comment "The Constraint that caused this. This property gets filled in automatically by the constraint validation engine." ;
 	] ;
 .
 
@@ -592,13 +577,6 @@ sh:Constraint
 		rdfs:label "filter shape" ;
 		rdfs:comment "Links a constraint to Shapes that the tested nodes need to fulfill before the constraint is evaluated." ;
 	] ;
-	sh:property [
-		sh:predicate sh:severity ;
-		sh:maxCount 1 ;
-		sh:valueClass sh:ResultClass ;
-		rdfs:label "severity" ;
-		rdfs:comment "Specifies the severity to use for any constraint violation produced by this constraint. Defaults to sh:Error for native constraints. For template constraints it uses the severity of the template by default." ;
-	] ;
 .
 
 sh:NativeConstraint
@@ -607,6 +585,13 @@ sh:NativeConstraint
 	rdfs:subClassOf sh:SPARQLExecutable ;
 	rdfs:label "Native constraint" ;
 	rdfs:comment "A constraint that has a native executable body attached with it." ;
+	sh:property [
+		sh:predicate sh:severity ;
+		sh:maxCount 1 ;
+		sh:valueClass sh:ResultClass ;
+		rdfs:label "severity" ;
+		rdfs:comment "Specifies the default rdf:type to produce for any constraint violation." ;
+	] ;
 	sh:property [
 		sh:predicate sh:message ;
 		sh:datatype xsd:string ;
@@ -673,107 +658,6 @@ sh:TemplateConstraint
 	rdfs:subClassOf sh:Constraint ;
 	rdfs:label "Template constraint" ;
 	rdfs:comment "A constraint that is instantiating a template." ;
-	sh:abstract true ;
-.
-
-
-# Rule vocabulary -------------------------------------------------------
-
-sh:Rule
-	a sh:ShapeClass ;
-	rdfs:subClassOf rdfs:Resource ;
-	rdfs:label "Rule" ;
-	rdfs:comment "An abstract superclass of rules. Rules are either template calls or \"native\" rules with an executable body." ;
-	sh:abstract true ;
-	sh:property [
-		sh:predicate sh:filterShape ;
-		sh:valueClass sh:Shape ;
-		sh:defaultValueType sh:Shape ;
-		rdfs:label "filter shape" ;
-		rdfs:comment "Links a constraint to Shapes that the tested nodes need to fulfill before the constraint is evaluated." ;
-	] ;
-	sh:property [
-		sh:predicate sh:salience ;
-		sh:maxCount 1 ;
-		sh:datatype xsd:integer ;
-		rdfs:label "salience" ;
-		rdfs:comment "Salience is used to determine the order of rules associated with the same Shape. When the rules associated with a Shape are evaluated, rules with larger values will be executed before those with smaller values." ;
-	] ;
-.
-
-sh:NativeRule
-	a sh:ShapeClass ;
-	rdfs:subClassOf sh:Rule ;
-	rdfs:subClassOf sh:SPARQLExecutable ;
-	rdfs:label "Native rule" ;
-	rdfs:comment "A rule that has a native executable body attached with it." ;
-	sh:property [
-		sh:predicate sh:message ;
-		sh:datatype xsd:string ;
-		rdfs:label "message" ;
-		rdfs:comment "Specifies the default sh:message(s) to produce for any errors while executing rules. May have multiple values for different languages." ;
-	] ;
-	# sh:property [
-		# sh:predicate sh:predicate ;
-		# sh:maxCount 1 ;
-		# sh:valueClass rdf:Property ;
-		# rdfs:label "predicate" ;
-		# rdfs:comment "Specifies the default sh:predicate to produce for any constraint violation." ;
-	# ] ;
-	sh:property [
-		sh:predicate rdfs:comment ;
-		sh:datatype xsd:string ;
-		rdfs:label "comment" ;
-		rdfs:comment "A human-readable explanation of this rule. May have multiple values for different languages." ;
-	] ;
-	sh:property [
-		sh:predicate sh:resultAnnotation ;
-		sh:valueClass sh:ResultAnnotation ;
-		rdfs:label "result annotation" ;
-		rdfs:comment "Result annotations provide information about additional properties that the constructed rule status messages shall have." ;
-	] ;
-.
-
-sh:RuleTemplate
-	a sh:ShapeClass ;
-	rdfs:subClassOf sh:Template ;
-	rdfs:label "Rule template" ;
-	rdfs:comment "A template that is used for rule evaluation." ;
-	sh:property [
-		sh:predicate sh:salience ;
-		sh:maxCount 1 ;
-		sh:datatype xsd:integer ;
-		rdfs:label "salience" ;
-		rdfs:comment "Salience is used to determine the order of rules associated with the same Shape. When the rules associated with a Shape are evaluated, rules with larger values will be executed before those with smaller values." ;
-	] ;
-	sh:property [
-		sh:predicate sh:message ;
-		sh:datatype xsd:string ;
-		rdfs:label "message" ;
-		rdfs:comment "Specifies the default sh:message(s) to produce for any constraint violation. May have multiple values for different languages." ;
-	] ;
-	sh:property [
-		sh:predicate sh:predicate ;
-		sh:maxCount 1 ;
-		sh:valueClass rdf:Property ;
-		rdfs:label "predicate" ;
-		rdfs:comment "Specifies the default sh:predicate to produce for any constraint violation." ;
-	] ;
-	sh:property [
-		sh:predicate sh:resultAnnotation ;
-		sh:valueClass sh:ResultAnnotation ;
-		rdfs:label "result annotation" ;
-		rdfs:comment "Result annotations provide information about additional properties that the constructed rule status messages shall have." ;
-	] ;
-.
-
-
-# TODO: This name is easy to confuse with sh:RuleTemplate
-sh:TemplateRule
-	a sh:RuleTemplate ;
-	rdfs:subClassOf sh:Rule ;
-	rdfs:label "Template rule" ;
-	rdfs:comment "A rule that is instantiating a template." ;
 	sh:abstract true ;
 .
 
@@ -1949,6 +1833,8 @@ sh:arg8 a rdf:Property ; rdfs:label "arg8" .
 sh:arg9 a rdf:Property ; rdfs:label "arg9" .
 sh:argument a rdf:Property ; rdfs:label "argument" .
 sh:cachable a rdf:Property ; rdfs:label "cachable" .
+sh:check a rdf:Property ; rdfs:label "check" .
+sh:checkAll a rdf:Property ; rdfs:label "check all" .
 sh:constraint a rdf:Property ; rdfs:label "constraint" .
 sh:constraintTemplate a rdf:Property ; rdfs:label "constraint template" .
 sh:datatype a rdf:Property ; rdfs:label "datatype" .
@@ -1960,7 +1846,7 @@ sh:entailment a rdf:Property ; rdfs:label "entailment" .
 sh:extends a rdf:Property ; rdfs:label "extends" .
 sh:filterShape a rdf:Property ; rdfs:label "filter shape" .
 sh:final a rdf:Property ; rdfs:label "final" .
-sh:focusNode a rdf:Property ; rdfs:label "focus node" .
+sh:fractionDigits a rdf:Property ; rdfs:label "fraction digits" .
 sh:hasValue a rdf:Property ; rdfs:label "has value" .
 sh:include a rdf:Property ; rdfs:label "include" .
 sh:inverseProperty a rdf:Property ; rdfs:label "inverse property" .
@@ -1988,8 +1874,7 @@ sh:qualifiedMinCount a rdf:Property ; rdfs:label "qualified min count" .
 sh:qualifiedValueShape a rdf:Property ; rdfs:label "qualified value shape" .
 sh:resultAnnotation a rdf:Property ; rdfs:label "result annotation" .
 sh:returnType a rdf:Property ; rdfs:label "return type" .
-sh:rule a rdf:Property ; rdfs:label "rule" .
-sh:salience a rdf:Property ; rdfs:label "salience" .
+sh:root a rdf:Property ; rdfs:label "root" .
 sh:scope a rdf:Property ; rdfs:label "scope" .
 sh:scopeClass a rdf:Property ; rdfs:label "scope class" .
 sh:scopeTemplate a rdf:Property ; rdfs:label "scope template" .
@@ -1997,10 +1882,13 @@ sh:severity a rdf:Property ; rdfs:label "severity" .
 sh:shape a rdf:Property ; rdfs:label "shape" .
 sh:shapes a rdf:Property ; rdfs:label "shapes" .
 sh:shapesGraph a rdf:Property ; rdfs:label "shapes graph" .
-sh:sourceConstraint a rdf:Property ; rdfs:label "source constraint" .
-sh:sourceShape a rdf:Property ; rdfs:label "source shape" .
+sh:source a rdf:Property ; rdfs:label "source" .
 sh:sparql a rdf:Property ; rdfs:label "SPARQL" .
 sh:subject a rdf:Property ; rdfs:label "subject" .
+sh:totalDigits a rdf:Property ; rdfs:label "total digits" .
+sh:uriStart a rdf:Property ; rdfs:label "URI start" .
 sh:valueClass a rdf:Property ; rdfs:label "value class" .
 sh:valueShape a rdf:Property ; rdfs:label "value shape" .
 sh:value a rdf:Property ; rdfs:label "value" .
+sh:violation a rdf:Property ;	rdfs:label "violation" .
+sh:whiteSpace a rdf:Property ; rdfs:label "whiteSpace" .   # maybe needed

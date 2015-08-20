@@ -83,7 +83,7 @@ public class SHACLARQFunction implements com.hp.hpl.jena.sparql.function.Functio
 		try {
 			queryString = shaclFunction.getSPARQL();
 			arqQuery = ARQFactory.get().createQuery(shaclFunction.getModel(), queryString);
-			
+
 			JenaUtil.setGraphReadOptimization(true);
 			try {
 				for(SHACLArgument arg : shaclFunction.getArguments(true)) {
