@@ -17,6 +17,8 @@
 		<and-001> 
 		<and-002> 
 		<class-001>
+		<closedShape-001>
+		<closedShape-002>
 		<datatype-001>
 		<datatype-002>
 		<directValueType-001>
@@ -138,6 +140,47 @@
   		sh:focusNode _:b1 ;
   		sh:subject _:b1 ;
   		sh:predicate sh:predicate ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
+<closedShape-001>
+	a sht:Validate ;
+	mf:name "Test of a sh:ClosedShape definition" ;
+	mf:action [
+		sht:schema <closedShape-001.ttl> ; 
+		sht:data <closedShape-001.ttl> ; 
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:focusNode ex:InvalidInstance1 ;
+  		sh:subject ex:InvalidInstance1 ;
+  		sh:predicate rdf:type ;
+  		sh:object ex:SomeClass ;
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:focusNode ex:InvalidInstance1 ;
+  		sh:subject ex:InvalidInstance1 ;
+  		sh:predicate ex:otherProperty ;
+  		sh:object 4 ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
+<closedShape-002>
+	a sht:Validate ;
+	mf:name "Test of a sh:ClosedShape definition with sh:ignoredProperties" ;
+	mf:action [
+		sht:schema <closedShape-002.ttl> ; 
+		sht:data <closedShape-002.ttl> ; 
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:focusNode ex:InvalidInstance1 ;
+  		sh:subject ex:InvalidInstance1 ;
+  		sh:predicate ex:otherProperty ;
+  		sh:object 4 ;
 	] ;
 	mf:status sht:proposed ; 
 .

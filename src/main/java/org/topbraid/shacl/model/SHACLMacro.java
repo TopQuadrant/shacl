@@ -16,12 +16,10 @@ import java.util.Map;
 public interface SHACLMacro extends SHACLClass {
 	
 	/**
-	 * Gets a List of all declared Arguments.
-	 * If ordered, then the local names of the predicates are used.
-	 * @param ordered  true to get an ordered list back (slower)
+	 * Gets an unordered List of all declared Arguments.
 	 * @return the (possibly empty) List of Arguments
 	 */
-	List<SHACLArgument> getArguments(boolean ordered);
+	List<SHACLArgument> getArguments();
 	
 
 	/**
@@ -29,6 +27,14 @@ public interface SHACLMacro extends SHACLClass {
 	 * @return a Map of variable names to Arguments
 	 */
 	Map<String,SHACLArgument> getArgumentsMap();
+
+	
+	/**
+	 * Gets an ordered List of all declared Arguments, based on
+	 * the local names of the predicates and sh:index values.
+	 * @return the (possibly empty) List of Arguments
+	 */
+	List<SHACLArgument> getOrderedArguments();
 	
 	
 	/**

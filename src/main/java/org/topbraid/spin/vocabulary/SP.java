@@ -310,6 +310,8 @@ public class SP {
     
     public final static Property silent = ResourceFactory.createProperty(NS + "silent");
 
+	public final static Property str = ResourceFactory.createProperty(NS + "str");
+
 	public final static Property strlang = ResourceFactory.createProperty(NS + "strlang");
 
     public final static Property subject = ResourceFactory.createProperty(NS + "subject");

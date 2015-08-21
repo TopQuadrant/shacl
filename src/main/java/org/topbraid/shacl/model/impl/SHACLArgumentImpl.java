@@ -7,6 +7,7 @@ import org.topbraid.spin.util.JenaUtil;
 
 import com.hp.hpl.jena.enhanced.EnhGraph;
 import com.hp.hpl.jena.graph.Node;
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -17,6 +18,9 @@ import com.hp.hpl.jena.rdf.model.Statement;
  * @author Holger Knublauch
  */
 public class SHACLArgumentImpl extends SHACLAbstractPropertyConstraintImpl implements SHACLArgument {
+	
+	private static final String SH_ARG = SH.NS + "arg";
+
 	
 	public SHACLArgumentImpl(Node node, EnhGraph graph) {
 		super(node, graph);
@@ -34,6 +38,24 @@ public class SHACLArgumentImpl extends SHACLAbstractPropertyConstraintImpl imple
 		}
 	}
 
+	
+	@Override
+	public Integer getIndex() {
+		Integer index = JenaUtil.getIntegerProperty(this, SH.index);
+		if(index == null) {
+			Property predicate = getPredicate();
+			if(predicate != null && predicate.getURI().startsWith(SH_ARG)) {
+				try {
+					return Integer.parseInt(predicate.getURI().substring(SH_ARG.length())) - 1;
+				}
+				catch(NumberFormatException ex) {
+					// Ignore
+				}
+			}
+		}
+		return index;
+	}
+	
 
 	@Override
 	public boolean isOptional() {

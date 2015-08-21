@@ -3,6 +3,7 @@ package org.topbraid.shacl.constraints.sparql;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,7 +36,27 @@ import com.hp.hpl.jena.vocabulary.RDFS;
  * @author Holger Knublauch
  */
 class SPARQLSubstitutions {
+	
+	public static void addMessageVarNames(String labelTemplate, Set<String> results) {
+		for(int i = 0; i < labelTemplate.length(); i++) {
+			if(i < labelTemplate.length() - 3 && labelTemplate.charAt(i) == '{' && labelTemplate.charAt(i + 1) == '?') {
+				int varEnd = i + 2;
+				while(varEnd < labelTemplate.length()) {
+					if(labelTemplate.charAt(varEnd) == '}') {
+						String varName = labelTemplate.substring(i + 2, varEnd);
+						results.add(varName);
+						break;
+					}
+					else {
+						varEnd++;
+					}
+				}
+				i = varEnd;
+			}
+		}
+	}
 
+	
 	// TODO: Algorithm incorrect, e.g. if { is included as a comment
 	static Query insertFilterClause(Query query, int scopeCount) {
 		String str = query.toString();

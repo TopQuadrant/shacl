@@ -25,14 +25,14 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
  * @author Holger Knublauch
  */
 public class SHACLMacroImpl extends SHACLClassImpl implements SHACLMacro {
-	
+
 	public SHACLMacroImpl(Node node, EnhGraph graph) {
 		super(node, graph);
 	}
 
 	
 	@Override
-	public List<SHACLArgument> getArguments(boolean ordered) {
+	public List<SHACLArgument> getArguments() {
 		List<SHACLArgument> results = new LinkedList<SHACLArgument>();
 		StmtIterator it = null;
 		JenaUtil.setGraphReadOptimization(true);
@@ -53,22 +53,6 @@ public class SHACLMacroImpl extends SHACLClassImpl implements SHACLMacro {
 			}
 			JenaUtil.setGraphReadOptimization(false);
 		}
-		
-		if(ordered) {
-			Collections.sort(results, new Comparator<SHACLArgument>() {
-				public int compare(SHACLArgument o1, SHACLArgument o2) {
-					Property p1 = o1.getPredicate();
-					Property p2 = o2.getPredicate();
-					if(p1 != null && p2 != null) {
-						return p1.getLocalName().compareTo(p2.getLocalName());
-					}
-					else {
-						return 0;
-					}
-				}
-			});
-		}
-		
 		return results;
 	}
 
@@ -76,12 +60,47 @@ public class SHACLMacroImpl extends SHACLClassImpl implements SHACLMacro {
 	@Override
 	public Map<String, SHACLArgument> getArgumentsMap() {
 		Map<String,SHACLArgument> results = new HashMap<String,SHACLArgument>();
-		for(SHACLArgument argument : getArguments(false)) {
+		for(SHACLArgument argument : getArguments()) {
 			Property property = argument.getPredicate();
 			if(property != null) {
 				results.put(property.getLocalName(), argument);
 			}
 		}
+		return results;
+	}
+	
+	
+	@Override
+	public List<SHACLArgument> getOrderedArguments() {
+		List<SHACLArgument> results = getArguments();
+		Collections.sort(results, new Comparator<SHACLArgument>() {
+			public int compare(SHACLArgument arg1, SHACLArgument arg2) {
+				Property p1 = arg1.getPredicate();
+				Property p2 = arg2.getPredicate();
+				if(p1 != null && p2 != null) {
+					Integer index1 = arg1.getIndex();
+					Integer index2 = arg2.getIndex();
+					if(index1 != null) {
+						if(index2 != null) {
+							int comp = index1.compareTo(index2);
+							if(comp != 0) {
+								return comp;
+							}
+						}
+						else {
+							return -1;
+						}
+					}
+					else if(index2 != null) {
+						return 1;
+					}
+					return p1.getLocalName().compareTo(p2.getLocalName());
+				}
+				else {
+					return 0;
+				}
+			}
+		});
 		return results;
 	}
 

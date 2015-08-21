@@ -86,7 +86,7 @@ public class SHACLARQFunction implements com.hp.hpl.jena.sparql.function.Functio
 			
 			JenaUtil.setGraphReadOptimization(true);
 			try {
-				for(SHACLArgument arg : shaclFunction.getArguments(true)) {
+				for(SHACLArgument arg : shaclFunction.getOrderedArguments()) {
 					String varName = arg.getVarName();
 					if(varName == null) {
 						throw new IllegalStateException("Argument " + arg + " of " + shaclFunction + " does not have a valid predicate");

@@ -1,7 +1,7 @@
 # baseURI: http://www.w3.org/ns/shacl
 
 # SHACL - Shapes Constraint Language
-# Draft last edited on 2015-08-07
+# Draft last edited on 2015-08-21
 # Created by the W3C RDF Data Shapes Working Group
 # Editor: Holger Knublauch <holger@topquadrant.com>
 
@@ -92,13 +92,6 @@ rdfs:Class
 		sh:maxCount 1 ;
 		rdfs:label "abstract" ;
 		rdfs:comment "True to indicate that this class is not expected to have direct instances." ;
-	] ;
-	sh:property [
-		sh:predicate sh:final ;
-		sh:datatype xsd:boolean ;
-		sh:maxCount 1 ;
-		rdfs:label "final" ;
-		rdfs:comment "True to indicate that this class is not expected to have subclasses." ;
 	] ;
 	sh:property [
 		sh:predicate sh:private ;
@@ -255,26 +248,19 @@ sh:Function
 		rdfs:label "cachable" ;
 		rdfs:comment "True to indicate that this function will always return the same values for the same combination of arguments, regardless of the query graphs. Engines can use this information to cache and reuse previous function calls." ;
 	] ;
-	sh:constraint [
-		sh:message "Function arguments must be the predicates sh:arg1, sh:arg2 etc." ;
-		sh:predicate sh:argument ;
-		sh:sparql """
-			SELECT ?this (?this AS ?subject) (?predicate AS ?object)
-			WHERE {
-				?this rdfs:subClassOf* ?class .
-				?class sh:argument/sh:predicate ?predicate .
-				FILTER (!STRSTARTS(str(?predicate), "http://www.w3.org/ns/shacl#arg")) .
-			}
-			""" ;
-	] ;
 .
 
-sh:Functions
+sh:ValidationFunctions
 	a sh:Function ;
 	rdfs:subClassOf rdfs:Resource ;
 	sh:abstract true ;
-	rdfs:label "Functions" ;
-	rdfs:comment "The recommended abstract superclass for all functions, so that they are grouped together under a common root in class trees etc." ;
+	rdfs:label "Validation functions" ;
+	rdfs:comment "The recommended abstract superclass for all validation functions that take a value as an argument and return a boolean result (true if the value is OK)." ;
+	sh:argument [
+		sh:index 0 ;
+		sh:predicate sh:value ;
+		rdfs:comment "The value to validate." ;
+	] ;
 .
 
 sh:Template
@@ -660,6 +646,36 @@ sh:ConstraintTemplate
 	] ;
 .
 
+sh:AbstractValueConstraintTemplate
+	a sh:ShapeClass ;
+	rdfs:subClassOf sh:ConstraintTemplate ;
+	rdfs:label "Abstract value constraint template" ;
+	rdfs:comment "A constraint template that points to a function that validates one given value at a time." ;
+	sh:property [
+		sh:predicate sh:validationFunction ;
+		sh:maxCount 1 ;
+		sh:minCount 1 ;
+		sh:valueClass sh:Function ;
+		rdfs:label "validation function" ;
+		rdfs:comment "A boolean function that takes a given value as its first argument. Additional arguments are passed into the function if their predicate matches the template's arguments. If the function returns true then the value is valid." ;
+	] ;
+	sh:abstract true ;
+.
+
+sh:PropertyValueConstraintTemplate
+	a sh:ShapeClass ;
+	rdfs:subClassOf sh:AbstractValueConstraintTemplate ;
+	rdfs:label "Property value constraint template" ;
+	rdfs:comment "A value constraint template that validates all objects of triples that have the given focus node as subject and the given predicate." ;
+.
+
+sh:InversePropertyValueConstraintTemplate
+	a sh:ShapeClass ;
+	rdfs:subClassOf sh:AbstractValueConstraintTemplate ;
+	rdfs:label "Inverse property value constraint template" ;
+	rdfs:comment "A value constraint template that validates all subjects of triples that have the given focus node as object and the given predicate." ;
+.
+
 # TODO: This name is easy to confuse with sh:ConstraintTemplate
 sh:TemplateConstraint
 	a sh:ConstraintTemplate ;
@@ -706,7 +722,7 @@ sh:AbstractPropertyConstraint
 # Arguments -------------------------------------------------------------------
 
 sh:AbstractArgumentDatatypeConstraint
-	a sh:ConstraintTemplate ;
+	a sh:PropertyValueConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
 	rdfs:label "Abstract argument datatype constraint" ;
 	rdfs:comment "Enforces a constraint that the value of an argument must be a literal of a certain datatype. sh:text is recommended if the values shall be either strings or string with language tags." ;
@@ -720,13 +736,7 @@ sh:AbstractArgumentDatatypeConstraint
 		rdfs:comment "The datatype that all values of the property must have." ;
 	] ;
 	sh:message "Values must have datatype {?datatype}" ;
-	sh:sparql """
-		SELECT ?this (?this AS ?subject) ?predicate ?object ?datatype
-		WHERE {
-			?this ?predicate ?object .
-			FILTER (!sh:hasDatatype(?object, ?datatype)) .
-		}
-		""" ;
+	sh:validationFunction sh:hasDatatype ;
 .
 
 sh:AbstractArgumentMaxCountConstraint
@@ -748,7 +758,7 @@ sh:AbstractArgumentMaxCountConstraint
 .
 
 sh:AbstractArgumentValueClassConstraint
-	a sh:ConstraintTemplate ;
+	a sh:PropertyValueConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
 	rdfs:label "Abstract argument value class constraint" ;
 	rdfs:comment "Enforces a constraint that the value of an argument must be of a certain type. This will accept instances of subclasses." ;
@@ -759,16 +769,10 @@ sh:AbstractArgumentValueClassConstraint
 		sh:nodeKind sh:IRI ;
 		sh:valueClass rdfs:Class ;
 		rdfs:label "value class" ;
-		rdfs:comment "The type that all values of the property must have, based on the semantics defined by the function sh:hasType." ;
+		rdfs:comment "The type that all values of the property must have, based on the semantics defined by the function sh:hasValueClass." ;
 	] ;
 	sh:message "Values must be instances of {?valueClass}" ;
-	sh:sparql """
-		SELECT ?this (?this AS ?subject) ?predicate ?object ?valueClass
-		WHERE {
-			?this ?predicate ?object .
-			FILTER (!sh:hasType(?object, ?valueClass)) .
-		}
-		""" ;
+	sh:validationFunction sh:hasValueClass ;
 .
 
 sh:AbstractOptionalArgumentConstraint
@@ -816,6 +820,14 @@ sh:Argument
 	rdfs:label "Argument" ;
 	rdfs:comment "Declares an argument that gets mapped to a variable in the parameterized SPARQL query." ;
 	sh:labelTemplate "Argument {?predicate} : {?datatype}{?valueClass}" ;
+	sh:property [
+		sh:predicate sh:index ;
+		rdfs:label "index" ;
+		rdfs:comment "The index of this argument, especially to determine the order of arguments in a function call. Values should be 0, 1, 2 etc. The default index for sh:arg1 is 0 etc." ;
+		sh:datatype xsd:integer ;
+		sh:minInclusive 0 ;
+		sh:maxCount 1 ;
+	] ;
 	sh:constraint [
 		sh:message "Arguments cannot have both ?datatype and ?valueClass." ;
 		sh:predicate sh:datatype ;
@@ -834,7 +846,7 @@ sh:Argument
 # Property constraints --------------------------------------------------------
 
 sh:AbstractAllowedValuesPropertyConstraint
-	a sh:ConstraintTemplate ;
+	a sh:PropertyValueConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
 	rdfs:label "Abstract allowed values property constraint" ;
 	rdfs:comment "Specifies the allowed values for a property by pointing to a List of nodes." ;
@@ -847,17 +859,7 @@ sh:AbstractAllowedValuesPropertyConstraint
 		rdfs:comment "The rdf:List containing the allowed values of the property." ;
 	] ;
 	sh:message "Value is not one of the allowed values" ;
-	sh:sparql """
-		SELECT ?this (?this AS ?subject) ?predicate ?object
-		WHERE {
-			?this ?predicate ?object .
-			FILTER NOT EXISTS {
-				GRAPH ?shapesGraph {
-					?allowedValues (rdf:rest*)/rdf:first ?object .
-				}
-			}
-		}
-		""" ;
+	sh:validationFunction sh:isAllowedValue ;
 .
 
 sh:AbstractCountPropertyConstraint
@@ -892,7 +894,7 @@ sh:AbstractCountPropertyConstraint
 .
 
 sh:AbstractDatatypePropertyConstraint
-	a sh:ConstraintTemplate ;
+	a sh:PropertyValueConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
 	rdfs:label "Abstract datatype property constraint" ;
 	rdfs:comment "Enforces a constraint that all values of the property must be literals of a certain datatype. This will accept strings with language tags instead of xsd:string." ;
@@ -906,17 +908,11 @@ sh:AbstractDatatypePropertyConstraint
 		rdfs:comment "The datatype that all values of the property must have. sh:text is recommended if the values shall be either strings or string with language tags." ;
 	] ;
 	sh:message "Values must have datatype {?datatype}" ;
-	sh:sparql """
-		SELECT ?this (?this AS ?subject) ?predicate ?object ?datatype
-		WHERE {
-			?this ?predicate ?object .
-			FILTER (!sh:hasDatatype(?object, ?datatype)) .
-		}
-		""" ;
+	sh:validationFunction sh:hasDatatype ;
 .
 
 sh:AbstractDirectValueTypePropertyConstraint
-	a sh:ConstraintTemplate ;
+	a sh:PropertyValueConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
 	rdfs:label "Abstract direct value type property constraint" ;
 	rdfs:comment "Enforces a constraint that all values of the property must be of a certain (direct) type. In contrast to sh:valueClass this does not include instances of subclasses." ;
@@ -930,13 +926,7 @@ sh:AbstractDirectValueTypePropertyConstraint
 		rdfs:comment "The type that all values of the property must have, excluding subclasses." ;
 	] ;
 	sh:message "Values must be direct instances of {?directValueType}" ;
-	sh:sparql """
-		SELECT ?this (?this AS ?subject) ?predicate ?object ?directValueType
-		WHERE {
-			?this ?predicate ?object .
-			FILTER NOT EXISTS { ?object rdf:type ?directValueType } .
-		}
-		""" ;
+	sh:validationFunction sh:hasDirectValueType ;
 .
 
 sh:AbstractHasValuePropertyConstraint
@@ -961,7 +951,7 @@ sh:AbstractHasValuePropertyConstraint
 .
 
 sh:AbstractNodeKindPropertyConstraint
-	a sh:ConstraintTemplate ;
+	a sh:PropertyValueConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
 	rdfs:label "Abstract node kind property constraint" ;
 	rdfs:comment "Specifies the valid node kind of a property." ;
@@ -974,13 +964,7 @@ sh:AbstractNodeKindPropertyConstraint
 		rdfs:comment "The node kind that all values of the property must be of." ;
 	] ;
 	sh:message "Values must be of kind {?nodeKind}" ;
-	sh:sparql """
-		SELECT ?this (?this AS ?subject) ?predicate ?object ?nodeKind
-		WHERE {
-			?this ?predicate ?object ;
-			FILTER (!sh:hasNodeKind(?object, ?nodeKind)) .
-		}
-		""" ;
+	sh:validationFunction sh:hasNodeKind ;
 .
 
 sh:AbstractQualifiedValueShapePropertyConstraint
@@ -1023,7 +1007,7 @@ sh:AbstractQualifiedValueShapePropertyConstraint
 .
 
 sh:AbstractValueClassPropertyConstraint
-	a sh:ConstraintTemplate ;
+	a sh:PropertyValueConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
 	rdfs:label "Abstract value class property constraint" ;
 	rdfs:comment "Enforces a constraint that all values of the property must be of a certain type. For resources this will accept instances of subclasses. Untyped blank nodes are allowed if a defaultValueType has been specified." ;
@@ -1042,17 +1026,10 @@ sh:AbstractValueClassPropertyConstraint
 		sh:nodeKind sh:IRI ;
 		sh:valueClass rdfs:Class ;
 		rdfs:label "value class" ;
-		rdfs:comment "The type that all values of the property must have, based on the semantics defined by the function sh:hasType." ;
+		rdfs:comment "The type that all values of the property must have, based on the semantics defined by the function sh:hasValueClass." ;
 	] ;
 	sh:message "Values must be instances of {?valueClass}" ;
-	sh:sparql """
-		SELECT ?this (?this AS ?subject) ?predicate ?object ?valueClass
-		WHERE {
-			?this ?predicate ?object .
-			FILTER (!sh:hasType(?object, ?valueClass)) .
-			FILTER (!bound(?defaultValueType) || !isBlank(?object) || EXISTS { ?object a ?anyType }) .
-		}
-		""" ;
+	sh:validationFunction sh:hasValueClass ;
 .
 
 sh:AbstractValueShapePropertyConstraint
@@ -1081,7 +1058,7 @@ sh:AbstractValueShapePropertyConstraint
 .
 
 sh:AbstractLengthPropertyConstraint
-	a sh:ConstraintTemplate ;
+	a sh:PropertyValueConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
 	rdfs:label "Abstract length property constraint" ;
 	rdfs:comment "Specifies the minimum and maximum string length of values." ;
@@ -1102,22 +1079,12 @@ sh:AbstractLengthPropertyConstraint
 		rdfs:label "max length" ;
 		rdfs:comment "The maximum string length permitted for values of this property." ;
 	] ;
-	sh:message "Invalid string length: {?objectLength} characters." ;
-	sh:sparql """
-		SELECT ?this (?this AS ?subject) ?predicate ?object ?objectLength
-		WHERE {
-			# TODO: The FILTER can be removed once the spec makes sure that inherited templates without
-			#       any bound arguments will be skipped
-			{ FILTER (bound(?minLength) || bound(?maxLength)) }
-			?this ?predicate ?object .
-			BIND (STRLEN(str(?object)) AS ?objectLength) .
-			FILTER (!bound(?objectLength) || (bound(?minLength) && ?objectLength < ?minLength) || (bound(?maxLength) && ?objectLength > ?maxLength)) .
-		}
-		""" ;
+	sh:message "Invalid string length." ;
+	sh:validationFunction sh:hasLength ;
 .
 
 sh:AbstractMaxExclusivePropertyConstraint
-	a sh:ConstraintTemplate ;
+	a sh:PropertyValueConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
 	rdfs:label "Abstract max exclusive property constraint" ;
 	rdfs:comment "Specifies an (exclusive) maximum value for literal values." ;
@@ -1130,18 +1097,11 @@ sh:AbstractMaxExclusivePropertyConstraint
 		rdfs:comment "The exclusive maximum value permitted for this property: ?value < ?maxExclusive" ;
 	] ;
 	sh:message "Values must be less than {?maxExclusive}" ;
-	sh:sparql """
-		SELECT ?this (?this AS ?subject) ?predicate ?object ?maxExclusive
-		WHERE {
-			?this ?predicate ?object .
-			BIND (?object >= ?maxExclusive AS ?result) .
-			FILTER (!bound(?result) || ?result) .
-		} 
-		""" ;
+	sh:validationFunction sh:hasMaxExclusive ;
 .
 
 sh:AbstractMaxInclusivePropertyConstraint
-	a sh:ConstraintTemplate ;
+	a sh:PropertyValueConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
 	rdfs:label "Abstract max inclusive property constraint" ;
 	rdfs:comment "Specifies an (inclusive) maximum value for literal values." ;
@@ -1154,18 +1114,11 @@ sh:AbstractMaxInclusivePropertyConstraint
 		rdfs:comment "The inclusive maximum value permitted for this property: ?value <= ?maxInclusive" ;
 	] ;
 	sh:message "Values must be less than or equal to {?maxInclusive}" ;
-	sh:sparql """
-		SELECT ?this (?this AS ?subject) ?predicate ?object ?maxInclusive
-		WHERE {
-			?this ?predicate ?object .
-			BIND (?object > ?maxInclusive AS ?result) .
-			FILTER (!bound(?result) || ?result) .
-		} 
-		""" ;
+	sh:validationFunction sh:hasMaxInclusive ;
 .
 
 sh:AbstractMinExclusivePropertyConstraint
-	a sh:ConstraintTemplate ;
+	a sh:PropertyValueConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
 	rdfs:label "Abstract min exclusive property constraint" ;
 	rdfs:comment "Specifies an (exclusive) minimum value for literal values." ;
@@ -1178,18 +1131,11 @@ sh:AbstractMinExclusivePropertyConstraint
 		rdfs:comment "The exclusive minimum value permitted for this property: ?value > ?minExclusive" ;
 	] ;
 	sh:message "Values must be greater than {?minExclusive}" ;
-	sh:sparql """
-		SELECT ?this (?this AS ?subject) ?predicate ?object ?minExclusive
-		WHERE {
-			?this ?predicate ?object .
-			BIND (?object <= ?minExclusive AS ?result) .
-			FILTER (!bound(?result) || ?result) .
-		} 
-		""" ;
+	sh:validationFunction sh:hasMinExclusive ;
 .
 
 sh:AbstractMinInclusivePropertyConstraint
-	a sh:ConstraintTemplate ;
+	a sh:PropertyValueConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
 	rdfs:label "Abstract min inclusive property constraint" ;
 	rdfs:comment "Specifies an (inclusive) minimum value for literal values." ;
@@ -1202,18 +1148,11 @@ sh:AbstractMinInclusivePropertyConstraint
 		rdfs:comment "The inclusive minimum value permitted for this property: ?value >= ?minInclusive" ;
 	] ;
 	sh:message "Values must be greater than or equal to {?minInclusive}" ;
-	sh:sparql """
-		SELECT ?this (?this AS ?subject) ?predicate ?object ?minInclusive
-		WHERE {
-			?this ?predicate ?object .
-			BIND (?object < ?minInclusive AS ?result) .
-			FILTER (!bound(?result) || ?result) .
-		} 
-		""" ;
+	sh:validationFunction sh:hasMinInclusive ;
 .
 
 sh:AbstractPatternPropertyConstraint
-	a sh:ConstraintTemplate ;
+	a sh:PropertyValueConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
 	rdfs:label "Abstract pattern property constraint" ;
 	rdfs:comment "Specifies a regular expression that all values of the property need to match." ;
@@ -1226,13 +1165,7 @@ sh:AbstractPatternPropertyConstraint
 		rdfs:comment "The (regular expression) pattern for values of this property." ;
 	] ;
 	sh:message "Values must match the pattern {?pattern}" ;
-	sh:sparql """
-		SELECT ?this (?this AS ?subject) ?predicate ?object ?pattern
-		WHERE {
-			?this ?predicate ?object .
-			FILTER (isBlank(?object) || !regex(str(?object), ?pattern)) .
-		} 
-		""" ;
+	sh:validationFunction sh:hasPattern ;
 .
 
 sh:PropertyConstraint
@@ -1311,7 +1244,7 @@ sh:AbstractCountInversePropertyConstraint
 .
 
 sh:AbstractValueClassInversePropertyConstraint
-	a sh:ConstraintTemplate ;
+	a sh:InversePropertyValueConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
 	rdfs:label "Abstract value class inverse property constraint" ;
 	rdfs:comment "Enforces a constraint that all incoming values of the property must be of a certain type. This will accept instances of subclasses.." ;
@@ -1321,7 +1254,7 @@ sh:AbstractValueClassInversePropertyConstraint
 		sh:optionalWhenInherited true ;
 		sh:valueClass rdfs:Class ;
 		rdfs:label "value class" ;
-		rdfs:comment "The type that all values of the inverse property must have, based on the semantics defined by the function sh:hasType." ;
+		rdfs:comment "The type that all values of the inverse property must have, based on the semantics defined by the function sh:hasValueClass." ;
 	] ;
 	sh:constraint [
 		sh:message "The values of sh:valueClass cannot be blank nodes." ;
@@ -1335,13 +1268,7 @@ sh:AbstractValueClassInversePropertyConstraint
 			""" ;
 	] ;
 	sh:message "Inverse values must be instances of {?valueClass}" ;
-	sh:sparql """
-		SELECT (?this AS ?object) ?subject ?predicate ?valueClass
-		WHERE {
-			?subject ?predicate ?this .
-			FILTER (!sh:hasType(?subject, ?valueClass)) .
-		}
-		""" ;
+	sh:validationFunction sh:hasValueClass ;
 .
 
 sh:AbstractValueShapeInversePropertyConstraint
@@ -1389,16 +1316,26 @@ sh:ClosedShapeConstraint
 	rdfs:comment "Triggers an error for each triple of the focus node that has a predicate that is not explicitly enumerated using sh:property in the surrounding shape." ;
 	sh:labelTemplate "Closed shape" ;
 	sh:message "Invalid triple for closed shape" ;
+	sh:argument [
+		sh:predicate sh:ignoredProperties ;
+		sh:valueClass rdf:List ;
+		sh:optional true ;
+		rdfs:label "ignored properties" ;
+		rdfs:comment "A List of predicates that are permitted regardless of whether they have been declared as sh:property. Could be used to allow sh:nodeShape or rdf:type." ;
+	] ;
 	sh:sparql """
 		SELECT ?this (?this AS ?subject) ?predicate ?object
 		WHERE {
 			?this ?predicate ?object .
-			FILTER (?predicate != rdf:type && ?predicate != sh:nodeShape) .
-			FILTER NOT EXISTS {
+			FILTER (NOT EXISTS {
 				GRAPH ?shapesGraph {
 					?currentShape sh:property/sh:predicate ?predicate .
 				}
-			}
+			} && (!bound(?ignoredProperties) || NOT EXISTS {
+				GRAPH ?shapesGraph {
+					?ignoredProperties rdf:rest*/rdf:first ?predicate .
+				}
+			}))
 		}	
 		""" ;
 .
@@ -1507,15 +1444,11 @@ sh:XorConstraint
 
 sh:hasDatatype
 	a sh:Function ;
-	rdfs:subClassOf sh:Functions ;
+	rdfs:subClassOf sh:ValidationFunctions ;
 	rdfs:label "has datatype" ;
-	rdfs:comment "Checks whether a given node (?arg1) is a literal with a given datatype (?arg2). If the datatype is sh:text, then the function will either accept xsd:string or rdf:langString." ;
+	rdfs:comment "Checks whether a given node (?value) is a literal with a given datatype (?datatype). If the datatype is sh:text, then the function will either accept xsd:string or rdf:langString." ;
 	sh:argument [
-		sh:predicate sh:arg1 ;
-		rdfs:comment "The node to check the datatype of." ;
-	] ;
-	sh:argument [
-		sh:predicate sh:arg2 ;
+		sh:predicate sh:datatype ;
 		sh:valueClass rdfs:Datatype ;
 		rdfs:comment "The datatype that the node must have." ;
 	] ;
@@ -1523,41 +1456,165 @@ sh:hasDatatype
 	sh:sparql """
 		ASK {
 			{
-				FILTER isLiteral(?arg1) .
+				FILTER isLiteral(?value) .
 			} .
-			BIND (datatype(?arg1) AS ?datatype) .
-			FILTER ((?datatype = ?arg2) || (?arg2 = sh:text && ?datatype IN (rdf:langString, xsd:string))) .
+			BIND (datatype(?value) AS ?realDatatype) .
+			FILTER ((?realDatatype = ?datatype) || (?datatype = sh:text && ?realDatatype IN (rdf:langString, xsd:string))) .
 		}
 		""" ;
 .
 
-sh:hasNodeKind
+sh:hasDirectValueType
 	a sh:Function ;
-	rdfs:subClassOf sh:Functions ;
-	rdfs:label "has node kind" ;
-	rdfs:comment "Checks whether a given node (?arg1) has a given sh:NodeKind (?arg2). For example, sh:hasNodeKind(42, sh:Literal) = true." ;
+	rdfs:subClassOf sh:ValidationFunctions ;
+	rdfs:label "has direct value type" ;
+	rdfs:comment "Checks whether a given node (?value) has a given class (?directValueType) as its rdf:type." ;
 	sh:argument [
-		sh:predicate sh:arg1 ;
-		rdfs:comment "The node to check the node kind of." ;
+		sh:predicate sh:directValueType ;
+		sh:optionalWhenInherited true ;
+		sh:nodeKind sh:IRI ;
+		sh:valueClass rdfs:Class ;
+		rdfs:label "direct value type" ;
+		rdfs:comment "The type that all value must have, excluding subclasses." ;
+	] ;
+	sh:returnType xsd:boolean ;
+	sh:sparql """
+		ASK {
+			?value a ?directValueType .
+		}
+		""" ;
+.
+
+sh:hasLength
+	a sh:Function ;
+	rdfs:subClassOf sh:ValidationFunctions ;
+	rdfs:label "has length" ;
+	rdfs:comment "Checks whether a given string (?value) has a length within a given minimum and maximum string length." ;
+	sh:argument [
+		sh:predicate sh:minLength ;
+		sh:index 1 ;
+		sh:optional true ;
+		sh:datatype xsd:integer ;
+		rdfs:label "min length" ;
+		rdfs:comment "The minimum string length (defaults to 0 if unspecified)." ;
 	] ;
 	sh:argument [
-		sh:predicate sh:arg2 ;
+		sh:predicate sh:maxLength ;
+		sh:index 2 ;
+		sh:optional true ;
+		sh:datatype xsd:integer ;
+		rdfs:label "max length" ;
+		rdfs:comment "The maximum string length (defaults to unlimited)." ;
+	] ;
+	sh:returnType xsd:boolean ;
+	sh:sparql """
+		ASK {
+			BIND (STRLEN(str(?value)) AS ?valueLength) .
+			FILTER (bound(?valueLength) && 
+				(?valueLength >= COALESCE(?minLength, 0)) &&
+				(!bound(?maxLength) || ?valueLength <= ?maxLength)) .
+		}
+		""" ;
+.
+
+sh:hasMaxExclusive
+	a sh:Function ;
+	rdfs:subClassOf sh:ValidationFunctions ;
+	rdfs:label "has max exclusive" ;
+	rdfs:comment "Checks whether a given node (?value) has value less than (<) the provided ?maxExclusive. Returns false if this cannot be determined, e.g. because values do not have comparable types." ;
+	sh:argument [
+		sh:predicate sh:maxExclusive ;
+		sh:nodeKind sh:Literal ;
+		rdfs:label "max exclusive" ;
+		rdfs:comment "The permitted exclusive maximum value" ;
+	] ;
+	sh:returnType xsd:boolean ;
+	sh:sparql "ASK { FILTER (?value < ?maxExclusive) }"
+.
+
+sh:hasMaxInclusive
+	a sh:Function ;
+	rdfs:subClassOf sh:ValidationFunctions ;
+	rdfs:label "has max inclusive" ;
+	rdfs:comment "Checks whether a given node (?value) has value less than or equal to (<=) the provided ?maxInclusive. Returns false if this cannot be determined, e.g. because values do not have comparable types." ;
+	sh:argument [
+		sh:predicate sh:maxInclusive ;
+		sh:nodeKind sh:Literal ;
+		rdfs:label "max inclusive" ;
+		rdfs:comment "The permitted inclusive maximum value" ;
+	] ;
+	sh:returnType xsd:boolean ;
+	sh:sparql "ASK { FILTER (?value <= ?maxInclusive) }"
+.
+
+sh:hasMinExclusive
+	a sh:Function ;
+	rdfs:subClassOf sh:ValidationFunctions ;
+	rdfs:label "has min exclusive" ;
+	rdfs:comment "Checks whether a given node (?value) has value greater than (>) the provided ?minExclusive. Returns false if this cannot be determined, e.g. because values do not have comparable types." ;
+	sh:argument [
+		sh:predicate sh:minExclusive ;
+		sh:nodeKind sh:Literal ;
+		rdfs:label "min exclusive" ;
+		rdfs:comment "The permitted exclusive minimum value" ;
+	] ;
+	sh:returnType xsd:boolean ;
+	sh:sparql "ASK { FILTER (?value > ?minExclusive) }"
+.
+
+sh:hasMinInclusive
+	a sh:Function ;
+	rdfs:subClassOf sh:ValidationFunctions ;
+	rdfs:label "has min inclusive" ;
+	rdfs:comment "Checks whether a given node (?value) has value greater than or equal to (>=) the provided ?minInclusive. Returns false if this cannot be determined, e.g. because values do not have comparable types." ;
+	sh:argument [
+		sh:predicate sh:minInclusive ;
+		sh:nodeKind sh:Literal ;
+		rdfs:label "min inclusive" ;
+		rdfs:comment "The permitted inclusive minimum value" ;
+	] ;
+	sh:returnType xsd:boolean ;
+	sh:sparql "ASK { FILTER (?value >= ?minInclusive) }"
+.
+
+sh:hasNodeKind
+	a sh:Function ;
+	rdfs:subClassOf sh:ValidationFunctions ;
+	rdfs:label "has node kind" ;
+	rdfs:comment "Checks whether a given node (?value) has a given sh:NodeKind (?nodeKind). For example, sh:hasNodeKind(42, sh:Literal) = true." ;
+	sh:argument [
+		sh:index 1 ;
+		sh:predicate sh:nodeKind ;
 		sh:valueClass sh:NodeKind ;
 		rdfs:comment "The node kind that the node must have." ;
 	] ;
 	sh:returnType xsd:boolean ;
 	sh:sparql """
 		ASK {
-			FILTER ((isIRI(?arg1) && ?arg2 = sh:IRI) ||
-				(isLiteral(?arg1) && ?arg2 = sh:Literal) ||
-				(isBlank(?arg1) && ?arg2 = sh:BlankNode))
+			FILTER ((isIRI(?value) && ?nodeKind = sh:IRI) ||
+				(isLiteral(?value) && ?nodeKind = sh:Literal) ||
+				(isBlank(?value) && ?nodeKind = sh:BlankNode)) .
 		}
 		""" ;
 .
 
+sh:hasPattern
+	a sh:Function ;
+	rdfs:subClassOf sh:ValidationFunctions ;
+	rdfs:label "has pattern" ;
+	rdfs:comment "Checks whether the string representation of a given node (?value) matches a given regular expression (?pattern). Returns false if the value is a blank node." ;
+	sh:argument [
+		sh:index 1 ;
+		sh:predicate sh:pattern ;
+		sh:datatype xsd:string ;
+		rdfs:comment "The regular expression to match." ;
+	] ;
+	sh:returnType xsd:boolean ;
+	sh:sparql "ASK { FILTER (!isBlank(?value) && regex(str(?value), ?pattern)) }" ;
+.
+
 sh:hasShape
 	a sh:Function ;
-	rdfs:subClassOf sh:Functions ;
 	rdfs:label "has shape" ;
 	rdfs:comment "Validates whether a given resource (?arg1) fulfills all error-level constraints defined for a given shape (?arg2). This creates a (possibly recursive) constraint validator equivalent to the validateNodeAgainstShape operation. The function returns an error, i.e. no result, if the validation could not be completed, e.g. due to an unsupported recursion or an unsupported extension language. Therefore the function should not be called inside of FILTER statements directly, but rather with BIND." ;
 	sh:argument [
@@ -1584,39 +1641,50 @@ sh:hasShape
 	sh:returnType xsd:boolean ;
 .
 
-sh:hasType
+sh:hasValueClass
 	a sh:Function ;
-	rdfs:subClassOf sh:Functions ;
-	rdfs:label "has type" ;
-	rdfs:comment "Checks whether a given node (?arg1) is an instance of a given class (?arg2) or its subclasses. If arg2 is rdf:Property then the function returns true if ?arg1 is an untyped IRI." ;
+	rdfs:subClassOf sh:ValidationFunctions ;
+	rdfs:label "has value class" ;
+	rdfs:comment "Checks whether a given node (?value) is an instance of a given class (?valueClass) or its subclasses. If ?valueClass is rdf:Property then the function returns true if ?value is an untyped IRI." ;
 	sh:argument [
-		sh:predicate sh:arg1 ;
-		rdfs:comment "The node to check the type of." ;
-	] ;
-	sh:argument [
-		sh:predicate sh:arg2 ;
+		sh:index 1 ;
+		sh:predicate sh:valueClass ;
 		sh:valueClass rdfs:Class ;
 		rdfs:comment "The type that the node must have." ;
 	] ;
+	sh:argument [
+		# TODO: Maybe this is not needed and we just hard-code the three use cases of this property into the SPARQL query below
+		sh:index 2 ;
+		sh:predicate sh:defaultValueType ;
+		sh:optional true ;
+		sh:valueClass rdfs:Class ;
+		rdfs:label "default value shape" ;
+		rdfs:comment "If specified then blank nodes that have no rdf:type pass this constraint. The type of those resources is assumed to be ?defaultValueType." ;
+	] ;  
 	sh:returnType xsd:boolean ;
 	sh:sparql """
 		ASK {
 			{
 				{
-					FILTER (isIRI(?arg1) || isBlank(?arg1)) .
+					FILTER (isIRI(?value) || isBlank(?value)) .
 				} .
-				?class (rdfs:subClassOf)* ?arg2 .
-				?arg1 a ?class .
+				?class (rdfs:subClassOf)* ?valueClass .
+				?value a ?class .
 			}
 			UNION
 			{
 				# Allow untyped resources for rdfs:Resource and rdf:Property
-				FILTER ((isIRI(?arg1) || isBlank(?arg1)) && (?arg2 = rdfs:Resource || ?arg2 = rdf:Property) && NOT EXISTS { ?arg1 a ?any }) .
+				FILTER ((isIRI(?value) || isBlank(?value)) && (?valueClass = rdfs:Resource || ?valueClass = rdf:Property) && NOT EXISTS { ?value a ?any }) .
 			}
 			UNION
 			{
 				# Allow untyped blank nodes with rdf:first if expected type is rdf:List
-				FILTER (?arg2 = rdf:List && isBlank(?arg1) && EXISTS { ?arg1 rdf:first ?any }) .
+				FILTER (?valueClass = rdf:List && isBlank(?value) && EXISTS { ?value rdf:first ?any }) .
+			}
+			UNION 
+			{
+				# Allow untyped blank nodes if ?defaultValueType is bound
+				FILTER (isBlank(?value) && bound(?defaultValueType) && NOT EXISTS { ?value a ?anyType }) .
 			}
 		}
 		""" ;
@@ -1624,7 +1692,6 @@ sh:hasType
 
 sh:inverseValueCount
 	a sh:Function ;
-	rdfs:subClassOf sh:Functions ;
 	rdfs:label "inverse value count" ;
 	rdfs:comment "Gets the number of values of a given property (?arg2) at a given object (?arg1). The result is the number of matches of (?subject, ?arg2, ?arg1)." ;
 	sh:argument [
@@ -1646,9 +1713,37 @@ sh:inverseValueCount
 		""" ;
 .
 
+sh:isAllowedValue
+	a sh:Function ;
+	rdfs:subClassOf sh:ValidationFunctions ;
+	sh:argument [
+		sh:index 1 ;
+		sh:predicate sh:allowedValues ;
+		sh:valueClass rdf:List ;
+		rdfs:label "allowed values" ;
+		rdfs:comment "The rdf:List containing the allowed values." ;
+	] ;
+	sh:argument [
+		sh:index 2 ;
+		sh:predicate sh:shapesGraph ;
+		sh:valueClass sh:Graph ;
+		rdfs:label "shapes graph" ;
+		rdfs:comment "The graph containing the rdf:List." ;
+	] ;
+	sh:returnType xsd:boolean ;
+	sh:sparql """
+		ASK {
+			FILTER EXISTS {
+				GRAPH ?shapesGraph {
+					?allowedValues (rdf:rest*)/rdf:first ?value .
+				}
+			}
+		}
+		""" ;
+.	
+
 sh:propertyValue
 	a sh:Function ;
-	rdfs:subClassOf sh:Functions ;
 	rdfs:label "property value" ;
 	rdfs:comment "Gets the 'first' value of a given property (?arg2) at a given subject (?arg1). The behavior is arbitrary if multiple values are present." ;
 	sh:argument [
@@ -1671,7 +1766,6 @@ sh:propertyValue
 
 sh:validShapeCount
 	a sh:Function ;
-	rdfs:subClassOf sh:Functions ;
 	rdfs:label "valid shape count" ;
 	rdfs:comment "Counts the number of shapes from a given rdf:List (?arg2) defined in a given shapes graph (?arg3) where a given focus node (?arg1) returns no error-level constraint violations. The function produces an error if one of the shapes validated to a fatal error." ;
 	sh:argument [
@@ -1706,7 +1800,6 @@ sh:validShapeCount
 
 sh:valueCount
 	a sh:Function ;
-	rdfs:subClassOf sh:Functions ;
 	rdfs:label "value count" ;
 	rdfs:comment "Gets the number of values of a given property (?arg2) at a given subject (?arg1). The result is the number of matches of (?arg1, ?arg2, ?object)." ;
 	sh:argument [
@@ -1730,7 +1823,6 @@ sh:valueCount
 
 sh:valuesWithShapeCount
 	a sh:Function ;
-	rdfs:subClassOf sh:Functions ;
 	rdfs:label "values with shape count" ;
 	rdfs:comment "Counts the number of values from a given subject (?arg1) / predicate (?arg2) combination that do not produce any error-level constraint violations for a given shape (?arg3) in a given shapes graph (?arg4). The function produces an error if one of the shapes validated to a fatal error." ;
 	sh:argument [
@@ -1768,7 +1860,6 @@ sh:valuesWithShapeCount
 
 sh:walkShapesList
 	a sh:Function ;
-	rdfs:subClassOf sh:Functions ;
 	rdfs:label "walk shapes list" ;
 	rdfs:comment "Walks a given rdf:List of shapes (?arg1) recursively until it encounters a shape where sh:hasShape returns a provide boolean value (?arg2) for a given focus node (?arg3) using the given shapes graph (?arg4). Returns true if the list has reached such a node, false if it has reached the end of the list. Returns an error if one of the calls to sh:hasShape has produced a fatal error." ;
 	sh:argument [
@@ -1851,10 +1942,11 @@ sh:detail a rdf:Property ; rdfs:label "detail" .
 sh:entailment a rdf:Property ; rdfs:label "entailment" .
 sh:extends a rdf:Property ; rdfs:label "extends" .
 sh:filterShape a rdf:Property ; rdfs:label "filter shape" .
-sh:final a rdf:Property ; rdfs:label "final" .
 sh:focusNode a rdf:Property ; rdfs:label "focus node" .
 sh:hasValue a rdf:Property ; rdfs:label "has value" .
+sh:ignoredProperties a rdf:Property ; rdfs:label "ignored properties" .
 sh:include a rdf:Property ; rdfs:label "include" .
+sh:index a rdf:Property ; rdfs:label "index" .
 sh:inverseProperty a rdf:Property ; rdfs:label "inverse property" .
 sh:labelTemplate a rdf:Property ; rdfs:label "label template" .
 sh:maxCount a rdf:Property ; rdfs:label "max count" .
@@ -1894,3 +1986,4 @@ sh:subject a rdf:Property ; rdfs:label "subject" .
 sh:valueClass a rdf:Property ; rdfs:label "value class" .
 sh:valueShape a rdf:Property ; rdfs:label "value shape" .
 sh:value a rdf:Property ; rdfs:label "value" .
+sh:validationFunction a rdf:Property ; rdfs:label "validation function" .

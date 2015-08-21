@@ -12,8 +12,11 @@ import org.topbraid.shacl.constraints.ExecutionLanguage;
 import org.topbraid.shacl.constraints.FatalErrorLog;
 import org.topbraid.shacl.constraints.ModelConstraintValidator;
 import org.topbraid.shacl.constraints.SHACLException;
+import org.topbraid.shacl.constraints.TemplateConstraintExecutable;
+import org.topbraid.shacl.model.SHACLArgument;
 import org.topbraid.shacl.model.SHACLConstraint;
 import org.topbraid.shacl.model.SHACLFactory;
+import org.topbraid.shacl.model.SHACLFunction;
 import org.topbraid.shacl.model.SHACLShape;
 import org.topbraid.shacl.model.SHACLTemplateCall;
 import org.topbraid.shacl.vocabulary.SH;
@@ -55,7 +58,16 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 	
 	@Override
 	public boolean canExecuteConstraint(ConstraintExecutable executable) {
-		return executable.getResource().hasProperty(SH.sparql);
+		if(executable.getResource().hasProperty(SH.sparql)) {
+			return true;
+		}
+		else if(executable instanceof TemplateConstraintExecutable) {
+			Resource function = ((TemplateConstraintExecutable)executable).getValidationFunction();
+			if(function != null && function.hasProperty(SH.sparql)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	
@@ -72,6 +84,9 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		
 		Resource resource = executable.getResource();
 		String sparql = JenaUtil.getStringProperty(resource, SH.sparql);
+		if(sparql == null && executable instanceof TemplateConstraintExecutable) {
+			sparql = createSPARQLFromValidationFunction((TemplateConstraintExecutable)executable);
+		}
 		if(sparql == null) {
 			String message = "Missing " + SH.PREFIX + ":" + SH.sparql.getLocalName() + " of " + SPINLabels.get().getLabel(resource);
 			if(resource.isAnon()) {
@@ -293,5 +308,62 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 			}
 		}
 		return false;*/
+	}
+	
+	
+	private String createSPARQLFromValidationFunction(TemplateConstraintExecutable executable) {
+		Resource function = executable.getValidationFunction();
+		boolean pvc = JenaUtil.hasIndirectType(executable.getResource(), SH.PropertyValueConstraintTemplate);
+		StringBuffer sb = new StringBuffer("SELECT ?this ");
+		if(pvc) {
+			sb.append("(?this AS ?subject) ?predicate (?value AS ?object)");
+		}
+		else {
+			sb.append("(?value AS ?subject) ?predicate (?this AS ?object)");
+		}
+		
+		// Collect other variables used in sh:messages
+		Set<String> otherVarNames = new HashSet<String>();
+		for(Literal message : executable.getMessages()) {
+			SPARQLSubstitutions.addMessageVarNames(message.getLexicalForm(), otherVarNames);
+		}
+		otherVarNames.remove("subject");
+		otherVarNames.remove("predicate");
+		otherVarNames.remove("object");
+		for(String varName : otherVarNames) {
+			sb.append(" ?" + varName);
+		}
+		
+		// Create body
+		sb.append("\nWHERE {\n");
+		if(pvc) {
+			sb.append("    ?this ?predicate ?value .\n");
+		}
+		else {
+			sb.append("    ?value ?predicate ?this .\n");
+		}
+		
+		sb.append("    FILTER (!<" + function + ">(?value");
+		SHACLFunction f = SHACLFactory.asFunction(function);
+		Iterator<SHACLArgument> args = f.getOrderedArguments().iterator();
+		args.next(); // Skip ?value
+		while(args.hasNext()) {
+			sb.append(", ?");
+			sb.append(args.next().getVarName());
+		}
+		sb.append(")) .\n}");
+		
+		/* TODO: Faster variation: insert the body of the ASK query directly.
+		 * Was causing unknown issues with Jena when executed for a given resource, requires investigation
+		sb.append("    FILTER NOT EXISTS {");
+		String sparql = JenaUtil.getStringProperty(function, SH.sparql);
+		int startIndex = sparql.indexOf('{');
+		int endIndex = sparql.lastIndexOf('}');
+		String body = sparql.substring(startIndex + 1, endIndex);
+		sb.append(body);
+		sb.append("\n    }\n}");
+		 */
+		
+		return sb.toString();
 	}
 }

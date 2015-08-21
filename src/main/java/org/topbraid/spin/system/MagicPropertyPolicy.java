@@ -48,6 +48,6 @@ public class MagicPropertyPolicy {
 	 * @return the Policy
 	 */
 	public Policy getPolicy(String functionURI, Graph graph, Node matchSubject, Node matchObject) {
-		return Policy.BOTH;
+		return Policy.QUERY_RESULTS_ONLY;
 	}
 }

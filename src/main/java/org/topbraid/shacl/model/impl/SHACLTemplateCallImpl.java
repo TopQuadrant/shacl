@@ -51,7 +51,7 @@ public class SHACLTemplateCallImpl extends SHACLResourceImpl implements SHACLTem
 		Map<String,RDFNode> map = new HashMap<String,RDFNode>();
 		SHACLTemplate template = getTemplate();
 		if(template != null) {
-			for(SHACLArgument arg : template.getArguments(false)) {
+			for(SHACLArgument arg : template.getArguments()) {
 				Property argProperty = arg.getPredicate();
 				if(argProperty != null) {
 					String varName = arg.getVarName();
@@ -71,7 +71,7 @@ public class SHACLTemplateCallImpl extends SHACLResourceImpl implements SHACLTem
 
 	@Override
 	public void addBindings(QuerySolutionMap bindings) {
-		for(SHACLArgument arg : getTemplate().getArguments(false)) {
+		for(SHACLArgument arg : getTemplate().getArguments()) {
 			Statement s = getProperty(arg.getPredicate());
 			if(s != null) {
 				bindings.add(arg.getVarName(), s.getObject());

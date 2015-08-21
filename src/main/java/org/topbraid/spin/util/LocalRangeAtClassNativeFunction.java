@@ -170,7 +170,7 @@ public class LocalRangeAtClassNativeFunction extends AbstractFunction2 {
 			}
 		}		
 		
-		{
+		if(!(graph instanceof OptimizedMultiUnion) || ((OptimizedMultiUnion)graph).getIncludesSPIN()) {
 			ExtendedIterator<Triple> it = graph.find(type, SPIN.constraint.asNode(), Node.ANY);
 			while(it.hasNext()) {
 				Node constraint = it.next().getObject();
@@ -185,42 +185,45 @@ public class LocalRangeAtClassNativeFunction extends AbstractFunction2 {
 			}
 		}		
 		
-		{
-			ExtendedIterator<Triple> it = graph.find(type, SH.argument.asNode(), Node.ANY);
-			while(it.hasNext()) {
-				Node constraint = it.next().getObject();
-				if(constraint.isBlank() || constraint.isURI()) {
-					if(graph.contains(constraint, SH.predicate.asNode(), property)) {
-						Node valueType = getObject(constraint, SH.valueClass.asNode(), graph);
-						if(valueType != null) {
-							it.close();
-							return valueType;
-						}
-						Node datatype = getObject(constraint, SH.datatype.asNode(), graph);
-						if(datatype != null) {
-							it.close();
-							return datatype;
+		if(!(graph instanceof OptimizedMultiUnion) || ((OptimizedMultiUnion)graph).getIncludesSHACL()) {
+			
+			{
+				ExtendedIterator<Triple> it = graph.find(type, SH.argument.asNode(), Node.ANY);
+				while(it.hasNext()) {
+					Node constraint = it.next().getObject();
+					if(constraint.isBlank() || constraint.isURI()) {
+						if(graph.contains(constraint, SH.predicate.asNode(), property)) {
+							Node valueType = getObject(constraint, SH.valueClass.asNode(), graph);
+							if(valueType != null) {
+								it.close();
+								return valueType;
+							}
+							Node datatype = getObject(constraint, SH.datatype.asNode(), graph);
+							if(datatype != null) {
+								it.close();
+								return datatype;
+							}
 						}
 					}
 				}
 			}
-		}		
-		
-		{
-			ExtendedIterator<Triple> it = graph.find(type, SH.property.asNode(), Node.ANY);
-			while(it.hasNext()) {
-				Node constraint = it.next().getObject();
-				if(constraint.isBlank() || constraint.isURI()) {
-					if(graph.contains(constraint, SH.predicate.asNode(), property)) {
-						Node valueType = getObject(constraint, SH.valueClass.asNode(), graph);
-						if(valueType != null) {
-							it.close();
-							return valueType;
-						}
-						Node datatype = getObject(constraint, SH.datatype.asNode(), graph);
-						if(datatype != null) {
-							it.close();
-							return datatype;
+
+			{
+				ExtendedIterator<Triple> it = graph.find(type, SH.property.asNode(), Node.ANY);
+				while(it.hasNext()) {
+					Node constraint = it.next().getObject();
+					if(constraint.isBlank() || constraint.isURI()) {
+						if(graph.contains(constraint, SH.predicate.asNode(), property)) {
+							Node valueType = getObject(constraint, SH.valueClass.asNode(), graph);
+							if(valueType != null) {
+								it.close();
+								return valueType;
+							}
+							Node datatype = getObject(constraint, SH.datatype.asNode(), graph);
+							if(datatype != null) {
+								it.close();
+								return datatype;
+							}
 						}
 					}
 				}
