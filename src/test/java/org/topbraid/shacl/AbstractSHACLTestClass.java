@@ -8,6 +8,7 @@ import junit.framework.TestCase;
 import org.junit.Assert;
 import org.topbraid.shacl.arq.SHACLFunctions;
 import org.topbraid.shacl.util.ModelPrinter;
+import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.vocabulary.MF;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.shacl.vocabulary.SHT;
@@ -69,7 +70,11 @@ abstract class AbstractSHACLTestClass extends TestCase {
 
 	
 	protected Dataset createDataset() throws Exception {
-		Dataset result = ARQFactory.get().getDataset(getDataModel());
+		Model dataModel = getDataModel();
+		if(SHACLUtil.exists(dataModel)) {
+			dataModel = SHACLUtil.withDefaultValueTypeInferences(dataModel);
+		}
+		Dataset result = ARQFactory.get().getDataset(dataModel);
 		result.addNamedModel(getShapesGraphURI().toString(), getShapesModel());
 		return result;
 	}

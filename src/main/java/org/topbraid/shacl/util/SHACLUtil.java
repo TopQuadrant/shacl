@@ -110,6 +110,30 @@ public class SHACLUtil {
 	
 	
 	/**
+	 * Runs the rule to infer missing rdf:type triples for certain blank nodes.
+	 * @param model  the input Model
+	 * @return a new Model containing the inferred triples
+	 */
+	public static Model createDefaultValueTypesModel(Model model) {
+		String sparql = JenaUtil.getStringProperty(SH.DefaultValueTypeRule.inModel(model), SH.sparql);
+		if(sparql == null) {
+			throw new IllegalArgumentException("Shapes graph does not include " + SH.PREFIX + ":" + SH.DefaultValueTypeRule);
+		}
+		Model resultModel = JenaUtil.createMemoryModel();
+		MultiUnion multiUnion = new MultiUnion(new Graph[] {
+			model.getGraph(),
+			resultModel.getGraph()
+		});
+		Model unionModel = ModelFactory.createModelForGraph(multiUnion);
+		Query query = ARQFactory.get().createQuery(model, sparql);
+		QueryExecution qexec = ARQFactory.get().createQueryExecution(query, unionModel);
+		qexec.execConstruct(resultModel);
+		qexec.close();
+		return resultModel;
+	}
+	
+	
+	/**
 	 * Creates an includes Model for a given input Model.
 	 * The includes Model is the union of the input Model will all graphs linked via
 	 * sh:include (or owl:imports), transitively. 
@@ -313,5 +337,14 @@ public class SHACLUtil {
     	return model != null &&
         		SH.NS.equals(model.getNsPrefixURI(SH.PREFIX)) && 
         		model.contains(SH.NativeConstraint, RDF.type, (RDFNode)null);
+	}
+	
+	
+	public static Model withDefaultValueTypeInferences(Model model) {
+		MultiUnion multiUnion = new MultiUnion(new Graph[] {
+				model.getGraph(),
+				SHACLUtil.createDefaultValueTypesModel(model).getGraph()
+		});
+		return ModelFactory.createModelForGraph(multiUnion);
 	}
 }

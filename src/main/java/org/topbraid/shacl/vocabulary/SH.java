@@ -35,6 +35,8 @@ public class SH {
 
     public final static Resource CountConstraint = ResourceFactory.createResource(NS + "CountConstraint");
 
+    public final static Resource DefaultValueTypeRule = ResourceFactory.createResource(NS + "DefaultValueTypeRule");
+
     public final static Resource Error = ResourceFactory.createResource(NS + "Error");
 
     public final static Resource FatalError = ResourceFactory.createResource(NS + "FatalError");
