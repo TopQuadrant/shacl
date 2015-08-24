@@ -341,10 +341,9 @@ public class SHACLUtil {
 	
 	
 	public static Model withDefaultValueTypeInferences(Model model) {
-		MultiUnion multiUnion = new MultiUnion(new Graph[] {
+		return ModelFactory.createModelForGraph(new MultiUnion(new Graph[] {
 				model.getGraph(),
 				SHACLUtil.createDefaultValueTypesModel(model).getGraph()
-		});
-		return ModelFactory.createModelForGraph(multiUnion);
+		}));
 	}
 }

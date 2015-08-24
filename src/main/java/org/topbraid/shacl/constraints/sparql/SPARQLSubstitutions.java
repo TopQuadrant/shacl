@@ -7,10 +7,9 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.topbraid.shacl.arq.functions.ScopeContainsPFunction;
 import org.topbraid.shacl.constraints.ModelConstraintValidator;
 import org.topbraid.shacl.constraints.SHACLException;
-import org.topbraid.shacl.model.SHACLFactory;
-import org.topbraid.shacl.model.SHACLTemplateCall;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.system.SPINLabels;
@@ -20,12 +19,10 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryParseException;
 import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.QuerySolutionMap;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.sparql.util.FmtUtils;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 /**
@@ -85,7 +82,7 @@ class SPARQLSubstitutions {
 
 	
 	// TODO: Algorithm incorrect, e.g. if { is included as a comment
-	static Query insertScopeAndFilterClauses(Query query, int filterCount, Resource shape, Dataset dataset) {
+	static Query insertScopeAndFilterClauses(Query query, int filterCount, Resource shape, Dataset dataset, QuerySolution binding) {
 		String str = query.toString();
 		Pattern pattern = Pattern.compile("(?i)WHERE\\s*\\{");
 		Matcher matcher = pattern.matcher(str);
@@ -94,8 +91,16 @@ class SPARQLSubstitutions {
 			StringBuilder sb = new StringBuilder(str);
 			
 			StringBuffer s = new StringBuffer();
-			// We need * here because Jena would otherwise drop the pre-bound variables
-			s.append("    {\n        SELECT DISTINCT *\nWHERE {\n");
+			s.append("    {\n        SELECT DISTINCT ?" + SH.thisVar.getName() + " ?" + SH.shapesGraphVar.getName() + " ?" + SH.currentShapeVar.getName());
+
+			// We need to enumerate template call arguments here because Jena would otherwise drop the pre-bound variables
+			Iterator<String> varNames = binding.varNames();
+			while(varNames.hasNext()) {
+				String varName = varNames.next();
+				s.append(" ?" + varName);
+			}
+			
+			s.append("\nWHERE {\n");
 			appendScopes(s, shape, dataset);
 			s.append("        }    }\n");
 			for(int i = 0; i < filterCount; i++) {
@@ -176,9 +181,8 @@ class SPARQLSubstitutions {
 			scopes.add("        " + varName + " <" + RDFS.subClassOf + ">* <" + cls + "> .\n            ?this a " + varName + " .\n");
 		}
 		
-		// TODO: This needs to be generalized to also work with scopes that are not SPARQL queries
-		for(Resource scope : JenaUtil.getResourceProperties(shape, SH.scope)) {
-			scopes.add(createScope(scope));
+		if(shape.hasProperty(SH.scope)) {
+			scopes.add(createScopes(shape));
 		}
 		
 		if(scopes.isEmpty()) {
@@ -192,7 +196,7 @@ class SPARQLSubstitutions {
 				sb.append("        {");
 				sb.append(scopes.get(i));
 				sb.append("        }");
-				if(i < scopes.size()) {
+				if(i < scopes.size() - 1) {
 					sb.append("        UNION\n");
 				}
 			}
@@ -200,56 +204,9 @@ class SPARQLSubstitutions {
 	}
 	
 	
-	private static String createScope(Resource scope) {
-		Resource type = JenaUtil.getType(scope);
-		if(type == null || SH.NativeScope.equals(type)) {
-			return getSPARQLWithSelect(scope);
-		}
-		else {
-			String sparql = getSPARQLWithSelect(type);
-			SHACLTemplateCall templateCall = SHACLFactory.asTemplateCall(scope);
-			QuerySolutionMap binding = new QuerySolutionMap();
-			templateCall.addBindings(binding);
-			StringBuffer sb = new StringBuffer();
-			Pattern pattern = Pattern.compile("(?i)WHERE\\s*\\{");
-			Matcher matcher = pattern.matcher(sparql);
-			matcher.find();
-			int index = matcher.end();
-			sb.append(sparql.substring(0, index));
-			sb.append("{\n    VALUES (");
-			List<String> varNames = new LinkedList<String>();
-			Iterator<String> it = binding.varNames();
-			while(it.hasNext()) {
-				varNames.add(it.next());
-			}
-			for(String varName : varNames) {
-				sb.append(" ?");
-				sb.append(varName);
-			}
-			sb.append(") {\n        (");
-			for(String varName : varNames) {
-				RDFNode value = binding.get(varName);
-				sb.append(FmtUtils.stringForNode(value.asNode()));
-				sb.append(" ");
-			}
-			sb.append(")\n    }\n}\n");
-			sb.append(sparql.substring(index));
-			return sb.toString();
-		}
-	}
-	
-	
-	private static String getSPARQLWithSelect(Resource host) {
-		String sparql = JenaUtil.getStringProperty(host, SH.sparql);
-		if(sparql == null) {
-			throw new SHACLException("Missing sh:sparql at " + host);
-		}
-		try {
-			ARQFactory.get().createQuery(host.getModel(), sparql);
-			return sparql;
-		}
-		catch(Exception ex) {
-			return "SELECT ?this WHERE {" + sparql + "}";
-		}
+	private static String createScopes(Resource shape) {
+		String scopeVar = "?scpe_" + (int)(Math.random() * 10000);
+		return  "        GRAPH ?shapesGraph { ?currentShape <" + SH.scope + "> " + scopeVar + "} .\n" +
+				"        (" + scopeVar + " ?shapesGraph) <" + ScopeContainsPFunction.URI + "> ?this .\n";
 	}
  }

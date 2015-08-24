@@ -44,6 +44,9 @@
 		<recursive-007>
 		<recursive-008>
 		<recursive-009>
+		<scope-001>
+		<scope-002>
+		<scope-003>
 		<valueClass-001>
 		<valueShape-001>
 		<xor-001>
@@ -702,6 +705,60 @@
 	mf:action [
 		sht:schema <recursive-009.ttl> ; 
 		sht:data   <recursive-009.ttl> ; 
+	] ;
+	mf:status sht:proposed ; 
+.
+
+<scope-001>
+	a sht:Validate ;
+	mf:name "Test of a sh:scopeClass" ;
+	mf:action [
+		sht:schema <scope-001.ttl> ; 
+		sht:data   <scope-001.ttl> ; 
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:focusNode ex:InvalidInstance1 ;
+  		sh:subject ex:InvalidInstance1 ;
+  		sh:predicate ex:myProperty ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
+<scope-002>
+	a sht:Validate ;
+	mf:name "Test of a single sh:scope" ;
+	mf:action [
+		sht:schema <scope-002.ttl> ; 
+		sht:data   <scope-002.ttl> ; 
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:focusNode ex:InvalidInstance1 ;
+  		sh:subject ex:InvalidInstance1 ;
+  		sh:predicate ex:myProperty ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
+<scope-003>
+	a sht:Validate ;
+	mf:name "Test of a shape with two scopes" ;
+	mf:action [
+		sht:schema <scope-003.ttl> ; 
+		sht:data   <scope-003.ttl> ; 
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:focusNode ex:InvalidInstance1 ;
+  		sh:subject ex:InvalidInstance1 ;
+  		sh:predicate ex:myProperty ;
+	] ;
+	mf:result [
+		a sh:Error ;
+  		sh:focusNode ex:InvalidInstance2 ;
+  		sh:subject ex:InvalidInstance2 ;
+  		sh:predicate ex:myProperty ;
 	] ;
 	mf:status sht:proposed ; 
 .

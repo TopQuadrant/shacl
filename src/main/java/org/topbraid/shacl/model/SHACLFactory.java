@@ -1,6 +1,7 @@
 package org.topbraid.shacl.model;
 
 import org.topbraid.shacl.arq.functions.HasShapeFunction;
+import org.topbraid.shacl.arq.functions.ScopeContainsPFunction;
 import org.topbraid.shacl.model.impl.SHACLArgumentImpl;
 import org.topbraid.shacl.model.impl.SHACLConstraintViolationImpl;
 import org.topbraid.shacl.model.impl.SHACLFunctionImpl;
@@ -22,6 +23,7 @@ import com.hp.hpl.jena.enhanced.Personality;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.sparql.function.FunctionRegistry;
+import com.hp.hpl.jena.sparql.pfunction.PropertyFunctionRegistry;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 public class SHACLFactory {
@@ -45,6 +47,7 @@ public class SHACLFactory {
     	p.add(SHACLTemplateScope.class, new SimpleImplementation(SH.TemplateScope.asNode(), SHACLTemplateScopeImpl.class));
     	
 		FunctionRegistry.get().put(SH.hasShape.getURI(), HasShapeFunction.class);
+		PropertyFunctionRegistry.get().put(ScopeContainsPFunction.URI, ScopeContainsPFunction.class);
     }
 	
 	

@@ -125,7 +125,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		}
 		if(focusNode == null) {
 			if(shape.isURIResource()) {
-				query = SPARQLSubstitutions.insertScopeAndFilterClauses(query, filters.size(), shape, dataset);
+				query = SPARQLSubstitutions.insertScopeAndFilterClauses(query, filters.size(), shape, dataset, bindings);
 			}
 		}
 		else if(!filters.isEmpty()) {
