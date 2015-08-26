@@ -7,17 +7,22 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.topbraid.shacl.constraints.ExecutionLanguage;
+import org.topbraid.shacl.constraints.ExecutionLanguageSelector;
 import org.topbraid.shacl.model.SHACLArgument;
 import org.topbraid.shacl.model.SHACLConstraintViolation;
 import org.topbraid.shacl.model.SHACLFactory;
 import org.topbraid.shacl.model.SHACLPropertyConstraint;
+import org.topbraid.shacl.model.SHACLTemplateCall;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.util.JenaUtil;
 
 import com.hp.hpl.jena.graph.Graph;
+import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.graph.compose.MultiUnion;
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QuerySolutionMap;
@@ -105,6 +110,30 @@ public class SHACLUtil {
 					}
 				}
 			}
+		}
+	}
+
+
+	/**
+	 * Adds all resources from a given sh:scope to a given results Set of Nodes.
+	 * @param scope  the value of sh:scope (template call or native scope)
+	 * @param dataset  the dataset to operate on
+	 * @param results  the Set to add the resulting Nodes to
+	 */
+	public static void addNodesInScope(Resource scope, Dataset dataset, Set<Node> results) {
+		Resource type = JenaUtil.getType(scope);
+		Resource executable;
+		SHACLTemplateCall templateCall = null;
+		if(type == null || SH.NativeScope.equals(type)) {
+			executable = scope;
+		}
+		else {
+			executable = type;
+			templateCall = SHACLFactory.asTemplateCall(scope);
+		}
+		ExecutionLanguage language = ExecutionLanguageSelector.get().getLanguageForScope(executable);
+		for(Resource focusNode : language.executeScope(dataset, executable, templateCall)) {
+			results.add(focusNode.asNode());
 		}
 	}
 	

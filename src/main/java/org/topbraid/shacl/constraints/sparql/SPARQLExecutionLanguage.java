@@ -244,7 +244,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		String queryString = ARQFactory.get().createPrefixDeclarations(executable.getModel()) + sparql;
 		Query query;
 		try {
-			query = ARQFactory.get().createQuery(queryString);
+			query = getSPARQLWithSelect(executable);
 		}
 		catch(QueryParseException ex) {
 			throw new SHACLException("Invalid SPARQL scope (" + ex.getLocalizedMessage() + "):\n" + queryString);
@@ -365,5 +365,19 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		 */
 		
 		return sb.toString();
+	}
+	
+	
+	private static Query getSPARQLWithSelect(Resource host) {
+		String sparql = JenaUtil.getStringProperty(host, SH.sparql);
+		if(sparql == null) {
+			throw new SHACLException("Missing sh:sparql at " + host);
+		}
+		try {
+			return ARQFactory.get().createQuery(host.getModel(), sparql);
+		}
+		catch(Exception ex) {
+			return ARQFactory.get().createQuery(host.getModel(), "SELECT ?this WHERE {" + sparql + "}");
+		}
 	}
 }
