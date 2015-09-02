@@ -121,18 +121,7 @@ public class SHACLUtil {
 	 * @param results  the Set to add the resulting Nodes to
 	 */
 	public static void addNodesInScope(Resource scope, Dataset dataset, Set<Node> results) {
-		Resource type = JenaUtil.getType(scope);
-		Resource executable;
-		SHACLTemplateCall templateCall = null;
-		if(type == null || SH.NativeScope.equals(type)) {
-			executable = scope;
-		}
-		else {
-			executable = type;
-			templateCall = SHACLFactory.asTemplateCall(scope);
-		}
-		ExecutionLanguage language = ExecutionLanguageSelector.get().getLanguageForScope(executable);
-		for(Resource focusNode : language.executeScope(dataset, executable, templateCall)) {
+		for(Resource focusNode : getResourcesInScope(scope, dataset)) {
 			results.add(focusNode.asNode());
 		}
 	}
@@ -202,6 +191,9 @@ public class SHACLUtil {
 			results.add(r.as(SHACLConstraintViolation.class));
 		}
 		for(Resource r : model.listResourcesWithProperty(RDF.type, SH.FatalError).toList()) {
+			results.add(r.as(SHACLConstraintViolation.class));
+		}
+		for(Resource r : model.listResourcesWithProperty(RDF.type, SH.SuccessResult).toList()) {
 			results.add(r.as(SHACLConstraintViolation.class));
 		}
 		return results;
@@ -324,6 +316,27 @@ public class SHACLUtil {
 			addDirectPropertiesOfClass(c, results);
 		}
 		return results;
+	}
+
+
+	/**
+	 * Gets all resources from a given sh:scope.
+	 * @param scope  the value of sh:scope (template call or native scope)
+	 * @param dataset  the dataset to operate on
+	 */
+	public static Iterable<Resource> getResourcesInScope(Resource scope, Dataset dataset) {
+		Resource type = JenaUtil.getType(scope);
+		Resource executable;
+		SHACLTemplateCall templateCall = null;
+		if(type == null || SH.NativeScope.equals(type)) {
+			executable = scope;
+		}
+		else {
+			executable = type;
+			templateCall = SHACLFactory.asTemplateCall(scope);
+		}
+		ExecutionLanguage language = ExecutionLanguageSelector.get().getLanguageForScope(executable);
+		return language.executeScope(dataset, executable, templateCall);
 	}
 	
 	

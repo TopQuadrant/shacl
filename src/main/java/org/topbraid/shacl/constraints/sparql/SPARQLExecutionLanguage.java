@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.topbraid.shacl.constraints.ConstraintExecutable;
@@ -199,6 +200,24 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 			}
 			else {
 				for(Literal defaultMessage : defaultMessages) {
+					if(executable.getTemplateCall() != null) {
+						QuerySolutionMap map = new QuerySolutionMap();
+						Iterator<String> varNames = sol.varNames();
+						while(varNames.hasNext()) {
+							String varName = varNames.next();
+							RDFNode value = sol.get(varName);
+							if(value != null) {
+								map.add(varName, value);
+							}
+						}
+						Map<String,RDFNode> args = ((TemplateConstraintExecutable)executable).getTemplateCall().getArgumentsMapByVarNames();
+						for(String varName : args.keySet()) {
+							if(!map.contains(varName)) {
+								map.add(varName, args.get(varName));
+							}
+						}
+						sol = map;
+					}
 					vio.addProperty(SH.message, SPARQLSubstitutions.withSubstitutions(defaultMessage, sol));
 				}
 			}

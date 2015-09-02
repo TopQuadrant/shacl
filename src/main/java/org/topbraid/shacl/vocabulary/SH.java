@@ -73,6 +73,8 @@ public class SH {
 
     public final static Resource ShapeClass = ResourceFactory.createResource(NS + "ShapeClass");
 
+    public final static Resource SuccessResult = ResourceFactory.createResource(NS + "SuccessResult");
+
     public final static Resource Template = ResourceFactory.createResource(NS + "Template");
     
     public final static Resource TemplateConstraint = ResourceFactory.createResource(NS + "TemplateConstraint");

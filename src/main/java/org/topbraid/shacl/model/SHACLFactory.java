@@ -134,6 +134,7 @@ public class SHACLFactory {
 	 * @return true if node is a Shape
 	 */
 	public static boolean isShape(RDFNode node) {
+		// TODO: Make it rely on sh:defaultValueType
 		if(node instanceof Resource) {
 			if(JenaUtil.hasIndirectType((Resource)node, SH.Shape)) {
 				return true;

@@ -30,7 +30,7 @@ import com.hp.hpl.jena.vocabulary.RDFS;
  * 
  * @author Holger Knublauch
  */
-public class ModelConstraintValidator {
+public class ModelConstraintValidator extends AbstractConstraintValidator {
 	
 	public static final String FILTER_VAR_NAME = "FILTER_SHAPE";
 
@@ -155,7 +155,9 @@ public class ModelConstraintValidator {
 					monitor.subTask("Validating Shape " + SPINLabels.get().getLabel(shape));
 				}
 				ExecutionLanguage lang = ExecutionLanguageSelector.get().getLanguageForConstraint(executable);
+				notifyValidationStarting(shape, executable, null, lang, results);
 				lang.executeConstraint(dataset, shape, shapesGraphURI, constraint, executable, null, results);
+				notifyValidationFinished(shape, executable, null, lang, results);
 			}
 		}
 	}

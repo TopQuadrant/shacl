@@ -1,7 +1,7 @@
 # baseURI: http://www.w3.org/ns/shacl
 
 # SHACL - Shapes Constraint Language
-# Draft last edited on 2015-08-24
+# Draft last edited on 2015-09-02
 # Created by the W3C RDF Data Shapes Working Group
 # Editor: Holger Knublauch <holger@topquadrant.com>
 
@@ -179,6 +179,7 @@ sh:NodeKind
 	rdfs:subClassOf rdfs:Resource ;
 	rdfs:label "Node kind" ;
 	rdfs:comment "The class of RDF node kinds: literals, blank nodes and IRIs." ;
+	# TODO: Maybe specify that this is an enumerated class (ISSUE-84)
 .
 
 sh:BlankNode
@@ -273,7 +274,7 @@ sh:Template
 	sh:abstract true ;
 	sh:property [
 		sh:predicate sh:labelTemplate ;
-		sh:datatype xsd:string ;
+		sh:datatype sh:text ;
 		rdfs:label "label template" ;
 		rdfs:comment "Outlines how human-readable labels of instances of this template class shall be produced. The values must be strings that can contain {?argName} as placeholders for the actual values of the given argument. There may be multiple values, for different languages." ;
 	] ;
@@ -330,7 +331,7 @@ sh:Result
 	] ;
 	sh:property [
 		sh:predicate sh:message ;
-		sh:datatype xsd:string ;
+		sh:datatype sh:text ;
 		rdfs:label "message" ;
 		rdfs:comment "A human-readable message explaining the cause of the result. Multiple values are possible assuming they have different languages." ;
 	] ;
@@ -588,7 +589,7 @@ sh:NativeConstraint
 	rdfs:comment "A constraint that has a native executable body attached with it." ;
 	sh:property [
 		sh:predicate sh:message ;
-		sh:datatype xsd:string ;
+		sh:datatype sh:text ;
 		rdfs:label "message" ;
 		rdfs:comment "Specifies the default sh:message(s) to produce for any constraint violation. May have multiple values for different languages." ;
 	] ;
@@ -601,7 +602,7 @@ sh:NativeConstraint
 	] ;
 	sh:property [
 		sh:predicate rdfs:comment ;
-		sh:datatype xsd:string ;
+		sh:datatype sh:text ;
 		rdfs:label "comment" ;
 		rdfs:comment "A human-readable explanation of this constraint. May have multiple values for different languages." ;
 	] ;
@@ -627,7 +628,7 @@ sh:ConstraintTemplate
 	] ;
 	sh:property [
 		sh:predicate sh:message ;
-		sh:datatype xsd:string ;
+		sh:datatype sh:text ;
 		rdfs:label "message" ;
 		rdfs:comment "Specifies the default sh:message(s) to produce for any constraint violation. May have multiple values for different languages." ;
 	] ;
@@ -707,13 +708,13 @@ sh:AbstractPropertyConstraint
 	] ;
 	sh:property [
 		sh:predicate rdfs:label ;
-		sh:datatype xsd:string ;
+		sh:datatype sh:text ;
 		rdfs:label "label" ;
 		rdfs:comment "A display label for input forms etc. By default, the global rdfs:label of the predicate should be used. Multiple values (for different languages) are supported." ;
 	] ;
 	sh:property [
 		sh:predicate rdfs:comment ;
-		sh:datatype xsd:string ;
+		sh:datatype sh:text ;
 		rdfs:label "comment" ;
 		rdfs:comment "A description of the role of the predicate to users. Multiple values (for different languages) are supported." ;
 	] ;
@@ -885,7 +886,7 @@ sh:AbstractCountPropertyConstraint
 	] ;
 	sh:message "Required value count [{?minCount}..{?maxCount}] but found {?count}" ;
 	sh:sparql """
-		SELECT ?this (?this AS ?subject) ?predicate ?count ?minCount ?maxCount
+		SELECT ?this (?this AS ?subject) ?predicate ?count
 		WHERE {
 			BIND (sh:valueCount(?this, ?predicate) AS ?count) .
 			FILTER ((?count < ?minCount) || (bound(?maxCount) && (?count > ?maxCount))) .
@@ -1204,6 +1205,23 @@ sh:PropertyConstraint
 
 # Inverse property constraints ------------------------------------------------
 
+sh:AbstractAllowedValuesInversePropertyConstraint
+	a sh:InversePropertyValueConstraintTemplate ;
+	rdfs:subClassOf sh:AbstractPropertyConstraint ;
+	rdfs:label "Abstract allowed values inverse property constraint" ;
+	rdfs:comment "Specifies the allowed values for an inverse property by pointing to a List of nodes." ;
+	sh:abstract true ;
+	sh:argument [
+		sh:predicate sh:allowedValues ;
+		sh:optionalWhenInherited true ;
+		sh:valueClass rdf:List ;
+		rdfs:label "allowed values" ;
+		rdfs:comment "The rdf:List containing the allowed values of the inverse property." ;
+	] ;
+	sh:message "Value is not one of the allowed values" ;
+	sh:validationFunction sh:isAllowedValue ;
+.
+
 sh:AbstractCountInversePropertyConstraint
 	a sh:ConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
@@ -1290,6 +1308,7 @@ sh:AbstractValueShapeInversePropertyConstraint
 
 sh:InversePropertyConstraint
 	a sh:ConstraintTemplate ;
+	rdfs:subClassOf sh:AbstractAllowedValuesInversePropertyConstraint ;
 	rdfs:subClassOf sh:AbstractCountInversePropertyConstraint ;
 	rdfs:subClassOf sh:AbstractValueClassInversePropertyConstraint ;
 	rdfs:subClassOf sh:AbstractValueShapeInversePropertyConstraint ;
@@ -1912,7 +1931,7 @@ sh:DefaultValueTypeRule
 sh:nodeShape
 	a rdf:Property ;
 	rdfs:label "node shape" ;
-	rdfs:comment "Links a resource with the shapes that it is supposed to have." ;
+	rdfs:comment "Links a resource with the shapes that it is supposed to have. All values of this property must be IRI nodes." ;
 	rdfs:range sh:Shape ;
 .
 

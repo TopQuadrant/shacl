@@ -40,6 +40,10 @@ public class ValidateSquareExampleTest extends TestCase {
 			dataModel.getGraph()
 		});
 		Model shapesModel = ModelFactory.createModelForGraph(unionGraph);
+		
+		// Note that we don't perform validation of the shape definitions themselves.
+		// To do that, activate the following line to make sure that all required triples are present:
+		// dataModel = SHACLUtil.withDefaultValueTypeInferences(shapesModel);
 
 		// Make sure all sh:Functions are registered
 		SHACLFunctions.registerFunctions(shapesModel);

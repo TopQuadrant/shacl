@@ -27,7 +27,7 @@ import com.hp.hpl.jena.rdf.model.Statement;
  * 
  * @author Holger Knublauch
  */
-public class ResourceConstraintValidator {
+public class ResourceConstraintValidator extends AbstractConstraintValidator {
 	
 	private static ResourceConstraintValidator singleton = new ResourceConstraintValidator();
 	
@@ -132,7 +132,9 @@ public class ResourceConstraintValidator {
 			Resource severity = executable.getSeverity();
 			if(minSeverity == null || minSeverity.equals(severity) || JenaUtil.hasSuperClass(severity, minSeverity)) {
 				ExecutionLanguage lang = ExecutionLanguageSelector.get().getLanguageForConstraint(executable);
+				notifyValidationStarting(shape, executable, focusNode, lang, results);
 				lang.executeConstraint(dataset, shape, shapesGraphURI, constraint, executable, focusNode, results);
+				notifyValidationFinished(shape, executable, focusNode, lang, results);
 			}
 		}
 	}

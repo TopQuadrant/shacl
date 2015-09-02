@@ -571,14 +571,15 @@ public class JenaUtil {
 	/**
 	 * Gets the local range of a given property at a given class, considering things like
 	 * rdfs:range, owl:allValuesFrom restrictions, spl:Argument and others.
-	 * Returns a suitable default range (rdfs:Resource or xsd:string) if no other is defined.
+	 * Optionally returns a suitable default range (rdfs:Resource or xsd:string) if no other is defined.
 	 * @param property  the Property to get the range of
 	 * @param type  the class to get the range at
 	 * @param graph  the Graph to operate on
-	 * @return a suitable range
+	 * @param useDefault  true to fall back to a suitable default
+	 * @return a suitable range; may be null if useDefault == false
 	 */
-	public static Node getLocalRange(Node property, Node type, Graph graph) {
-		return LocalRangeAtClassNativeFunction.run(type, property, graph);
+	public static Node getLocalRange(Node property, Node type, Graph graph, boolean useDefault) {
+		return LocalRangeAtClassNativeFunction.run(type, property, graph, useDefault);
 	}
 	
 	

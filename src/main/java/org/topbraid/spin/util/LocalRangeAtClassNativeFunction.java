@@ -42,7 +42,7 @@ public class LocalRangeAtClassNativeFunction extends AbstractFunction2 {
 	@Override
 	protected NodeValue exec(Node cls, Node property, FunctionEnv env) {
 		Graph graph = env.getActiveGraph();
-		Node result = run(cls, property, graph);
+		Node result = run(cls, property, graph, true);
 		return NodeValue.makeNode(result);
 	}
 
@@ -55,11 +55,11 @@ public class LocalRangeAtClassNativeFunction extends AbstractFunction2 {
 	}
 
 
-	public static Node run(Node cls, Node property, Graph graph) {
+	public static Node run(Node cls, Node property, Graph graph, boolean useDefault) {
 		Node result = walk(property, cls, graph, new HashSet<Node>());
 		if(result == null) {
 			result = getGlobalRange(property, graph);
-			if(result == null) {
+			if(result == null && useDefault) {
 				result = getDefaultRange(property, graph);
 			}
 		}
