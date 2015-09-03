@@ -228,23 +228,10 @@ public class SHACLUtil {
 		try {
 			while(it.hasNext()) {
 				Statement s = it.next();
-				if(SH.property.equals(s.getPredicate())) {
-					return SH.PropertyConstraint.inModel(resource.getModel());
+				Resource defaultValueType = JenaUtil.getResourceProperty(s.getPredicate(), SH.defaultValueType);
+				if(defaultValueType != null) {
+					return defaultValueType;
 				}
-				else if(SH.argument.equals(s.getPredicate())) {
-					return SH.Argument.inModel(resource.getModel());
-				}
-				else if(SH.constraint.equals(s.getPredicate())) {
-					return SH.NativeConstraint.inModel(resource.getModel());
-				}
-				else if(SH.scope.equals(s.getPredicate())) {
-					return SH.NativeScope.inModel(resource.getModel());
-				}
-				else if(SH.inverseProperty.equals(s.getPredicate())) {
-					return SH.InversePropertyConstraint.inModel(resource.getModel());
-				}
-				
-				// TODO: maybe handle other properties
 			}
 		}
 		finally {
@@ -342,7 +329,7 @@ public class SHACLUtil {
 	
 	public static List<Resource> getTypes(Resource subject) {
 		List<Resource> types = JenaUtil.getTypes(subject);
-		if(types.isEmpty() && subject.isAnon()) {
+		if(types.isEmpty()) {
 			Resource defaultType = getDefaultTemplateType(subject);
 			if(defaultType != null) {
 				return Collections.singletonList(defaultType);

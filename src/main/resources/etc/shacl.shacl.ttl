@@ -1,7 +1,7 @@
 # baseURI: http://www.w3.org/ns/shacl
 
 # SHACL - Shapes Constraint Language
-# Draft last edited on 2015-09-02
+# Draft last edited on 2015-09-04
 # Created by the W3C RDF Data Shapes Working Group
 # Editor: Holger Knublauch <holger@topquadrant.com>
 
@@ -1913,12 +1913,12 @@ sh:DefaultValueTypeRule
 	rdfs:comment "A template encapsulating a query that can be used to construct rdf:type triples for certain untyped blank nodes that are an object in a triple where the predicate has a sh:defaultValueType. This can be used as a pre-processor for shape graphs before they are validated." ;
 	sh:sparql """
 		CONSTRUCT {
-			?blankNode a ?defaultValueType .
+			?node a ?defaultValueType .
 		}
 		WHERE {
 			?predicate sh:defaultValueType ?defaultValueType .
-			?anySubject ?predicate ?blankNode .
-			FILTER (isBlank(?blankNode) && NOT EXISTS { ?blankNode a ?anyType }) .
+			?anySubject ?predicate ?node .
+			FILTER (NOT EXISTS { ?node a ?anyType }) .
 		}
 		""" ;
 .

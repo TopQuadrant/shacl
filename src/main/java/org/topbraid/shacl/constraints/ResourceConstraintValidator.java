@@ -150,7 +150,7 @@ public class ResourceConstraintValidator extends AbstractConstraintValidator {
 		for(Property constraintProperty : constraintProperties) {
 			for(Resource c : JenaUtil.getResourceProperties(shape, constraintProperty)) {
 				Resource type = JenaUtil.getType(c);
-				if(type == null && c.isAnon()) {
+				if(type == null) {
 					type = SHACLUtil.getDefaultTemplateType(c);
 				}
 				if(type != null) {

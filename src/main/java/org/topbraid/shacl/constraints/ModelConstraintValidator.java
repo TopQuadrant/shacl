@@ -108,7 +108,7 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 						}
 						Resource c = s.getResource(); 
 						Resource type = JenaUtil.getType(c);
-						if(type == null && c.isAnon()) {
+						if(type == null) {
 							type = SHACLUtil.getDefaultTemplateType(c);
 						}
 						if(type != null) {

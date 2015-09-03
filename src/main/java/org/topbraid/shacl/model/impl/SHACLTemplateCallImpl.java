@@ -36,7 +36,7 @@ public class SHACLTemplateCallImpl extends SHACLResourceImpl implements SHACLTem
 		if(type != null) {
 			return SHACLFactory.asTemplate(type);
 		}
-		else if(isAnon()) {
+		else {
 			type = SHACLUtil.getDefaultTemplateType(this);
 			if(type != null) {
 				return SHACLFactory.asTemplate(type);

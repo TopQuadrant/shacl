@@ -97,7 +97,7 @@ public class SHACLFactory {
 	
 	
 	public static boolean isNativeConstraint(RDFNode node) {
-		if(node != null && node.isAnon()) {
+		if(node != null && (node.isAnon() || node.isURIResource())) {
 			if(((Resource)node).hasProperty(RDF.type, SH.NativeConstraint)) {
 				return true;
 			}
@@ -110,17 +110,12 @@ public class SHACLFactory {
 	
 	
 	public static boolean isNativeScope(RDFNode node) {
-		if(node != null) {
-			if(node.isAnon()) {
-				if(((Resource)node).hasProperty(RDF.type, SH.NativeScope)) {
-					return true;
-				}
-				if(!((Resource)node).hasProperty(RDF.type)) {
-					return SH.NativeScope.equals(SHACLUtil.getDefaultTemplateType((Resource)node));
-				}
+		if(node instanceof Resource) {
+			if(((Resource)node).hasProperty(RDF.type, SH.NativeScope)) {
+				return true;
 			}
-			else if(node.isURIResource()) {
-				return ((Resource)node).hasProperty(RDF.type, SH.NativeScope);
+			else if(!((Resource)node).hasProperty(RDF.type)) {
+				return SH.NativeScope.equals(SHACLUtil.getDefaultTemplateType((Resource)node));
 			}
 		}
 		return false;
@@ -169,8 +164,8 @@ public class SHACLFactory {
 				}
 			}
 			
-			// If this is a typeless blank node, check for defaultType of incoming references
-			if(resource.isAnon() && !resource.hasProperty(RDF.type)) {
+			// If this is a typeless node, check for defaultType of incoming references
+			if(!resource.hasProperty(RDF.type)) {
 				Resource dt = SHACLUtil.getDefaultTemplateType(resource);
 				if(dt != null && !SH.NativeConstraint.equals(dt) && !SH.NativeScope.equals(dt)) {
 					return true;

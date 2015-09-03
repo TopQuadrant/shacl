@@ -79,7 +79,7 @@ public class RelevantProperties {
 	public static Collection<Property> getRelevantSHACLPropertiesOfInstance(Resource instance) {
 		if(SHACLUtil.exists(instance.getModel())) {
 			List<Resource> types = JenaUtil.getTypes(instance);
-			if(types.isEmpty() && instance.isAnon()) {
+			if(types.isEmpty()) {
 				Resource defaultType = SHACLUtil.getDefaultTemplateType(instance);
 				if(defaultType != null) {
 					List<Property> properties = getRelevantSHACLPropertiesOfClass(defaultType);
