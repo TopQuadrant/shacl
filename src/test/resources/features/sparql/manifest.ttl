@@ -13,23 +13,8 @@
 	rdfs:comment "Tests of SPARQL features" ;
 	rdfs:label "SPARQL Features tests" ;
 	mf:entries ( 
-		<global-001> 
 		<template-001> 
 	)
-.
-
-<global-001>
-	a sht:Validate ;
-	mf:name "Test for a SPARQL constraint attached to the graph resource" ;
-	mf:action [
-		sht:schema <global-001.ttl> ; 
-		sht:data <global-001.ttl> ; 
-	] ;
-	mf:result [
-		a sh:Error ;
-  		sh:focusNode rdfs:Resource ;
-	] ;
-	mf:status sht:proposed ; 
 .
 
 <template-001>

@@ -53,8 +53,7 @@ public class HasShapeFunction extends AbstractFunction4 {
 					Resource resource = (Resource) model.asRDFNode(resourceNode);
 					Dataset dataset = DatasetImpl.wrap(env.getDataset());
 					Resource shape = (Resource) dataset.getDefaultModel().asRDFNode(shapeNode);
-					Model results = ResourceConstraintValidator.get().validateNodeAgainstShape(
-							dataset, URI.create(shapesGraphNode.getURI()), resource.asNode(), shape.asNode(), SH.Error, null);
+					Model results = doRun(resource, shape, dataset,	shapesGraphNode);
 					if(results.contains(null, RDF.type, SH.FatalError)) {
 						throw new ExprEvalException("Propagating fatal error from nested shapes");
 					}
@@ -68,5 +67,12 @@ public class HasShapeFunction extends AbstractFunction4 {
 		finally {
 			recursionIsErrorFlag.set(oldFlag);
 		}
+	}
+
+
+	protected Model doRun(Resource resource, Resource shape, Dataset dataset,
+			Node shapesGraphNode) {
+		return ResourceConstraintValidator.get().validateNodeAgainstShape(
+				dataset, URI.create(shapesGraphNode.getURI()), resource.asNode(), shape.asNode(), SH.Error, null);
 	}
 }
