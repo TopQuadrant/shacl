@@ -12,9 +12,5 @@
 	a mf:Manifest ;
 	rdfs:comment "SHACL Test suite" ;
 	rdfs:label "SHACL test suite " ;
-	mf:include <example/manifest.ttl> ;
 	mf:include <features/manifest.ttl> ;
-	mf:include <algebra/manifest_compact_syntax.ttl> ; 
-	mf:include <algebra/manifest_turtle_syntax.ttl> ;
-	mf:include <simple/manifest.ttl> ;
 .

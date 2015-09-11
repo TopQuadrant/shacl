@@ -22,16 +22,20 @@
 		<datatype-001>
 		<datatype-002>
 		<directValueType-001>
+		<equal-001>
 		<filterShape-001>
 		<filterShape-002>
 		<filterShape-003>
 		<inverseProperty-001> 
 		<length-001> 
+		<lessThan-001> 
+		<lessThanOrEqual-001> 
 		<maxExclusive-001> 
 		<maxInclusive-001> 
 		<minExclusive-001> 
 		<minInclusive-001> 
 		<not-001>
+		<notEqual-001>
 		<or-001>
 		<pattern-001> 
 		<property-001>
@@ -61,7 +65,8 @@
 		sht:data <allowedValues-001.ttl> ; 
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidInstance1 ;
   		sh:subject ex:InvalidInstance1 ;
   		sh:predicate ex:value ;
@@ -78,11 +83,13 @@
 		sht:data <and-001.ttl> ; 
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidRectangle1 ;
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidRectangle2 ;
 	] ;
 	mf:status sht:proposed ; 
@@ -96,11 +103,13 @@
 		sht:data <and-002.ttl> ; 
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidInstance1 ;
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidInstance2 ;
 	] ;
 	mf:status sht:proposed ; 
@@ -113,14 +122,7 @@
 		sht:schema <and-003.ttl> ; 
 		sht:data <and-003.ttl> ; 
 	] ;
-	mf:result [
-		a sh:FatalError ;
-  		sh:focusNode ex:InvalidInstance1 ;
-	] ;
-	mf:result [
-		a sh:Error ;
-  		sh:focusNode ex:InvalidInstance2 ;
-	] ;
+	mf:result sht:Failure ;
 	mf:status sht:proposed ; 
 .
 
@@ -132,14 +134,16 @@
 		sht:data <class-001.ttl> ; 
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode _:b1 ;
   		sh:subject _:b1 ;
   		sh:predicate sh:maxCount ;
   		sh:object 1.2 ;
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode _:b1 ;
   		sh:subject _:b1 ;
   		sh:predicate sh:predicate ;
@@ -155,14 +159,16 @@
 		sht:data <closedShape-001.ttl> ; 
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidInstance1 ;
   		sh:subject ex:InvalidInstance1 ;
   		sh:predicate rdf:type ;
   		sh:object ex:SomeClass ;
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidInstance1 ;
   		sh:subject ex:InvalidInstance1 ;
   		sh:predicate ex:otherProperty ;
@@ -179,7 +185,8 @@
 		sht:data <closedShape-002.ttl> ; 
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidInstance1 ;
   		sh:subject ex:InvalidInstance1 ;
   		sh:predicate ex:otherProperty ;
@@ -196,14 +203,16 @@
 		sht:data <datatype-001.ttl> ; 
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidInstance1 ;
   		sh:subject ex:InvalidInstance1 ;
   		sh:predicate ex:value ;
   		sh:object "A"@en ;
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidInstance2 ;
   		sh:subject ex:InvalidInstance2 ;
   		sh:predicate ex:value ;
@@ -220,7 +229,8 @@
 		sht:data <datatype-002.ttl> ; 
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidInstance1 ;
   		sh:subject ex:InvalidInstance1 ;
   		sh:predicate ex:value ;
@@ -237,18 +247,70 @@
 		sht:data <directValueType-001.ttl> ; 
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidInstance1 ;
   		sh:subject ex:InvalidInstance1 ;
   		sh:predicate ex:value ;
   		sh:object ex:SubInstance ;
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidInstance2 ;
   		sh:subject ex:InvalidInstance2 ;
   		sh:predicate ex:value ;
   		sh:object ex:InvalidInstance2 ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
+<equal-001>
+	a sht:Validate ;
+	mf:name "Test of a sh:EqualConstraint" ;
+	mf:action [
+		sht:schema <equal-001.ttl> ; 
+		sht:data   <equal-001.ttl> ; 
+	] ;
+	mf:result [
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
+  		sh:focusNode ex:InvalidResource1 ;
+  		sh:subject ex:InvalidResource1 ;
+  		sh:predicate ex:property1 ;
+  		sh:object "A" ;
+	] ;
+	mf:result [
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
+  		sh:focusNode ex:InvalidResource1 ;
+  		sh:subject ex:InvalidResource1 ;
+  		sh:predicate ex:property2 ;
+  		sh:object "B" ;
+	] ;
+	mf:result [
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
+  		sh:focusNode ex:InvalidResource2 ;
+  		sh:subject ex:InvalidResource2 ;
+  		sh:predicate ex:property1 ;
+  		sh:object "A" ;
+	] ;
+	mf:result [
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
+  		sh:focusNode ex:InvalidResource3 ;
+  		sh:subject ex:InvalidResource3 ;
+  		sh:predicate ex:property2 ;
+  		sh:object "A" ;
+	] ;
+	mf:result [
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
+  		sh:focusNode ex:InvalidResource4 ;
+  		sh:subject ex:InvalidResource4 ;
+  		sh:predicate ex:property1 ;
+  		sh:object "B" ;
 	] ;
 	mf:status sht:proposed ; 
 .
@@ -261,7 +323,8 @@
 		sht:data   <filterShape-001.ttl> ; 
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidInstance1 ;
   		sh:subject ex:InvalidInstance1 ;
   		sh:predicate ex:child ;
@@ -277,7 +340,8 @@
 		sht:data   <filterShape-002.ttl> ; 
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidExampleInstance ;
 	] ;
 	mf:status sht:proposed ; 
@@ -291,7 +355,8 @@
 		sht:data   <filterShape-003.ttl> ; 
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidExampleInstance ;
 	] ;
 	mf:status sht:proposed ; 
@@ -305,13 +370,15 @@
 		sht:data   <inverseProperty-001.ttl> ; 
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:Father ;
   		sh:object ex:Father ;
   		sh:predicate ex:child ;
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:Mother ;
   		sh:object ex:Mother ;
   		sh:predicate ex:child ;
@@ -327,32 +394,96 @@
 		sht:data   <length-001.ttl> ; 
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidResource1 ;
   		sh:subject ex:InvalidResource1 ;
   		sh:predicate ex:property ;
   		sh:object "" ;
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidResource2 ;
   		sh:subject ex:InvalidResource2 ;
   		sh:predicate ex:property ;
   		sh:object "abcdef" ;
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidResource3 ;
   		sh:subject ex:InvalidResource3 ;
   		sh:predicate ex:property ;
   		sh:object 123456 ;
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidResource4 ;
   		sh:subject ex:InvalidResource4 ;
   		sh:predicate ex:property ;
   		sh:object [] ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
+<lessThan-001>
+	a sht:Validate ;
+	mf:name "Test of a sh:LessThanConstraint" ;
+	mf:action [
+		sht:schema <lessThan-001.ttl> ; 
+		sht:data   <lessThan-001.ttl> ; 
+	] ;
+	mf:result [
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
+  		sh:focusNode ex:InvalidResource1 ;
+  		sh:subject ex:InvalidResource1 ;
+  		sh:predicate ex:property1 ;
+  		sh:object 4 ;
+	] ;
+	mf:result [
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
+  		sh:focusNode ex:InvalidResource2 ;
+  		sh:subject ex:InvalidResource2 ;
+  		sh:predicate ex:property1 ;
+  		sh:object 6 ;
+	] ;
+	mf:result [
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
+  		sh:focusNode ex:InvalidResource3 ;
+  		sh:subject ex:InvalidResource3 ;
+  		sh:predicate ex:property1 ;
+  		sh:object 5 ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
+<lessThanOrEqual-001>
+	a sht:Validate ;
+	mf:name "Test of a sh:LessThanOrEqualConstraint" ;
+	mf:action [
+		sht:schema <lessThanOrEqual-001.ttl> ; 
+		sht:data   <lessThanOrEqual-001.ttl> ; 
+	] ;
+	mf:result [
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
+  		sh:focusNode ex:InvalidResource1 ;
+  		sh:subject ex:InvalidResource1 ;
+  		sh:predicate ex:property1 ;
+  		sh:object 5 ;
+	] ;
+	mf:result [
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
+  		sh:focusNode ex:InvalidResource2 ;
+  		sh:subject ex:InvalidResource2 ;
+  		sh:predicate ex:property1 ;
+  		sh:object 6 ;
 	] ;
 	mf:status sht:proposed ; 
 .
@@ -365,21 +496,24 @@
 		sht:data   <maxExclusive-001.ttl> ; 
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidResource1 ;
   		sh:subject ex:InvalidResource1 ;
   		sh:predicate ex:property ;
   		sh:object 1 ;
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidResource2 ;
   		sh:subject ex:InvalidResource2 ;
   		sh:predicate ex:property ;
   		sh:object 2 ;
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidResource3 ;
   		sh:subject ex:InvalidResource3 ;
   		sh:predicate ex:property ;
@@ -396,14 +530,16 @@
 		sht:data   <maxInclusive-001.ttl> ; 
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidResource1 ;
   		sh:subject ex:InvalidResource1 ;
   		sh:predicate ex:property ;
   		sh:object 2 ;
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidResource2 ;
   		sh:subject ex:InvalidResource2 ;
   		sh:predicate ex:property ;
@@ -420,21 +556,24 @@
 		sht:data   <minExclusive-001.ttl> ; 
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidResource1 ;
   		sh:subject ex:InvalidResource1 ;
   		sh:predicate ex:property ;
   		sh:object 1 ;
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidResource2 ;
   		sh:subject ex:InvalidResource2 ;
   		sh:predicate ex:property ;
   		sh:object 0 ;
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidResource3 ;
   		sh:subject ex:InvalidResource3 ;
   		sh:predicate ex:property ;
@@ -451,14 +590,16 @@
 		sht:data   <minInclusive-001.ttl> ; 
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidResource1 ;
   		sh:subject ex:InvalidResource1 ;
   		sh:predicate ex:property ;
   		sh:object 0 ;
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidResource2 ;
   		sh:subject ex:InvalidResource2 ;
   		sh:predicate ex:property ;
@@ -475,8 +616,35 @@
 		sht:data   <not-001.ttl> ; 
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidInstance1 ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
+<notEqual-001>
+	a sht:Validate ;
+	mf:name "Test of a sh:NotEqualConstraint" ;
+	mf:action [
+		sht:schema <notEqual-001.ttl> ; 
+		sht:data   <notEqual-001.ttl> ; 
+	] ;
+	mf:result [
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
+  		sh:focusNode ex:InvalidResource1 ;
+  		sh:subject ex:InvalidResource1 ;
+  		sh:predicate ex:property1 ;
+  		sh:object "A" ;
+	] ;
+	mf:result [
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
+  		sh:focusNode ex:InvalidResource2 ;
+  		sh:subject ex:InvalidResource2 ;
+  		sh:predicate ex:property1 ;
+  		sh:object "A" ;
 	] ;
 	mf:status sht:proposed ; 
 .
@@ -489,11 +657,13 @@
 		sht:data   <or-001.ttl> ; 
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidRectangle1 ;
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidRectangle2 ;
 	] ;
 	mf:status sht:proposed ; 
@@ -507,21 +677,24 @@
 		sht:data   <pattern-001.ttl> ; 
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidResource1 ;
   		sh:subject ex:InvalidResource1 ;
   		sh:predicate ex:property ;
   		sh:object "The 123" ;
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidResource2 ;
   		sh:subject ex:InvalidResource2 ;
   		sh:predicate ex:property ;
   		sh:object "132" ;
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidResource3 ;
   		sh:subject ex:InvalidResource3 ;
   		sh:predicate ex:property ;
@@ -538,20 +711,23 @@
 		sht:data   <property-001.ttl> ; 
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:RectangleWithFloatHeight ;
   		sh:subject ex:RectangleWithFloatHeight ;
   		sh:predicate ex:height ;
   		sh:object 9.2 ;
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:RectangleWithoutHeight ;
   		sh:subject ex:RectangleWithoutHeight ;
   		sh:predicate ex:height ;
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:RectangleWithTwoHeights ;
   		sh:subject ex:RectangleWithTwoHeights ;
   		sh:predicate ex:height ;
@@ -567,7 +743,8 @@
 		sht:data   <qualifiedValueShape-001.ttl> ; 
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:Observation1 ;
   		sh:subject ex:Observation1 ;
   		sh:predicate ex:related ;
@@ -583,7 +760,8 @@
 		sht:data   <recursive-001.ttl> ; 
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:Enrico ;
   		sh:subject ex:Enrico ;
   		sh:predicate ex:knows ;
@@ -609,13 +787,7 @@
 		sht:schema <recursive-003.ttl> ; 
 		sht:data   <recursive-003.ttl> ; 
 	] ;
-	mf:result [
-		a sh:FatalError ;
-  		sh:focusNode ex:Instance1 ;
-  		sh:subject ex:Instance1 ;
-  		sh:predicate ex:someProperty ;
-  		sh:object ex:Instance2 ;
-	] ;
+	mf:result sht:Failure ;
 	mf:status sht:proposed ; 
 .
 
@@ -636,10 +808,7 @@
 		sht:schema <recursive-005.ttl> ; 
 		sht:data   <recursive-005.ttl> ; 
 	] ;
-	mf:result [
-		a sh:FatalError ;
-  		sh:focusNode ex:a ;
-	] ;
+	mf:result sht:Failure ;
 	mf:status sht:proposed ; 
 .
 
@@ -650,20 +819,7 @@
 		sht:schema <recursive-006.ttl> ; 
 		sht:data   <recursive-006.ttl> ; 
 	] ;
-	mf:result [
-		a sh:FatalError ;
-  		sh:focusNode ex:a ;
-  		sh:subject ex:a ;
-  		sh:predicate ex:p ;
-  		sh:object ex:b ;
-	] ;
-	mf:result [
-		a sh:FatalError ;
-  		sh:focusNode ex:a ;
-  		sh:subject ex:a ;
-  		sh:predicate ex:p ;
-  		sh:object ex:c ;
-	] ;
+	mf:result sht:Failure ;
 	mf:status sht:proposed ; 
 .
 
@@ -674,14 +830,7 @@
 		sht:schema <recursive-007.ttl> ; 
 		sht:data   <recursive-007.ttl> ; 
 	] ;
-	mf:result [
-		a sh:FatalError ;
-  		sh:focusNode ex:a ;
-	] ;
-	mf:result [
-		a sh:FatalError ;
-  		sh:focusNode ex:b ;
-	] ;
+	mf:result sht:Failure ;
 	mf:status sht:proposed ; 
 .
 
@@ -692,10 +841,7 @@
 		sht:schema <recursive-008.ttl> ; 
 		sht:data   <recursive-008.ttl> ; 
 	] ;
-	mf:result [
-		a sh:FatalError ;
-  		sh:focusNode ex:a ;
-	] ;
+	mf:result sht:Failure ;
 	mf:status sht:proposed ; 
 .
 
@@ -717,7 +863,8 @@
 		sht:data   <scope-001.ttl> ; 
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidInstance1 ;
   		sh:subject ex:InvalidInstance1 ;
   		sh:predicate ex:myProperty ;
@@ -733,7 +880,8 @@
 		sht:data   <scope-002.ttl> ; 
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidInstance1 ;
   		sh:subject ex:InvalidInstance1 ;
   		sh:predicate ex:myProperty ;
@@ -749,13 +897,15 @@
 		sht:data   <scope-003.ttl> ; 
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidInstance1 ;
   		sh:subject ex:InvalidInstance1 ;
   		sh:predicate ex:myProperty ;
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidInstance2 ;
   		sh:subject ex:InvalidInstance2 ;
   		sh:predicate ex:myProperty ;
@@ -771,7 +921,8 @@
 		sht:data   <valueClass-001.ttl> ; 
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidInstance1 ;
   		sh:subject ex:InvalidInstance1 ;
   		sh:predicate ex:value ;
@@ -788,7 +939,8 @@
 		sht:data   <valueShape-001.ttl> ; 
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:Issue_1 ;
   		sh:subject ex:Issue_1 ;
   		sh:predicate ex:assignedTo ;
@@ -805,11 +957,13 @@
 		sht:data   <xor-001.ttl> ; 
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidInstance1 ;
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidInstance2 ;
 	] ;
 	mf:status sht:proposed ; 

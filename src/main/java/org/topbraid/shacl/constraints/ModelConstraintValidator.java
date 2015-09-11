@@ -150,7 +150,7 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 	private void validateConstraintForShape(Dataset dataset, URI shapesGraphURI, Resource minSeverity, SHACLConstraint constraint, Resource shape, Model results, ProgressMonitor monitor) {
 		for(ConstraintExecutable executable : constraint.getExecutables()) {
 			Resource severity = executable.getSeverity();
-			if(minSeverity == null || minSeverity.equals(severity) || JenaUtil.hasSuperClass(severity, minSeverity)) {
+			if(SHACLUtil.hasMinSeverity(severity, minSeverity)) {
 				if(monitor != null) {
 					monitor.subTask("Validating Shape " + SPINLabels.get().getLabel(shape));
 				}

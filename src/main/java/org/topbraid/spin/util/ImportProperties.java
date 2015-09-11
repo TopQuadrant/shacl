@@ -29,7 +29,6 @@ public class ImportProperties {
 	
 	private List<Property> results = Arrays.asList(new Property[] {
 		OWL.imports,
-		SH.include,
 		SH.shapesGraph
 	});
 	

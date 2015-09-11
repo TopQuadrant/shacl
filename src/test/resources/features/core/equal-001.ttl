@@ -1,0 +1,63 @@
+# baseURI: http://www.w3.org/ns/shacl/test/features/core/equal-001
+
+@prefix ex: <http://example.org/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<>
+	a sh:Graph ;
+	sh:shapesGraph <http://www.w3.org/ns/shacl> ;
+.
+
+
+# Shape Definitions -----------------------------------------------------------
+
+ex:MyShape
+	a sh:Shape ;
+	sh:constraint [
+		a sh:EqualConstraint ;
+		sh:predicate1 ex:property1 ;
+		sh:predicate2 ex:property2 ;
+	] 
+.
+
+# Instances -------------------------------------------------------------------
+
+ex:ValidResource1
+	sh:nodeShape ex:MyShape ;
+	ex:property1 "A" ;
+	ex:property2 "A" ;
+.
+
+ex:ValidResource2
+	sh:nodeShape ex:MyShape ;
+	ex:property1 "A" ;
+	ex:property1 "B" ;
+	ex:property2 "A" ;
+	ex:property2 "B" ;
+.
+
+ex:InvalidResource1
+	sh:nodeShape ex:MyShape ;
+	ex:property1 "A" ;
+	ex:property2 "B" ;
+.
+
+ex:InvalidResource2
+	sh:nodeShape ex:MyShape ;
+	ex:property1 "A" ;
+.
+
+ex:InvalidResource3
+	sh:nodeShape ex:MyShape ;
+	ex:property2 "A" ;
+.
+
+ex:InvalidResource4
+	sh:nodeShape ex:MyShape ;
+	ex:property1 "A" ;
+	ex:property1 "B" ;
+	ex:property2 "A" ;
+.

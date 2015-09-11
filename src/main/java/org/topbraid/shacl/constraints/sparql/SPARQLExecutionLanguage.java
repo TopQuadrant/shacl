@@ -10,7 +10,7 @@ import java.util.Set;
 
 import org.topbraid.shacl.constraints.ConstraintExecutable;
 import org.topbraid.shacl.constraints.ExecutionLanguage;
-import org.topbraid.shacl.constraints.FatalErrorLog;
+import org.topbraid.shacl.constraints.FailureLog;
 import org.topbraid.shacl.constraints.ModelConstraintValidator;
 import org.topbraid.shacl.constraints.SHACLException;
 import org.topbraid.shacl.constraints.TemplateConstraintExecutable;
@@ -21,6 +21,7 @@ import org.topbraid.shacl.model.SHACLFunction;
 import org.topbraid.shacl.model.SHACLShape;
 import org.topbraid.shacl.model.SHACLTemplateCall;
 import org.topbraid.shacl.vocabulary.SH;
+import org.topbraid.shacl.vocabulary.TSH;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.statistics.SPINStatistics;
 import org.topbraid.spin.statistics.SPINStatisticsManager;
@@ -175,23 +176,25 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		while(rs.hasNext()) {
 			QuerySolution sol = rs.next();
 			
+			Resource resultType = SH.ValidationResult;
 			Resource severity = executable.getSeverity();
-			RDFNode selectMessage = sol.get(SH.messageVar.getVarName());
-			if(JenaDatatypes.TRUE.equals(sol.get("error"))) {
-				severity = SH.FatalError;
+			RDFNode selectMessage = null;
+			if(JenaDatatypes.TRUE.equals(sol.get(SH.failureVar.getName()))) {
+				resultType = TSH.FailureResult;
 				String message = "Constraint " + SPINLabels.get().getLabel(executable.getResource());
 				if(executable.getTemplateCall() != null) {
 					message += " of type " + SPINLabels.get().getLabel(executable.getTemplateCall().getTemplate());
 				}
-				message += " has produced ?error";
+				message += " has produced ?" + SH.failureVar.getName();
 				if(focusNode != null) {
 					message += " for focus node " + SPINLabels.get().getLabel(focusNode);
 				}
-				FatalErrorLog.get().log(message);
-				selectMessage = ResourceFactory.createTypedLiteral("Fatal Error: Could not validate shape");
+				FailureLog.get().logFailure(message);
+				selectMessage = ResourceFactory.createTypedLiteral("Validation Failure: Could not validate shape");
 			}
 			
-			Resource vio = results.createResource(severity);
+			Resource vio = results.createResource(resultType);
+			vio.addProperty(SH.severity, severity);
 			vio.addProperty(SH.sourceConstraint, constraint);
 			vio.addProperty(SH.sourceShape, shape);
 			

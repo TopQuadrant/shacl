@@ -10,11 +10,12 @@ import java.util.Set;
 import org.topbraid.shacl.constraints.ExecutionLanguage;
 import org.topbraid.shacl.constraints.ExecutionLanguageSelector;
 import org.topbraid.shacl.model.SHACLArgument;
-import org.topbraid.shacl.model.SHACLConstraintViolation;
 import org.topbraid.shacl.model.SHACLFactory;
 import org.topbraid.shacl.model.SHACLPropertyConstraint;
+import org.topbraid.shacl.model.SHACLResult;
 import org.topbraid.shacl.model.SHACLTemplateCall;
 import org.topbraid.shacl.vocabulary.SH;
+import org.topbraid.shacl.vocabulary.TSH;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.util.JenaUtil;
 
@@ -34,7 +35,6 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
@@ -97,9 +97,7 @@ public class SHACLUtil {
 		graphs.add(model);
 		reachedURIs.add(uri);
 		
-		ExtendedIterator<Triple> includes = model.find(null, SH.include.asNode(), null);
-		ExtendedIterator<Triple> imports = model.find(null, OWL.imports.asNode(), null);
-		for(Triple t : includes.andThen(imports).toList()) {
+		for(Triple t : model.find(null, OWL.imports.asNode(), null).toList()) {
 			if(t.getObject().isURI()) {
 				String includeURI = t.getObject().getURI();
 				if(!reachedURIs.contains(includeURI)) {
@@ -181,20 +179,17 @@ public class SHACLUtil {
 	}
 	
 	
-	public static List<SHACLConstraintViolation> getAllConstraintViolations(Model model) {
-		List<SHACLConstraintViolation> results = new LinkedList<SHACLConstraintViolation>();
+	public static List<SHACLResult> getAllResults(Model model) {
+		List<SHACLResult> results = new LinkedList<SHACLResult>();
 		// TODO: Not pretty code, not generic
-		for(Resource r : model.listResourcesWithProperty(RDF.type, SH.Warning).toList()) {
-			results.add(r.as(SHACLConstraintViolation.class));
+		for(Resource r : model.listResourcesWithProperty(RDF.type, SH.ValidationResult).toList()) {
+			results.add(r.as(SHACLResult.class));
 		}
-		for(Resource r : model.listResourcesWithProperty(RDF.type, SH.Error).toList()) {
-			results.add(r.as(SHACLConstraintViolation.class));
+		for(Resource r : model.listResourcesWithProperty(RDF.type, TSH.FailureResult).toList()) {
+			results.add(r.as(SHACLResult.class));
 		}
-		for(Resource r : model.listResourcesWithProperty(RDF.type, SH.FatalError).toList()) {
-			results.add(r.as(SHACLConstraintViolation.class));
-		}
-		for(Resource r : model.listResourcesWithProperty(RDF.type, SH.SuccessResult).toList()) {
-			results.add(r.as(SHACLConstraintViolation.class));
+		for(Resource r : model.listResourcesWithProperty(RDF.type, TSH.SuccessResult).toList()) {
+			results.add(r.as(SHACLResult.class));
 		}
 		return results;
 	}
@@ -336,6 +331,19 @@ public class SHACLUtil {
 			}
 		}
 		return types;
+	}
+	
+	
+	public static boolean hasMinSeverity(Resource severity, Resource minSeverity) {
+		if(minSeverity == null || SH.Info.equals(minSeverity)) {
+			return true;
+		}
+		if(SH.Warning.equals(minSeverity)) {
+			return !SH.Info.equals(severity);
+		}
+		else { // SH.Error
+			return SH.Error.equals(severity);
+		}
 	}
 	
 	

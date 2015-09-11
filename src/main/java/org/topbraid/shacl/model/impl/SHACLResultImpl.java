@@ -1,6 +1,6 @@
 package org.topbraid.shacl.model.impl;
 
-import org.topbraid.shacl.model.SHACLConstraintViolation;
+import org.topbraid.shacl.model.SHACLResult;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaUtil;
 
@@ -11,13 +11,13 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 /**
- * Default implementation of SHACLConstraintViolation.
+ * Default implementation of SHACLResult.
  * 
  * @author Holger Knublauch
  */
-public class SHACLConstraintViolationImpl extends SHACLResourceImpl implements SHACLConstraintViolation {
+public class SHACLResultImpl extends SHACLResourceImpl implements SHACLResult {
 	
-	public SHACLConstraintViolationImpl(Node node, EnhGraph graph) {
+	public SHACLResultImpl(Node node, EnhGraph graph) {
 		super(node, graph);
 	}
 

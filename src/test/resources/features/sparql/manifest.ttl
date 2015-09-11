@@ -25,28 +25,32 @@
 		sht:data <template-001.ttl> ; 
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidInstance1 ;
   		sh:subject ex:InvalidInstance1 ;
   		sh:predicate rdfs:label ;
   		sh:object "English"@en ;
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidInstance1 ;
   		sh:subject ex:InvalidInstance1 ;
   		sh:predicate rdfs:label ;
   		sh:object "British"@en ;
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidInstance2 ;
   		sh:subject ex:InvalidInstance2 ;
   		sh:predicate rdfs:label ;
   		sh:object "English"@en ;
 	] ;
 	mf:result [
-		a sh:Error ;
+		a sh:ValidationResult ;
+		sh:severity sh:Error ;
   		sh:focusNode ex:InvalidInstance2 ;
   		sh:subject ex:InvalidInstance2 ;
   		sh:predicate rdfs:label ;

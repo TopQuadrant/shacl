@@ -6,9 +6,8 @@ import java.net.URI;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import org.topbraid.shacl.constraints.FatalErrorLog;
+import org.topbraid.shacl.constraints.FailureLog;
 import org.topbraid.shacl.vocabulary.MF;
-import org.topbraid.shacl.vocabulary.SHT;
 import org.topbraid.spin.util.JenaUtil;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -29,9 +28,9 @@ public class WGTest extends TestSuite {
 	
 	
     public static Test suite() throws Exception {
-    	FatalErrorLog.set(new FatalErrorLog() {
+    	FailureLog.set(new FailureLog() {
 			@Override
-			public void log(String message) {
+			public void logFailure(String message) {
 				// Suppress
 			}
     	});

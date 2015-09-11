@@ -12,8 +12,25 @@ import com.hp.hpl.jena.rdf.model.Resource;
  * @author Holger Knublauch
  */
 public class AbstractConstraintValidator {
+	
+	private static ThreadLocal<Model> currentResultsModel = new ThreadLocal<Model>();
+	
+	public static Model getCurrentResultsModel() {
+		return currentResultsModel.get();
+	}
+	
+	protected void setCurrentResultsModel(Model value) {
+		if(value != null) {
+			currentResultsModel.set(value);
+		}
+		else {
+			currentResultsModel.remove();
+		}
+	}
 
 	private List<ValidationListener> listeners = new ArrayList<ValidationListener>();
+	
+	private Model oldResultsModel;
 	
 	
 	public void addValidationListener(ValidationListener listener) {
@@ -25,10 +42,18 @@ public class AbstractConstraintValidator {
 		for(ValidationListener listener : listeners) {
 			listener.validationFinished(shape, executable, focusNode, lang, results);
 		}
+		if(oldResultsModel != null) {
+			currentResultsModel.set(oldResultsModel);
+		}
+		else {
+			currentResultsModel.remove();
+		}
 	}
 	
 	
 	protected void notifyValidationStarting(Resource shape, ConstraintExecutable executable, Resource focusNode, ExecutionLanguage lang, Model results) {
+		oldResultsModel = currentResultsModel.get();
+		currentResultsModel.set(results);
 		for(ValidationListener listener : listeners) {
 			listener.validationStarting(shape, executable, focusNode, lang, results);
 		}

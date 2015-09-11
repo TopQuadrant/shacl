@@ -3,11 +3,11 @@ package org.topbraid.shacl.model;
 import org.topbraid.shacl.arq.functions.HasShapeFunction;
 import org.topbraid.shacl.arq.functions.ScopeContainsPFunction;
 import org.topbraid.shacl.model.impl.SHACLArgumentImpl;
-import org.topbraid.shacl.model.impl.SHACLConstraintViolationImpl;
 import org.topbraid.shacl.model.impl.SHACLFunctionImpl;
 import org.topbraid.shacl.model.impl.SHACLNativeConstraintImpl;
 import org.topbraid.shacl.model.impl.SHACLNativeScopeImpl;
 import org.topbraid.shacl.model.impl.SHACLPropertyConstraintImpl;
+import org.topbraid.shacl.model.impl.SHACLResultImpl;
 import org.topbraid.shacl.model.impl.SHACLShapeImpl;
 import org.topbraid.shacl.model.impl.SHACLTemplateCallImpl;
 import org.topbraid.shacl.model.impl.SHACLTemplateConstraintImpl;
@@ -35,7 +35,7 @@ public class SHACLFactory {
     
 	private static void init(Personality<RDFNode> p) {
     	p.add(SHACLArgument.class, new SimpleImplementation(SH.Argument.asNode(), SHACLArgumentImpl.class));
-    	p.add(SHACLConstraintViolation.class, new SimpleImplementation(SH.ConstraintViolation.asNode(), SHACLConstraintViolationImpl.class));
+    	p.add(SHACLResult.class, new SimpleImplementation(SH.AbstractResult.asNode(), SHACLResultImpl.class));
     	p.add(SHACLFunction.class, new SimpleImplementation(SH.Function.asNode(), SHACLFunctionImpl.class));
     	p.add(SHACLPropertyConstraint.class, new SimpleImplementation(SH.PropertyConstraint.asNode(), SHACLPropertyConstraintImpl.class));
     	p.add(SHACLShape.class, new SimpleImplementation(SH.Shape.asNode(), SHACLShapeImpl.class));

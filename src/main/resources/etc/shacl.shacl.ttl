@@ -1,7 +1,7 @@
 # baseURI: http://www.w3.org/ns/shacl
 
 # SHACL - Shapes Constraint Language
-# Draft last edited on 2015-09-04
+# Draft last edited on 2015-09-11
 # Created by the W3C RDF Data Shapes Working Group
 # Editor: Holger Knublauch <holger@topquadrant.com>
 
@@ -158,16 +158,10 @@ sh:Graph
 		rdfs:comment "Links a graph with an entailment regime that its shape definitions shall be evaluated with." ;
 	] ;
 	sh:property [
-		sh:predicate sh:include ;
-		sh:valueClass sh:Graph ;
-		rdfs:label "include" ;
-		rdfs:comment "Links a graph with other graphs that shall be included into the query graph over which constraints are validated. This is a transitive property, i.e. includes of includes are also added." ;
-	] ;
-	sh:property [
 		sh:predicate sh:shapesGraph ;
 		sh:valueClass rdfs:Resource ;
 		rdfs:label "shapes graph" ;
-		rdfs:comment "Links a graph with other graphs that shall be included into the shapes graph that includes shape and template definitions as well as the SHACL metamodel." ;
+		rdfs:comment "Links a graph with other graphs that shall be included into the shapes graph that contains shape and template definitions as well as the SHACL metamodel." ;
 	] ;
 .
 
@@ -223,12 +217,12 @@ sh:Macro
 		sh:message "Duplicate Argument for the same predicate {?argPredicate}" ;
 		sh:predicate sh:argument ;
 		sh:sparql """
-			SELECT ?this (?this AS ?subject) (?predicate AS ?argPredicate) (?argument1 AS ?object)
+			SELECT $this ($this AS ?subject) (?predicate AS ?argPredicate) (?argument1 AS ?object)
 			WHERE {
-				?this rdfs:subClassOf* ?class1 .
+				$this rdfs:subClassOf* ?class1 .
 				?class1 sh:argument ?argument1 .
 				?argument1 sh:predicate ?predicate .
-				?this rdfs:subClassOf* ?class2 .
+				$this rdfs:subClassOf* ?class2 .
 				?class2 sh:argument ?argument2 .
 				FILTER (?argument1 != ?argument2) .
 				?argument2 sh:predicate ?predicate .
@@ -280,52 +274,20 @@ sh:Template
 	] ;
 .
 
-sh:Profile
-	a sh:ShapeClass ;
-	rdfs:subClassOf rdfs:Resource ;
-	rdfs:label "Profile" ;
-	rdfs:comment "A profile is a collection of constraint templates and scope templates. Profiles can be used to group together templates with similar complexity. Tools can indicate that they support specific profiles only." ;
-	sh:property [
-		sh:predicate sh:constraintTemplate ;
-		sh:valueClass sh:ConstraintTemplate ;
-		rdfs:label "constraint template" ;
-		rdfs:comment "A constraint template supported by the profile." ;
-	] ;
-	sh:property [
-		sh:predicate sh:scopeTemplate ;
-		sh:valueClass sh:ScopeTemplate ;
-		rdfs:label "scope template" ;
-		rdfs:comment "A scope template supported by the profile." ;
-	] ;
-	sh:property [
-		sh:predicate sh:extends ;
-		sh:valueClass sh:Profile ;
-		rdfs:label "extends" ;
-		rdfs:comment "Points at another profile that forms a sub-set of this profile." ;
-	] ;
-.
-
 
 # Results vocabulary ----------------------------------------------------------
 
 # This vocabulary describes the output of constraint validation
 
-sh:ResultClass
-	a rdfs:Class ;
-	rdfs:subClassOf sh:ShapeClass ;
-	rdfs:label "Result class" ;
-	rdfs:comment "The meta-class of result types that can be instantiated to represent validation results." ;
-.
-
-sh:Result
+sh:AbstractResult
 	a sh:ShapeClass ;
 	rdfs:subClassOf rdfs:Resource ;
-	rdfs:label "Result" ;
-	rdfs:comment "Instances of subclasses of this class can be constructed during constraint validation, to represent a single validation result." ;
+	rdfs:label "Abstract Result" ;
+	rdfs:comment "Instances of subclasses of this class can be constructed during constraint validation." ;
 	sh:abstract true ;
 	sh:property [
 		sh:predicate sh:detail ;
-		sh:valueClass sh:Result ;
+		sh:valueClass sh:AbstractResult ;
 		rdfs:label "detail" ;
 		rdfs:comment "Can link a result with other results that provide more details. This is especially useful to describe violations against nested patterns or shapes." ;
 	] ;
@@ -363,6 +325,13 @@ sh:Result
 		rdfs:comment "The focus node evaluated when the result was produced." ;
 	] ;
 	sh:property [
+		sh:predicate sh:severity ;
+		sh:valueClass sh:Severity ;
+		sh:maxCount 1 ;
+		rdfs:label "severity" ;
+		rdfs:comment "The severity of the result, derived from the source constraint." ;
+	] ;
+	sh:property [
 		sh:predicate sh:sourceConstraint ;
 		sh:valueClass sh:Constraint ;
 		sh:maxCount 1 ;
@@ -378,40 +347,36 @@ sh:Result
 	] ;
 .
 
-sh:ConstraintViolation
+sh:ValidationResult
 	a sh:ShapeClass ;
-	rdfs:subClassOf sh:Result ;
-	rdfs:label "Constraint Violation" ;
-	rdfs:comment "A validation result representing a constraint violation." ;
-	sh:abstract true ;
+	rdfs:subClassOf sh:AbstractResult ;
+	rdfs:label "Validation Result" ;
+	rdfs:comment "A validation result." ;
+.
+
+sh:Severity
+	a sh:ShapeClass ;
+	rdfs:subClassOf rdfs:Resource ;
+	rdfs:label "Severity" ;
+	rdfs:comment "The class of severities. Consists of exactly: sh:Info, sh:Warning, sh:Error." ;
 .
 
 sh:Info
-	a sh:ResultClass ;
-	rdfs:subClassOf sh:Result ;
+	a sh:Severity ;
 	rdfs:label "Info" ;
-	rdfs:comment "An INFO-level validation result." ; 
+	rdfs:comment "The severity of informational results." ; 
 .
 
 sh:Warning
-	a sh:ResultClass ;
-	rdfs:subClassOf sh:ConstraintViolation ;
+	a sh:Severity ;
 	rdfs:label "Warning" ;
-	rdfs:comment "A non-critical constraint violation indicating a warning." ; 
+	rdfs:comment "The severity of warning-level results." ; 
 .
 
 sh:Error
-	a sh:ResultClass ;
-	rdfs:subClassOf sh:ConstraintViolation ;
+	a sh:Severity ;
 	rdfs:label "Error" ;
-	rdfs:comment "A constraint violation indicating an error." ; 
-.
-
-sh:FatalError
-	a sh:ResultClass ;
-	rdfs:subClassOf sh:Error ;
-	rdfs:label "Fatal Error" ;
-	rdfs:comment "An error that cannot be recovered and further evaluation may terminate immediately. Engines may decide to perform the validation of potentially fatal constraints first." ;
+	rdfs:comment "The severity of error-level results." ; 
 .
 
 sh:ResultAnnotation
@@ -575,7 +540,7 @@ sh:Constraint
 	sh:property [
 		sh:predicate sh:severity ;
 		sh:maxCount 1 ;
-		sh:valueClass sh:ResultClass ;
+		sh:valueClass sh:Severity ;
 		rdfs:label "severity" ;
 		rdfs:comment "Specifies the severity to use for any constraint violation produced by this constraint. Defaults to sh:Error for native constraints. For template constraints it uses the severity of the template by default." ;
 	] ;
@@ -622,22 +587,22 @@ sh:ConstraintTemplate
 	sh:property [
 		sh:predicate sh:severity ;
 		sh:maxCount 1 ;
-		sh:valueClass sh:ResultClass ;
+		sh:valueClass sh:Severity ;
 		rdfs:label "severity" ;
-		rdfs:comment "Specifies the default rdf:type to produce for any constraint violation." ;
+		rdfs:comment "Specifies the default sh:severity to produce for validation results." ;
 	] ;
 	sh:property [
 		sh:predicate sh:message ;
 		sh:datatype sh:text ;
 		rdfs:label "message" ;
-		rdfs:comment "Specifies the default sh:message(s) to produce for any constraint violation. May have multiple values for different languages." ;
+		rdfs:comment "Specifies the default sh:message(s) to produce for validation results. May have multiple values for different languages." ;
 	] ;
 	sh:property [
 		sh:predicate sh:predicate ;
 		sh:maxCount 1 ;
 		sh:valueClass rdf:Property ;
 		rdfs:label "predicate" ;
-		rdfs:comment "Specifies the default sh:predicate to produce for any constraint violation." ;
+		rdfs:comment "Specifies the default sh:predicate to produce for validation results." ;
 	] ;
 	sh:property [
 		sh:predicate sh:resultAnnotation ;
@@ -747,11 +712,11 @@ sh:AbstractArgumentMaxCountConstraint
 	sh:abstract true ;
 	sh:message "Arguments cannot have more than one value." ;
 	sh:sparql """
-		SELECT ?this (?this AS ?subject) ?predicate
+		SELECT $this ($this AS ?subject) $predicate
 		WHERE {
 			FILTER EXISTS {
-				?this ?predicate ?value1 .
-				?this ?predicate ?value2 .
+				$this $predicate ?value1 .
+				$this $predicate ?value2 .
 				FILTER (?value1 != ?value2) .
 			}
 		}
@@ -804,9 +769,9 @@ sh:AbstractOptionalArgumentConstraint
 	] ;  
 	sh:message "Missing value for required argument" ;
 	sh:sparql """
-		SELECT ?this (?this AS ?subject) ?predicate
+		SELECT $this ($this AS ?subject) ?predicate
 		WHERE {
-			FILTER (!bound(?defaultValue) && !?optional && !?optionalWhenInherited && NOT EXISTS { ?this ?predicate ?any }) .
+			FILTER (!bound($defaultValue) && !$optional && !$optionalWhenInherited && NOT EXISTS { $this $predicate ?any }) .
 		}
 		""" ;
 .
@@ -836,8 +801,8 @@ sh:Argument
 			SELECT *
 			WHERE {
 				FILTER EXISTS {
-					?this sh:datatype ?value1 .
-					?this sh:valueClass ?value2 .
+					$this sh:datatype ?value1 .
+					$this sh:valueClass ?value2 .
 				}
 			}
 			""" ;
@@ -886,10 +851,10 @@ sh:AbstractCountPropertyConstraint
 	] ;
 	sh:message "Required value count [{?minCount}..{?maxCount}] but found {?count}" ;
 	sh:sparql """
-		SELECT ?this (?this AS ?subject) ?predicate ?count
+		SELECT $this ($this AS ?subject) $predicate ?count
 		WHERE {
-			BIND (sh:valueCount(?this, ?predicate) AS ?count) .
-			FILTER ((?count < ?minCount) || (bound(?maxCount) && (?count > ?maxCount))) .
+			BIND (sh:valueCount($this, $predicate) AS ?count) .
+			FILTER ((?count < $minCount) || (bound($maxCount) && (?count > $maxCount))) .
 		}
 		""" ;
 .
@@ -944,9 +909,9 @@ sh:AbstractHasValuePropertyConstraint
 	] ;
 	sh:message "Missing expected value {?hasValue}" ;
 	sh:sparql """
-		SELECT ?this (?this AS ?subject) ?predicate ?hasValue
+		SELECT $this ($this AS ?subject) $predicate
 		WHERE {
-			FILTER NOT EXISTS { ?this ?predicate ?hasValue }
+			FILTER NOT EXISTS { $this $predicate $hasValue }
 		}
 		""" ;
 .
@@ -998,11 +963,11 @@ sh:AbstractQualifiedValueShapePropertyConstraint
 	] ;  
 	sh:message "Violation of qualified value shape constraint {?qualifiedValueShape}: expected [{?qualifiedMinCount}..{?qualifiedMaxCount}], found {?count}" ;
 	sh:sparql """
-		SELECT ?this (?this AS ?subject) ?predicate ?qualifiedValueShape ?qualifiedMinCount ?qualifiedMaxCount ?count ?error
+		SELECT $this ($this AS ?subject) $predicate ?count ?failure
 		WHERE {
-			BIND (sh:valuesWithShapeCount(?this, ?predicate, ?qualifiedValueShape, ?shapesGraph) AS ?count) .
-			BIND (!bound(?count) AS ?error) .
-			FILTER IF(?error, true, ((?count < ?qualifiedMinCount) || (bound(?qualifiedMaxCount) && (?count > ?qualifiedMaxCount)))) .
+			BIND (sh:valuesWithShapeCount($this, $predicate, $qualifiedValueShape, $shapesGraph) AS ?count) .
+			BIND (!bound(?count) AS ?failure) .
+			FILTER IF(?failure, true, ((?count < $qualifiedMinCount) || (bound($qualifiedMaxCount) && (?count > $qualifiedMaxCount)))) .
 		}
 		""" ;
 .
@@ -1040,12 +1005,12 @@ sh:AbstractValueShapePropertyConstraint
 	] ;  
 	sh:message "Value does not fulfill the constraints of shape {?valueShape}" ;
 	sh:sparql """
-		SELECT ?this (?this AS ?subject) ?predicate ?object ?valueShape ?error
+		SELECT $this ($this AS ?subject) $predicate ?object ?failure
 		WHERE {
-			?this ?predicate ?object .
-			BIND (sh:hasShape(?object, ?valueShape, ?shapesGraph) AS ?hasShape) .
-			BIND (!bound(?hasShape) AS ?error) .
-			FILTER (?error || !?hasShape) .
+			$this $predicate ?object .
+			BIND (sh:hasShape(?object, $valueShape, $shapesGraph) AS ?hasShape) .
+			BIND (!bound(?hasShape) AS ?failure) .
+			FILTER (?failure || !?hasShape) .
 		}
 		""" ;
 .
@@ -1191,11 +1156,11 @@ sh:PropertyConstraint
 		sh:message "Property constraints cannot have both datatype and valueClass or directValueType." ;
 		sh:predicate sh:datatype ;
 		sh:sparql """
-			SELECT ?this
+			SELECT $this
 			WHERE {
 				FILTER EXISTS {
-					?this sh:datatype ?datatype .
-					?this sh:valueClass|sh:directValueType ?any .
+					$this sh:datatype $datatype .
+					$this sh:valueClass|sh:directValueType ?any .
 				}
 			}
 			"""
@@ -1245,10 +1210,10 @@ sh:AbstractCountInversePropertyConstraint
 	] ;
 	sh:message "Inverse property must have [{?minCount}..{?maxCount}] values, but found {?count}" ;
 	sh:sparql """
-		SELECT ?this (?this AS ?object) ?predicate ?minCount ?maxCount ?count
+		SELECT $this ($this AS ?object) $predicate ?count
 		WHERE {
-			BIND (sh:inverseValueCount(?this, ?predicate) AS ?count) .
-			FILTER ((?count < ?minCount) || (bound(?maxCount) && (?count > ?maxCount))) .
+			BIND (sh:inverseValueCount($this, $predicate) AS ?count) .
+			FILTER ((?count < $minCount) || (bound($maxCount) && (?count > $maxCount))) .
 		}
 		""" ;
 .
@@ -1261,21 +1226,11 @@ sh:AbstractValueClassInversePropertyConstraint
 	sh:abstract true ;
 	sh:argument [
 		sh:predicate sh:valueClass ;
+		sh:nodeKind sh:IRI ;
 		sh:optionalWhenInherited true ;
 		sh:valueClass rdfs:Class ;
 		rdfs:label "value class" ;
 		rdfs:comment "The type that all values of the inverse property must have, based on the semantics defined by the function sh:hasValueClass." ;
-	] ;
-	sh:constraint [
-		sh:message "The values of sh:valueClass cannot be blank nodes." ;
-		sh:predicate sh:valueClass ;
-		sh:sparql """
-			SELECT ?this (?this AS ?subject) (?valueClass AS ?object)
-			WHERE {
-				?this sh:valueClass ?valueClass .
-				FILTER isBlank(?valueClass) .
-			}
-			""" ;
 	] ;
 	sh:message "Inverse values must be instances of {?valueClass}" ;
 	sh:validationFunction sh:hasValueClass ;
@@ -1296,12 +1251,12 @@ sh:AbstractValueShapeInversePropertyConstraint
 	] ;  
 	sh:message "Inverse value does not fulfill the constraints of shape {?valueShape}" ;
 	sh:sparql """
-		SELECT ?this (?this AS ?object) ?predicate ?subject ?valueShape ?error
+		SELECT $this ($this AS ?object) $predicate ?subject ?failure
 		WHERE {
-			?subject ?predicate ?this .
-			BIND (sh:hasShape(?subject, ?valueShape, ?shapesGraph) AS ?hasShape) .
-			BIND (!bound(?hasShape) AS ?error) .
-			FILTER (?error || !?hasShape) .
+			?subject $predicate $this .
+			BIND (sh:hasShape(?subject, $valueShape, $shapesGraph) AS ?hasShape) .
+			BIND (!bound(?hasShape) AS ?failure) .
+			FILTER (?failure || !?hasShape) .
 		}
 		""" ;
 .
@@ -1315,6 +1270,110 @@ sh:InversePropertyConstraint
 	rdfs:label "Inverse property constraint" ;
 	rdfs:comment "Declares the structural constraints for an incoming property at the associated class. The supported arguments are inherited from the superclasses." ;
 	sh:labelTemplate "Inverse property {?predicate} : {?valueClass} [{?minCount}..{?maxCount}]" ;
+.
+
+
+# Property Pair Constraint Templates ------------------------------------------
+
+sh:AbstractPropertyPairConstraint
+	a sh:ConstraintTemplate ;
+	rdfs:subClassOf sh:TemplateConstraint ;
+	rdfs:label "Abstract property pair constraint" ;
+	rdfs:comment "Shared superclass for templates that take two predicates as some of their arguments." ;
+	sh:abstract true ;
+	sh:argument [
+		sh:predicate sh:predicate1 ;
+		sh:valueClass rdf:Property ;
+		rdfs:label "predicate 1" ;
+		rdfs:comment "The first Property being constrained." ;
+	] ;
+	sh:argument [
+		sh:predicate sh:predicate2 ;
+		sh:valueClass rdf:Property ;
+		rdfs:label "predicate 2" ;
+		rdfs:comment "The second Property being constrained." ;
+	] ;
+	sh:constraint [
+		a sh:NotEqualConstraint ;
+		sh:predicate1 sh:predicate1 ;
+		sh:predicate2 sh:predicate2 ;
+		rdfs:comment "The two predicates must not be equal" ;
+	] ;
+.
+
+sh:EqualConstraint
+	a sh:ConstraintTemplate ;
+	rdfs:subClassOf sh:AbstractPropertyPairConstraint ;
+	rdfs:label "Equal property pair constraint" ;
+	rdfs:comment "Reports an error for any value of predicate 1 that is not also a value of predicate 2 and vice-versa, for the same focus node." ;
+	sh:message "Value sets of {?predicate1} and {?predicate2} must be equal" ;
+	sh:sparql """
+		SELECT $this ($this AS ?subject) ?predicate ?object
+		WHERE {
+			{
+				$this $predicate1 ?object .
+				FILTER NOT EXISTS {
+					$this $predicate2 ?object .
+				}
+				BIND ($predicate1 AS ?predicate) .
+			}
+			UNION
+			{
+				$this $predicate2 ?object .
+				FILTER NOT EXISTS {
+					$this $predicate1 ?object .
+				}
+				BIND ($predicate2 AS ?predicate) .
+			}
+		}
+		"""
+.
+
+sh:LessThanConstraint
+	a sh:ConstraintTemplate ;
+	rdfs:subClassOf sh:AbstractPropertyPairConstraint ;
+	rdfs:label "Less than property pair constraint" ;
+	rdfs:comment "Reports an error for any pair of values of the two properties for the same focus node, where the first value is not less than the second value." ;
+	sh:message "Values of {?predicate1} must be less than the values of {?predicate2}" ;
+	sh:sparql """
+		SELECT $this ($this AS ?subject) ($predicate1 AS ?predicate) ?object
+		WHERE {
+			$this $predicate1 ?object .
+			$this $predicate2 ?object2 .
+			FILTER (?object >= ?object2) .
+		}
+		"""
+.
+
+sh:LessThanOrEqualConstraint
+	a sh:ConstraintTemplate ;
+	rdfs:subClassOf sh:AbstractPropertyPairConstraint ;
+	rdfs:label "Less than or equal property pair constraint" ;
+	rdfs:comment "Reports an error for any pair of values of the two properties for the same focus node, where the first value is not less than or equal to the second value." ;
+	sh:message "Values of {?predicate1} must be less than or equal to the values of {?predicate2}" ;
+	sh:sparql """
+		SELECT $this ($this AS ?subject) ($predicate1 AS ?predicate) ?object
+		WHERE {
+			$this $predicate1 ?object .
+			$this $predicate2 ?object2 .
+			FILTER (?object > ?object2) .
+		}
+		"""
+.
+
+sh:NotEqualConstraint
+	a sh:ConstraintTemplate ;
+	rdfs:subClassOf sh:AbstractPropertyPairConstraint ;
+	rdfs:label "Not equal property pair constraint" ;
+	rdfs:comment "Reports an error for any pair of equal values of the two properties, for the same focus node." ;
+	sh:message "Values of {?predicate1} and {?predicate2} must not be equal" ;
+	sh:sparql """
+		SELECT $this ($this AS ?subject) ($predicate1 AS ?predicate) ?object
+		WHERE {
+			$this $predicate1 ?object .
+			$this $predicate2 ?object .
+		}
+		"""
 .
 
 
@@ -1335,16 +1394,16 @@ sh:ClosedShapeConstraint
 		rdfs:comment "A List of predicates that are permitted regardless of whether they have been declared as sh:property. Could be used to allow sh:nodeShape or rdf:type." ;
 	] ;
 	sh:sparql """
-		SELECT ?this (?this AS ?subject) ?predicate ?object
+		SELECT $this ($this AS ?subject) ?predicate ?object
 		WHERE {
-			?this ?predicate ?object .
+			$this $predicate ?object .
 			FILTER (NOT EXISTS {
-				GRAPH ?shapesGraph {
-					?currentShape sh:property/sh:predicate ?predicate .
+				GRAPH $shapesGraph {
+					$currentShape sh:property/sh:predicate $predicate .
 				}
-			} && (!bound(?ignoredProperties) || NOT EXISTS {
-				GRAPH ?shapesGraph {
-					?ignoredProperties rdf:rest*/rdf:first ?predicate .
+			} && (!bound($ignoredProperties) || NOT EXISTS {
+				GRAPH $shapesGraph {
+					$ignoredProperties rdf:rest*/rdf:first $predicate .
 				}
 			}))
 		}	
@@ -1368,14 +1427,14 @@ sh:NotConstraint
 		rdfs:label "shape" ;
 		rdfs:comment "The shape to negate." ; 
 	] ;
-	sh:labelTemplate "Not constraint: {?shapes}" ;
+	sh:labelTemplate "Not constraint: {?shape}" ;
 	sh:message "Violation of NOT constraint" ;
 	sh:sparql """
-		SELECT ?this ?error
+		SELECT $this ?failure
 		WHERE {
-			BIND (sh:hasShape(?this, ?shape, ?shapesGraph, true) AS ?hasShape) .
-			BIND (!bound(?hasShape) AS ?error) .
-			FILTER (?error || ?hasShape) .
+			BIND (sh:hasShape($this, $shape, $shapesGraph, true) AS ?hasShape) .
+			BIND (!bound(?hasShape) AS ?failure) .
+			FILTER (?failure || ?hasShape) .
 		}
 		""" ;
 .
@@ -1394,10 +1453,10 @@ sh:AndConstraint
 	sh:labelTemplate "And constraint: {?shapes}" ;
 	sh:message "Violation of AND constraint" ;
 	sh:sparql """
-		SELECT ?this ?error
+		SELECT $this ?failure
 		WHERE {
-			BIND (sh:walkShapesList(?shapes, false, ?this, ?shapesGraph) AS ?result) .
-			BIND (!bound(?result) AS ?error) .
+			BIND (sh:walkShapesList($shapes, false, $this, $shapesGraph) AS ?result) .
+			BIND (!bound(?result) AS ?failure) .
 			FILTER COALESCE(?result, true) .
 		}
 		""" ;
@@ -1417,10 +1476,10 @@ sh:OrConstraint
 	sh:labelTemplate "Or constraint: {?shapes}" ;
 	sh:message "Violation of OR constraint" ;
 	sh:sparql """
-		SELECT ?this ?error
+		SELECT $this ?failure
 		WHERE {
-			BIND (sh:walkShapesList(?shapes, true, ?this, ?shapesGraph) AS ?result) .
-			BIND (!bound(?result) AS ?error) .
+			BIND (sh:walkShapesList($shapes, true, $this, $shapesGraph) AS ?result) .
+			BIND (!bound(?result) AS ?failure) .
 			FILTER COALESCE(!?result, true) .
 		}
 		""" ;
@@ -1440,11 +1499,11 @@ sh:XorConstraint
 	sh:labelTemplate "Xor constraint: {?shapes}" ;
 	sh:message "Violation of XOR constraint" ;
 	sh:sparql """
-		SELECT ?this ?error
+		SELECT $this ?failure
 		WHERE {
-			BIND (sh:validShapeCount(?this, ?shapes, ?shapesGraph) AS ?count)
-			BIND (!bound(?count) AS ?error) .
-			FILTER IF(?error, true, ?count != 1) .
+			BIND (sh:validShapeCount($this, $shapes, $shapesGraph) AS ?count)
+			BIND (!bound(?count) AS ?failure) .
+			FILTER IF(?failure, true, ?count != 1) .
 		}
 		""" ;
 .
@@ -1466,10 +1525,10 @@ sh:hasDatatype
 	sh:sparql """
 		ASK {
 			{
-				FILTER isLiteral(?value) .
+				FILTER isLiteral($value) .
 			} .
-			BIND (datatype(?value) AS ?realDatatype) .
-			FILTER ((?realDatatype = ?datatype) || (?datatype = sh:text && ?realDatatype IN (rdf:langString, xsd:string))) .
+			BIND (datatype($value) AS ?valueDatatype) .
+			FILTER ((?valueDatatype = $datatype) || ($datatype = sh:text && ?valueDatatype IN (rdf:langString, xsd:string))) .
 		}
 		""" ;
 .
@@ -1490,7 +1549,7 @@ sh:hasDirectValueType
 	sh:returnType xsd:boolean ;
 	sh:sparql """
 		ASK {
-			?value a ?directValueType .
+			$value a $directValueType .
 		}
 		""" ;
 .
@@ -1519,10 +1578,10 @@ sh:hasLength
 	sh:returnType xsd:boolean ;
 	sh:sparql """
 		ASK {
-			BIND (STRLEN(str(?value)) AS ?valueLength) .
+			BIND (STRLEN(str($value)) AS ?valueLength) .
 			FILTER (bound(?valueLength) && 
-				(?valueLength >= COALESCE(?minLength, 0)) &&
-				(!bound(?maxLength) || ?valueLength <= ?maxLength)) .
+				(?valueLength >= COALESCE($minLength, 0)) &&
+				(!bound($maxLength) || ?valueLength <= $maxLength)) .
 		}
 		""" ;
 .
@@ -1539,7 +1598,7 @@ sh:hasMaxExclusive
 		rdfs:comment "The permitted exclusive maximum value" ;
 	] ;
 	sh:returnType xsd:boolean ;
-	sh:sparql "ASK { FILTER (?value < ?maxExclusive) }"
+	sh:sparql "ASK { FILTER ($value < $maxExclusive) }"
 .
 
 sh:hasMaxInclusive
@@ -1554,7 +1613,7 @@ sh:hasMaxInclusive
 		rdfs:comment "The permitted inclusive maximum value" ;
 	] ;
 	sh:returnType xsd:boolean ;
-	sh:sparql "ASK { FILTER (?value <= ?maxInclusive) }"
+	sh:sparql "ASK { FILTER ($value <= $maxInclusive) }"
 .
 
 sh:hasMinExclusive
@@ -1569,7 +1628,7 @@ sh:hasMinExclusive
 		rdfs:comment "The permitted exclusive minimum value" ;
 	] ;
 	sh:returnType xsd:boolean ;
-	sh:sparql "ASK { FILTER (?value > ?minExclusive) }"
+	sh:sparql "ASK { FILTER ($value > $minExclusive) }"
 .
 
 sh:hasMinInclusive
@@ -1584,7 +1643,7 @@ sh:hasMinInclusive
 		rdfs:comment "The permitted inclusive minimum value" ;
 	] ;
 	sh:returnType xsd:boolean ;
-	sh:sparql "ASK { FILTER (?value >= ?minInclusive) }"
+	sh:sparql "ASK { FILTER ($value >= $minInclusive) }"
 .
 
 sh:hasNodeKind
@@ -1601,9 +1660,9 @@ sh:hasNodeKind
 	sh:returnType xsd:boolean ;
 	sh:sparql """
 		ASK {
-			FILTER ((isIRI(?value) && ?nodeKind = sh:IRI) ||
-				(isLiteral(?value) && ?nodeKind = sh:Literal) ||
-				(isBlank(?value) && ?nodeKind = sh:BlankNode)) .
+			FILTER ((isIRI($value) && $nodeKind = sh:IRI) ||
+				(isLiteral($value) && $nodeKind = sh:Literal) ||
+				(isBlank($value) && $nodeKind = sh:BlankNode)) .
 		}
 		""" ;
 .
@@ -1620,7 +1679,7 @@ sh:hasPattern
 		rdfs:comment "The regular expression to match." ;
 	] ;
 	sh:returnType xsd:boolean ;
-	sh:sparql "ASK { FILTER (!isBlank(?value) && regex(str(?value), ?pattern)) }" ;
+	sh:sparql "ASK { FILTER (!isBlank($value) && regex(str($value), $pattern)) }" ;
 .
 
 sh:hasShape
@@ -1667,20 +1726,20 @@ sh:hasValueClass
 		ASK {
 			{
 				{
-					FILTER (isIRI(?value) || isBlank(?value)) .
+					FILTER (isIRI($value) || isBlank($value)) .
 				} .
-				?class (rdfs:subClassOf)* ?valueClass .
-				?value a ?class .
+				?class (rdfs:subClassOf)* $valueClass .
+				$value a ?class .
 			}
 			UNION
 			{
 				# Allow untyped resources for rdfs:Resource and rdf:Property
-				FILTER ((isIRI(?value) || isBlank(?value)) && (?valueClass = rdfs:Resource || ?valueClass = rdf:Property) && NOT EXISTS { ?value a ?any }) .
+				FILTER ((isIRI($value) || isBlank($value)) && ($valueClass = rdfs:Resource || $valueClass = rdf:Property) && NOT EXISTS { $value a ?any }) .
 			}
 			UNION
 			{
 				# Allow untyped blank nodes with rdf:first if expected type is rdf:List
-				FILTER (?valueClass = rdf:List && isBlank(?value) && EXISTS { ?value rdf:first ?any }) .
+				FILTER ($valueClass = rdf:List && isBlank($value) && EXISTS { $value rdf:first ?any }) .
 			}
 		}
 		""" ;
@@ -1704,7 +1763,7 @@ sh:inverseValueCount
 	sh:sparql """
 		SELECT ((COUNT(?subject)) AS ?result)
 		WHERE {
-			?subject ?arg2 ?arg1 .
+			?subject $arg2 $arg1 .
 		}
 		""" ;
 .
@@ -1730,8 +1789,8 @@ sh:isAllowedValue
 	sh:sparql """
 		ASK {
 			FILTER EXISTS {
-				GRAPH ?shapesGraph {
-					?allowedValues (rdf:rest*)/rdf:first ?value .
+				GRAPH $shapesGraph {
+					$allowedValues (rdf:rest*)/rdf:first $value .
 				}
 			}
 		}
@@ -1755,7 +1814,7 @@ sh:propertyValue
 	sh:sparql """
 		SELECT ?object
 		WHERE {
-			?arg1 ?arg2 ?object .
+			$arg1 $arg2 ?object .
 		}
 		""" ;
 .
@@ -1785,10 +1844,10 @@ sh:validShapeCount
 		# (this mechanism is used to propagate errors from sh:hasShape calls)
 		SELECT (SUM(?s) AS ?result)
 		WHERE {
-			GRAPH ?arg3 {
-				?arg2 rdf:rest*/rdf:first ?shape .
+			GRAPH $arg3 {
+				$arg2 rdf:rest*/rdf:first ?shape .
 			}
-			BIND (sh:hasShape(?arg1, ?shape, ?arg3, true) AS ?hasShape) .
+			BIND (sh:hasShape($arg1, ?shape, $arg3, true) AS ?hasShape) .
 			BIND (IF(bound(?hasShape), IF(?hasShape, 1, 0), 'error') AS ?s) .
 		}
 		""" ;
@@ -1812,7 +1871,7 @@ sh:valueCount
 	sh:sparql """
 		SELECT ((COUNT(?object)) AS ?result)
 		WHERE {
-			?arg1 ?arg2 ?object .
+			$arg1 $arg2 ?object .
 		}
 		""" ;
 .
@@ -1847,8 +1906,8 @@ sh:valuesWithShapeCount
 		# (this mechanism is used to propagate errors from sh:hasShape calls)
 		SELECT (SUM(?s) AS ?result)
 		WHERE {
-			?arg1 ?arg2 ?value .
-			BIND (sh:hasShape(?value, ?arg3, ?arg4, true) AS ?hasShape) .
+			$arg1 $arg2 ?value .
+			BIND (sh:hasShape(?value, $arg3, $arg4, true) AS ?hasShape) .
 			BIND (IF(bound(?hasShape), IF(?hasShape, 1, 0), 'error') AS ?s) .
 		}
 		""" ;
@@ -1882,14 +1941,14 @@ sh:walkShapesList
 	sh:sparql """
 		SELECT ?result
 		WHERE {
-			GRAPH ?arg4 {
+			GRAPH $arg4 {
 				OPTIONAL {
-					?arg1 rdf:first ?shape .
-					?arg1 rdf:rest ?rest .
+					$arg1 rdf:first ?shape .
+					$arg1 rdf:rest ?rest .
 				}
 			}
-			BIND (IF(bound(?shape), sh:hasShape(?arg3, ?shape, ?arg4, true), !?arg2) AS ?hasShape) .
-			BIND (IF(?hasShape = ?arg2, true, IF(bound(?rest), sh:walkShapesList(?rest, ?arg2, ?arg3, ?arg4), false)) AS ?result) .
+			BIND (IF(bound(?shape), sh:hasShape($arg3, ?shape, $arg4, true), !$arg2) AS ?hasShape) .
+			BIND (IF(?hasShape = $arg2, true, IF(bound(?rest), sh:walkShapesList(?rest, $arg2, $arg3, $arg4), false)) AS ?result) .
 		}
 		""" ;
 .
@@ -1957,19 +2016,16 @@ sh:arg9 a rdf:Property ; rdfs:label "arg9" .
 sh:argument a rdf:Property ; rdfs:label "argument" .
 sh:cachable a rdf:Property ; rdfs:label "cachable" .
 sh:constraint a rdf:Property ; rdfs:label "constraint" .
-sh:constraintTemplate a rdf:Property ; rdfs:label "constraint template" .
 sh:datatype a rdf:Property ; rdfs:label "datatype" .
 sh:defaultValue a rdf:Property ; rdfs:label "default value" .
 sh:defaultValueType a rdf:Property ; rdfs:label "default value type" .
 sh:directValueType a rdf:Property ; rdfs:label "direct value type" .
 sh:detail a rdf:Property ; rdfs:label "detail" .
 sh:entailment a rdf:Property ; rdfs:label "entailment" .
-sh:extends a rdf:Property ; rdfs:label "extends" .
 sh:filterShape a rdf:Property ; rdfs:label "filter shape" .
 sh:focusNode a rdf:Property ; rdfs:label "focus node" .
 sh:hasValue a rdf:Property ; rdfs:label "has value" .
 sh:ignoredProperties a rdf:Property ; rdfs:label "ignored properties" .
-sh:include a rdf:Property ; rdfs:label "include" .
 sh:index a rdf:Property ; rdfs:label "index" .
 sh:inverseProperty a rdf:Property ; rdfs:label "inverse property" .
 sh:labelTemplate a rdf:Property ; rdfs:label "label template" .
@@ -1998,7 +2054,6 @@ sh:resultAnnotation a rdf:Property ; rdfs:label "result annotation" .
 sh:returnType a rdf:Property ; rdfs:label "return type" .
 sh:scope a rdf:Property ; rdfs:label "scope" .
 sh:scopeClass a rdf:Property ; rdfs:label "scope class" .
-sh:scopeTemplate a rdf:Property ; rdfs:label "scope template" .
 sh:severity a rdf:Property ; rdfs:label "severity" .
 sh:shape a rdf:Property ; rdfs:label "shape" .
 sh:shapes a rdf:Property ; rdfs:label "shapes" .

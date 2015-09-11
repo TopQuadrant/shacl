@@ -4,7 +4,7 @@ import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 
-public interface SHACLConstraintViolation extends SHACLResource {
+public interface SHACLResult extends SHACLResource {
 	
 	String getMessage();
 	

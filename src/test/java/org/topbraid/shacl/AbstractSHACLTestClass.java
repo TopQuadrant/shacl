@@ -11,7 +11,7 @@ import org.topbraid.shacl.util.ModelPrinter;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.vocabulary.MF;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.shacl.vocabulary.SHT;
+import org.topbraid.shacl.vocabulary.TSH;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.util.JenaDatatypes;
 import org.topbraid.spin.util.JenaUtil;
@@ -50,6 +50,11 @@ abstract class AbstractSHACLTestClass extends TestCase {
 		Statement resultS = testResource.getProperty(MF.result);
 		if(resultS == null || JenaDatatypes.TRUE.equals(resultS.getObject())) {
 			Assert.assertTrue("Expected no validation results for " + testResource + ", but found: " + results.size() + " triples:\n" + printed, results.isEmpty());
+		}
+		else if(testResource.hasProperty(MF.result, SHT.Failure)) {
+			if(!results.contains(null, RDF.type, TSH.FailureResult)) {
+				fail("Validation was expected to produce failure for " + testResource);
+			}
 		}
 		else {
 			results.setNsPrefix(SH.PREFIX, SH.NS);

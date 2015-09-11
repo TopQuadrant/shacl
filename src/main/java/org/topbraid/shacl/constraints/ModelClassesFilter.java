@@ -35,7 +35,7 @@ public class ModelClassesFilter {
 		SYSTEM_CLASSES.addAll(Arrays.asList(new Resource[] {
 			RDFS.Class,
 			RDFS.Resource,
-			SH.ConstraintViolation,
+			SH.AbstractResult,
 			SH.Graph,
 			SH.NativeConstraint
 		}));

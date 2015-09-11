@@ -2,9 +2,11 @@ package org.topbraid.shacl.arq.functions;
 
 import java.net.URI;
 
-import org.topbraid.shacl.constraints.FatalErrorLog;
+import org.topbraid.shacl.constraints.AbstractConstraintValidator;
+import org.topbraid.shacl.constraints.FailureLog;
 import org.topbraid.shacl.constraints.ResourceConstraintValidator;
 import org.topbraid.shacl.vocabulary.SH;
+import org.topbraid.shacl.vocabulary.TSH;
 import org.topbraid.spin.arq.AbstractFunction4;
 import org.topbraid.spin.util.JenaDatatypes;
 
@@ -38,7 +40,15 @@ public class HasShapeFunction extends AbstractFunction4 {
 		try {
 			if(SHACLRecursionGuard.start(resourceNode, shapeNode)) {
 				if(JenaDatatypes.TRUE.asNode().equals(recursionIsError) || (oldFlag != null && oldFlag)) {
-					FatalErrorLog.get().log("Unsupported recursion at " + resourceNode + " against " + shapeNode);
+					String message = "Unsupported recursion";
+					Model resultsModel = AbstractConstraintValidator.getCurrentResultsModel();
+					if(resultsModel != null) {
+						Resource failure = resultsModel.createResource(TSH.FailureResult);
+						failure.addProperty(SH.message, message);
+						failure.addProperty(SH.focusNode, resultsModel.asRDFNode(resourceNode));
+						failure.addProperty(SH.sourceShape, resultsModel.asRDFNode(shapeNode));
+					}
+					FailureLog.get().logFailure(message);
 					throw new ExprEvalException("Unsupported recursion");
 				}
 				else {
@@ -54,8 +64,8 @@ public class HasShapeFunction extends AbstractFunction4 {
 					Dataset dataset = DatasetImpl.wrap(env.getDataset());
 					Resource shape = (Resource) dataset.getDefaultModel().asRDFNode(shapeNode);
 					Model results = doRun(resource, shape, dataset,	shapesGraphNode);
-					if(results.contains(null, RDF.type, SH.FatalError)) {
-						throw new ExprEvalException("Propagating fatal error from nested shapes");
+					if(results.contains(null, RDF.type, TSH.FailureResult)) {
+						throw new ExprEvalException("Propagating failure from nested shapes");
 					}
 					return NodeValue.makeBoolean(results.isEmpty());
 				}

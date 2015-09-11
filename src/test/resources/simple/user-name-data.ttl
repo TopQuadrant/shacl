@@ -1,7 +1,0 @@
-@prefix ex:     <http://example.org/> .
-@prefix sh:     <http://www.w3.org/ns/shacl#> .
-@prefix foaf:   <http://xmlns.com/foaf/0.1/> .
-
-ex:john foaf:name "John" .
-
-ex:InvalidWithoutName ex:otherProperty "John" .

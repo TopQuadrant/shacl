@@ -58,7 +58,7 @@ public class ValidateSquareExampleTest extends TestCase {
 		Model results = ModelConstraintValidator.get().validateModel(dataset, shapesGraphURI, null, false, null);
 		// System.out.println(ModelPrinter.get().print(results));
 		
-		// Expecting 2 constraint violations (8 triples each)
-		assertEquals(16, results.size());
+		// Expecting 2 constraint violations (9 triples each)
+		assertEquals(18, results.size());
 	}
 }

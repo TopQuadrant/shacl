@@ -23,6 +23,8 @@ public class SH {
 
     public final static Resource AbstractPropertyConstraint = ResourceFactory.createResource(NS + "AbstractPropertyConstraint");
 
+    public final static Resource AbstractResult = ResourceFactory.createResource(NS + "AbstractResult");
+
     public final static Resource Argument = ResourceFactory.createResource(NS + "Argument");
 
     public final static Resource BlankNode = ResourceFactory.createResource(NS + "BlankNode");
@@ -31,21 +33,19 @@ public class SH {
 
     public final static Resource ConstraintTemplate = ResourceFactory.createResource(NS + "ConstraintTemplate");
     
-    public final static Resource ConstraintViolation = ResourceFactory.createResource(NS + "ConstraintViolation");
-
     public final static Resource CountConstraint = ResourceFactory.createResource(NS + "CountConstraint");
 
     public final static Resource DefaultValueTypeRule = ResourceFactory.createResource(NS + "DefaultValueTypeRule");
 
     public final static Resource Error = ResourceFactory.createResource(NS + "Error");
 
-    public final static Resource FatalError = ResourceFactory.createResource(NS + "FatalError");
-
     public final static Resource Function = ResourceFactory.createResource(NS + "Function");
 
     public final static Resource Functions = ResourceFactory.createResource(NS + "Functions");
 
     public final static Resource Graph = ResourceFactory.createResource(NS + "Graph");
+
+    public final static Resource Info = ResourceFactory.createResource(NS + "Info");
 
     public final static Resource InversePropertyConstraint = ResourceFactory.createResource(NS + "InversePropertyConstraint");
     
@@ -73,8 +73,6 @@ public class SH {
 
     public final static Resource ShapeClass = ResourceFactory.createResource(NS + "ShapeClass");
 
-    public final static Resource SuccessResult = ResourceFactory.createResource(NS + "SuccessResult");
-
     public final static Resource Template = ResourceFactory.createResource(NS + "Template");
     
     public final static Resource TemplateConstraint = ResourceFactory.createResource(NS + "TemplateConstraint");
@@ -84,6 +82,8 @@ public class SH {
     public final static Resource Templates = ResourceFactory.createResource(NS + "Templates");
 
     public final static Resource text = ResourceFactory.createResource(NS + "text");
+
+    public final static Resource ValidationResult = ResourceFactory.createResource(NS + "ValidationResult");
 
     public final static Resource Warning = ResourceFactory.createResource(NS + "Warning");
 
@@ -121,8 +121,6 @@ public class SH {
     public final static Resource hasType = ResourceFactory.createResource(NS + "hasType");
 
     public final static Property hasValue = ResourceFactory.createProperty(NS + "hasValue");
-    
-    public final static Property include = ResourceFactory.createProperty(NS + "include");
 
     public final static Property index = ResourceFactory.createProperty(NS + "index");
 
@@ -197,14 +195,12 @@ public class SH {
 	
 	public static final Var currentShapeVar = Var.alloc("currentShape");
 
-	public static final Var messageVar = Var.alloc(message.getLocalName());
+	public static final Var failureVar = Var.alloc("failure");
 
 	public static final Var objectVar = Var.alloc(object.getLocalName());
 
 	public static final Var predicateVar = Var.alloc(predicate.getLocalName());
 
-	public static final Var severityVar = Var.alloc(severity.getLocalName());
-	
 	public static final Var shapesGraphVar = Var.alloc("shapesGraph");
 
 	public static final Var subjectVar = Var.alloc(subject.getLocalName());

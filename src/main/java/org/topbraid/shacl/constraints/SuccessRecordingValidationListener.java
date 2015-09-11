@@ -1,6 +1,7 @@
 package org.topbraid.shacl.constraints;
 
 import org.topbraid.shacl.vocabulary.SH;
+import org.topbraid.shacl.vocabulary.TSH;
 import org.topbraid.spin.util.JenaUtil;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -31,7 +32,7 @@ public class SuccessRecordingValidationListener implements ValidationListener {
 			ConstraintExecutable executable, Resource focusNode,
 			ExecutionLanguage lang, Model results) {
 		if(results.size() == oldSize) {
-			Resource success = model.createResource(SH.SuccessResult);
+			Resource success = model.createResource(TSH.SuccessResult);
 			success.addProperty(SH.sourceShape, shape);
 			success.addProperty(SH.sourceConstraint, executable.getTemplateCall() != null ? executable.getTemplateCall() : executable.getResource());
 			if(focusNode != null) {

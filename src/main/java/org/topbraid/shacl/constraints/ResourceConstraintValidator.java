@@ -113,7 +113,10 @@ public class ResourceConstraintValidator extends AbstractConstraintValidator {
 	 */
 	public Model validateNodeAgainstShape(Dataset dataset, URI shapesGraphURI, Node focusNode, Node shape, Resource minSeverity, ProgressMonitor monitor) {
 		Model results = JenaUtil.createMemoryModel();
+		Model oldResults = getCurrentResultsModel();
+		setCurrentResultsModel(results);
 		addResourceViolations(dataset, shapesGraphURI, focusNode, shape, SHACLUtil.getAllConstraintProperties(), minSeverity, results, monitor);
+		setCurrentResultsModel(oldResults);
 		return results;
 	}
 
@@ -130,7 +133,7 @@ public class ResourceConstraintValidator extends AbstractConstraintValidator {
 		for(ConstraintExecutable executable : constraint.getExecutables()) {
 			
 			Resource severity = executable.getSeverity();
-			if(minSeverity == null || minSeverity.equals(severity) || JenaUtil.hasSuperClass(severity, minSeverity)) {
+			if(SHACLUtil.hasMinSeverity(severity, minSeverity)) {
 				ExecutionLanguage lang = ExecutionLanguageSelector.get().getLanguageForConstraint(executable);
 				notifyValidationStarting(shape, executable, focusNode, lang, results);
 				lang.executeConstraint(dataset, shape, shapesGraphURI, constraint, executable, focusNode, results);

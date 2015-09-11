@@ -1,4 +1,4 @@
-package org.topbraid.shacl.vocabulary;
+package org.topbraid.shacl;
 
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -14,6 +14,8 @@ public class SHT {
 	
 	
 	public final static Resource ConvertSchemaSyntax = ResourceFactory.createResource(NS + "ConvertSchemaSyntax");
+	
+	public final static Resource Failure = ResourceFactory.createResource(NS + "Failure");
 	
 	public final static Resource MatchNodeShape = ResourceFactory.createResource(NS + "MatchNodeShape");
 	
