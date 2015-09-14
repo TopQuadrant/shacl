@@ -1,8 +1,7 @@
 # baseURI: http://www.w3.org/ns/shacl
 
 # SHACL - Shapes Constraint Language
-# Draft last edited on 2015-09-11
-# Created by the W3C RDF Data Shapes Working Group
+# Draft last edited on 2015-09-14
 # Editor: Holger Knublauch <holger@topquadrant.com>
 
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -1340,7 +1339,7 @@ sh:LessThanConstraint
 		WHERE {
 			$this $predicate1 ?object .
 			$this $predicate2 ?object2 .
-			FILTER (?object >= ?object2) .
+			FILTER (!(?object < ?object2)) .
 		}
 		"""
 .
@@ -1356,7 +1355,7 @@ sh:LessThanOrEqualConstraint
 		WHERE {
 			$this $predicate1 ?object .
 			$this $predicate2 ?object2 .
-			FILTER (?object > ?object2) .
+			FILTER (!(?object <= ?object2)) .
 		}
 		"""
 .
@@ -1396,14 +1395,14 @@ sh:ClosedShapeConstraint
 	sh:sparql """
 		SELECT $this ($this AS ?subject) ?predicate ?object
 		WHERE {
-			$this $predicate ?object .
+			$this ?predicate ?object .
 			FILTER (NOT EXISTS {
 				GRAPH $shapesGraph {
-					$currentShape sh:property/sh:predicate $predicate .
+					$currentShape sh:property/sh:predicate ?predicate .
 				}
 			} && (!bound($ignoredProperties) || NOT EXISTS {
 				GRAPH $shapesGraph {
-					$ignoredProperties rdf:rest*/rdf:first $predicate .
+					$ignoredProperties rdf:rest*/rdf:first ?predicate .
 				}
 			}))
 		}	
@@ -1455,9 +1454,9 @@ sh:AndConstraint
 	sh:sparql """
 		SELECT $this ?failure
 		WHERE {
-			BIND (sh:walkShapesList($shapes, false, $this, $shapesGraph) AS ?result) .
-			BIND (!bound(?result) AS ?failure) .
-			FILTER COALESCE(?result, true) .
+			BIND (sh:countShapesWithMatchResult($this, $shapes, $shapesGraph, false) AS ?count)
+			BIND (!bound(?count) AS ?failure) .
+			FILTER IF(?failure, true, ?count > 0) .
 		}
 		""" ;
 .
@@ -1478,9 +1477,9 @@ sh:OrConstraint
 	sh:sparql """
 		SELECT $this ?failure
 		WHERE {
-			BIND (sh:walkShapesList($shapes, true, $this, $shapesGraph) AS ?result) .
-			BIND (!bound(?result) AS ?failure) .
-			FILTER COALESCE(!?result, true) .
+			BIND (sh:countShapesWithMatchResult($this, $shapes, $shapesGraph, true) AS ?count)
+			BIND (!bound(?count) AS ?failure) .
+			FILTER IF(?failure, true, ?count = 0) .
 		}
 		""" ;
 .
@@ -1501,9 +1500,9 @@ sh:XorConstraint
 	sh:sparql """
 		SELECT $this ?failure
 		WHERE {
-			BIND (sh:validShapeCount($this, $shapes, $shapesGraph) AS ?count)
+			BIND (sh:countShapesWithMatchResult($this, $shapes, $shapesGraph, true) AS ?count)
 			BIND (!bound(?count) AS ?failure) .
-			FILTER IF(?failure, true, ?count != 1) .
+			FILTER IF(?failure, true, ?count - (2 * floor(?count / 2)) = 0) .
 		}
 		""" ;
 .
@@ -1819,10 +1818,10 @@ sh:propertyValue
 		""" ;
 .
 
-sh:validShapeCount
+sh:countShapesWithMatchResult
 	a sh:Function ;
-	rdfs:label "valid shape count" ;
-	rdfs:comment "Counts the number of shapes from a given rdf:List (?arg2) defined in a given shapes graph (?arg3) where a given focus node (?arg1) returns no error-level constraint violations. The function produces an error if one of the shapes validated to a fatal error." ;
+	rdfs:label "count shapes with match result" ;
+	rdfs:comment "Counts the number of shapes from a given rdf:List (?arg2) defined in a given shapes graph (?arg3) where sh:hasShape returns the provided match value (true or false, ?arg4) for a given focus node (?arg1). The function produces a failure if one of the shapes validated to a failure." ;
 	sh:argument [
 		sh:predicate sh:arg1 ;
 		sh:valueClass rdfs:Resource ;
@@ -1838,6 +1837,11 @@ sh:validShapeCount
 		sh:valueClass rdfs:Resource ;
 		rdfs:comment "The shapes graph." ;
 	] ;
+	sh:argument [
+		sh:predicate sh:arg4 ;
+		sh:datatype xsd:boolean ;
+		rdfs:comment "The expected value of sh:hasShape to count." ;
+	] ;
 	sh:returnType xsd:integer ;
 	sh:sparql """
 		# The SUM will fail with an error if one of the operands is not a number
@@ -1848,7 +1852,7 @@ sh:validShapeCount
 				$arg2 rdf:rest*/rdf:first ?shape .
 			}
 			BIND (sh:hasShape($arg1, ?shape, $arg3, true) AS ?hasShape) .
-			BIND (IF(bound(?hasShape), IF(?hasShape, 1, 0), 'error') AS ?s) .
+			BIND (IF(bound(?hasShape), IF(?hasShape = ?arg4, 1, 0), 'error') AS ?s) .
 		}
 		""" ;
 .
