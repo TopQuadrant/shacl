@@ -1,7 +1,7 @@
 # baseURI: http://www.w3.org/ns/shacl
 
 # SHACL - Shapes Constraint Language
-# Draft last edited on 2015-09-14
+# Draft last edited on 2015-09-15
 # Editor: Holger Knublauch <holger@topquadrant.com>
 
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -556,13 +556,6 @@ sh:NativeConstraint
 		sh:datatype sh:text ;
 		rdfs:label "message" ;
 		rdfs:comment "Specifies the default sh:message(s) to produce for any constraint violation. May have multiple values for different languages." ;
-	] ;
-	sh:property [
-		sh:predicate sh:predicate ;
-		sh:maxCount 1 ;
-		sh:valueClass rdf:Property ;
-		rdfs:label "predicate" ;
-		rdfs:comment "Specifies the default sh:predicate to produce for any constraint violation." ;
 	] ;
 	sh:property [
 		sh:predicate rdfs:comment ;
@@ -1913,46 +1906,6 @@ sh:valuesWithShapeCount
 			$arg1 $arg2 ?value .
 			BIND (sh:hasShape(?value, $arg3, $arg4, true) AS ?hasShape) .
 			BIND (IF(bound(?hasShape), IF(?hasShape, 1, 0), 'error') AS ?s) .
-		}
-		""" ;
-.
-
-sh:walkShapesList
-	a sh:Function ;
-	rdfs:label "walk shapes list" ;
-	rdfs:comment "Walks a given rdf:List of shapes (?arg1) recursively until it encounters a shape where sh:hasShape returns a provide boolean value (?arg2) for a given focus node (?arg3) using the given shapes graph (?arg4). Returns true if the list has reached such a node, false if it has reached the end of the list. Returns an error if one of the calls to sh:hasShape has produced a fatal error." ;
-	sh:argument [
-		sh:predicate sh:arg1 ;
-		sh:valueClass rdf:List ;
-		rdfs:comment "The current rdf:List node in the recursion." ;
-	] ;
-	sh:argument [
-		sh:predicate sh:arg2 ;
-		sh:datatype xsd:boolean ;
-		rdfs:comment "The value to match sh:hasShape against." ;
-	] ;
-	sh:argument [
-		sh:predicate sh:arg3 ;
-		sh:valueClass rdfs:Resource ;
-		rdfs:comment "The focus node to validate." ;
-	] ;
-	sh:argument [
-		sh:predicate sh:arg4 ;
-		sh:valueClass rdfs:Resource ;
-		rdfs:comment "The shapes graph." ;
-	] ;
-	sh:returnType xsd:boolean ;
-	sh:sparql """
-		SELECT ?result
-		WHERE {
-			GRAPH $arg4 {
-				OPTIONAL {
-					$arg1 rdf:first ?shape .
-					$arg1 rdf:rest ?rest .
-				}
-			}
-			BIND (IF(bound(?shape), sh:hasShape($arg3, ?shape, $arg4, true), !$arg2) AS ?hasShape) .
-			BIND (IF(?hasShape = $arg2, true, IF(bound(?rest), sh:walkShapesList(?rest, $arg2, $arg3, $arg4), false)) AS ?result) .
 		}
 		""" ;
 .
