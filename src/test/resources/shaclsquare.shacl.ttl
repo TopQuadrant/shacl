@@ -139,7 +139,7 @@ ex:PositivePropertyValueConstraint
 	sh:labelTemplate "Values of property {?property} must be > 0" ;
 	sh:argument [
 		sh:predicate arg:property ;
-		sh:valueClass rdf:Property ;
+		sh:valueClass rdfs:Resource ;
 		rdfs:label "property" ;
 		rdfs:comment "The property to constrain (e.g. ex:width or ex:height)." ;
 	] ;

@@ -1,7 +1,7 @@
 # baseURI: http://www.w3.org/ns/shacl
 
 # SHACL - Shapes Constraint Language
-# Draft last edited on 2015-09-15
+# Draft last edited on 2015-09-17
 # Editor: Holger Knublauch <holger@topquadrant.com>
 
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -1706,7 +1706,7 @@ sh:hasValueClass
 	a sh:Function ;
 	rdfs:subClassOf sh:ValidationFunctions ;
 	rdfs:label "has value class" ;
-	rdfs:comment "Checks whether a given node (?value) is an instance of a given class (?valueClass) or its subclasses. If ?valueClass is rdf:Property then the function returns true if ?value is an untyped IRI." ;
+	rdfs:comment "Checks whether a given node ($value) is an instance of a given class ($valueClass) or its subclasses. Returns false if the value is a literal. Returns true if $valueClass is rdfs:Resource. Returns true if $valueClass is rdf:List and $value has a rdf:first value." ;
 	sh:argument [
 		sh:index 1 ;
 		sh:predicate sh:valueClass ;
@@ -1716,23 +1716,12 @@ sh:hasValueClass
 	sh:returnType xsd:boolean ;
 	sh:sparql """
 		ASK {
-			{
-				{
-					FILTER (isIRI($value) || isBlank($value)) .
-				} .
-				?class (rdfs:subClassOf)* $valueClass .
-				$value a ?class .
-			}
-			UNION
-			{
-				# Allow untyped resources for rdfs:Resource and rdf:Property
-				FILTER ((isIRI($value) || isBlank($value)) && ($valueClass = rdfs:Resource || $valueClass = rdf:Property) && NOT EXISTS { $value a ?any }) .
-			}
-			UNION
-			{
-				# Allow untyped blank nodes with rdf:first if expected type is rdf:List
-				FILTER ($valueClass = rdf:List && isBlank($value) && EXISTS { $value rdf:first ?any }) .
-			}
+			FILTER (isIRI($value) || isBlank($value)) .
+			FILTER (
+				$valueClass = rdfs:Resource ||
+				($valueClass = rdf:List && EXISTS { $value rdf:first ?any }) ||
+				EXISTS { $value rdf:type/rdfs:subClassOf* $valueClass }
+				)
 		}
 		""" ;
 .
@@ -1918,6 +1907,9 @@ sh:constraint sh:defaultValueType sh:NativeConstraint .
 sh:filterShape sh:defaultValueType sh:Shape .
 sh:inverseProperty sh:defaultValueType sh:InversePropertyConstraint .
 sh:property sh:defaultValueType sh:PropertyConstraint .
+sh:predicate sh:defaultValueType rdf:Property .
+sh:predicate1 sh:defaultValueType rdf:Property .
+sh:predicate2 sh:defaultValueType rdf:Property .
 sh:qualifiedValueShape sh:defaultValueType sh:Shape .
 sh:scope sh:defaultValueType sh:NativeScope .
 sh:shape sh:defaultValueType sh:Shape .
