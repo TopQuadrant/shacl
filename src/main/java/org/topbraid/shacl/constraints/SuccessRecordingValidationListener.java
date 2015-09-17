@@ -35,6 +35,9 @@ public class SuccessRecordingValidationListener implements ValidationListener {
 			Resource success = model.createResource(TSH.SuccessResult);
 			success.addProperty(SH.sourceShape, shape);
 			success.addProperty(SH.sourceConstraint, executable.getTemplateCall() != null ? executable.getTemplateCall() : executable.getResource());
+			if(executable.getTemplateCall() != null) {
+				success.addProperty(SH.sourceTemplate, executable.getTemplateCall().getTemplate());
+			}
 			if(focusNode != null) {
 				success.addProperty(SH.focusNode, focusNode);
 			}

@@ -38,12 +38,15 @@ public class FallbackExecutionLanguage implements ExecutionLanguage {
 	public void executeConstraint(Dataset dataset, Resource shape,
 			URI shapesGraphURI, SHACLConstraint constraint, ConstraintExecutable executable,
 			Resource focusNode, Model results) {
-		Resource vio = results.createResource(TSH.FailureResult);
-		vio.addProperty(SH.message, "No execution language found for constraint");
-		vio.addProperty(SH.sourceConstraint, constraint);
-		vio.addProperty(SH.sourceShape, shape);
+		Resource result = results.createResource(TSH.FailureResult);
+		result.addProperty(SH.message, "No execution language found for constraint");
+		result.addProperty(SH.sourceConstraint, constraint);
+		result.addProperty(SH.sourceShape, shape);
+		if(executable.getTemplateCall() != null) {
+			result.addProperty(SH.sourceTemplate, executable.getTemplateCall().getTemplate());
+		}
 		if(focusNode != null) {
-			vio.addProperty(SH.focusNode, focusNode);
+			result.addProperty(SH.focusNode, focusNode);
 		}
 	}
 

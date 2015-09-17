@@ -16,6 +16,9 @@ public interface SHACLResult extends SHACLResource {
 
 	
 	Resource getSourceShape();
+
+	
+	Resource getSourceTemplate();
 	
 	
 	Resource getSubject();

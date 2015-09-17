@@ -63,6 +63,7 @@ abstract class AbstractSHACLTestClass extends TestCase {
 			results.removeAll(null, SH.message, (RDFNode)null);
 			results.removeAll(null, SH.sourceConstraint, (RDFNode)null);
 			results.removeAll(null, SH.sourceShape, (RDFNode)null);
+			results.removeAll(null, SH.sourceTemplate, (RDFNode)null);
 			Model expected = JenaUtil.createDefaultModel();
 			for(Statement s : testResource.listProperties(MF.result).toList()) {
 				expected.add(s.getResource().listProperties());

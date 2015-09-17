@@ -344,6 +344,13 @@ sh:AbstractResult
 		rdfs:label "source shape" ;
 		rdfs:comment "The Shape that caused this result." ;
 	] ;
+	sh:property [
+		sh:predicate sh:sourceTemplate ;
+		sh:valueClass sh:ConstraintTemplate ;
+		sh:maxCount 1 ;
+		rdfs:label "source template" ;
+		rdfs:comment "The Template that caused this result." ;
+	] ;
 .
 
 sh:ValidationResult

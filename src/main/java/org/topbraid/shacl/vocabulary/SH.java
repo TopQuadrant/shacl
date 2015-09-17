@@ -182,6 +182,8 @@ public class SH {
 
     public final static Property sourceShape = ResourceFactory.createProperty(NS + "sourceShape");
 
+    public final static Property sourceTemplate = ResourceFactory.createProperty(NS + "sourceTemplate");
+
     public final static Property sparql = ResourceFactory.createProperty(NS + "sparql");
 
     public final static Property subject = ResourceFactory.createProperty(NS + "subject");

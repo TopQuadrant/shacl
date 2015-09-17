@@ -65,6 +65,12 @@ public class SHACLResultImpl extends SHACLResourceImpl implements SHACLResult {
 
 	
 	@Override
+	public Resource getSourceTemplate() {
+		return JenaUtil.getResourceProperty(this, SH.sourceTemplate);
+	}
+
+	
+	@Override
 	public Resource getSubject() {
 		return JenaUtil.getResourceProperty(this, SH.subject);
 	}

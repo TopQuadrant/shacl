@@ -42,15 +42,6 @@ public abstract class ConstraintExecutable {
 	}
 	
 	
-	/**
-	 * Gets the specified sh:predicate (if any), to be used for constructed results.
-	 * @return the predicate or null
-	 */
-	public Resource getPredicate() {
-		return JenaUtil.getResourceProperty(getResource(), SH.predicate);
-	}
-	
-	
 	public Resource getResource() {
 		return resource;
 	}

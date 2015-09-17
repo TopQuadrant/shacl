@@ -193,13 +193,16 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 				selectMessage = ResourceFactory.createTypedLiteral("Validation Failure: Could not validate shape");
 			}
 			
-			Resource vio = results.createResource(resultType);
-			vio.addProperty(SH.severity, severity);
-			vio.addProperty(SH.sourceConstraint, constraint);
-			vio.addProperty(SH.sourceShape, shape);
+			Resource result = results.createResource(resultType);
+			result.addProperty(SH.severity, severity);
+			result.addProperty(SH.sourceConstraint, constraint);
+			result.addProperty(SH.sourceShape, shape);
+			if(executable.getTemplateCall() != null) {
+				result.addProperty(SH.sourceTemplate, executable.getTemplateCall().getTemplate());
+			}
 			
 			if(selectMessage != null) {
-				vio.addProperty(SH.message, selectMessage);
+				result.addProperty(SH.message, selectMessage);
 			}
 			else {
 				for(Literal defaultMessage : defaultMessages) {
@@ -221,34 +224,28 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 						}
 						sol = map;
 					}
-					vio.addProperty(SH.message, SPARQLSubstitutions.withSubstitutions(defaultMessage, sol));
+					result.addProperty(SH.message, SPARQLSubstitutions.withSubstitutions(defaultMessage, sol));
 				}
 			}
 			
 			RDFNode selectPath = sol.get(SH.predicateVar.getVarName());
 			if(selectPath instanceof Resource) {
-				vio.addProperty(SH.predicate, selectPath);
-			}
-			else {
-				Resource path = executable.getPredicate();
-				if(path != null) {
-					vio.addProperty(SH.predicate, path);
-				}
+				result.addProperty(SH.predicate, selectPath);
 			}
 			
 			RDFNode selectObject = sol.get(SH.objectVar.getVarName());
 			if(selectObject != null) {
-				vio.addProperty(SH.object, selectObject);
+				result.addProperty(SH.object, selectObject);
 			}
 			
 			RDFNode selectSubject = sol.get(SH.subjectVar.getVarName());
 			if(selectSubject instanceof Resource) {
-				vio.addProperty(SH.subject, selectSubject);
+				result.addProperty(SH.subject, selectSubject);
 			}
 			
 			RDFNode thisValue = sol.get(SH.thisVar.getVarName());
 			if(thisValue != null) {
-				vio.addProperty(SH.focusNode, thisValue);
+				result.addProperty(SH.focusNode, thisValue);
 			}
 	
 			violationCount++;
