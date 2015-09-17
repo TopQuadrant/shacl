@@ -26,7 +26,7 @@
 	] ;
 	mf:result [
 		a sh:ValidationResult ;
-		sh:severity sh:Error ;
+		sh:severity sh:Violation ;
   		sh:focusNode ex:InvalidInstance1 ;
   		sh:subject ex:InvalidInstance1 ;
   		sh:predicate rdfs:label ;
@@ -34,7 +34,7 @@
 	] ;
 	mf:result [
 		a sh:ValidationResult ;
-		sh:severity sh:Error ;
+		sh:severity sh:Violation ;
   		sh:focusNode ex:InvalidInstance1 ;
   		sh:subject ex:InvalidInstance1 ;
   		sh:predicate rdfs:label ;
@@ -42,7 +42,7 @@
 	] ;
 	mf:result [
 		a sh:ValidationResult ;
-		sh:severity sh:Error ;
+		sh:severity sh:Violation ;
   		sh:focusNode ex:InvalidInstance2 ;
   		sh:subject ex:InvalidInstance2 ;
   		sh:predicate rdfs:label ;
@@ -50,7 +50,7 @@
 	] ;
 	mf:result [
 		a sh:ValidationResult ;
-		sh:severity sh:Error ;
+		sh:severity sh:Violation ;
   		sh:focusNode ex:InvalidInstance2 ;
   		sh:subject ex:InvalidInstance2 ;
   		sh:predicate rdfs:label ;

@@ -365,7 +365,7 @@ sh:Severity
 	a sh:ShapeClass ;
 	rdfs:subClassOf rdfs:Resource ;
 	rdfs:label "Severity" ;
-	rdfs:comment "The class of severities. Consists of exactly: sh:Info, sh:Warning, sh:Error." ;
+	rdfs:comment "The class of severities. Consists of exactly: sh:Info, sh:Warning, sh:Violation." ;
 .
 
 sh:Info
@@ -380,9 +380,9 @@ sh:Warning
 	rdfs:comment "The severity of warning-level results." ; 
 .
 
-sh:Error
+sh:Violation
 	a sh:Severity ;
-	rdfs:label "Error" ;
+	rdfs:label "Violation" ;
 	rdfs:comment "The severity of error-level results." ; 
 .
 
@@ -549,7 +549,7 @@ sh:Constraint
 		sh:maxCount 1 ;
 		sh:valueClass sh:Severity ;
 		rdfs:label "severity" ;
-		rdfs:comment "Specifies the severity to use for any constraint violation produced by this constraint. Defaults to sh:Error for native constraints. For template constraints it uses the severity of the template by default." ;
+		rdfs:comment "Specifies the severity to use for any constraint violation produced by this constraint. Defaults to sh:Violation for native constraints. For template constraints it uses the severity of the template by default." ;
 	] ;
 .
 
@@ -1437,29 +1437,6 @@ sh:OrConstraint
 			BIND (sh:countShapesWithMatchResult($this, $shapes, $shapesGraph, true) AS ?count)
 			BIND (!bound(?count) AS ?failure) .
 			FILTER IF(?failure, true, ?count = 0) .
-		}
-		""" ;
-.
-
-sh:XorConstraint
-	a sh:ConstraintTemplate ;
-	rdfs:subClassOf sh:TemplateConstraint ;
-	rdfs:label "Xor constraint" ;
-	rdfs:comment "Enforces a constraint that exactly one of multiple provided shapes must be valid for the focus resource." ;
-	sh:argument [
-		sh:predicate sh:shapes ;
-		sh:valueClass rdf:List ;
-		rdfs:label "shapes" ;
-		rdfs:comment "A list of shapes that will be validated." ; 
-	] ;
-	sh:labelTemplate "Xor constraint: {?shapes}" ;
-	sh:message "Violation of XOR constraint" ;
-	sh:sparql """
-		SELECT $this ?failure
-		WHERE {
-			BIND (sh:countShapesWithMatchResult($this, $shapes, $shapesGraph, true) AS ?count)
-			BIND (!bound(?count) AS ?failure) .
-			FILTER IF(?failure, true, ?count - (2 * floor(?count / 2)) = 0) .
 		}
 		""" ;
 .

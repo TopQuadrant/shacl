@@ -37,8 +37,6 @@ public class SH {
 
     public final static Resource DefaultValueTypeRule = ResourceFactory.createResource(NS + "DefaultValueTypeRule");
 
-    public final static Resource Error = ResourceFactory.createResource(NS + "Error");
-
     public final static Resource Function = ResourceFactory.createResource(NS + "Function");
 
     public final static Resource Functions = ResourceFactory.createResource(NS + "Functions");
@@ -84,6 +82,8 @@ public class SH {
     public final static Resource text = ResourceFactory.createResource(NS + "text");
 
     public final static Resource ValidationResult = ResourceFactory.createResource(NS + "ValidationResult");
+
+    public final static Resource Violation = ResourceFactory.createResource(NS + "Violation");
 
     public final static Resource Warning = ResourceFactory.createResource(NS + "Warning");
 

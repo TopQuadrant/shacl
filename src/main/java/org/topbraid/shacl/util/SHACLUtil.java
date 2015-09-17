@@ -342,7 +342,7 @@ public class SHACLUtil {
 			return !SH.Info.equals(severity);
 		}
 		else { // SH.Error
-			return SH.Error.equals(severity);
+			return SH.Violation.equals(severity);
 		}
 	}
 	

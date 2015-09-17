@@ -53,7 +53,7 @@ public abstract class ConstraintExecutable {
 	 */
 	public Resource getSeverity() {
 		Resource result = JenaUtil.getResourceProperty(getResource(), SH.severity);
-		return result == null ? SH.Error : result;
+		return result == null ? SH.Violation : result;
 	}
 	
 	

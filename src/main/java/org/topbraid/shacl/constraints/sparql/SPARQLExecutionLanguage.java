@@ -178,7 +178,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 			
 			Resource resultType = SH.ValidationResult;
 			Resource severity = executable.getSeverity();
-			RDFNode selectMessage = null;
+			RDFNode selectMessage = sol.get(SH.message.getLocalName());
 			if(JenaDatatypes.TRUE.equals(sol.get(SH.failureVar.getName()))) {
 				resultType = TSH.FailureResult;
 				String message = "Constraint " + SPINLabels.get().getLabel(executable.getResource());
