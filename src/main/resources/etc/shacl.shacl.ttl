@@ -497,7 +497,7 @@ sh:InversePropertyScope
 	sh:sparql """
 		SELECT DISTINCT ?this
 		WHERE {
-			?any ?predicate ?this .
+			?any $predicate ?this .
 		}
 		""" ;
 .
@@ -516,7 +516,7 @@ sh:PropertyScope
 	sh:sparql """
 		SELECT DISTINCT ?this
 		WHERE {
-			?this ?predicate ?any .
+			?this $predicate ?any .
 		}
 		""" ;
 .
@@ -1402,9 +1402,9 @@ sh:ClosedShapeConstraint
 		""" ;
 .
 
-sh:ClosedShape
+sh:Closed
 	a sh:ClosedShapeConstraint ;
-	rdfs:label "Closed shape" ;
+	rdfs:label "Closed" ;
 	rdfs:comment "A singleton instance of sh:ClosedShapeConstraint that can be shared between multiple shape definitions." ; 
 .
 

@@ -22,7 +22,7 @@ ex:MyShape
 	sh:property [
 		sh:predicate sh:nodeShape ;
 	] ;
-	sh:constraint sh:ClosedShape ;
+	sh:constraint sh:Closed ;
 .
 
 # Instances -------------------------------------------------------------------
