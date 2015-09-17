@@ -136,6 +136,7 @@ xsd:boolean a rdfs:Datatype ; rdfs:subClassOf rdfs:Literal ; rdfs:label "boolean
 xsd:date a rdfs:Datatype ; rdfs:subClassOf rdfs:Literal ; rdfs:label "date" .
 xsd:dateTime a rdfs:Datatype ; rdfs:subClassOf rdfs:Literal ; rdfs:label "dateTime" .
 xsd:decimal a rdfs:Datatype ; rdfs:subClassOf rdfs:Literal ; rdfs:label "decimal" .
+xsd:double a rdfs:Datatype ; rdfs:subClassOf rdfs:Literal ; rdfs:label "double" .
 xsd:float a rdfs:Datatype ; rdfs:subClassOf rdfs:Literal ; rdfs:label "float" .
 xsd:integer a rdfs:Datatype ; rdfs:subClassOf rdfs:Literal ; rdfs:label "integer" .
 xsd:string a rdfs:Datatype ; rdfs:subClassOf rdfs:Literal ; rdfs:label "string" .
@@ -686,60 +687,6 @@ sh:AbstractPropertyConstraint
 
 # Arguments -------------------------------------------------------------------
 
-sh:AbstractArgumentDatatypeConstraint
-	a sh:PropertyValueConstraintTemplate ;
-	rdfs:subClassOf sh:AbstractPropertyConstraint ;
-	rdfs:label "Abstract argument datatype constraint" ;
-	rdfs:comment "Enforces a constraint that the value of an argument must be a literal of a certain datatype. sh:text is recommended if the values shall be either strings or string with language tags." ;
-	sh:abstract true ;
-	sh:argument [
-		sh:predicate sh:datatype ;
-		sh:optionalWhenInherited true ;
-		sh:nodeKind sh:IRI ;
-		sh:valueClass rdfs:Datatype ;
-		rdfs:label "datatype" ;
-		rdfs:comment "The datatype that all values of the property must have." ;
-	] ;
-	sh:message "Values must have datatype {?datatype}" ;
-	sh:validationFunction sh:hasDatatype ;
-.
-
-sh:AbstractArgumentMaxCountConstraint
-	a sh:ConstraintTemplate ;
-	rdfs:subClassOf sh:AbstractPropertyConstraint ;
-	rdfs:label "Abstract argument max count constraint" ;
-	sh:abstract true ;
-	sh:message "Arguments cannot have more than one value." ;
-	sh:sparql """
-		SELECT $this ($this AS ?subject) $predicate
-		WHERE {
-			FILTER EXISTS {
-				$this $predicate ?value1 .
-				$this $predicate ?value2 .
-				FILTER (?value1 != ?value2) .
-			}
-		}
-		""" ;
-.
-
-sh:AbstractArgumentValueClassConstraint
-	a sh:PropertyValueConstraintTemplate ;
-	rdfs:subClassOf sh:AbstractPropertyConstraint ;
-	rdfs:label "Abstract argument value class constraint" ;
-	rdfs:comment "Enforces a constraint that the value of an argument must be of a certain type. This will accept instances of subclasses." ;
-	sh:abstract true ;
-	sh:argument [
-		sh:predicate sh:valueClass ;
-		sh:optionalWhenInherited true ;
-		sh:nodeKind sh:IRI ;
-		sh:valueClass rdfs:Class ;
-		rdfs:label "value class" ;
-		rdfs:comment "The type that all values of the property must have, based on the semantics defined by the function sh:hasValueClass." ;
-	] ;
-	sh:message "Values must be instances of {?valueClass}" ;
-	sh:validationFunction sh:hasValueClass ;
-.
-
 sh:AbstractOptionalArgumentConstraint
 	a sh:ConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
@@ -777,11 +724,10 @@ sh:AbstractOptionalArgumentConstraint
 
 sh:Argument
 	a sh:ConstraintTemplate ;
+	rdfs:subClassOf sh:AbstractDatatypePropertyConstraint ;
+	rdfs:subClassOf sh:AbstractNodeKindPropertyConstraint ;
 	rdfs:subClassOf sh:AbstractOptionalArgumentConstraint ;
-	rdfs:subClassOf sh:AbstractArgumentDatatypeConstraint ;
-	rdfs:subClassOf sh:AbstractArgumentMaxCountConstraint ;
-	rdfs:subClassOf sh:AbstractArgumentValueClassConstraint ;
-	# TODO: Should we support node kinds here too?
+	rdfs:subClassOf sh:AbstractValueClassPropertyConstraint ;
 	rdfs:label "Argument" ;
 	rdfs:comment "Declares an argument that gets mapped to a variable in the parameterized SPARQL query." ;
 	sh:labelTemplate "Argument {?predicate} : {?datatype}{?valueClass}" ;
@@ -794,7 +740,7 @@ sh:Argument
 		sh:maxCount 1 ;
 	] ;
 	sh:constraint [
-		sh:message "Arguments cannot have both ?datatype and ?valueClass." ;
+		sh:message "Arguments cannot have both ?datatype and ?valueClass" ;
 		sh:predicate sh:datatype ;
 		sh:sparql """
 			SELECT *
@@ -806,6 +752,17 @@ sh:Argument
 			}
 			""" ;
 	] ;
+	sh:message "Arguments cannot have more than one value." ;
+	sh:sparql """
+		SELECT $this ($this AS ?subject) $predicate
+		WHERE {
+			FILTER EXISTS {
+				$this $predicate ?value1 .
+				$this $predicate ?value2 .
+				FILTER (?value1 != ?value2) .
+			}
+		}
+		""" ;
 .
 
 # Property constraints --------------------------------------------------------
@@ -2016,6 +1973,7 @@ sh:shapes a rdf:Property ; rdfs:label "shapes" .
 sh:shapesGraph a rdf:Property ; rdfs:label "shapes graph" .
 sh:sourceConstraint a rdf:Property ; rdfs:label "source constraint" .
 sh:sourceShape a rdf:Property ; rdfs:label "source shape" .
+sh:sourceTemplate a rdf:Property ; rdfs:label "source template" .
 sh:sparql a rdf:Property ; rdfs:label "SPARQL" .
 sh:subject a rdf:Property ; rdfs:label "subject" .
 sh:valueClass a rdf:Property ; rdfs:label "value class" .

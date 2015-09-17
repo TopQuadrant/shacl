@@ -197,8 +197,8 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 			result.addProperty(SH.severity, severity);
 			result.addProperty(SH.sourceConstraint, constraint);
 			result.addProperty(SH.sourceShape, shape);
-			if(executable.getTemplateCall() != null) {
-				result.addProperty(SH.sourceTemplate, executable.getTemplateCall().getTemplate());
+			if(executable instanceof TemplateConstraintExecutable) {
+				result.addProperty(SH.sourceTemplate, ((TemplateConstraintExecutable)executable).getResource());
 			}
 			
 			if(selectMessage != null) {

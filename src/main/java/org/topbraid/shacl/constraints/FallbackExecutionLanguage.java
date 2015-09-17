@@ -42,8 +42,8 @@ public class FallbackExecutionLanguage implements ExecutionLanguage {
 		result.addProperty(SH.message, "No execution language found for constraint");
 		result.addProperty(SH.sourceConstraint, constraint);
 		result.addProperty(SH.sourceShape, shape);
-		if(executable.getTemplateCall() != null) {
-			result.addProperty(SH.sourceTemplate, executable.getTemplateCall().getTemplate());
+		if(executable instanceof TemplateConstraintExecutable) {
+			result.addProperty(SH.sourceTemplate, ((TemplateConstraintExecutable)executable).getResource());
 		}
 		if(focusNode != null) {
 			result.addProperty(SH.focusNode, focusNode);
