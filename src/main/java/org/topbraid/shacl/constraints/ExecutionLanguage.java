@@ -7,6 +7,7 @@ import org.topbraid.shacl.model.SHACLTemplateCall;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 /**
@@ -21,9 +22,9 @@ public interface ExecutionLanguage {
 	
 	boolean canExecuteScope(Resource executable);
 	
-	void executeConstraint(Dataset dataset, Resource shape, URI shapesGraphURI, SHACLConstraint constraint, ConstraintExecutable executable, Resource focusNode, Model results);
+	void executeConstraint(Dataset dataset, Resource shape, URI shapesGraphURI, SHACLConstraint constraint, ConstraintExecutable executable, RDFNode focusNode, Model results);
 
-	Iterable<Resource> executeScope(Dataset dataset, Resource executable, SHACLTemplateCall templateCall);
+	Iterable<RDFNode> executeScope(Dataset dataset, Resource executable, SHACLTemplateCall templateCall);
 	
-	boolean isNodeInScope(Resource focusNode, Dataset dataset, Resource executable, SHACLTemplateCall templateCall);
+	boolean isNodeInScope(RDFNode focusNode, Dataset dataset, Resource executable, SHACLTemplateCall templateCall);
 }

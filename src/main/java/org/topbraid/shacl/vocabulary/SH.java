@@ -59,6 +59,8 @@ public class SH {
     
     public final static Resource NativeScope = ResourceFactory.createResource(NS + "NativeScope");
     
+    public final static Resource NodeConstraintTemplate = ResourceFactory.createResource(NS + "NodeConstraintTemplate");
+    
     public final static Resource OrConstraint = ResourceFactory.createResource(NS + "OrConstraint");
 
     public final static Resource PropertyConstraint = ResourceFactory.createResource(NS + "PropertyConstraint");

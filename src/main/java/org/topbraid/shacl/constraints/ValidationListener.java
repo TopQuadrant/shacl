@@ -1,6 +1,7 @@
 package org.topbraid.shacl.constraints;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 /**
@@ -10,8 +11,8 @@ import com.hp.hpl.jena.rdf.model.Resource;
  */
 public interface ValidationListener {
 	
-	void validationFinished(Resource shape, ConstraintExecutable executable, Resource focusNode, ExecutionLanguage lang, Model results);
+	void validationFinished(Resource shape, ConstraintExecutable executable, RDFNode focusNode, ExecutionLanguage lang, Model results);
 
 	
-	void validationStarting(Resource shape, ConstraintExecutable executable, Resource focusNode, ExecutionLanguage lang, Model results);
+	void validationStarting(Resource shape, ConstraintExecutable executable, RDFNode focusNode, ExecutionLanguage lang, Model results);
 }

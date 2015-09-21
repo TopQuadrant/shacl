@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 /**
@@ -38,7 +39,7 @@ public class AbstractConstraintValidator {
 	}
 	
 	
-	protected void notifyValidationFinished(Resource shape, ConstraintExecutable executable, Resource focusNode, ExecutionLanguage lang, Model results) {
+	protected void notifyValidationFinished(Resource shape, ConstraintExecutable executable, RDFNode focusNode, ExecutionLanguage lang, Model results) {
 		for(ValidationListener listener : listeners) {
 			listener.validationFinished(shape, executable, focusNode, lang, results);
 		}
@@ -51,7 +52,7 @@ public class AbstractConstraintValidator {
 	}
 	
 	
-	protected void notifyValidationStarting(Resource shape, ConstraintExecutable executable, Resource focusNode, ExecutionLanguage lang, Model results) {
+	protected void notifyValidationStarting(Resource shape, ConstraintExecutable executable, RDFNode focusNode, ExecutionLanguage lang, Model results) {
 		oldResultsModel = currentResultsModel.get();
 		currentResultsModel.set(results);
 		for(ValidationListener listener : listeners) {

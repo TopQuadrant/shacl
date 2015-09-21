@@ -82,7 +82,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 	@Override
 	public void executeConstraint(Dataset dataset, Resource shape, URI shapesGraphURI,
 			SHACLConstraint constraint, ConstraintExecutable executable,
-			Resource focusNode, Model results) {
+			RDFNode focusNode, Model results) {
 		
 		Resource resource = executable.getResource();
 		String sparql = JenaUtil.getStringProperty(resource, SH.sparql);
@@ -167,97 +167,107 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 
 
 	private static int executeSelectQuery(Model results, SHACLConstraint constraint, Resource shape,
-			Resource focusNode, ConstraintExecutable executable,
+			RDFNode focusNode, ConstraintExecutable executable,
 			QueryExecution qexec) {
 	
 		ResultSet rs = qexec.execSelect();
 		int violationCount = 0;
-		List<Literal> defaultMessages = executable.getMessages();
-		while(rs.hasNext()) {
-			QuerySolution sol = rs.next();
-			
-			Resource resultType = SH.ValidationResult;
-			Resource severity = executable.getSeverity();
-			RDFNode selectMessage = sol.get(SH.message.getLocalName());
-			if(JenaDatatypes.TRUE.equals(sol.get(SH.failureVar.getName()))) {
-				resultType = TSH.FailureResult;
-				String message = "Constraint " + SPINLabels.get().getLabel(executable.getResource());
-				if(executable.getTemplateCall() != null) {
-					message += " of type " + SPINLabels.get().getLabel(executable.getTemplateCall().getTemplate());
-				}
-				message += " has produced ?" + SH.failureVar.getName();
-				if(focusNode != null) {
-					message += " for focus node " + SPINLabels.get().getLabel(focusNode);
-				}
-				FailureLog.get().logFailure(message);
-				selectMessage = ResourceFactory.createTypedLiteral("Validation Failure: Could not validate shape");
-			}
-			
-			Resource result = results.createResource(resultType);
-			result.addProperty(SH.severity, severity);
-			result.addProperty(SH.sourceConstraint, constraint);
-			result.addProperty(SH.sourceShape, shape);
-			if(executable instanceof TemplateConstraintExecutable) {
-				result.addProperty(SH.sourceTemplate, ((TemplateConstraintExecutable)executable).getResource());
-			}
-			
-			if(selectMessage != null) {
-				result.addProperty(SH.message, selectMessage);
-			}
-			else {
-				for(Literal defaultMessage : defaultMessages) {
+		try {
+			List<Literal> defaultMessages = executable.getMessages();
+			while(rs.hasNext()) {
+				QuerySolution sol = rs.next();
+				
+				Resource resultType = SH.ValidationResult;
+				Resource severity = executable.getSeverity();
+				RDFNode selectMessage = sol.get(SH.message.getLocalName());
+				if(JenaDatatypes.TRUE.equals(sol.get(SH.failureVar.getName()))) {
+					resultType = TSH.FailureResult;
+					String message = "Constraint " + SPINLabels.get().getLabel(executable.getResource());
 					if(executable.getTemplateCall() != null) {
-						QuerySolutionMap map = new QuerySolutionMap();
-						Iterator<String> varNames = sol.varNames();
-						while(varNames.hasNext()) {
-							String varName = varNames.next();
-							RDFNode value = sol.get(varName);
-							if(value != null) {
-								map.add(varName, value);
-							}
-						}
-						Map<String,RDFNode> args = ((TemplateConstraintExecutable)executable).getTemplateCall().getArgumentsMapByVarNames();
-						for(String varName : args.keySet()) {
-							if(!map.contains(varName)) {
-								map.add(varName, args.get(varName));
-							}
-						}
-						sol = map;
+						message += " of type " + SPINLabels.get().getLabel(executable.getTemplateCall().getTemplate());
 					}
-					result.addProperty(SH.message, SPARQLSubstitutions.withSubstitutions(defaultMessage, sol));
+					message += " has produced ?" + SH.failureVar.getName();
+					if(focusNode != null) {
+						message += " for focus node ";
+						if(focusNode.isLiteral()) {
+							message += focusNode;
+						}
+						else {
+							message += SPINLabels.get().getLabel((Resource)focusNode);
+						}
+					}
+					FailureLog.get().logFailure(message);
+					selectMessage = ResourceFactory.createTypedLiteral("Validation Failure: Could not validate shape");
 				}
+				
+				Resource result = results.createResource(resultType);
+				result.addProperty(SH.severity, severity);
+				result.addProperty(SH.sourceConstraint, constraint);
+				result.addProperty(SH.sourceShape, shape);
+				if(executable instanceof TemplateConstraintExecutable) {
+					result.addProperty(SH.sourceTemplate, ((TemplateConstraintExecutable)executable).getResource());
+				}
+				
+				if(selectMessage != null) {
+					result.addProperty(SH.message, selectMessage);
+				}
+				else {
+					for(Literal defaultMessage : defaultMessages) {
+						if(executable.getTemplateCall() != null) {
+							QuerySolutionMap map = new QuerySolutionMap();
+							Iterator<String> varNames = sol.varNames();
+							while(varNames.hasNext()) {
+								String varName = varNames.next();
+								RDFNode value = sol.get(varName);
+								if(value != null) {
+									map.add(varName, value);
+								}
+							}
+							Map<String,RDFNode> args = ((TemplateConstraintExecutable)executable).getTemplateCall().getArgumentsMapByVarNames();
+							for(String varName : args.keySet()) {
+								if(!map.contains(varName)) {
+									map.add(varName, args.get(varName));
+								}
+							}
+							sol = map;
+						}
+						result.addProperty(SH.message, SPARQLSubstitutions.withSubstitutions(defaultMessage, sol));
+					}
+				}
+				
+				RDFNode selectPath = sol.get(SH.predicateVar.getVarName());
+				if(selectPath instanceof Resource) {
+					result.addProperty(SH.predicate, selectPath);
+				}
+				
+				RDFNode selectObject = sol.get(SH.objectVar.getVarName());
+				if(selectObject != null) {
+					result.addProperty(SH.object, selectObject);
+				}
+				
+				RDFNode selectSubject = sol.get(SH.subjectVar.getVarName());
+				if(selectSubject instanceof Resource) {
+					result.addProperty(SH.subject, selectSubject);
+				}
+				
+				RDFNode thisValue = sol.get(SH.thisVar.getVarName());
+				if(thisValue != null) {
+					result.addProperty(SH.focusNode, thisValue);
+				}
+		
+				violationCount++;
 			}
-			
-			RDFNode selectPath = sol.get(SH.predicateVar.getVarName());
-			if(selectPath instanceof Resource) {
-				result.addProperty(SH.predicate, selectPath);
-			}
-			
-			RDFNode selectObject = sol.get(SH.objectVar.getVarName());
-			if(selectObject != null) {
-				result.addProperty(SH.object, selectObject);
-			}
-			
-			RDFNode selectSubject = sol.get(SH.subjectVar.getVarName());
-			if(selectSubject instanceof Resource) {
-				result.addProperty(SH.subject, selectSubject);
-			}
-			
-			RDFNode thisValue = sol.get(SH.thisVar.getVarName());
-			if(thisValue != null) {
-				result.addProperty(SH.focusNode, thisValue);
-			}
-	
-			violationCount++;
 		}
-		qexec.close();
+		finally {
+			qexec.close();
+		}
 		
 		return violationCount;
 	}
 
 	
 	@Override
-	public Iterable<Resource> executeScope(Dataset dataset, Resource executable, SHACLTemplateCall templateCall) {
+	public Iterable<RDFNode> executeScope(Dataset dataset, Resource executable, SHACLTemplateCall templateCall) {
 
 		String sparql = JenaUtil.getStringProperty(executable, SH.sparql);
 		String queryString = ARQFactory.get().createPrefixDeclarations(executable.getModel()) + sparql;
@@ -277,15 +287,15 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 			qexec.setInitialBinding(bindings);
 		}
 
-		Set<Resource> results = new HashSet<Resource>();
+		Set<RDFNode> results = new HashSet<RDFNode>();
 		ResultSet rs = qexec.execSelect();
 		List<String> varNames = rs.getResultVars();
 		while(rs.hasNext()) {
 			QuerySolution qs = rs.next();
 			for(String varName : varNames) {
 				RDFNode value = qs.get(varName);
-				if(value instanceof Resource) {
-					results.add((Resource)value);
+				if(value != null) {
+					results.add(value);
 				}
 			}
 		}
@@ -295,7 +305,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 
 	
 	@Override
-	public boolean isNodeInScope(Resource focusNode, Dataset dataset, Resource executable, SHACLTemplateCall templateCall) {
+	public boolean isNodeInScope(RDFNode focusNode, Dataset dataset, Resource executable, SHACLTemplateCall templateCall) {
 
 		// If sh:sparql exists only, then we expect run the query with ?this pre-bound
 		String sparql = JenaUtil.getStringProperty(executable, SH.sparql);
@@ -332,56 +342,70 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 	
 	private String createSPARQLFromValidationFunction(TemplateConstraintExecutable executable) {
 		Resource function = executable.getValidationFunction();
-		boolean pvc = JenaUtil.hasIndirectType(executable.getResource(), SH.PropertyValueConstraintTemplate);
 		StringBuffer sb = new StringBuffer("SELECT ?this ");
-		if(pvc) {
-			sb.append("(?this AS ?subject) ?predicate (?value AS ?object)");
+		if(JenaUtil.hasIndirectType(executable.getResource(), SH.NodeConstraintTemplate)) {
+			sb.append("\nWHERE {\n");
+			sb.append("    FILTER (!<" + function + ">(?this");
+			SHACLFunction f = SHACLFactory.asFunction(function);
+			Iterator<SHACLArgument> args = f.getOrderedArguments().iterator();
+			args.next(); // Skip ?value
+			while(args.hasNext()) {
+				sb.append(", ?");
+				sb.append(args.next().getVarName());
+			}
+			sb.append(")) .\n}");
 		}
 		else {
-			sb.append("(?value AS ?subject) ?predicate (?this AS ?object)");
+			boolean pvc = JenaUtil.hasIndirectType(executable.getResource(), SH.PropertyValueConstraintTemplate);
+			if(pvc) {
+				sb.append("(?this AS ?subject) ?predicate (?value AS ?object)");
+			}
+			else {
+				sb.append("(?value AS ?subject) ?predicate (?this AS ?object)");
+			}
+			
+			// Collect other variables used in sh:messages
+			Set<String> otherVarNames = new HashSet<String>();
+			for(Literal message : executable.getMessages()) {
+				SPARQLSubstitutions.addMessageVarNames(message.getLexicalForm(), otherVarNames);
+			}
+			otherVarNames.remove("subject");
+			otherVarNames.remove("predicate");
+			otherVarNames.remove("object");
+			for(String varName : otherVarNames) {
+				sb.append(" ?" + varName);
+			}
+			
+			// Create body
+			sb.append("\nWHERE {\n");
+			if(pvc) {
+				sb.append("    ?this ?predicate ?value .\n");
+			}
+			else {
+				sb.append("    ?value ?predicate ?this .\n");
+			}
+			
+			sb.append("    FILTER (!<" + function + ">(?value");
+			SHACLFunction f = SHACLFactory.asFunction(function);
+			Iterator<SHACLArgument> args = f.getOrderedArguments().iterator();
+			args.next(); // Skip ?value
+			while(args.hasNext()) {
+				sb.append(", ?");
+				sb.append(args.next().getVarName());
+			}
+			sb.append(")) .\n}");
+			
+			/* TODO: Faster variation: insert the body of the ASK query directly.
+			 * Was causing unknown issues with Jena when executed for a given resource, requires investigation
+			sb.append("    FILTER NOT EXISTS {");
+			String sparql = JenaUtil.getStringProperty(function, SH.sparql);
+			int startIndex = sparql.indexOf('{');
+			int endIndex = sparql.lastIndexOf('}');
+			String body = sparql.substring(startIndex + 1, endIndex);
+			sb.append(body);
+			sb.append("\n    }\n}");
+			 */
 		}
-		
-		// Collect other variables used in sh:messages
-		Set<String> otherVarNames = new HashSet<String>();
-		for(Literal message : executable.getMessages()) {
-			SPARQLSubstitutions.addMessageVarNames(message.getLexicalForm(), otherVarNames);
-		}
-		otherVarNames.remove("subject");
-		otherVarNames.remove("predicate");
-		otherVarNames.remove("object");
-		for(String varName : otherVarNames) {
-			sb.append(" ?" + varName);
-		}
-		
-		// Create body
-		sb.append("\nWHERE {\n");
-		if(pvc) {
-			sb.append("    ?this ?predicate ?value .\n");
-		}
-		else {
-			sb.append("    ?value ?predicate ?this .\n");
-		}
-		
-		sb.append("    FILTER (!<" + function + ">(?value");
-		SHACLFunction f = SHACLFactory.asFunction(function);
-		Iterator<SHACLArgument> args = f.getOrderedArguments().iterator();
-		args.next(); // Skip ?value
-		while(args.hasNext()) {
-			sb.append(", ?");
-			sb.append(args.next().getVarName());
-		}
-		sb.append(")) .\n}");
-		
-		/* TODO: Faster variation: insert the body of the ASK query directly.
-		 * Was causing unknown issues with Jena when executed for a given resource, requires investigation
-		sb.append("    FILTER NOT EXISTS {");
-		String sparql = JenaUtil.getStringProperty(function, SH.sparql);
-		int startIndex = sparql.indexOf('{');
-		int endIndex = sparql.lastIndexOf('}');
-		String body = sparql.substring(startIndex + 1, endIndex);
-		sb.append(body);
-		sb.append("\n    }\n}");
-		 */
 		
 		return sb.toString();
 	}

@@ -5,6 +5,7 @@ import org.topbraid.shacl.vocabulary.TSH;
 import org.topbraid.spin.util.JenaUtil;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 /**
@@ -29,7 +30,7 @@ public class SuccessRecordingValidationListener implements ValidationListener {
 	
 	@Override
 	public void validationFinished(Resource shape,
-			ConstraintExecutable executable, Resource focusNode,
+			ConstraintExecutable executable, RDFNode focusNode,
 			ExecutionLanguage lang, Model results) {
 		if(results.size() == oldSize) {
 			Resource success = model.createResource(TSH.SuccessResult);
@@ -47,7 +48,7 @@ public class SuccessRecordingValidationListener implements ValidationListener {
 	
 	@Override
 	public void validationStarting(Resource shape,
-			ConstraintExecutable executable, Resource focusNode,
+			ConstraintExecutable executable, RDFNode focusNode,
 			ExecutionLanguage lang, Model results) {
 		oldSize = results.size();
 	}

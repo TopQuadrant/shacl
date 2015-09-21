@@ -119,7 +119,7 @@ public class SHACLUtil {
 	 * @param results  the Set to add the resulting Nodes to
 	 */
 	public static void addNodesInScope(Resource scope, Dataset dataset, Set<Node> results) {
-		for(Resource focusNode : getResourcesInScope(scope, dataset)) {
+		for(RDFNode focusNode : getResourcesInScope(scope, dataset)) {
 			results.add(focusNode.asNode());
 		}
 	}
@@ -302,11 +302,11 @@ public class SHACLUtil {
 
 
 	/**
-	 * Gets all resources from a given sh:scope.
+	 * Gets all nodes from a given sh:scope.
 	 * @param scope  the value of sh:scope (template call or native scope)
 	 * @param dataset  the dataset to operate on
 	 */
-	public static Iterable<Resource> getResourcesInScope(Resource scope, Dataset dataset) {
+	public static Iterable<RDFNode> getResourcesInScope(Resource scope, Dataset dataset) {
 		Resource type = JenaUtil.getType(scope);
 		Resource executable;
 		SHACLTemplateCall templateCall = null;

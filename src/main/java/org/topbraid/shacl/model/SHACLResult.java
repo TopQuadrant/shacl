@@ -9,7 +9,7 @@ public interface SHACLResult extends SHACLResource {
 	String getMessage();
 	
 	
-	Resource getFocusNode();
+	RDFNode getFocusNode();
 
 	
 	Resource getSourceConstraint();

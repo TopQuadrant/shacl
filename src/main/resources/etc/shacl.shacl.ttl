@@ -1,7 +1,7 @@
 # baseURI: http://www.w3.org/ns/shacl
 
 # SHACL - Shapes Constraint Language
-# Draft last edited on 2015-09-17
+# Draft last edited on 2015-09-21
 # Editor: Holger Knublauch <holger@topquadrant.com>
 
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -612,10 +612,10 @@ sh:ConstraintTemplate
 	] ;
 .
 
-sh:AbstractValueConstraintTemplate
+sh:AbstractValidationConstraintTemplate
 	a sh:ShapeClass ;
 	rdfs:subClassOf sh:ConstraintTemplate ;
-	rdfs:label "Abstract value constraint template" ;
+	rdfs:label "Abstract validation constraint template" ;
 	rdfs:comment "A constraint template that points to a function that validates one given value at a time." ;
 	sh:property [
 		sh:predicate sh:validationFunction ;
@@ -628,18 +628,25 @@ sh:AbstractValueConstraintTemplate
 	sh:abstract true ;
 .
 
+sh:NodeConstraintTemplate
+	a sh:ShapeClass ;
+	rdfs:subClassOf sh:AbstractValidationConstraintTemplate ;
+	rdfs:label "Node constraint template" ;
+	rdfs:comment "A constraint template that validates the focus node using the validation function." ;
+.
+
 sh:PropertyValueConstraintTemplate
 	a sh:ShapeClass ;
-	rdfs:subClassOf sh:AbstractValueConstraintTemplate ;
+	rdfs:subClassOf sh:AbstractValidationConstraintTemplate ;
 	rdfs:label "Property value constraint template" ;
-	rdfs:comment "A value constraint template that validates all objects of triples that have the given focus node as subject and the given predicate." ;
+	rdfs:comment "A constraint template that validates all objects of triples that have the given focus node as subject and the given predicate." ;
 .
 
 sh:InversePropertyValueConstraintTemplate
 	a sh:ShapeClass ;
-	rdfs:subClassOf sh:AbstractValueConstraintTemplate ;
+	rdfs:subClassOf sh:AbstractValidationConstraintTemplate ;
 	rdfs:label "Inverse property value constraint template" ;
-	rdfs:comment "A value constraint template that validates all subjects of triples that have the given focus node as object and the given predicate." ;
+	rdfs:comment "A constraint template that validates all subjects of triples that have the given focus node as object and the given predicate." ;
 .
 
 # TODO: This name is easy to confuse with sh:ConstraintTemplate
@@ -964,7 +971,7 @@ sh:AbstractValueShapePropertyConstraint
 		SELECT $this ($this AS ?subject) $predicate ?object ?failure
 		WHERE {
 			$this $predicate ?object .
-			BIND (sh:hasShape(?object, $valueShape, $shapesGraph) AS ?hasShape) .
+			BIND (sh:hasShape(?object, $valueShape, $shapesGraph, false) AS ?hasShape) .
 			BIND (!bound(?hasShape) AS ?failure) .
 			FILTER (?failure || !?hasShape) .
 		}
@@ -1210,7 +1217,7 @@ sh:AbstractValueShapeInversePropertyConstraint
 		SELECT $this ($this AS ?object) $predicate ?subject ?failure
 		WHERE {
 			?subject $predicate $this .
-			BIND (sh:hasShape(?subject, $valueShape, $shapesGraph) AS ?hasShape) .
+			BIND (sh:hasShape(?subject, $valueShape, $shapesGraph, false) AS ?hasShape) .
 			BIND (!bound(?hasShape) AS ?failure) .
 			FILTER (?failure || !?hasShape) .
 		}
@@ -1330,6 +1337,235 @@ sh:NotEqualConstraint
 			$this $predicate2 ?object .
 		}
 		"""
+.
+
+# Node constraints ------------------------------------------------------------
+
+sh:AbstractAllowedValuesNodeConstraint
+	a sh:NodeConstraintTemplate ;
+	rdfs:subClassOf sh:TemplateConstraint ;
+	rdfs:label "Abstract allowed values node constraint" ;
+	rdfs:comment "Specifies the allowed values by pointing to a List of nodes." ;
+	sh:abstract true ;
+	sh:argument [
+		sh:predicate sh:allowedValues ;
+		sh:optionalWhenInherited true ;
+		sh:valueClass rdf:List ;
+		rdfs:label "allowed values" ;
+		rdfs:comment "The rdf:List containing the allowed values of the property." ;
+	] ;
+	sh:message "Value is not one of the allowed values" ;
+	sh:validationFunction sh:isAllowedValue ;
+.
+
+sh:AbstractDatatypeNodeConstraint
+	a sh:NodeConstraintTemplate ;
+	rdfs:subClassOf sh:TemplateConstraint ;
+	rdfs:label "Abstract datatype node constraint" ;
+	rdfs:comment "Enforces a constraint that the focus nodes must be literals of a certain datatype." ;
+	sh:abstract true ;
+	sh:argument [
+		sh:predicate sh:datatype ;
+		sh:optionalWhenInherited true ;
+		sh:nodeKind sh:IRI ;
+		sh:valueClass rdfs:Datatype ;
+		rdfs:label "datatype" ;
+		rdfs:comment "The datatype that the focus nodes must have. sh:text is recommended if the values shall be either strings or string with language tags." ;
+	] ;
+	sh:message "Must have datatype {?datatype}" ;
+	sh:validationFunction sh:hasDatatype ;
+.
+
+sh:AbstractDirectValueTypeNodeConstraint
+	a sh:NodeConstraintTemplate ;
+	rdfs:subClassOf sh:TemplateConstraint ;
+	rdfs:label "Abstract direct value type node constraint" ;
+	rdfs:comment "Enforces a constraint that the focus nodes must be of a certain (direct) type. In contrast to sh:valueClass this does not include instances of subclasses." ;
+	sh:abstract true ;
+	sh:argument [
+		sh:predicate sh:directValueType ;
+		sh:optionalWhenInherited true ;
+		sh:nodeKind sh:IRI ;
+		sh:valueClass rdfs:Class ;
+		rdfs:label "direct value type" ;
+		rdfs:comment "The type that all values of the property must have, excluding subclasses." ;
+	] ;
+	sh:message "Must be direct instances of {?directValueType}" ;
+	sh:validationFunction sh:hasDirectValueType ;
+.
+
+sh:AbstractNodeKindNodeConstraint
+	a sh:NodeConstraintTemplate ;
+	rdfs:subClassOf sh:TemplateConstraint ;
+	rdfs:label "Abstract node kind node constraint" ;
+	rdfs:comment "Specifies the valid node kind of the focus node." ;
+	sh:abstract true ;
+	sh:argument [
+		sh:predicate sh:nodeKind ;
+		sh:optionalWhenInherited true ;
+		sh:valueClass sh:NodeKind ;
+		rdfs:label "node kind" ;
+		rdfs:comment "The node kind that all focus nodes must be of." ;
+	] ;
+	sh:message "Must be of kind {?nodeKind}" ;
+	sh:validationFunction sh:hasNodeKind ;
+.
+
+sh:AbstractClassNodeConstraint
+	a sh:NodeConstraintTemplate ;
+	rdfs:subClassOf sh:TemplateConstraint ;
+	rdfs:label "Abstract value class node constraint" ;
+	rdfs:comment "Enforces a constraint that all focus nodes must be of a certain type. For resources this will accept instances of subclasses." ;
+	sh:abstract true ;
+	sh:argument [
+		sh:predicate sh:valueClass ;
+		sh:optionalWhenInherited true ;
+		sh:nodeKind sh:IRI ;
+		sh:valueClass rdfs:Class ;
+		rdfs:label "value class" ;
+		rdfs:comment "The type that all focus nodes must have, based on the semantics defined by the function sh:hasValueClass." ;
+	] ;
+	sh:message "Must be instances of {?valueClass}" ;
+	sh:validationFunction sh:hasValueClass ;
+.
+
+sh:AbstractLengthNodeConstraint
+	a sh:NodeConstraintTemplate ;
+	rdfs:subClassOf sh:TemplateConstraint ;
+	rdfs:label "Abstract length node constraint" ;
+	rdfs:comment "Specifies the minimum and maximum string length of nodes." ;
+	sh:abstract true ;
+	sh:argument [
+		sh:predicate sh:minLength ;
+		sh:optional true ;
+		sh:optionalWhenInherited true ;
+		sh:datatype xsd:integer ;
+		rdfs:label "min length" ;
+		rdfs:comment "The minimum string length permitted for the focus nodes." ;
+	] ;
+	sh:argument [
+		sh:predicate sh:maxLength ;
+		sh:optional true ;
+		sh:optionalWhenInherited true ;
+		sh:datatype xsd:integer ;
+		rdfs:label "max length" ;
+		rdfs:comment "The maximum string length permitted for the focus nodes." ;
+	] ;
+	sh:message "Invalid string length." ;
+	sh:validationFunction sh:hasLength ;
+.
+
+sh:AbstractMaxExclusiveNodeConstraint
+	a sh:NodeConstraintTemplate ;
+	rdfs:subClassOf sh:TemplateConstraint ;
+	rdfs:label "Abstract max exclusive constraint" ;
+	rdfs:comment "Specifies an (exclusive) maximum value for literal nodes." ;
+	sh:abstract true ;
+	sh:argument [
+		sh:predicate sh:maxExclusive ;
+		sh:optionalWhenInherited true ;
+		sh:nodeKind sh:Literal ;
+		rdfs:label "max exclusive" ;
+		rdfs:comment "The exclusive maximum value permitted: ?value < ?maxExclusive" ;
+	] ;
+	sh:message "Values must be less than {?maxExclusive}" ;
+	sh:validationFunction sh:hasMaxExclusive ;
+.
+
+sh:AbstractMaxInclusiveNodeConstraint
+	a sh:NodeConstraintTemplate ;
+	rdfs:subClassOf sh:TemplateConstraint ;
+	rdfs:label "Abstract max inclusive constraint" ;
+	rdfs:comment "Specifies an (inclusive) maximum value for literal nodes." ;
+	sh:abstract true ;
+	sh:argument [
+		sh:predicate sh:maxInclusive ;
+		sh:optionalWhenInherited true ;
+		sh:nodeKind sh:Literal ;
+		rdfs:label "max inclusive" ;
+		rdfs:comment "The inclusive maximum value permitted: ?value <= ?maxInclusive" ;
+	] ;
+	sh:message "Must be less than or equal to {?maxInclusive}" ;
+	sh:validationFunction sh:hasMaxInclusive ;
+.
+
+sh:AbstractMinExclusiveNodeConstraint
+	a sh:NodeConstraintTemplate ;
+	rdfs:subClassOf sh:TemplateConstraint ;
+	rdfs:label "Abstract min exclusive constraint" ;
+	rdfs:comment "Specifies an (exclusive) minimum value for literal nodes." ;
+	sh:abstract true ;
+	sh:argument [
+		sh:predicate sh:minExclusive ;
+		sh:optionalWhenInherited true ;
+		sh:nodeKind sh:Literal ;
+		rdfs:label "min exclusive" ;
+		rdfs:comment "The exclusive minimum value permitted: ?value > ?minExclusive" ;
+	] ;
+	sh:message "Must be greater than {?minExclusive}" ;
+	sh:validationFunction sh:hasMinExclusive ;
+.
+
+sh:AbstractMinInclusiveNodeConstraint
+	a sh:NodeConstraintTemplate ;
+	rdfs:subClassOf sh:TemplateConstraint ;
+	rdfs:label "Abstract min inclusive constraint" ;
+	rdfs:comment "Specifies an (inclusive) minimum value for literal nodes." ;
+	sh:abstract true ;
+	sh:argument [
+		sh:predicate sh:minInclusive ;
+		sh:optionalWhenInherited true ;
+		sh:nodeKind sh:Literal ;
+		rdfs:label "min inclusive" ;
+		rdfs:comment "The inclusive minimum value permitted: ?value >= ?minInclusive" ;
+	] ;
+	sh:message "Must be greater than or equal to {?minInclusive}" ;
+	sh:validationFunction sh:hasMinInclusive ;
+.
+
+sh:AbstractPatternNodeConstraint
+	a sh:NodeConstraintTemplate ;
+	rdfs:subClassOf sh:TemplateConstraint ;
+	rdfs:label "Abstract pattern constraint" ;
+	rdfs:comment "Specifies a regular expression that all nodes need to match." ;
+	sh:abstract true ;
+	sh:argument [
+		sh:predicate sh:pattern ;
+		sh:optionalWhenInherited true ;
+		sh:datatype xsd:string ;
+		rdfs:label "pattern" ;
+		rdfs:comment "The (regular expression) pattern for the focus nodes." ;
+	] ;
+	sh:message "Must match the pattern {?pattern}" ;
+	sh:validationFunction sh:hasPattern ;
+.
+
+sh:NodeConstraint
+	a sh:ConstraintTemplate ;
+	rdfs:subClassOf sh:AbstractAllowedValuesNodeConstraint ;
+	rdfs:subClassOf sh:AbstractDatatypeNodeConstraint ;
+	rdfs:subClassOf sh:AbstractDirectValueTypeNodeConstraint ;
+	rdfs:subClassOf sh:AbstractLengthNodeConstraint ;
+	rdfs:subClassOf sh:AbstractMaxExclusiveNodeConstraint ;
+	rdfs:subClassOf sh:AbstractMaxInclusiveNodeConstraint ;
+	rdfs:subClassOf sh:AbstractMinExclusiveNodeConstraint ;
+	rdfs:subClassOf sh:AbstractMinInclusiveNodeConstraint ;
+	rdfs:subClassOf sh:AbstractNodeKindNodeConstraint ;
+	rdfs:subClassOf sh:AbstractPatternNodeConstraint ;
+	rdfs:subClassOf sh:AbstractClassNodeConstraint ;
+	rdfs:label "Node constraint" ;
+	sh:constraint [
+		sh:message "Node constraints cannot have both datatype and class or directValueType." ;
+		sh:sparql """
+			SELECT $this ($this AS ?subject) (sh:datatype AS ?predicate) ($datatype AS ?object)
+			WHERE {
+				FILTER EXISTS {
+					$this sh:datatype $datatype .
+					$this sh:class|sh:directValueType ?any .
+				}
+			}
+			"""
+	] ;
 .
 
 
@@ -1833,9 +2069,16 @@ sh:valuesWithShapeCount
 		# (this mechanism is used to propagate errors from sh:hasShape calls)
 		SELECT (SUM(?s) AS ?result)
 		WHERE {
-			$arg1 $arg2 ?value .
-			BIND (sh:hasShape(?value, $arg3, $arg4, true) AS ?hasShape) .
-			BIND (IF(bound(?hasShape), IF(?hasShape, 1, 0), 'error') AS ?s) .
+			{
+				FILTER NOT EXISTS { $arg1 $arg2 ?value }
+				BIND (0 AS ?s)
+			}
+			UNION {
+				FILTER EXISTS { $arg1 $arg2 ?value }
+				$arg1 $arg2 ?value .
+				BIND (sh:hasShape(?value, $arg3, $arg4, true) AS ?hasShape) .
+				BIND (IF(bound(?hasShape), IF(?hasShape, 1, 0), 'error') AS ?s) .
+			}
 		}
 		""" ;
 .

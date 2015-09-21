@@ -14,6 +14,7 @@ import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.sparql.core.DatasetImpl;
 import com.hp.hpl.jena.sparql.expr.ExprEvalException;
@@ -60,7 +61,7 @@ public class HasShapeFunction extends AbstractFunction4 {
 				
 				try {
 					Model model = ModelFactory.createModelForGraph(env.getActiveGraph());
-					Resource resource = (Resource) model.asRDFNode(resourceNode);
+					RDFNode resource = model.asRDFNode(resourceNode);
 					Dataset dataset = DatasetImpl.wrap(env.getDataset());
 					Resource shape = (Resource) dataset.getDefaultModel().asRDFNode(shapeNode);
 					Model results = doRun(resource, shape, dataset,	shapesGraphNode);
@@ -80,7 +81,7 @@ public class HasShapeFunction extends AbstractFunction4 {
 	}
 
 
-	protected Model doRun(Resource resource, Resource shape, Dataset dataset,
+	protected Model doRun(RDFNode resource, Resource shape, Dataset dataset,
 			Node shapesGraphNode) {
 		return ResourceConstraintValidator.get().validateNodeAgainstShape(
 				dataset, URI.create(shapesGraphNode.getURI()), resource.asNode(), shape.asNode(), SH.Violation, null);

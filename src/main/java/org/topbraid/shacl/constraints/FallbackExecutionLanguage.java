@@ -10,6 +10,7 @@ import org.topbraid.shacl.vocabulary.TSH;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 /**
@@ -37,7 +38,7 @@ public class FallbackExecutionLanguage implements ExecutionLanguage {
 	@Override
 	public void executeConstraint(Dataset dataset, Resource shape,
 			URI shapesGraphURI, SHACLConstraint constraint, ConstraintExecutable executable,
-			Resource focusNode, Model results) {
+			RDFNode focusNode, Model results) {
 		Resource result = results.createResource(TSH.FailureResult);
 		result.addProperty(SH.message, "No execution language found for constraint");
 		result.addProperty(SH.sourceConstraint, constraint);
@@ -52,14 +53,14 @@ public class FallbackExecutionLanguage implements ExecutionLanguage {
 
 
 	@Override
-	public Iterable<Resource> executeScope(Dataset dataset,
+	public Iterable<RDFNode> executeScope(Dataset dataset,
 			Resource executable, SHACLTemplateCall templateCall) {
 		return Collections.emptyList();
 	}
 
 
 	@Override
-	public boolean isNodeInScope(Resource focusNode, Dataset dataset,
+	public boolean isNodeInScope(RDFNode focusNode, Dataset dataset,
 			Resource executable, SHACLTemplateCall templateCall) {
 		return false;
 	}

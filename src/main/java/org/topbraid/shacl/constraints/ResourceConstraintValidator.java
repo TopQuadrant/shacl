@@ -124,7 +124,7 @@ public class ResourceConstraintValidator extends AbstractConstraintValidator {
 	private void addQueryResults(Model results, 
 			SHACLConstraint constraint,
 			Resource shape,
-			Resource focusNode,
+			RDFNode focusNode,
 			Dataset dataset,
 			URI shapesGraphURI,
 			Resource minSeverity,
@@ -147,7 +147,7 @@ public class ResourceConstraintValidator extends AbstractConstraintValidator {
 			List<Property> constraintProperties, Resource minSeverity, Model results,
 			ProgressMonitor monitor) {
 		
-		Resource resource = (Resource) dataset.getDefaultModel().asRDFNode(resourceNode);
+		RDFNode resource = dataset.getDefaultModel().asRDFNode(resourceNode);
 		Model shapesModel = dataset.getNamedModel(shapesGraphURI.toString());
 		Resource shape = (Resource) shapesModel.asRDFNode(shapeNode);
 		for(Property constraintProperty : constraintProperties) {

@@ -61,7 +61,8 @@ public class TemplateConstraintExecutable extends ConstraintExecutable {
 	
 	
 	public Resource getValidationFunction() {
-		if(JenaUtil.hasIndirectType(template, SH.PropertyValueConstraintTemplate) ||
+		if(JenaUtil.hasIndirectType(template, SH.NodeConstraintTemplate) ||
+				JenaUtil.hasIndirectType(template, SH.PropertyValueConstraintTemplate) ||
 				JenaUtil.hasIndirectType(template, SH.InversePropertyValueConstraintTemplate)) {
 			return template.getPropertyResourceValue(SH.validationFunction);
 		}
