@@ -1,4 +1,4 @@
-package org.topbraid.shacl.vocabulary;
+package org.topbraid.shacl;
 
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;

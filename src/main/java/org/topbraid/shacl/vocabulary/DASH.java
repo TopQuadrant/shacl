@@ -1,0 +1,58 @@
+package org.topbraid.shacl.vocabulary;
+
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
+
+/**
+ * Vocabulary for http://datashapes.org/dash
+ *
+ * Automatically generated with TopBraid Composer.
+ */
+public class DASH {
+
+    public final static String BASE_URI = "http://datashapes.org/dash";
+
+    public final static String NS = BASE_URI + "#";
+
+    public final static String PREFIX = "dash";
+
+
+    public final static Resource FailureResult = ResourceFactory.createResource(NS + "FailureResult");
+    
+    public final static Resource FailureTestCaseResult = ResourceFactory.createResource(NS + "FailureTestCaseResult");
+
+    public final static Resource FunctionTestCase = ResourceFactory.createResource(NS + "FunctionTestCase");
+
+    public final static Resource GraphValidationTestCase = ResourceFactory.createResource(NS + "GraphValidationTestCase");
+
+    public final static Resource NodeValidationTestCase = ResourceFactory.createResource(NS + "NodeValidationTestCase");
+
+    public final static Resource PrimaryKeyPropertyConstraint = ResourceFactory.createResource(NS + "PrimaryKeyPropertyConstraint");
+
+    public final static Resource SuccessResult = ResourceFactory.createResource(NS + "SuccessResult");
+    
+    public final static Resource SuccessTestCaseResult = ResourceFactory.createResource(NS + "SuccessTestCaseResult");
+
+    public final static Resource TestCase = ResourceFactory.createResource(NS + "TestCase");
+
+    public final static Resource ValidationTestCase = ResourceFactory.createResource(NS + "ValidationTestCase");
+
+    
+    public final static Property expectedResult = ResourceFactory.createProperty(NS + "expectedResult");
+
+    public final static Property expression = ResourceFactory.createProperty(NS + "expression");
+
+    public final static Property node = ResourceFactory.createProperty(NS + "node");
+
+    public final static Property testCase = ResourceFactory.createProperty(NS + "testCase");
+
+    public final static Property testGraph = ResourceFactory.createProperty(NS + "testGraph");
+
+    public final static Property uriStart = ResourceFactory.createProperty(NS + "uriStart");
+
+
+    public static String getURI() {
+        return NS;
+    }
+}

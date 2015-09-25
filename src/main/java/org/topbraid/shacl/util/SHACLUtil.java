@@ -14,8 +14,8 @@ import org.topbraid.shacl.model.SHACLFactory;
 import org.topbraid.shacl.model.SHACLPropertyConstraint;
 import org.topbraid.shacl.model.SHACLResult;
 import org.topbraid.shacl.model.SHACLTemplateCall;
+import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.shacl.vocabulary.TSH;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.util.JenaUtil;
 
@@ -185,13 +185,47 @@ public class SHACLUtil {
 		for(Resource r : model.listResourcesWithProperty(RDF.type, SH.ValidationResult).toList()) {
 			results.add(r.as(SHACLResult.class));
 		}
-		for(Resource r : model.listResourcesWithProperty(RDF.type, TSH.FailureResult).toList()) {
+		for(Resource r : model.listResourcesWithProperty(RDF.type, DASH.FailureResult).toList()) {
 			results.add(r.as(SHACLResult.class));
 		}
-		for(Resource r : model.listResourcesWithProperty(RDF.type, TSH.SuccessResult).toList()) {
+		for(Resource r : model.listResourcesWithProperty(RDF.type, DASH.SuccessResult).toList()) {
 			results.add(r.as(SHACLResult.class));
 		}
 		return results;
+	}
+	
+	
+	/**
+	 * Gets all (transitive) superclasses including shapes that reference a class via sh:scopeClass.
+	 * @param cls  the class to start at
+	 * @return a Set of classes and shapes
+	 */
+	public static Set<Resource> getAllSuperClassesAndShapesStar(Resource cls) {
+		Set<Resource> results = new HashSet<Resource>();
+		getAllSuperClassesAndShapesStarHelper(cls, results);
+		return results;
+	}
+	
+	
+	private static void getAllSuperClassesAndShapesStarHelper(Resource node, Set<Resource> results) {
+		if(!results.contains(node)) {
+			results.add(node);
+			{
+				StmtIterator it = node.listProperties(RDFS.subClassOf);
+				while(it.hasNext()) {
+					Statement s = it.next();
+					if(s.getObject().isResource()) {
+						getAllSuperClassesAndShapesStarHelper(s.getResource(), results);
+					}
+				}
+			}
+			{
+				StmtIterator it = node.getModel().listStatements(null, SH.scopeClass, node);
+				while(it.hasNext()) {
+					getAllSuperClassesAndShapesStarHelper(it.next().getSubject(), results);
+				}
+			}
+		}
 	}
 	
 	
@@ -294,7 +328,7 @@ public class SHACLUtil {
 	 */
 	public static List<Property> getPropertiesOfClass(Resource cls) {
 		List<Property> results = new LinkedList<Property>();
-		for(Resource c : JenaUtil.getAllSuperClassesStar(cls)) {
+		for(Resource c : getAllSuperClassesAndShapesStar(cls)) {
 			addDirectPropertiesOfClass(c, results);
 		}
 		return results;

@@ -5,8 +5,8 @@ import java.util.Collections;
 
 import org.topbraid.shacl.model.SHACLConstraint;
 import org.topbraid.shacl.model.SHACLTemplateCall;
+import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.shacl.vocabulary.TSH;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -39,7 +39,7 @@ public class FallbackExecutionLanguage implements ExecutionLanguage {
 	public void executeConstraint(Dataset dataset, Resource shape,
 			URI shapesGraphURI, SHACLConstraint constraint, ConstraintExecutable executable,
 			RDFNode focusNode, Model results) {
-		Resource result = results.createResource(TSH.FailureResult);
+		Resource result = results.createResource(DASH.FailureResult);
 		result.addProperty(SH.message, "No execution language found for constraint");
 		result.addProperty(SH.sourceConstraint, constraint);
 		result.addProperty(SH.sourceShape, shape);

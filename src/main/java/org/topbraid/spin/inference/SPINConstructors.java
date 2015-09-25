@@ -139,21 +139,6 @@ public class SPINConstructors {
 			constructInstance(queryModel, instance, type, targetModel, newResources, new HashSet<Resource>(), class2Constructor, statistics, explanations, monitor);
 		}
 	}
-
-	
-	/**
-	 * Runs all constructors defined for a given type on a given instance.
-	 * @param queryModel  the model to query
-	 * @param instance  the instance to run the constructors of
-	 * @param type  the class to run the constructors of
-	 * @param targetModel  the model that will receive the new triples
-	 * @param newResources  will hold the newly constructed instances
-	 * @param reachedTypes  contains the already reached types
-	 * @param monitor  an optional progress monitor
-	 */
-	public static void constructInstance(Model queryModel, Resource instance, Resource type, Model targetModel, List<Resource> newResources, Set<Resource> reachedTypes, ProgressMonitor monitor) {
-		constructInstance(queryModel, instance, type, targetModel, newResources, reachedTypes, monitor);
-	}
 	
 
 	/**

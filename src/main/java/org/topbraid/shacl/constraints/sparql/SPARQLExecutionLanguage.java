@@ -20,8 +20,8 @@ import org.topbraid.shacl.model.SHACLFactory;
 import org.topbraid.shacl.model.SHACLFunction;
 import org.topbraid.shacl.model.SHACLShape;
 import org.topbraid.shacl.model.SHACLTemplateCall;
+import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.shacl.vocabulary.TSH;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.statistics.SPINStatistics;
 import org.topbraid.spin.statistics.SPINStatisticsManager;
@@ -181,7 +181,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 				Resource severity = executable.getSeverity();
 				RDFNode selectMessage = sol.get(SH.message.getLocalName());
 				if(JenaDatatypes.TRUE.equals(sol.get(SH.failureVar.getName()))) {
-					resultType = TSH.FailureResult;
+					resultType = DASH.FailureResult;
 					String message = "Constraint " + SPINLabels.get().getLabel(executable.getResource());
 					if(executable.getTemplateCall() != null) {
 						message += " of type " + SPINLabels.get().getLabel(executable.getTemplateCall().getTemplate());

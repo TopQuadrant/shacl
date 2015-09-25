@@ -7,7 +7,6 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.topbraid.shacl.constraints.FailureLog;
-import org.topbraid.shacl.vocabulary.MF;
 import org.topbraid.spin.util.JenaUtil;
 
 import com.hp.hpl.jena.rdf.model.Model;

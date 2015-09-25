@@ -9,9 +9,8 @@ import org.junit.Assert;
 import org.topbraid.shacl.arq.SHACLFunctions;
 import org.topbraid.shacl.util.ModelPrinter;
 import org.topbraid.shacl.util.SHACLUtil;
-import org.topbraid.shacl.vocabulary.MF;
+import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.shacl.vocabulary.TSH;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.util.JenaDatatypes;
 import org.topbraid.spin.util.JenaUtil;
@@ -52,7 +51,7 @@ abstract class AbstractSHACLTestClass extends TestCase {
 			Assert.assertTrue("Expected no validation results for " + testResource + ", but found: " + results.size() + " triples:\n" + printed, results.isEmpty());
 		}
 		else if(testResource.hasProperty(MF.result, SHT.Failure)) {
-			if(!results.contains(null, RDF.type, TSH.FailureResult)) {
+			if(!results.contains(null, RDF.type, DASH.FailureResult)) {
 				fail("Validation was expected to produce failure for " + testResource);
 			}
 		}

@@ -1,7 +1,6 @@
 package org.topbraid.shacl;
 
 import org.topbraid.shacl.constraints.ResourceConstraintValidator;
-import org.topbraid.shacl.vocabulary.MF;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
