@@ -43,6 +43,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.vocabulary.RDF;
 
 /**
  * The ExecutionLanguage for SPARQL-based SHACL constraints.
@@ -68,6 +69,11 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 			if(function != null && function.hasProperty(SH.sparql)) {
 				return true;
 			}
+			if(executable.getResource().equals(SH.AbstractDerivedPropertyConstraint) ||
+					executable.getResource().equals(SH.AbstractDerivedInversePropertyConstraint)) {
+				Resource derivedValues = executable.getTemplateCall().getPropertyResourceValue(SH.derivedValues);
+				return derivedValues != null && derivedValues.hasProperty(SH.sparql);
+			}
 		}
 		return false;
 	}
@@ -87,7 +93,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		Resource resource = executable.getResource();
 		String sparql = JenaUtil.getStringProperty(resource, SH.sparql);
 		if(sparql == null && executable instanceof TemplateConstraintExecutable) {
-			sparql = createSPARQLFromValidationFunction((TemplateConstraintExecutable)executable);
+			sparql = createSPARQLFromValidationFunctionOrDerivedValues((TemplateConstraintExecutable)executable);
 		}
 		if(sparql == null) {
 			String message = "Missing " + SH.PREFIX + ":" + SH.sparql.getLocalName() + " of " + SPINLabels.get().getLabel(resource);
@@ -164,7 +170,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 			SPINStatisticsManager.get().add(Collections.singletonList(stats));
 		}
 	}
-
+	
 
 	private static int executeSelectQuery(Model results, SHACLConstraint constraint, Resource shape,
 			RDFNode focusNode, ConstraintExecutable executable,
@@ -340,10 +346,36 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 	}
 	
 	
-	private String createSPARQLFromValidationFunction(TemplateConstraintExecutable executable) {
+	private String createSPARQLFromValidationFunctionOrDerivedValues(TemplateConstraintExecutable executable) {
 		Resource function = executable.getValidationFunction();
 		StringBuffer sb = new StringBuffer("SELECT ?this ");
-		if(JenaUtil.hasIndirectType(executable.getResource(), SH.NodeConstraintTemplate)) {
+		if(executable.getResource().equals(SH.AbstractDerivedPropertyConstraint)) {
+
+			sb.append("($this AS ?subject) $predicate (?value AS ?object) ?message");
+
+			String sparql = executable.getTemplateCall().getPropertyResourceValue(SH.derivedValues).getProperty(SH.sparql).getLiteral().getLexicalForm();
+			sb.append("\nWHERE {\n");
+			sb.append("    {\n");
+			sb.append("        $this $predicate ?value .\n");
+			sb.append("        FILTER NOT EXISTS {\n");
+			sb.append(sparql);
+			sb.append("        }\n");
+			sb.append("        BIND (\"Existing value is not among derived values\" AS ?message) .\n");
+			sb.append("    }\n");
+			sb.append("    UNION {\n");
+			sb.append(sparql);
+			sb.append("\n");
+			sb.append("        FILTER NOT EXISTS {\n");
+			sb.append("            $this $predicate ?value .\n");
+			sb.append("        }\n");
+			sb.append("        BIND (\"Derived value is not among existing values\" AS ?message) .\n");
+			sb.append("    }\n");
+			sb.append("}");
+		}
+		else if(executable.getTemplateCall().hasProperty(RDF.type, SH.AbstractDerivedInversePropertyConstraint)) {
+			// TODO
+		}
+		else if(JenaUtil.hasIndirectType(executable.getResource(), SH.NodeConstraintTemplate)) {
 			sb.append("\nWHERE {\n");
 			sb.append("    FILTER (!<" + function + ">(?this");
 			SHACLFunction f = SHACLFactory.asFunction(function);

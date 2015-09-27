@@ -9,6 +9,7 @@ import org.topbraid.shacl.model.SHACLFactory;
 import org.topbraid.shacl.model.SHACLTemplate;
 import org.topbraid.shacl.model.SHACLTemplateConstraint;
 import org.topbraid.shacl.util.SHACLUtil;
+import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaUtil;
 
 import com.hp.hpl.jena.enhanced.EnhGraph;
@@ -37,7 +38,9 @@ public class SHACLTemplateConstraintImpl extends SHACLTemplateCallImpl implement
 		for(Resource cls : JenaUtil.getAllSuperClassesStar(type)) {
 			SHACLTemplate template = SHACLFactory.asTemplate(cls);
 			TemplateConstraintExecutable executable = new TemplateConstraintExecutable(this, template);
-			if(template.getSPARQL() != null || executable.getValidationFunction() != null) {
+			if(template.getSPARQL() != null || executable.getValidationFunction() != null || 
+					SH.AbstractDerivedPropertyConstraint.equals(template) ||
+					SH.AbstractDerivedInversePropertyConstraint.equals(template)) {
 				if(executable.isComplete()) {
 					results.add(executable);
 				}

@@ -1,7 +1,7 @@
 # baseURI: http://www.w3.org/ns/shacl
 
 # SHACL - Shapes Constraint Language
-# Draft last edited on 2015-09-21
+# Draft last edited on 2015-09-27
 # Editor: Holger Knublauch <holger@topquadrant.com>
 
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -1094,6 +1094,7 @@ sh:PropertyConstraint
 	rdfs:subClassOf sh:AbstractAllowedValuesPropertyConstraint ;
 	rdfs:subClassOf sh:AbstractCountPropertyConstraint ;
 	rdfs:subClassOf sh:AbstractDatatypePropertyConstraint ;
+	rdfs:subClassOf sh:AbstractDerivedPropertyConstraint ;
 	rdfs:subClassOf sh:AbstractDirectValueTypePropertyConstraint ;
 	rdfs:subClassOf sh:AbstractHasValuePropertyConstraint ;
 	rdfs:subClassOf sh:AbstractLengthPropertyConstraint ;
@@ -1228,11 +1229,48 @@ sh:InversePropertyConstraint
 	a sh:ConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractAllowedValuesInversePropertyConstraint ;
 	rdfs:subClassOf sh:AbstractCountInversePropertyConstraint ;
+	rdfs:subClassOf sh:AbstractDerivedInversePropertyConstraint ;
 	rdfs:subClassOf sh:AbstractValueClassInversePropertyConstraint ;
 	rdfs:subClassOf sh:AbstractValueShapeInversePropertyConstraint ;
 	rdfs:label "Inverse property constraint" ;
 	rdfs:comment "Declares the structural constraints for an incoming property at the associated class. The supported arguments are inherited from the superclasses." ;
 	sh:labelTemplate "Inverse property {?predicate} : {?valueClass} [{?minCount}..{?maxCount}]" ;
+.
+
+
+# Derived Values --------------------------------------------------------------
+
+sh:DerivedValuesTemplate
+	a sh:ShapeClass ;
+	rdfs:subClassOf sh:Template ;
+	rdfs:label "Derived values template" ;
+	rdfs:comment "The class of templates that can be used to derive (property) values." ;
+.
+
+sh:AbstractDerivedPropertyConstraint
+	a sh:ConstraintTemplate ;
+	rdfs:subClassOf sh:AbstractPropertyConstraint ;
+	sh:abstract true ;
+	sh:argument [
+		sh:predicate sh:derivedValues ;
+		sh:valueClass sh:DerivedValuesTemplate ;
+		sh:optionalWhenInherited true ;
+		rdfs:label "derived values" ;
+		rdfs:comment "Points at a template that wraps an executable body (e.g. a SPARQL query) that computes all values for the given property." ;
+	] ;
+.
+
+sh:AbstractDerivedInversePropertyConstraint
+	a sh:ConstraintTemplate ;
+	rdfs:subClassOf sh:AbstractPropertyConstraint ;
+	sh:abstract true ;
+	sh:argument [
+		sh:predicate sh:derivedValues ;
+		sh:valueClass sh:DerivedValuesTemplate ;
+		sh:optionalWhenInherited true ;
+		rdfs:label "derived values" ;
+		rdfs:comment "Points at a template that wraps an executable body (e.g. a SPARQL query) that computes all values for the given inverse property." ;
+	] ;
 .
 
 
@@ -2088,6 +2126,7 @@ sh:valuesWithShapeCount
 
 sh:argument sh:defaultValueType sh:Argument .
 sh:constraint sh:defaultValueType sh:NativeConstraint .
+sh:derivedValues sh:defaultValueType sh:DerivedValuesTemplate .
 sh:filterShape sh:defaultValueType sh:Shape .
 sh:inverseProperty sh:defaultValueType sh:InversePropertyConstraint .
 sh:property sh:defaultValueType sh:PropertyConstraint .

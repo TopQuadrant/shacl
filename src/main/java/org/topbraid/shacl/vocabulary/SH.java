@@ -21,6 +21,10 @@ public class SH {
     public final static String PREFIX = "sh";
 
 
+    public final static Resource AbstractDerivedInversePropertyConstraint = ResourceFactory.createResource(NS + "AbstractDerivedInversePropertyConstraint");
+
+    public final static Resource AbstractDerivedPropertyConstraint = ResourceFactory.createResource(NS + "AbstractDerivedPropertyConstraint");
+
     public final static Resource AbstractPropertyConstraint = ResourceFactory.createResource(NS + "AbstractPropertyConstraint");
 
     public final static Resource AbstractResult = ResourceFactory.createResource(NS + "AbstractResult");
@@ -105,6 +109,8 @@ public class SH {
     public final static Property defaultValue = ResourceFactory.createProperty(NS + "defaultValue");
 
     public final static Property defaultValueType = ResourceFactory.createProperty(NS + "defaultValueType");
+
+    public final static Property derivedValues = ResourceFactory.createProperty(NS + "derivedValues");
 
     public final static Property directValueType = ResourceFactory.createProperty(NS + "directValueType");
 
