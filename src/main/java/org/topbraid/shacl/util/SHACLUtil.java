@@ -46,6 +46,10 @@ import com.hp.hpl.jena.vocabulary.RDFS;
  */
 public class SHACLUtil {
 	
+	public final static String MACROS_FILE_PART = ".macros.";
+	
+	public final static String SHAPES_FILE_PART = ".shapes.";
+	
 	private final static Set<Resource> classesWithDefaultType = new HashSet<Resource>();
 	static {
 		classesWithDefaultType.add(SH.NativeConstraint);

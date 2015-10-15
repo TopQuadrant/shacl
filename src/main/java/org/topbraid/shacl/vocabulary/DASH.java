@@ -12,6 +12,8 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 public class DASH {
 
     public final static String BASE_URI = "http://datashapes.org/dash";
+    
+    public final static String NAME = "DASH Data Shapes Vocabulary";
 
     public final static String NS = BASE_URI + "#";
 
@@ -26,9 +28,11 @@ public class DASH {
 
     public final static Resource GraphValidationTestCase = ResourceFactory.createResource(NS + "GraphValidationTestCase");
 
-    public final static Resource NodeValidationTestCase = ResourceFactory.createResource(NS + "NodeValidationTestCase");
+    public final static Resource InferencingTestCase = ResourceFactory.createResource(NS + "InferencingTestCase");
 
     public final static Resource PrimaryKeyPropertyConstraint = ResourceFactory.createResource(NS + "PrimaryKeyPropertyConstraint");
+
+    public final static Resource QueryTestCase = ResourceFactory.createResource(NS + "QueryTestCase");
 
     public final static Resource SuccessResult = ResourceFactory.createResource(NS + "SuccessResult");
     

@@ -1,4 +1,4 @@
-# baseURI: http://www.w3.org/ns/shacl/test/features/core/allowedValues-001
+# baseURI: http://www.w3.org/ns/shacl/test/features/core/in-001
 
 @prefix ex: <http://example.org/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -17,7 +17,7 @@ ex:MyShape
 	a sh:Shape ;
 	sh:property [
 		sh:predicate ex:value ;
-		sh:allowedValues ( "A" "B" "C" ) ;
+		sh:in ( "A" "B" "C" ) ;
 	] ;
 .
 

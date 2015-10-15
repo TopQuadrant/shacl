@@ -107,7 +107,7 @@ abstract class AbstractSHACLTestClass extends TestCase {
 	protected Model getSHACLModel() {
 		if(shaclModel == null) {
 			shaclModel = JenaUtil.createDefaultModel();
-			InputStream is = getClass().getResourceAsStream("/etc/shacl.shacl.ttl");
+			InputStream is = getClass().getResourceAsStream("/etc/shacl.ttl");
 			shaclModel.read(is, SH.BASE_URI, FileUtils.langTurtle);
 		}
 		return shaclModel;

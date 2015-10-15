@@ -43,12 +43,12 @@ public abstract class SHACLAbstractPropertyConstraintImpl extends SHACLTemplateC
 	
 	@Override
 	public Resource getValueTypeOrDatatype() {
-		Resource valueClass = JenaUtil.getResourceProperty(this, SH.valueClass);
+		Resource valueClass = JenaUtil.getResourceProperty(this, SH.class_);
 		if(valueClass != null) {
 			return valueClass;
 		}
 		else {
-			Resource directValueType = JenaUtil.getResourceProperty(this, SH.directValueType);
+			Resource directValueType = JenaUtil.getResourceProperty(this, SH.directType);
 			if(directValueType != null) {
 				return directValueType;
 			}

@@ -26,7 +26,7 @@ ex:Associate
 		sh:predicate ex:knows ;
 		sh:minCount 1 ;
 		sh:maxCount 1 ;
-		sh:valueClass ex:Person ;
+		sh:class ex:Person ;
 		sh:valueShape ex:Contact ;
 	] ;
 .
@@ -41,7 +41,7 @@ ex:Contact
 	] ;
 	sh:property [
 		sh:predicate ex:knows ;
-		sh:valueClass ex:Person ;
+		sh:class ex:Person ;
 		sh:valueShape ex:Associate ;
 	] ;
 .

@@ -23,12 +23,12 @@ ex:PersonShape
 	sh:scopeClass ex:Person ;
 	sh:property [
 		sh:predicate ex:gender ;
-		sh:allowedValues ( "male" "female" ) ;
+		sh:in ( "male" "female" ) ;
 	] ;
 	sh:property [
 		a sh:PropertyConstraint ;
 		sh:predicate ex:child ;
-		sh:valueClass ex:Person ;
+		sh:class ex:Person ;
 	] ;
 	sh:property [
 		a sh:PropertyConstraint ;

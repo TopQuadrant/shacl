@@ -1,4 +1,4 @@
-# baseURI: http://www.w3.org/ns/shacl/test/features/core/class-002
+# baseURI: http://www.w3.org/ns/shacl/test/features/core/class-001
 
 @prefix ex: <http://example.org/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -13,13 +13,46 @@
 
 # Shapes ----------------------------------------------------------------------
 
-# Invalid: Missing sh:predicate, incorrect sh:datatype for sh:maxCount
-ex:MyClass
-	a sh:ShapeClass ;
-	rdfs:subClassOf rdfs:Class ;
+ex:MyShape
+	a sh:Shape ;
 	sh:property [
-		a sh:PropertyConstraint ;
-		sh:minCount 1 ;
-		sh:maxCount 1.2 ;
+		sh:predicate ex:value ;
+		sh:class ex:SuperClass ;
 	] ;
+.
+
+
+# Data ------------------------------------------------------------------------
+
+ex:SuperClass
+	a rdfs:Class ;
+	rdfs:subClassOf rdfs:Resource ;
+.
+
+ex:SubClass
+	a rdfs:Class ;
+	rdfs:subClassOf ex:SuperClass ;
+.
+
+ex:SuperInstance
+	a ex:SuperClass ;
+.
+
+ex:SubInstance
+	a ex:SubClass ;
+.
+
+ex:ValidInstance1
+	sh:nodeShape ex:MyShape ;
+	ex:value ex:SuperInstance ;
+.
+
+ex:ValidInstance2
+	sh:nodeShape ex:MyShape ;
+	ex:value ex:SubInstance ;
+.
+
+ex:InvalidInstance1
+	sh:nodeShape ex:MyShape ;
+	ex:value ex:InvalidInstance1 ;
 .

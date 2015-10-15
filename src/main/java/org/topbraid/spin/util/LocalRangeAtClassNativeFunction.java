@@ -193,7 +193,7 @@ public class LocalRangeAtClassNativeFunction extends AbstractFunction2 {
 					Node constraint = it.next().getObject();
 					if(constraint.isBlank() || constraint.isURI()) {
 						if(graph.contains(constraint, SH.predicate.asNode(), property)) {
-							Node valueType = getObject(constraint, SH.valueClass.asNode(), graph);
+							Node valueType = getObject(constraint, SH.class_.asNode(), graph);
 							if(valueType != null) {
 								it.close();
 								return valueType;
@@ -214,7 +214,7 @@ public class LocalRangeAtClassNativeFunction extends AbstractFunction2 {
 					Node constraint = it.next().getObject();
 					if(constraint.isBlank() || constraint.isURI()) {
 						if(graph.contains(constraint, SH.predicate.asNode(), property)) {
-							Node valueType = getObject(constraint, SH.valueClass.asNode(), graph);
+							Node valueType = getObject(constraint, SH.class_.asNode(), graph);
 							if(valueType != null) {
 								it.close();
 								return valueType;

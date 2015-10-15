@@ -20,7 +20,7 @@ ex:Issue
 	rdfs:label "Issue" ;
   	sh:property [
 		sh:predicate ex:submittedBy ;
-		sh:valueClass ex:Person ;
+		sh:class ex:Person ;
 		sh:minCount 1 ;
 		rdfs:label "submitted by" ;
     ] ;

@@ -246,7 +246,6 @@ public class SPINInferences {
 						changed |= runCommandOnClass(arqWrapper, arqWrapper.getLabel(), queryModel, newTriples, subClass, true, class2Constructor, statistics, explanations, explanationText, newRules, thisUnbound, monitor);
 					}
 				}
-				System.out.println(sb);
 			}
 			iteration++;
 			

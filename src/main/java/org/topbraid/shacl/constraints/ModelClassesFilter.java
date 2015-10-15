@@ -36,8 +36,10 @@ public class ModelClassesFilter {
 			RDFS.Class,
 			RDFS.Resource,
 			SH.AbstractResult,
+			SH.Constraint,
 			SH.Graph,
-			SH.NativeConstraint
+			SH.ResultAnnotation,
+			SH.Shape
 		}));
 	}
 

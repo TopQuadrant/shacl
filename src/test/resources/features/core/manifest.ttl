@@ -13,19 +13,20 @@
 	rdfs:comment "Tests of Core features" ;
 	rdfs:label "Core Features tests" ;
 	mf:entries ( 
-		<allowedValues-001> 
 		<and-001> 
 		<and-002> 
 		<class-001>
+		<classdef-001>
 		<closedShape-001>
 		<closedShape-002>
 		<datatype-001>
 		<datatype-002>
-		<directValueType-001>
+		<directType-001>
 		<equal-001>
 		<filterShape-001>
 		<filterShape-002>
 		<filterShape-003>
+		<in-001> 
 		<inverseProperty-001> 
 		<length-001> 
 		<lessThan-001> 
@@ -50,27 +51,8 @@
 		<scope-001>
 		<scope-002>
 		<scope-003>
-		<valueClass-001>
 		<valueShape-001>
 	)
-.
-
-<allowedValues-001>
-	a sht:Validate ;
-	mf:name "Test of a sh:allowedValues" ;
-	mf:action [
-		sht:schema <allowedValues-001.ttl> ; 
-		sht:data <allowedValues-001.ttl> ; 
-	] ;
-	mf:result [
-		a sh:ValidationResult ;
-		sh:severity sh:Violation ;
-  		sh:focusNode ex:InvalidInstance1 ;
-  		sh:subject ex:InvalidInstance1 ;
-  		sh:predicate ex:value ;
-  		sh:object "D" ;
-	] ;
-	mf:status sht:proposed ; 
 .
 
 <and-001>
@@ -126,10 +108,28 @@
 
 <class-001>
 	a sht:Validate ;
-	mf:name "Test of a sh:ShapeClass definition" ;
+	mf:name "Test of a sh:class" ;
 	mf:action [
 		sht:schema <class-001.ttl> ; 
-		sht:data <class-001.ttl> ; 
+		sht:data   <class-001.ttl> ; 
+	] ;
+	mf:result [
+		a sh:ValidationResult ;
+		sh:severity sh:Violation ;
+  		sh:focusNode ex:InvalidInstance1 ;
+  		sh:subject ex:InvalidInstance1 ;
+  		sh:predicate ex:value ;
+  		sh:object ex:InvalidInstance1 ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
+<classdef-001>
+	a sht:Validate ;
+	mf:name "Test of a sh:ShapeClass definition" ;
+	mf:action [
+		sht:schema <classdef-001.ttl> ; 
+		sht:data <classdef-001.ttl> ; 
 	] ;
 	mf:result [
 		a sh:ValidationResult ;
@@ -237,12 +237,12 @@
 	mf:status sht:proposed ; 
 .
 
-<directValueType-001>
+<directType-001>
 	a sht:Validate ;
-	mf:name "Test of sh:directValueType" ;
+	mf:name "Test of sh:directType" ;
 	mf:action [
-		sht:schema <directValueType-001.ttl> ; 
-		sht:data <directValueType-001.ttl> ; 
+		sht:schema <directType-001.ttl> ; 
+		sht:data <directType-001.ttl> ; 
 	] ;
 	mf:result [
 		a sh:ValidationResult ;
@@ -356,6 +356,24 @@
 		a sh:ValidationResult ;
 		sh:severity sh:Violation ;
   		sh:focusNode ex:InvalidExampleInstance ;
+	] ;
+	mf:status sht:proposed ; 
+.
+
+<in-001>
+	a sht:Validate ;
+	mf:name "Test of a sh:in" ;
+	mf:action [
+		sht:schema <in-001.ttl> ; 
+		sht:data <in-001.ttl> ; 
+	] ;
+	mf:result [
+		a sh:ValidationResult ;
+		sh:severity sh:Violation ;
+  		sh:focusNode ex:InvalidInstance1 ;
+  		sh:subject ex:InvalidInstance1 ;
+  		sh:predicate ex:value ;
+  		sh:object "D" ;
 	] ;
 	mf:status sht:proposed ; 
 .
@@ -896,24 +914,6 @@
   		sh:focusNode ex:InvalidInstance2 ;
   		sh:subject ex:InvalidInstance2 ;
   		sh:predicate ex:myProperty ;
-	] ;
-	mf:status sht:proposed ; 
-.
-
-<valueClass-001>
-	a sht:Validate ;
-	mf:name "Test of a sh:valueClass" ;
-	mf:action [
-		sht:schema <valueClass-001.ttl> ; 
-		sht:data   <valueClass-001.ttl> ; 
-	] ;
-	mf:result [
-		a sh:ValidationResult ;
-		sh:severity sh:Violation ;
-  		sh:focusNode ex:InvalidInstance1 ;
-  		sh:subject ex:InvalidInstance1 ;
-  		sh:predicate ex:value ;
-  		sh:object ex:InvalidInstance1 ;
 	] ;
 	mf:status sht:proposed ; 
 .

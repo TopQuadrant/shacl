@@ -1,4 +1,4 @@
-# baseURI: http://www.w3.org/ns/shacl/test/features/core/valueClass-001
+# baseURI: http://www.w3.org/ns/shacl/test/features/core/directType-001
 
 @prefix ex: <http://example.org/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -17,7 +17,7 @@ ex:MyShape
 	a sh:Shape ;
 	sh:property [
 		sh:predicate ex:value ;
-		sh:valueClass ex:SuperClass ;
+		sh:directType ex:SuperClass ;
 	] ;
 .
 
@@ -47,12 +47,12 @@ ex:ValidInstance1
 	ex:value ex:SuperInstance ;
 .
 
-ex:ValidInstance2
+ex:InvalidInstance1
 	sh:nodeShape ex:MyShape ;
 	ex:value ex:SubInstance ;
 .
 
-ex:InvalidInstance1
+ex:InvalidInstance2
 	sh:nodeShape ex:MyShape ;
-	ex:value ex:InvalidInstance1 ;
+	ex:value ex:InvalidInstance2 ;
 .

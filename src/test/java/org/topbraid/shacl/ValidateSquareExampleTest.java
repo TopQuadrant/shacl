@@ -29,11 +29,11 @@ public class ValidateSquareExampleTest extends TestCase {
 		
 		// Load the main data model
 		Model dataModel = JenaUtil.createMemoryModel();
-		dataModel.read(getClass().getResourceAsStream("/shaclsquare.shacl.ttl"), "urn:dummy", FileUtils.langTurtle);
+		dataModel.read(getClass().getResourceAsStream("/shaclsquare.ttl"), "urn:dummy", FileUtils.langTurtle);
 		
 		// Load the shapes Model (here, includes the dataModel because that has templates in it)
 		Model shaclModel = JenaUtil.createDefaultModel();
-		InputStream is = getClass().getResourceAsStream("/etc/shacl.shacl.ttl");
+		InputStream is = getClass().getResourceAsStream("/etc/shacl.ttl");
 		shaclModel.read(is, SH.BASE_URI, FileUtils.langTurtle);
 		MultiUnion unionGraph = new MultiUnion(new Graph[] {
 			shaclModel.getGraph(),

@@ -71,6 +71,8 @@ public class SH {
     
     public final static Resource PropertyValueConstraintTemplate = ResourceFactory.createResource(NS + "PropertyValueConstraintTemplate");
 
+    public final static Resource ResultAnnotation = ResourceFactory.createResource(NS + "ResultAnnotation");
+
     public final static Resource Scope = ResourceFactory.createResource(NS + "Scope");
 
     public final static Resource Shape = ResourceFactory.createResource(NS + "Shape");
@@ -96,11 +98,11 @@ public class SH {
     
     public final static Property abstract_ = ResourceFactory.createProperty(NS + "abstract");
 
-    public final static Property allowedValues = ResourceFactory.createProperty(NS + "allowedValues");
-
     public final static Property argument = ResourceFactory.createProperty(NS + "argument");
 
     public final static Property cachable = ResourceFactory.createProperty(NS + "cachable");
+
+    public final static Property class_ = ResourceFactory.createProperty(NS + "class");
 
     public final static Property constraint = ResourceFactory.createProperty(NS + "constraint");
 
@@ -112,7 +114,7 @@ public class SH {
 
     public final static Property derivedValues = ResourceFactory.createProperty(NS + "derivedValues");
 
-    public final static Property directValueType = ResourceFactory.createProperty(NS + "directValueType");
+    public final static Property directType = ResourceFactory.createProperty(NS + "directType");
 
     public final static Property entailment = ResourceFactory.createProperty(NS + "entailment");
     
@@ -129,6 +131,8 @@ public class SH {
     public final static Resource hasType = ResourceFactory.createResource(NS + "hasType");
 
     public final static Property hasValue = ResourceFactory.createProperty(NS + "hasValue");
+    
+    public final static Property in = ResourceFactory.createProperty(NS + "in");
 
     public final static Property index = ResourceFactory.createProperty(NS + "index");
 
@@ -197,8 +201,6 @@ public class SH {
     public final static Property subject = ResourceFactory.createProperty(NS + "subject");
     
     public final static Property validationFunction = ResourceFactory.createProperty(NS + "validationFunction");
-
-    public final static Property valueClass = ResourceFactory.createProperty(NS + "valueClass");
     
     public final static Property valueShape = ResourceFactory.createProperty(NS + "valueShape");
 
