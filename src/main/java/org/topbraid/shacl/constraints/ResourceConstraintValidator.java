@@ -157,7 +157,7 @@ public class ResourceConstraintValidator extends AbstractConstraintValidator {
 					type = SHACLUtil.getDefaultTemplateType(c);
 				}
 				if(type != null) {
-					if(SH.NativeConstraint.equals(type)) {
+					if(JenaUtil.hasSuperClass(type,  SH.NativeConstraint)) {
 						SHACLConstraint constraint = SHACLFactory.asNativeConstraint(c);
 						addQueryResults(results, constraint, shape, resource, dataset, shapesGraphURI, minSeverity, monitor);
 					}

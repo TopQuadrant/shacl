@@ -63,6 +63,8 @@ public class SH {
     
     public final static Resource NativeScope = ResourceFactory.createResource(NS + "NativeScope");
     
+    public final static Resource NodeConstraint = ResourceFactory.createResource(NS + "NodeConstraint");
+    
     public final static Resource NodeConstraintTemplate = ResourceFactory.createResource(NS + "NodeConstraintTemplate");
     
     public final static Resource OrConstraint = ResourceFactory.createResource(NS + "OrConstraint");
@@ -78,6 +80,10 @@ public class SH {
     public final static Resource Shape = ResourceFactory.createResource(NS + "Shape");
 
     public final static Resource ShapeClass = ResourceFactory.createResource(NS + "ShapeClass");
+    
+    public final static Resource SPARQLConstraint = ResourceFactory.createResource(NS + "SPARQLConstraint");
+    
+    public final static Resource SPARQLScope = ResourceFactory.createResource(NS + "SPARQLScope");
 
     public final static Resource Template = ResourceFactory.createResource(NS + "Template");
     

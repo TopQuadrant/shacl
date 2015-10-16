@@ -97,28 +97,12 @@ public class SHACLFactory {
 	
 	
 	public static boolean isNativeConstraint(RDFNode node) {
-		if(node != null && (node.isAnon() || node.isURIResource())) {
-			if(((Resource)node).hasProperty(RDF.type, SH.NativeConstraint)) {
-				return true;
-			}
-			if(!((Resource)node).hasProperty(RDF.type)) {
-				return SH.NativeConstraint.equals(SHACLUtil.getDefaultTemplateType((Resource)node));
-			}
-		}
-		return false;
+		return node instanceof Resource && JenaUtil.hasIndirectType((Resource)node, SH.NativeConstraint);
 	}
 	
 	
 	public static boolean isNativeScope(RDFNode node) {
-		if(node instanceof Resource) {
-			if(((Resource)node).hasProperty(RDF.type, SH.NativeScope)) {
-				return true;
-			}
-			else if(!((Resource)node).hasProperty(RDF.type)) {
-				return SH.NativeScope.equals(SHACLUtil.getDefaultTemplateType((Resource)node));
-			}
-		}
-		return false;
+		return node instanceof Resource && JenaUtil.hasIndirectType((Resource)node, SH.NativeScope);
 	}
 	
 	
@@ -154,7 +138,7 @@ public class SHACLFactory {
 	 * @return true if node is a template call
 	 */
 	public static boolean isTemplateCall(RDFNode node) {
-		if(node != null && node.isResource()) {
+		if(node instanceof Resource) {
 			Resource resource = (Resource) node;
 			
 			// Return true if this has sh:Template as its metaclass
@@ -167,7 +151,7 @@ public class SHACLFactory {
 			// If this is a typeless node, check for defaultType of incoming references
 			if(!resource.hasProperty(RDF.type)) {
 				Resource dt = SHACLUtil.getDefaultTemplateType(resource);
-				if(dt != null && !SH.NativeConstraint.equals(dt) && !SH.NativeScope.equals(dt)) {
+				if(dt != null && JenaUtil.hasIndirectType(dt, SH.Template)) {
 					return true;
 				}
 			}

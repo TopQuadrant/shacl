@@ -112,7 +112,7 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 							type = SHACLUtil.getDefaultTemplateType(c);
 						}
 						if(type != null) {
-							if(SH.NativeConstraint.equals(type)) {
+							if(JenaUtil.hasSuperClass(type, SH.NativeConstraint)) {
 								list.add(SHACLFactory.asNativeConstraint(c));
 							}
 							else if(JenaUtil.hasIndirectType(type, SH.ConstraintTemplate)) {

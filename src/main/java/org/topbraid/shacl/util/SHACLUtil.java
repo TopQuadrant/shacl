@@ -52,8 +52,7 @@ public class SHACLUtil {
 	
 	private final static Set<Resource> classesWithDefaultType = new HashSet<Resource>();
 	static {
-		classesWithDefaultType.add(SH.NativeConstraint);
-		classesWithDefaultType.add(SH.NativeScope);
+		classesWithDefaultType.add(SH.NodeConstraint);
 		classesWithDefaultType.add(SH.Argument);
 		classesWithDefaultType.add(SH.InversePropertyConstraint);
 		classesWithDefaultType.add(SH.PropertyConstraint);
@@ -348,7 +347,7 @@ public class SHACLUtil {
 		Resource type = JenaUtil.getType(scope);
 		Resource executable;
 		SHACLTemplateCall templateCall = null;
-		if(type == null || SH.NativeScope.equals(type)) {
+		if(SHACLFactory.isNativeScope(scope)) {
 			executable = scope;
 		}
 		else {

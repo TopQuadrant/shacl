@@ -110,6 +110,7 @@ ex:Square
   rdfs:label "Square" ;
   rdfs:subClassOf ex:Rectangle ;
   sh:constraint [
+      a sh:SPARQLConstraint ;
       sh:message "Width and height of a Square must be equal" ;
       sh:predicate ex:width ;
       sh:sparql """

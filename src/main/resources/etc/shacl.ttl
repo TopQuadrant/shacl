@@ -214,6 +214,7 @@ sh:Macro
 		rdfs:comment "Declares the argument(s) of this macro." ;
 	] ;
 	sh:constraint [
+		a sh:SPARQLConstraint ;
 		rdfs:comment "The same predicate can only be used once at all Arguments." ;
 		sh:message "Duplicate Argument for the same predicate {?argPredicate}" ;
 		sh:predicate sh:argument ;
@@ -444,10 +445,18 @@ sh:Scope
 
 sh:NativeScope
 	a sh:ShapeClass ;
+	sh:abstract true ;
 	rdfs:subClassOf sh:Scope ;
-	rdfs:subClassOf sh:SPARQLExecutable ;
 	rdfs:label "Native scope" ;
 	rdfs:comment "A scope that has a native executable body attached to it." ;
+.
+
+sh:SPARQLScope
+	a sh:ShapeClass ;
+	rdfs:subClassOf sh:NativeScope ;
+	rdfs:subClassOf sh:SPARQLExecutable ;
+	rdfs:label "SPARQL scope" ;
+	rdfs:comment "A scope that has a SPARQL body attached to it." ;
 .
 
 sh:ScopeTemplate
@@ -556,9 +565,9 @@ sh:Constraint
 sh:NativeConstraint
 	a sh:ShapeClass ;
 	rdfs:subClassOf sh:Constraint ;
-	rdfs:subClassOf sh:SPARQLExecutable ;
 	rdfs:label "Native constraint" ;
 	rdfs:comment "A constraint that has a native executable body attached with it." ;
+	sh:abstract true ;
 	sh:property [
 		sh:predicate sh:message ;
 		sh:datatype sh:text ;
@@ -577,6 +586,14 @@ sh:NativeConstraint
 		rdfs:label "result annotation" ;
 		rdfs:comment "Result annotations provide information about additional properties that the constructed constraint violations shall have." ;
 	] ;
+.
+
+sh:SPARQLConstraint
+	a sh:ShapeClass ;
+	rdfs:subClassOf sh:NativeConstraint ;
+	rdfs:subClassOf sh:SPARQLExecutable ;
+	rdfs:label "SPARQL constraint" ;
+	rdfs:comment "A constraint that has a SPARQL body attached with it." ;
 .
 
 sh:ConstraintTemplate
@@ -747,6 +764,7 @@ sh:Argument
 		sh:maxCount 1 ;
 	] ;
 	sh:constraint [
+		a sh:SPARQLConstraint ;
 		sh:message "Arguments cannot have both ?datatype and ?class" ;
 		sh:predicate sh:datatype ;
 		sh:sparql """
@@ -1207,6 +1225,7 @@ sh:PropertyConstraint
 		rdfs:comment "A default value that could be used to pre-populate input forms etc. This has no formal meaning otherwise." ;
 	] ;
 	sh:constraint [
+		a sh:SPARQLConstraint ;
 		sh:message "Property constraints cannot have both datatype and class or directType." ;
 		sh:predicate sh:datatype ;
 		sh:sparql """
@@ -1716,6 +1735,7 @@ sh:NodeConstraint
 	rdfs:subClassOf sh:AbstractClassNodeConstraint ;
 	rdfs:label "Node constraint" ;
 	sh:constraint [
+		a sh:SPARQLConstraint ;
 		sh:message "Node constraints cannot have both datatype and class or directType." ;
 		sh:sparql """
 			SELECT $this ($this AS ?subject) (sh:datatype AS ?predicate) ($datatype AS ?object)
@@ -2265,7 +2285,7 @@ sh:valuesWithShapeCount
 # Declarations of sh:defaultValueType -----------------------------------------
 
 sh:argument sh:defaultValueType sh:Argument .
-sh:constraint sh:defaultValueType sh:NativeConstraint .
+sh:constraint sh:defaultValueType sh:NodeConstraint .
 sh:derivedValues sh:defaultValueType sh:DerivedValuesTemplate .
 sh:filterShape sh:defaultValueType sh:Shape .
 sh:inverseProperty sh:defaultValueType sh:InversePropertyConstraint .
@@ -2274,7 +2294,6 @@ sh:predicate sh:defaultValueType rdf:Property .
 sh:predicate1 sh:defaultValueType rdf:Property .
 sh:predicate2 sh:defaultValueType rdf:Property .
 sh:qualifiedValueShape sh:defaultValueType sh:Shape .
-sh:scope sh:defaultValueType sh:NativeScope .
 sh:shape sh:defaultValueType sh:Shape .
 sh:valueShape sh:defaultValueType sh:Shape .
 
