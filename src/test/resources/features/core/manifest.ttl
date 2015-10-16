@@ -439,7 +439,15 @@
   		sh:focusNode ex:InvalidResource4 ;
   		sh:subject ex:InvalidResource4 ;
   		sh:predicate ex:property ;
-  		sh:object [] ;
+  		sh:object _:blankNodeLength001 ;
+	] ;
+	mf:result [
+		a sh:ValidationResult ;
+		sh:severity sh:Violation ;
+  		sh:focusNode ex:InvalidResource4 ;
+  		sh:subject ex:InvalidResource4 ;
+  		sh:predicate ex:property ;
+  		sh:object _:blankNodeLength001 ;
 	] ;
 	mf:status sht:proposed ; 
 .

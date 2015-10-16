@@ -774,35 +774,22 @@ sh:Argument
 
 # Property constraints --------------------------------------------------------
 
-sh:AbstractCountPropertyConstraint
-	a sh:ConstraintTemplate ;
+sh:AbstractClassPropertyConstraint
+	a sh:PropertyValueConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
-	rdfs:label "Abstract count property constraint" ;
-	rdfs:comment "Enforces a constraint on the cardinality of the property using minCount and maxCount. By default, a property may have 0 to unlimited number of values." ;
+	rdfs:label "Abstract class property constraint" ;
+	rdfs:comment "Enforces a constraint that all values of the property must be of a certain type. For resources this will accept instances of subclasses. Untyped blank nodes are allowed if a defaultValueType has been specified." ;
 	sh:abstract true ;
 	sh:argument [
-		sh:predicate sh:minCount ;
-		sh:defaultValue 0 ;
-		sh:optional true ;
-		sh:datatype xsd:integer ;
-		rdfs:label "min count" ;
-		rdfs:comment "The minimum number of values that the property must have. Defaults to 0." ;
-	] ;  
-	sh:argument [
-		sh:predicate sh:maxCount ;
-		sh:optional true ;
-		sh:datatype xsd:integer ;
-		rdfs:label "max count" ;
-		rdfs:comment "The maximum number of values that the property must have. Defaults to unlimited." ;
+		sh:predicate sh:class ;
+		sh:optionalWhenInherited true ;
+		sh:nodeKind sh:IRI ;
+		sh:class rdfs:Class ;
+		rdfs:label "class" ;
+		rdfs:comment "The type that all values of the property must have, based on the semantics defined by the function sh:hasClass." ;
 	] ;
-	sh:message "Required value count [{?minCount}..{?maxCount}] but found {?count}" ;
-	sh:sparql """
-		SELECT $this ($this AS ?subject) $predicate ?count
-		WHERE {
-			BIND (sh:valueCount($this, $predicate) AS ?count) .
-			FILTER ((?count < $minCount) || (bound($maxCount) && (?count > $maxCount))) .
-		}
-		""" ;
+	sh:message "Values must be instances of {?class}" ;
+	sh:validationFunction sh:hasClass ;
 .
 
 sh:AbstractDatatypePropertyConstraint
@@ -879,6 +866,52 @@ sh:AbstractInPropertyConstraint
 	sh:validationFunction sh:isIn ;
 .
 
+sh:AbstractMaxCountPropertyConstraint
+	a sh:ConstraintTemplate ;
+	rdfs:subClassOf sh:AbstractPropertyConstraint ;
+	rdfs:label "Abstract max count property constraint" ;
+	rdfs:comment "Enforces a constraint on the maximum cardinality of the property." ;
+	sh:abstract true ;
+	sh:argument [
+		sh:predicate sh:maxCount ;
+		sh:optionalWhenInherited true ;
+		sh:datatype xsd:integer ;
+		rdfs:label "max count" ;
+		rdfs:comment "The maximum number of values that the property can have." ;
+	] ;
+	sh:message "Required maximum value count {$maxCount} but found {?count}" ;
+	sh:sparql """
+		SELECT $this ($this AS ?subject) $predicate ?count
+		WHERE {
+			BIND (sh:valueCount($this, $predicate) AS ?count) .
+			FILTER (?count > $maxCount) .
+		}
+		""" ;
+.
+
+sh:AbstractMinCountPropertyConstraint
+	a sh:ConstraintTemplate ;
+	rdfs:subClassOf sh:AbstractPropertyConstraint ;
+	rdfs:label "Abstract min count property constraint" ;
+	rdfs:comment "Enforces a constraint on the minimum cardinality of the property." ;
+	sh:abstract true ;
+	sh:argument [
+		sh:predicate sh:minCount ;
+		sh:optionalWhenInherited true ;
+		sh:datatype xsd:integer ;
+		rdfs:label "min count" ;
+		rdfs:comment "The minimum number of values that the property must have." ;
+	] ;
+	sh:message "Required minimum value count {$minCount} but found {?count}" ;
+	sh:sparql """
+		SELECT $this ($this AS ?subject) $predicate ?count
+		WHERE {
+			BIND (sh:valueCount($this, $predicate) AS ?count) .
+			FILTER (?count < $minCount) .
+		}
+		""" ;
+.
+
 sh:AbstractNodeKindPropertyConstraint
 	a sh:PropertyValueConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
@@ -896,11 +929,11 @@ sh:AbstractNodeKindPropertyConstraint
 	sh:validationFunction sh:hasNodeKind ;
 .
 
-sh:AbstractQualifiedValueShapePropertyConstraint
+sh:AbstractQualifiedCountPropertyConstraint
 	a sh:ConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
-	rdfs:label "Abstract qualified value shape property constraint" ;
-	rdfs:comment "Enforces a constraint that a certain number of values of the property must have a certain shape." ;
+	rdfs:label "Abstract qualified count property constraint" ;
+	rdfs:comment "Base class for qualified min and max count constraints, declaring the shared argument sh:qualifiedValueShape." ;
 	sh:abstract true ;
 	sh:argument [
 		sh:predicate sh:qualifiedValueShape ;
@@ -909,48 +942,54 @@ sh:AbstractQualifiedValueShapePropertyConstraint
 		rdfs:label "qualified value shape" ;
 		rdfs:comment "The shape that the values must have." ;
 	] ;  
-	sh:argument [
-		sh:predicate sh:qualifiedMinCount ;
-		sh:optionalWhenInherited true ;
-		sh:datatype xsd:integer ;
-		sh:defaultValue 0 ;
-		rdfs:label "qualified min count" ;
-		rdfs:comment "The minimum number of values that must have the shape." ;
-	] ;  
+.
+
+sh:AbstractQualifiedMaxCountPropertyConstraint
+	a sh:ConstraintTemplate ;
+	rdfs:subClassOf sh:AbstractQualifiedCountPropertyConstraint ;
+	rdfs:label "Abstract qualified max count property constraint" ;
+	rdfs:comment "Enforces a constraint that a maximum number of values of the property can have a certain shape." ;
+	sh:abstract true ;
 	sh:argument [
 		sh:predicate sh:qualifiedMaxCount ;
 		sh:optionalWhenInherited true ;
 		sh:datatype xsd:integer ;
 		rdfs:label "qualified max count" ;
-		rdfs:comment "The maximum number of values that must have the shape." ;
+		rdfs:comment "The maximum number of values that can have the shape." ;
 	] ;  
-	sh:message "Violation of qualified value shape constraint {?qualifiedValueShape}: expected [{?qualifiedMinCount}..{?qualifiedMaxCount}], found {?count}" ;
+	sh:message "Violation of qualified value shape constraint {$qualifiedValueShape}: expected at most {$qualifiedMaxCount}, found {?count}" ;
 	sh:sparql """
 		SELECT $this ($this AS ?subject) $predicate ?count ?failure
 		WHERE {
 			BIND (sh:valuesWithShapeCount($this, $predicate, $qualifiedValueShape, $shapesGraph) AS ?count) .
 			BIND (!bound(?count) AS ?failure) .
-			FILTER IF(?failure, true, ((?count < $qualifiedMinCount) || (bound($qualifiedMaxCount) && (?count > $qualifiedMaxCount)))) .
+			FILTER IF(?failure, true, ?count > $qualifiedMaxCount) .
 		}
 		""" ;
 .
 
-sh:AbstractClassPropertyConstraint
-	a sh:PropertyValueConstraintTemplate ;
-	rdfs:subClassOf sh:AbstractPropertyConstraint ;
-	rdfs:label "Abstract class property constraint" ;
-	rdfs:comment "Enforces a constraint that all values of the property must be of a certain type. For resources this will accept instances of subclasses. Untyped blank nodes are allowed if a defaultValueType has been specified." ;
+sh:AbstractQualifiedMinCountPropertyConstraint
+	a sh:ConstraintTemplate ;
+	rdfs:subClassOf sh:AbstractQualifiedCountPropertyConstraint ;
+	rdfs:label "Abstract qualified min count property constraint" ;
+	rdfs:comment "Enforces a constraint that a minimum number of values of the property must have a certain shape." ;
 	sh:abstract true ;
 	sh:argument [
-		sh:predicate sh:class ;
+		sh:predicate sh:qualifiedMinCount ;
 		sh:optionalWhenInherited true ;
-		sh:nodeKind sh:IRI ;
-		sh:class rdfs:Class ;
-		rdfs:label "class" ;
-		rdfs:comment "The type that all values of the property must have, based on the semantics defined by the function sh:hasClass." ;
-	] ;
-	sh:message "Values must be instances of {?class}" ;
-	sh:validationFunction sh:hasClass ;
+		sh:datatype xsd:integer ;
+		rdfs:label "qualified min count" ;
+		rdfs:comment "The minimum number of values that must have the shape." ;
+	] ;  
+	sh:message "Violation of qualified value shape constraint {$qualifiedValueShape}: expected at least {$qualifiedMinCount}, found {?count}" ;
+	sh:sparql """
+		SELECT $this ($this AS ?subject) $predicate ?count ?failure
+		WHERE {
+			BIND (sh:valuesWithShapeCount($this, $predicate, $qualifiedValueShape, $shapesGraph) AS ?count) .
+			BIND (!bound(?count) AS ?failure) .
+			FILTER IF(?failure, true, ?count < $qualifiedMinCount) .
+		}
+		""" ;
 .
 
 sh:AbstractValueShapePropertyConstraint
@@ -978,30 +1017,38 @@ sh:AbstractValueShapePropertyConstraint
 		""" ;
 .
 
-sh:AbstractLengthPropertyConstraint
+sh:AbstractMaxLengthPropertyConstraint
 	a sh:PropertyValueConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
-	rdfs:label "Abstract length property constraint" ;
-	rdfs:comment "Specifies the minimum and maximum string length of values." ;
+	rdfs:label "Abstract max length property constraint" ;
+	rdfs:comment "Specifies the maximum string length of values." ;
 	sh:abstract true ;
 	sh:argument [
-		sh:predicate sh:minLength ;
-		sh:optional true ;
-		sh:optionalWhenInherited true ;
-		sh:datatype xsd:integer ;
-		rdfs:label "min length" ;
-		rdfs:comment "The minimum string length permitted for values of this property." ;
-	] ;
-	sh:argument [
 		sh:predicate sh:maxLength ;
-		sh:optional true ;
 		sh:optionalWhenInherited true ;
 		sh:datatype xsd:integer ;
 		rdfs:label "max length" ;
 		rdfs:comment "The maximum string length permitted for values of this property." ;
 	] ;
 	sh:message "Invalid string length." ;
-	sh:validationFunction sh:hasLength ;
+	sh:validationFunction sh:hasMaxLength ;
+.
+
+sh:AbstractMinLengthPropertyConstraint
+	a sh:PropertyValueConstraintTemplate ;
+	rdfs:subClassOf sh:AbstractPropertyConstraint ;
+	rdfs:label "Abstract min length property constraint" ;
+	rdfs:comment "Specifies the minimum string length of values." ;
+	sh:abstract true ;
+	sh:argument [
+		sh:predicate sh:minLength ;
+		sh:optionalWhenInherited true ;
+		sh:datatype xsd:integer ;
+		rdfs:label "min length" ;
+		rdfs:comment "The minimum string length permitted for values of this property." ;
+	] ;
+	sh:message "Invalid string length." ;
+	sh:validationFunction sh:hasMinLength ;
 .
 
 sh:AbstractMaxExclusivePropertyConstraint
@@ -1131,20 +1178,23 @@ sh:AbstractUniqueLangPropertyConstraint
 sh:PropertyConstraint
 	a sh:ConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractClassPropertyConstraint ;
-	rdfs:subClassOf sh:AbstractCountPropertyConstraint ;
 	rdfs:subClassOf sh:AbstractDatatypePropertyConstraint ;
 	rdfs:subClassOf sh:AbstractDerivedPropertyConstraint ;
 	rdfs:subClassOf sh:AbstractDirectTypePropertyConstraint ;
 	rdfs:subClassOf sh:AbstractHasValuePropertyConstraint ;
 	rdfs:subClassOf sh:AbstractInPropertyConstraint ;
-	rdfs:subClassOf sh:AbstractLengthPropertyConstraint ;
+	rdfs:subClassOf sh:AbstractMaxCountPropertyConstraint ;
+	rdfs:subClassOf sh:AbstractMinCountPropertyConstraint ;
 	rdfs:subClassOf sh:AbstractMaxExclusivePropertyConstraint ;
 	rdfs:subClassOf sh:AbstractMaxInclusivePropertyConstraint ;
 	rdfs:subClassOf sh:AbstractMinExclusivePropertyConstraint ;
 	rdfs:subClassOf sh:AbstractMinInclusivePropertyConstraint ;
+	rdfs:subClassOf sh:AbstractMaxLengthPropertyConstraint ;
+	rdfs:subClassOf sh:AbstractMinLengthPropertyConstraint ;
 	rdfs:subClassOf sh:AbstractNodeKindPropertyConstraint ;
 	rdfs:subClassOf sh:AbstractPatternPropertyConstraint ;
-	rdfs:subClassOf sh:AbstractQualifiedValueShapePropertyConstraint ;
+	rdfs:subClassOf sh:AbstractQualifiedMaxCountPropertyConstraint ;
+	rdfs:subClassOf sh:AbstractQualifiedMinCountPropertyConstraint ;
 	rdfs:subClassOf sh:AbstractUniqueLangPropertyConstraint ;
 	rdfs:subClassOf sh:AbstractValueShapePropertyConstraint ;
 	rdfs:label "Property constraint" ;
@@ -1191,37 +1241,6 @@ sh:AbstractInInversePropertyConstraint
 	sh:validationFunction sh:isIn ;
 .
 
-sh:AbstractCountInversePropertyConstraint
-	a sh:ConstraintTemplate ;
-	rdfs:subClassOf sh:AbstractPropertyConstraint ;
-	rdfs:label "Abstract count inverse property constraint" ;
-	rdfs:comment "Enforces a constraint on the cardinality of an incoming property using minCount and maxCount. By default, an inverse property may have 0 to unlimited number of values." ;
-	sh:abstract true ;
-	sh:argument [
-		sh:predicate sh:minCount ;
-		sh:defaultValue 0 ;
-		sh:optional true ;
-		sh:datatype xsd:integer ;
-		rdfs:label "min count" ;
-		rdfs:comment "The minimum number of values that the inverse property must have. Defaults to 0." ;
-	] ;  
-	sh:argument [
-		sh:predicate sh:maxCount ;
-		sh:optional true ;
-		sh:datatype xsd:integer ;
-		rdfs:label "max count" ;
-		rdfs:comment "The maximum number of values that the inverse property must have. Defaults to unlimited." ;
-	] ;
-	sh:message "Inverse property must have [{?minCount}..{?maxCount}] values, but found {?count}" ;
-	sh:sparql """
-		SELECT $this ($this AS ?object) $predicate ?count
-		WHERE {
-			BIND (sh:inverseValueCount($this, $predicate) AS ?count) .
-			FILTER ((?count < $minCount) || (bound($maxCount) && (?count > $maxCount))) .
-		}
-		""" ;
-.
-
 sh:AbstractClassInversePropertyConstraint
 	a sh:InversePropertyValueConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
@@ -1238,6 +1257,52 @@ sh:AbstractClassInversePropertyConstraint
 	] ;
 	sh:message "Inverse values must be instances of {?class}" ;
 	sh:validationFunction sh:hasClass ;
+.
+
+sh:AbstractMaxCountInversePropertyConstraint
+	a sh:ConstraintTemplate ;
+	rdfs:subClassOf sh:AbstractPropertyConstraint ;
+	rdfs:label "Abstract max count inverse property constraint" ;
+	rdfs:comment "Enforces a constraint on the maximum cardinality of an incoming property." ;
+	sh:abstract true ;
+	sh:argument [
+		sh:predicate sh:maxCount ;
+		sh:optionalWhenInherited true ;
+		sh:datatype xsd:integer ;
+		rdfs:label "max count" ;
+		rdfs:comment "The maximum number of values that the inverse property can have." ;
+	] ;
+	sh:message "Inverse property must have at most {$maxCount} values, but found {?count}" ;
+	sh:sparql """
+		SELECT $this ($this AS ?object) $predicate ?count
+		WHERE {
+			BIND (sh:inverseValueCount($this, $predicate) AS ?count) .
+			FILTER (?count > $maxCount) .
+		}
+		""" ;
+.
+
+sh:AbstractMinCountInversePropertyConstraint
+	a sh:ConstraintTemplate ;
+	rdfs:subClassOf sh:AbstractPropertyConstraint ;
+	rdfs:label "Abstract min count inverse property constraint" ;
+	rdfs:comment "Enforces a constraint on the minimum cardinality of an incoming property." ;
+	sh:abstract true ;
+	sh:argument [
+		sh:predicate sh:minCount ;
+		sh:optionalWhenInherited true ;
+		sh:datatype xsd:integer ;
+		rdfs:label "min count" ;
+		rdfs:comment "The minimum number of values that the inverse property can have." ;
+	] ;
+	sh:message "Inverse property must have at least {$minCount} values, but found {?count}" ;
+	sh:sparql """
+		SELECT $this ($this AS ?object) $predicate ?count
+		WHERE {
+			BIND (sh:inverseValueCount($this, $predicate) AS ?count) .
+			FILTER (?count < $maxCount) .
+		}
+		""" ;
 .
 
 sh:AbstractValueShapeInversePropertyConstraint
@@ -1268,9 +1333,10 @@ sh:AbstractValueShapeInversePropertyConstraint
 sh:InversePropertyConstraint
 	a sh:ConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractClassInversePropertyConstraint ;
-	rdfs:subClassOf sh:AbstractCountInversePropertyConstraint ;
 	rdfs:subClassOf sh:AbstractDerivedInversePropertyConstraint ;
 	rdfs:subClassOf sh:AbstractInInversePropertyConstraint ;
+	rdfs:subClassOf sh:AbstractMaxCountInversePropertyConstraint ;
+	rdfs:subClassOf sh:AbstractMinCountInversePropertyConstraint ;
 	rdfs:subClassOf sh:AbstractValueShapeInversePropertyConstraint ;
 	rdfs:label "Inverse property constraint" ;
 	rdfs:comment "Declares the structural constraints for an incoming property at the associated class. The supported arguments are inherited from the superclasses." ;
@@ -1419,6 +1485,24 @@ sh:NotEqualConstraint
 
 # Node constraints ------------------------------------------------------------
 
+sh:AbstractClassNodeConstraint
+	a sh:NodeConstraintTemplate ;
+	rdfs:subClassOf sh:TemplateConstraint ;
+	rdfs:label "Abstract class node constraint" ;
+	rdfs:comment "Enforces a constraint that all focus nodes must be of a certain type. For resources this will accept instances of subclasses." ;
+	sh:abstract true ;
+	sh:argument [
+		sh:predicate sh:class ;
+		sh:optionalWhenInherited true ;
+		sh:nodeKind sh:IRI ;
+		sh:class rdfs:Class ;
+		rdfs:label "class" ;
+		rdfs:comment "The type that all focus nodes must have, based on the semantics defined by the function sh:hasClass." ;
+	] ;
+	sh:message "Must be instances of {?class}" ;
+	sh:validationFunction sh:hasClass ;
+.
+
 sh:AbstractDatatypeNodeConstraint
 	a sh:NodeConstraintTemplate ;
 	rdfs:subClassOf sh:TemplateConstraint ;
@@ -1489,48 +1573,38 @@ sh:AbstractNodeKindNodeConstraint
 	sh:validationFunction sh:hasNodeKind ;
 .
 
-sh:AbstractClassNodeConstraint
+sh:AbstractMaxLengthNodeConstraint
 	a sh:NodeConstraintTemplate ;
 	rdfs:subClassOf sh:TemplateConstraint ;
-	rdfs:label "Abstract class node constraint" ;
-	rdfs:comment "Enforces a constraint that all focus nodes must be of a certain type. For resources this will accept instances of subclasses." ;
+	rdfs:label "Abstract max length node constraint" ;
+	rdfs:comment "Specifies the maximum string length of nodes." ;
 	sh:abstract true ;
-	sh:argument [
-		sh:predicate sh:class ;
-		sh:optionalWhenInherited true ;
-		sh:nodeKind sh:IRI ;
-		sh:class rdfs:Class ;
-		rdfs:label "class" ;
-		rdfs:comment "The type that all focus nodes must have, based on the semantics defined by the function sh:hasClass." ;
-	] ;
-	sh:message "Must be instances of {?class}" ;
-	sh:validationFunction sh:hasClass ;
-.
-
-sh:AbstractLengthNodeConstraint
-	a sh:NodeConstraintTemplate ;
-	rdfs:subClassOf sh:TemplateConstraint ;
-	rdfs:label "Abstract length node constraint" ;
-	rdfs:comment "Specifies the minimum and maximum string length of nodes." ;
-	sh:abstract true ;
-	sh:argument [
-		sh:predicate sh:minLength ;
-		sh:optional true ;
-		sh:optionalWhenInherited true ;
-		sh:datatype xsd:integer ;
-		rdfs:label "min length" ;
-		rdfs:comment "The minimum string length permitted for the focus nodes." ;
-	] ;
 	sh:argument [
 		sh:predicate sh:maxLength ;
-		sh:optional true ;
 		sh:optionalWhenInherited true ;
 		sh:datatype xsd:integer ;
 		rdfs:label "max length" ;
 		rdfs:comment "The maximum string length permitted for the focus nodes." ;
 	] ;
 	sh:message "Invalid string length." ;
-	sh:validationFunction sh:hasLength ;
+	sh:validationFunction sh:hasMaxLength ;
+.
+
+sh:AbstractMinLengthNodeConstraint
+	a sh:NodeConstraintTemplate ;
+	rdfs:subClassOf sh:TemplateConstraint ;
+	rdfs:label "Abstract min length node constraint" ;
+	rdfs:comment "Specifies the minimum string length of nodes." ;
+	sh:abstract true ;
+	sh:argument [
+		sh:predicate sh:minLength ;
+		sh:optionalWhenInherited true ;
+		sh:datatype xsd:integer ;
+		rdfs:label "min length" ;
+		rdfs:comment "The minimum string length permitted for the focus nodes." ;
+	] ;
+	sh:message "Invalid string length." ;
+	sh:validationFunction sh:hasMinLength ;
 .
 
 sh:AbstractMaxExclusiveNodeConstraint
@@ -1631,11 +1705,12 @@ sh:NodeConstraint
 	rdfs:subClassOf sh:AbstractDatatypeNodeConstraint ;
 	rdfs:subClassOf sh:AbstractDirectTypeNodeConstraint ;
 	rdfs:subClassOf sh:AbstractInNodeConstraint ;
-	rdfs:subClassOf sh:AbstractLengthNodeConstraint ;
 	rdfs:subClassOf sh:AbstractMaxExclusiveNodeConstraint ;
 	rdfs:subClassOf sh:AbstractMaxInclusiveNodeConstraint ;
 	rdfs:subClassOf sh:AbstractMinExclusiveNodeConstraint ;
 	rdfs:subClassOf sh:AbstractMinInclusiveNodeConstraint ;
+	rdfs:subClassOf sh:AbstractMaxLengthNodeConstraint ;
+	rdfs:subClassOf sh:AbstractMinLengthNodeConstraint ;
 	rdfs:subClassOf sh:AbstractNodeKindNodeConstraint ;
 	rdfs:subClassOf sh:AbstractPatternNodeConstraint ;
 	rdfs:subClassOf sh:AbstractClassNodeConstraint ;
@@ -1766,6 +1841,30 @@ sh:OrConstraint
 
 # Built-in Functions ----------------------------------------------------------
 
+sh:hasClass
+	a sh:Function ;
+	rdfs:subClassOf sh:ValidationFunctions ;
+	rdfs:label "has class" ;
+	rdfs:comment "Checks whether a given node ($value) is an instance of a given class ($class) or its subclasses. Returns false if the value is a literal. Returns true if $class is rdfs:Resource. Returns true if $class is rdf:List and $value has a rdf:first value." ;
+	sh:argument [
+		sh:index 1 ;
+		sh:predicate sh:class ;
+		sh:class rdfs:Class ;
+		rdfs:comment "The type that the node must have." ;
+	] ;
+	sh:returnType xsd:boolean ;
+	sh:sparql """
+		ASK {
+			FILTER (isIRI($value) || isBlank($value)) .
+			FILTER (
+				$class = rdfs:Resource ||
+				($class = rdf:List && EXISTS { $value rdf:first ?any }) ||
+				EXISTS { $value rdf:type/rdfs:subClassOf* $class }
+				)
+		}
+		""" ;
+.
+
 sh:hasDatatype
 	a sh:Function ;
 	rdfs:subClassOf sh:ValidationFunctions ;
@@ -1809,34 +1908,44 @@ sh:hasDirectType
 		""" ;
 .
 
-sh:hasLength
+sh:hasMaxLength
 	a sh:Function ;
 	rdfs:subClassOf sh:ValidationFunctions ;
-	rdfs:label "has length" ;
-	rdfs:comment "Checks whether a given string (?value) has a length within a given minimum and maximum string length." ;
-	sh:argument [
-		sh:predicate sh:minLength ;
-		sh:index 1 ;
-		sh:optional true ;
-		sh:datatype xsd:integer ;
-		rdfs:label "min length" ;
-		rdfs:comment "The minimum string length (defaults to 0 if unspecified)." ;
-	] ;
+	rdfs:label "has max length" ;
+	rdfs:comment "Checks whether a given string (?value) has a length within a given maximum string length." ;
 	sh:argument [
 		sh:predicate sh:maxLength ;
-		sh:index 2 ;
-		sh:optional true ;
+		sh:index 1 ;
 		sh:datatype xsd:integer ;
 		rdfs:label "max length" ;
-		rdfs:comment "The maximum string length (defaults to unlimited)." ;
+		rdfs:comment "The maximum string length." ;
 	] ;
 	sh:returnType xsd:boolean ;
 	sh:sparql """
 		ASK {
 			BIND (STRLEN(str($value)) AS ?valueLength) .
-			FILTER (bound(?valueLength) && 
-				(?valueLength >= COALESCE($minLength, 0)) &&
-				(!bound($maxLength) || ?valueLength <= $maxLength)) .
+			FILTER (bound(?valueLength) && ?valueLength <= $maxLength) .
+		}
+		""" ;
+.
+
+sh:hasMinLength
+	a sh:Function ;
+	rdfs:subClassOf sh:ValidationFunctions ;
+	rdfs:label "has min length" ;
+	rdfs:comment "Checks whether a given string (?value) has a length within a given minimum string length." ;
+	sh:argument [
+		sh:predicate sh:minLength ;
+		sh:index 1 ;
+		sh:datatype xsd:integer ;
+		rdfs:label "min length" ;
+		rdfs:comment "The minimum string length." ;
+	] ;
+	sh:returnType xsd:boolean ;
+	sh:sparql """
+		ASK {
+			BIND (STRLEN(str($value)) AS ?valueLength) .
+			FILTER (bound(?valueLength) && ?valueLength >= $minLength) .
 		}
 		""" ;
 .
@@ -1970,30 +2079,6 @@ sh:hasShape
 		rdfs:comment "If set to true then any recursive occurrence of the same resource against the same shape will fail (result=undefined)." ;
 	] ;
 	sh:returnType xsd:boolean ;
-.
-
-sh:hasClass
-	a sh:Function ;
-	rdfs:subClassOf sh:ValidationFunctions ;
-	rdfs:label "has class" ;
-	rdfs:comment "Checks whether a given node ($value) is an instance of a given class ($class) or its subclasses. Returns false if the value is a literal. Returns true if $class is rdfs:Resource. Returns true if $class is rdf:List and $value has a rdf:first value." ;
-	sh:argument [
-		sh:index 1 ;
-		sh:predicate sh:class ;
-		sh:class rdfs:Class ;
-		rdfs:comment "The type that the node must have." ;
-	] ;
-	sh:returnType xsd:boolean ;
-	sh:sparql """
-		ASK {
-			FILTER (isIRI($value) || isBlank($value)) .
-			FILTER (
-				$class = rdfs:Resource ||
-				($class = rdf:List && EXISTS { $value rdf:first ?any }) ||
-				EXISTS { $value rdf:type/rdfs:subClassOf* $class }
-				)
-		}
-		""" ;
 .
 
 sh:inverseValueCount
