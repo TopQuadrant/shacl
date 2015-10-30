@@ -42,12 +42,16 @@ public class DASH {
 
     public final static Resource ValidationTestCase = ResourceFactory.createResource(NS + "ValidationTestCase");
 
+
+    public final static Property cachable = ResourceFactory.createProperty(NS + "cachable");
     
     public final static Property expectedResult = ResourceFactory.createProperty(NS + "expectedResult");
 
     public final static Property expression = ResourceFactory.createProperty(NS + "expression");
 
     public final static Property node = ResourceFactory.createProperty(NS + "node");
+    
+    public final static Property private_ = ResourceFactory.createProperty(NS + "private");
 
     public final static Property testCase = ResourceFactory.createProperty(NS + "testCase");
 

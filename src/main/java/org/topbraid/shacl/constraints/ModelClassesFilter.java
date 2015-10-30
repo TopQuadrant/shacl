@@ -8,6 +8,7 @@ import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaUtil;
 
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 /**
@@ -33,11 +34,11 @@ public class ModelClassesFilter {
 	
 	static {
 		SYSTEM_CLASSES.addAll(Arrays.asList(new Resource[] {
+			OWL.Ontology,
 			RDFS.Class,
 			RDFS.Resource,
 			SH.AbstractResult,
 			SH.Constraint,
-			SH.Graph,
 			SH.ResultAnnotation,
 			SH.Shape
 		}));

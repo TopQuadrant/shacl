@@ -45,8 +45,6 @@ public class SH {
 
     public final static Resource Functions = ResourceFactory.createResource(NS + "Functions");
 
-    public final static Resource Graph = ResourceFactory.createResource(NS + "Graph");
-
     public final static Resource Info = ResourceFactory.createResource(NS + "Info");
 
     public final static Resource InversePropertyConstraint = ResourceFactory.createResource(NS + "InversePropertyConstraint");
@@ -105,8 +103,6 @@ public class SH {
     public final static Property abstract_ = ResourceFactory.createProperty(NS + "abstract");
 
     public final static Property argument = ResourceFactory.createProperty(NS + "argument");
-
-    public final static Property cachable = ResourceFactory.createProperty(NS + "cachable");
 
     public final static Property class_ = ResourceFactory.createProperty(NS + "class");
 
@@ -177,8 +173,6 @@ public class SH {
     public final static Property optionalWhenInherited = ResourceFactory.createProperty(NS + "optionalWhenInherited");
 
     public final static Property predicate = ResourceFactory.createProperty(NS + "predicate");
-    
-    public final static Property private_ = ResourceFactory.createProperty(NS + "private");
 
     public final static Property property = ResourceFactory.createProperty(NS + "property");
 

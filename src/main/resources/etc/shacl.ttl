@@ -1,9 +1,10 @@
 # baseURI: http://www.w3.org/ns/shacl
 
 # SHACL - Shapes Constraint Language
-# Draft last edited on 2015-10-16
+# Draft last edited on 2015-10-30
 # Editor: Holger Knublauch <holger@topquadrant.com>
 
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
@@ -11,18 +12,12 @@
 
 
 <http://www.w3.org/ns/shacl>
-	a sh:Graph ;
 	rdfs:label "SHACL Vocabulary" ;
 	rdfs:comment "The vocabulary defining the Shapes Constraint Language (SHACL)." ;
 .
 
 
-# Declaration of the required RDFS terms --------------------------------------
-
-rdfs:Resource
-	a rdfs:Class ;
-	rdfs:label "Resource" ;
-.
+# Shape classes ---------------------------------------------------------------
 
 sh:Shape
 	a sh:ShapeClass ;
@@ -67,90 +62,36 @@ sh:Shape
 	] ;
 .
 
+# TODO: Feature at risk, see ISSUE-23
 sh:ShapeClass
 	a rdfs:Class ;
 	rdfs:subClassOf rdfs:Class ;
 	rdfs:subClassOf sh:Shape ;
 	rdfs:label "Shape class" ;
-	rdfs:comment "The metaclass for classes that are also shapes." ;
+	rdfs:comment "The metaclass for classes that are also shapes. This is syntactic sugar for declaring an instance of both rdfs:Class and sh:Shape." ;
 .
 
-rdfs:Class
-	a sh:ShapeClass ;
-	rdfs:subClassOf rdfs:Resource ;
-	rdfs:label "Class" ;
-	rdfs:comment "The class of classes." ;
+
+# Shapes that extend existing RDFS/OWL classes --------------------------------
+
+sh:ClassShape
+	a sh:Shape ;
+	sh:scopeClass rdfs:Class ;
 	sh:property [
+		# TODO: Feature at risk and semantics unclear, see ISSUE-78
 		sh:predicate sh:abstract ;
 		sh:datatype xsd:boolean ;
 		sh:maxCount 1 ;
 		rdfs:label "abstract" ;
 		rdfs:comment "True to indicate that this class is not expected to have direct instances." ;
 	] ;
-	sh:property [
-		sh:predicate sh:private ;
-		sh:datatype xsd:boolean ;
-		sh:maxCount 1 ;
-		rdfs:label "private" ;
-		rdfs:comment "True to indicate that this class is only meant to be used inside of the graph that it has been defined in. This is often used to discourage instantiation outside of controlled scenarios. User interfaces may hide private classes from selection widgets." ;
-	] ;
 .
 
-rdfs:Datatype
-	a rdfs:Class ;
-	rdfs:subClassOf rdfs:Class ;
-	rdfs:label "Datatype" ;
-	rdfs:comment "The class of RDF datatypes." ;
-.
-
-rdfs:Literal
-	a rdfs:Class ;
-	rdfs:subClassOf rdfs:Resource ;
-	rdfs:label "Literal" ;
-	rdfs:comment "The class of literal values, eg. textual strings and integers." ;
-.
-
-rdf:List
-	a rdfs:Class ;
-	rdfs:subClassOf rdfs:Resource ;
-	rdfs:label "List" ;
-	rdfs:comment "The class of RDF Lists." ;
-.
-
-rdf:Property
-	a rdfs:Class ;
-	rdfs:subClassOf rdfs:Resource ;
-	rdfs:label "Property" ;
-	rdfs:comment "The class of RDF properties." ;
-.
-
-sh:text
-	a rdfs:Datatype ;
-	rdfs:subClassOf rdfs:Literal ;
-	rdfs:label "text" ;
-	rdfs:comment "The union of xsd:string and rdf:langString, to be used in cases where a property can either be a string or a string with a language tag. This type should never be used directly as the type of literals." ;
-.
-
-# Just a suggestion of commonly used datatypes - more should be added
-xsd:boolean a rdfs:Datatype ; rdfs:subClassOf rdfs:Literal ; rdfs:label "boolean" .
-xsd:date a rdfs:Datatype ; rdfs:subClassOf rdfs:Literal ; rdfs:label "date" .
-xsd:dateTime a rdfs:Datatype ; rdfs:subClassOf rdfs:Literal ; rdfs:label "dateTime" .
-xsd:decimal a rdfs:Datatype ; rdfs:subClassOf rdfs:Literal ; rdfs:label "decimal" .
-xsd:double a rdfs:Datatype ; rdfs:subClassOf rdfs:Literal ; rdfs:label "double" .
-xsd:float a rdfs:Datatype ; rdfs:subClassOf rdfs:Literal ; rdfs:label "float" .
-xsd:integer a rdfs:Datatype ; rdfs:subClassOf rdfs:Literal ; rdfs:label "integer" .
-xsd:string a rdfs:Datatype ; rdfs:subClassOf rdfs:Literal ; rdfs:label "string" .
-xsd:time a rdfs:Datatype ; rdfs:subClassOf rdfs:Literal ; rdfs:label "time" .
-rdf:langString a rdfs:Datatype ; rdfs:subClassOf rdfs:Literal ; rdfs:label "string with language" .
-
-
-# Graph management ------------------------------------------------------------
-
-sh:Graph
-	a sh:ShapeClass ;
-	rdfs:subClassOf rdfs:Resource ;
-	rdfs:label "Graph" ;
-	rdfs:comment "A collection of RDF triples identified by a URI. In a Linked Data scenario, a graph should be accessible from its URI via content negotiation in formats such as Turtle and JSON-LD." ;
+sh:GraphShape
+	a sh:Shape ;
+	sh:scopeClass owl:Ontology ;
+	rdfs:label "Graph shape" ;
+	rdfs:comment "Defines a couple of properties that are applicable to graphs. In the absence of a custom SHACL class such as sh:Graph, this shape applies to owl:Ontology which also holds owl:imports triples." ;
 	sh:property [
 		sh:predicate sh:entailment ;
 		sh:class rdfs:Resource ;
@@ -170,11 +111,13 @@ sh:Graph
 # Node kind vocabulary --------------------------------------------------------
 
 sh:NodeKind
-	a rdfs:Class ;
+	a sh:ShapeClass ;
 	rdfs:subClassOf rdfs:Resource ;
 	rdfs:label "Node kind" ;
-	rdfs:comment "The class of RDF node kinds: literals, blank nodes and IRIs." ;
-	# TODO: Maybe specify that this is an enumerated class (ISSUE-84)
+	rdfs:comment "The class of RDF node kinds: blank nodes, IRIs and literals." ;
+	sh:constraint [
+		sh:in ( sh:BlankNode sh:IRI sh:Literal ) ;
+	] ;
 .
 
 sh:BlankNode
@@ -196,89 +139,7 @@ sh:Literal
 .
 
 
-# Macros meta-model -----------------------------------------------------------
-
-# This is the meta model for Templates and Functions - encapsulated reusable
-# queries that can take arguments. 
-
-sh:Macro
-	a sh:ShapeClass ;
-	rdfs:subClassOf sh:ShapeClass ;
-	rdfs:label "Macro" ;
-	rdfs:comment "Abstract superclass of macro components of a SHACL library, especially Functions and Templates. Macros can take arguments, which are constraints that are different from PropertyConstraints in that they can only have at most one value." ;
-	sh:abstract true;
-	sh:property [
-		sh:predicate sh:argument ;
-		sh:class sh:Argument ;
-		rdfs:label "argument" ;
-		rdfs:comment "Declares the argument(s) of this macro." ;
-	] ;
-	sh:constraint [
-		a sh:SPARQLConstraint ;
-		rdfs:comment "The same predicate can only be used once at all Arguments." ;
-		sh:message "Duplicate Argument for the same predicate {?argPredicate}" ;
-		sh:predicate sh:argument ;
-		sh:sparql """
-			SELECT $this ($this AS ?subject) (?predicate AS ?argPredicate) (?argument1 AS ?object)
-			WHERE {
-				$this rdfs:subClassOf* ?class1 .
-				?class1 sh:argument ?argument1 .
-				?argument1 sh:predicate ?predicate .
-				$this rdfs:subClassOf* ?class2 .
-				?class2 sh:argument ?argument2 .
-				FILTER (?argument1 != ?argument2) .
-				?argument2 sh:predicate ?predicate .
-			}
-			""" ;
-	] ;
-.
-
-sh:Function
-	a sh:ShapeClass ;
-	rdfs:subClassOf sh:SPARQLExecutable ;
-	rdfs:subClassOf sh:Macro ;
-	rdfs:label "Function" ;
-	rdfs:comment "A macro implementing a SPARQL function, backed by a SPARQL ASK or SELECT query." ;
-	sh:property [
-		sh:predicate sh:cachable ;
-		sh:datatype xsd:boolean ;
-		sh:maxCount 1 ;
-		rdfs:label "cachable" ;
-		rdfs:comment "True to indicate that this function will always return the same values for the same combination of arguments, regardless of the query graphs. Engines can use this information to cache and reuse previous function calls." ;
-	] ;
-.
-
-sh:ValidationFunctions
-	a sh:Function ;
-	rdfs:subClassOf rdfs:Resource ;
-	sh:abstract true ;
-	rdfs:label "Validation functions" ;
-	rdfs:comment "The recommended abstract superclass for all validation functions that take a value as an argument and return a boolean result (true if the value is OK)." ;
-	sh:argument [
-		sh:index 0 ;
-		sh:predicate sh:value ;
-		rdfs:comment "The value to validate." ;
-	] ;
-.
-
-sh:Template
-	a sh:ShapeClass ;
-	rdfs:subClassOf sh:Macro ;
-	rdfs:subClassOf sh:SPARQLExecutable ;
-	rdfs:label "Template" ;
-	rdfs:comment "A macro that acts as an abstraction of a (reusable) SPARQL query. The query can be parameterized by the supplied arguments." ;
-	sh:abstract true ;
-	sh:property [
-		sh:predicate sh:labelTemplate ;
-		sh:datatype sh:text ;
-		rdfs:label "label template" ;
-		rdfs:comment "Outlines how human-readable labels of instances of this template class shall be produced. The values must be strings that can contain {?argName} as placeholders for the actual values of the given argument. There may be multiple values, for different languages." ;
-	] ;
-.
-
-
 # Results vocabulary ----------------------------------------------------------
-
 # This vocabulary describes the output of constraint validation
 
 sh:AbstractResult
@@ -414,6 +275,80 @@ sh:ResultAnnotation
 		rdfs:comment "The name of the SPARQL variable from the SELECT clause that shall be used for the values." ;
 		sh:maxCount 1 ;
 		sh:datatype xsd:string ;
+	] ;
+.
+
+
+# Macros meta-model -----------------------------------------------------------
+
+# This is the meta model for Templates and Functions - encapsulated reusable
+# queries that can take arguments. 
+
+sh:Macro
+	a sh:ShapeClass ;
+	rdfs:subClassOf sh:ShapeClass ;
+	rdfs:label "Macro" ;
+	rdfs:comment "Abstract superclass of macro components of a SHACL library, especially Functions and Templates. Macros can take arguments, which are constraints that are different from PropertyConstraints in that they can only have at most one value." ;
+	sh:abstract true;
+	sh:property [
+		sh:predicate sh:argument ;
+		sh:class sh:Argument ;
+		rdfs:label "argument" ;
+		rdfs:comment "Declares the argument(s) of this macro." ;
+	] ;
+	sh:constraint [
+		a sh:SPARQLConstraint ;
+		rdfs:comment "The same predicate can only be used once at all Arguments." ;
+		sh:message "Duplicate Argument for the same predicate {?argPredicate}" ;
+		sh:predicate sh:argument ;
+		sh:sparql """
+			SELECT $this ($this AS ?subject) (?predicate AS ?argPredicate) (?argument1 AS ?object)
+			WHERE {
+				$this rdfs:subClassOf* ?class1 .
+				?class1 sh:argument ?argument1 .
+				?argument1 sh:predicate ?predicate .
+				$this rdfs:subClassOf* ?class2 .
+				?class2 sh:argument ?argument2 .
+				FILTER (?argument1 != ?argument2) .
+				?argument2 sh:predicate ?predicate .
+			}
+			""" ;
+	] ;
+.
+
+sh:Function
+	a sh:ShapeClass ;
+	rdfs:subClassOf sh:SPARQLExecutable ;
+	rdfs:subClassOf sh:Macro ;
+	rdfs:label "Function" ;
+	rdfs:comment "A macro implementing a SPARQL function, backed by a SPARQL ASK or SELECT query." ;
+.
+
+sh:ValidationFunctions
+	a sh:Function ;
+	rdfs:subClassOf rdfs:Resource ;
+	sh:abstract true ;
+	rdfs:label "Validation functions" ;
+	rdfs:comment "The recommended abstract superclass for all validation functions that take a value as an argument and return a boolean result (true if the value is OK)." ;
+	sh:argument [
+		sh:index 0 ;
+		sh:predicate sh:value ;
+		rdfs:comment "The value to validate." ;
+	] ;
+.
+
+sh:Template
+	a sh:ShapeClass ;
+	rdfs:subClassOf sh:Macro ;
+	rdfs:subClassOf sh:SPARQLExecutable ;
+	rdfs:label "Template" ;
+	rdfs:comment "A macro that acts as an abstraction of a (reusable) SPARQL query. The query can be parameterized by the supplied arguments." ;
+	sh:abstract true ;
+	sh:property [
+		sh:predicate sh:labelTemplate ;
+		sh:datatype sh:text ;
+		rdfs:label "label template" ;
+		rdfs:comment "Outlines how human-readable labels of instances of this template class shall be produced. The values must be strings that can contain {?argName} as placeholders for the actual values of the given argument. There may be multiple values, for different languages." ;
 	] ;
 .
 
@@ -629,6 +564,7 @@ sh:ConstraintTemplate
 	] ;
 .
 
+# TODO: This will likely removed, e.g. as suggested in ISSUE-95
 sh:AbstractValidationConstraintTemplate
 	a sh:ShapeClass ;
 	rdfs:subClassOf sh:ConstraintTemplate ;
@@ -645,6 +581,7 @@ sh:AbstractValidationConstraintTemplate
 	sh:abstract true ;
 .
 
+# TODO: This will likely removed, e.g. as suggested in ISSUE-95
 sh:NodeConstraintTemplate
 	a sh:ShapeClass ;
 	rdfs:subClassOf sh:AbstractValidationConstraintTemplate ;
@@ -652,6 +589,7 @@ sh:NodeConstraintTemplate
 	rdfs:comment "A constraint template that validates the focus node using the validation function." ;
 .
 
+# TODO: This will likely removed, e.g. as suggested in ISSUE-95
 sh:PropertyValueConstraintTemplate
 	a sh:ShapeClass ;
 	rdfs:subClassOf sh:AbstractValidationConstraintTemplate ;
@@ -659,6 +597,7 @@ sh:PropertyValueConstraintTemplate
 	rdfs:comment "A constraint template that validates all objects of triples that have the given focus node as subject and the given predicate." ;
 .
 
+# TODO: This will likely removed, e.g. as suggested in ISSUE-95
 sh:InversePropertyValueConstraintTemplate
 	a sh:ShapeClass ;
 	rdfs:subClassOf sh:AbstractValidationConstraintTemplate ;
@@ -666,7 +605,6 @@ sh:InversePropertyValueConstraintTemplate
 	rdfs:comment "A constraint template that validates all subjects of triples that have the given focus node as object and the given predicate." ;
 .
 
-# TODO: This name is easy to confuse with sh:ConstraintTemplate
 sh:TemplateConstraint
 	a sh:ConstraintTemplate ;
 	rdfs:subClassOf sh:Constraint ;
@@ -676,12 +614,9 @@ sh:TemplateConstraint
 .
 
 
-# Property templating sub-system ----------------------------------------------
-
-# The following templates cover frequently needed data modeling patterns.
-# They have in common that they are about one specific rdf:Property (predicate).
-# These templates are part of the core standard so that engines may decide to
-# hard-code them without requiring a full SPARQL implementation.
+# -----------------------------------------------------------------------------
+# Property constraint sub-system ----------------------------------------------
+# -----------------------------------------------------------------------------
 
 sh:AbstractPropertyConstraint
 	a sh:ConstraintTemplate ;
@@ -693,7 +628,7 @@ sh:AbstractPropertyConstraint
 		sh:predicate sh:predicate ;
 		sh:class rdf:Property ;
 		rdfs:label "predicate" ;
-		rdfs:comment "The Property being constrained." ;
+		rdfs:comment "The property being constrained." ;
 	] ;
 	sh:property [
 		sh:predicate rdfs:label ;
@@ -711,6 +646,7 @@ sh:AbstractPropertyConstraint
 
 # Arguments -------------------------------------------------------------------
 
+# TODO: This would be removed by the simplifications suggested in ISSUE-95
 sh:AbstractOptionalArgumentConstraint
 	a sh:ConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
@@ -792,6 +728,7 @@ sh:Argument
 
 # Property constraints --------------------------------------------------------
 
+# TODO: This would be combined into a validation function as suggested in ISSUE-95
 sh:AbstractClassPropertyConstraint
 	a sh:PropertyValueConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
@@ -810,6 +747,7 @@ sh:AbstractClassPropertyConstraint
 	sh:validationFunction sh:hasClass ;
 .
 
+# TODO: This would be combined into a validation function as suggested in ISSUE-95
 sh:AbstractDatatypePropertyConstraint
 	a sh:PropertyValueConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
@@ -828,6 +766,7 @@ sh:AbstractDatatypePropertyConstraint
 	sh:validationFunction sh:hasDatatype ;
 .
 
+# TODO: This would be combined into a validation function as suggested in ISSUE-95
 sh:AbstractDirectTypePropertyConstraint
 	a sh:PropertyValueConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
@@ -867,6 +806,7 @@ sh:AbstractHasValuePropertyConstraint
 		""" ;
 .
 
+# TODO: This would be combined into a validation function as suggested in ISSUE-95
 sh:AbstractInPropertyConstraint
 	a sh:PropertyValueConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
@@ -930,6 +870,7 @@ sh:AbstractMinCountPropertyConstraint
 		""" ;
 .
 
+# TODO: This would be combined into a validation function as suggested in ISSUE-95
 sh:AbstractNodeKindPropertyConstraint
 	a sh:PropertyValueConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
@@ -1035,6 +976,7 @@ sh:AbstractValueShapePropertyConstraint
 		""" ;
 .
 
+# TODO: This would be combined into a validation function as suggested in ISSUE-95
 sh:AbstractMaxLengthPropertyConstraint
 	a sh:PropertyValueConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
@@ -1052,6 +994,7 @@ sh:AbstractMaxLengthPropertyConstraint
 	sh:validationFunction sh:hasMaxLength ;
 .
 
+# TODO: This would be combined into a validation function as suggested in ISSUE-95
 sh:AbstractMinLengthPropertyConstraint
 	a sh:PropertyValueConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
@@ -1069,6 +1012,7 @@ sh:AbstractMinLengthPropertyConstraint
 	sh:validationFunction sh:hasMinLength ;
 .
 
+# TODO: This would be combined into a validation function as suggested in ISSUE-95
 sh:AbstractMaxExclusivePropertyConstraint
 	a sh:PropertyValueConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
@@ -1086,6 +1030,7 @@ sh:AbstractMaxExclusivePropertyConstraint
 	sh:validationFunction sh:hasMaxExclusive ;
 .
 
+# TODO: This would be combined into a validation function as suggested in ISSUE-95
 sh:AbstractMaxInclusivePropertyConstraint
 	a sh:PropertyValueConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
@@ -1103,6 +1048,7 @@ sh:AbstractMaxInclusivePropertyConstraint
 	sh:validationFunction sh:hasMaxInclusive ;
 .
 
+# TODO: This would be combined into a validation function as suggested in ISSUE-95
 sh:AbstractMinExclusivePropertyConstraint
 	a sh:PropertyValueConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
@@ -1120,6 +1066,7 @@ sh:AbstractMinExclusivePropertyConstraint
 	sh:validationFunction sh:hasMinExclusive ;
 .
 
+# TODO: This would be combined into a validation function as suggested in ISSUE-95
 sh:AbstractMinInclusivePropertyConstraint
 	a sh:PropertyValueConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
@@ -1137,6 +1084,7 @@ sh:AbstractMinInclusivePropertyConstraint
 	sh:validationFunction sh:hasMinInclusive ;
 .
 
+# TODO: This would be combined into a validation function as suggested in ISSUE-95
 sh:AbstractPatternPropertyConstraint
 	a sh:PropertyValueConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
@@ -1243,6 +1191,7 @@ sh:PropertyConstraint
 
 # Inverse property constraints ------------------------------------------------
 
+# TODO: This would be combined into a validation function as suggested in ISSUE-95
 sh:AbstractInInversePropertyConstraint
 	a sh:InversePropertyValueConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
@@ -1260,6 +1209,7 @@ sh:AbstractInInversePropertyConstraint
 	sh:validationFunction sh:isIn ;
 .
 
+# TODO: This would be combined into a validation function as suggested in ISSUE-95
 sh:AbstractClassInversePropertyConstraint
 	a sh:InversePropertyValueConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
@@ -1364,6 +1314,7 @@ sh:InversePropertyConstraint
 
 
 # Derived Values --------------------------------------------------------------
+# TODO: This feature has not been approved yet, see ISSUE-97
 
 sh:DerivedValuesTemplate
 	a sh:ShapeClass ;
@@ -1400,6 +1351,7 @@ sh:AbstractDerivedInversePropertyConstraint
 
 
 # Property Pair Constraint Templates ------------------------------------------
+# TODO: These are likely becoming integrated into sh:property, see ISSUE-103
 
 sh:AbstractPropertyPairConstraint
 	a sh:ConstraintTemplate ;
@@ -1504,6 +1456,7 @@ sh:NotEqualConstraint
 
 # Node constraints ------------------------------------------------------------
 
+# TODO: This would be combined into a validation function as suggested in ISSUE-95
 sh:AbstractClassNodeConstraint
 	a sh:NodeConstraintTemplate ;
 	rdfs:subClassOf sh:TemplateConstraint ;
@@ -1522,6 +1475,7 @@ sh:AbstractClassNodeConstraint
 	sh:validationFunction sh:hasClass ;
 .
 
+# TODO: This would be combined into a validation function as suggested in ISSUE-95
 sh:AbstractDatatypeNodeConstraint
 	a sh:NodeConstraintTemplate ;
 	rdfs:subClassOf sh:TemplateConstraint ;
@@ -1540,6 +1494,7 @@ sh:AbstractDatatypeNodeConstraint
 	sh:validationFunction sh:hasDatatype ;
 .
 
+# TODO: This would be combined into a validation function as suggested in ISSUE-95
 sh:AbstractDirectTypeNodeConstraint
 	a sh:NodeConstraintTemplate ;
 	rdfs:subClassOf sh:TemplateConstraint ;
@@ -1558,6 +1513,7 @@ sh:AbstractDirectTypeNodeConstraint
 	sh:validationFunction sh:hasDirectType ;
 .
 
+# TODO: This would be combined into a validation function as suggested in ISSUE-95
 sh:AbstractInNodeConstraint
 	a sh:NodeConstraintTemplate ;
 	rdfs:subClassOf sh:TemplateConstraint ;
@@ -1575,6 +1531,7 @@ sh:AbstractInNodeConstraint
 	sh:validationFunction sh:isIn ;
 .
 
+# TODO: This would be combined into a validation function as suggested in ISSUE-95
 sh:AbstractNodeKindNodeConstraint
 	a sh:NodeConstraintTemplate ;
 	rdfs:subClassOf sh:TemplateConstraint ;
@@ -1592,6 +1549,7 @@ sh:AbstractNodeKindNodeConstraint
 	sh:validationFunction sh:hasNodeKind ;
 .
 
+# TODO: This would be combined into a validation function as suggested in ISSUE-95
 sh:AbstractMaxLengthNodeConstraint
 	a sh:NodeConstraintTemplate ;
 	rdfs:subClassOf sh:TemplateConstraint ;
@@ -1609,6 +1567,7 @@ sh:AbstractMaxLengthNodeConstraint
 	sh:validationFunction sh:hasMaxLength ;
 .
 
+# TODO: This would be combined into a validation function as suggested in ISSUE-95
 sh:AbstractMinLengthNodeConstraint
 	a sh:NodeConstraintTemplate ;
 	rdfs:subClassOf sh:TemplateConstraint ;
@@ -1626,6 +1585,7 @@ sh:AbstractMinLengthNodeConstraint
 	sh:validationFunction sh:hasMinLength ;
 .
 
+# TODO: This would be combined into a validation function as suggested in ISSUE-95
 sh:AbstractMaxExclusiveNodeConstraint
 	a sh:NodeConstraintTemplate ;
 	rdfs:subClassOf sh:TemplateConstraint ;
@@ -1643,6 +1603,7 @@ sh:AbstractMaxExclusiveNodeConstraint
 	sh:validationFunction sh:hasMaxExclusive ;
 .
 
+# TODO: This would be combined into a validation function as suggested in ISSUE-95
 sh:AbstractMaxInclusiveNodeConstraint
 	a sh:NodeConstraintTemplate ;
 	rdfs:subClassOf sh:TemplateConstraint ;
@@ -1660,6 +1621,7 @@ sh:AbstractMaxInclusiveNodeConstraint
 	sh:validationFunction sh:hasMaxInclusive ;
 .
 
+# TODO: This would be combined into a validation function as suggested in ISSUE-95
 sh:AbstractMinExclusiveNodeConstraint
 	a sh:NodeConstraintTemplate ;
 	rdfs:subClassOf sh:TemplateConstraint ;
@@ -1677,6 +1639,7 @@ sh:AbstractMinExclusiveNodeConstraint
 	sh:validationFunction sh:hasMinExclusive ;
 .
 
+# TODO: This would be combined into a validation function as suggested in ISSUE-95
 sh:AbstractMinInclusiveNodeConstraint
 	a sh:NodeConstraintTemplate ;
 	rdfs:subClassOf sh:TemplateConstraint ;
@@ -1694,6 +1657,7 @@ sh:AbstractMinInclusiveNodeConstraint
 	sh:validationFunction sh:hasMinInclusive ;
 .
 
+# TODO: This would be combined into a validation function as suggested in ISSUE-95
 sh:AbstractPatternNodeConstraint
 	a sh:NodeConstraintTemplate ;
 	rdfs:subClassOf sh:TemplateConstraint ;
@@ -1752,6 +1716,7 @@ sh:NodeConstraint
 
 # Other Constraint Templates --------------------------------------------------
 
+# TODO: This would become sh:closed as suggested in ISSUE-103
 sh:ClosedShapeConstraint
 	a sh:ConstraintTemplate ;
 	rdfs:subClassOf sh:TemplateConstraint ;
@@ -1783,12 +1748,14 @@ sh:ClosedShapeConstraint
 		""" ;
 .
 
+# TODO: This would become sh:closed=true as suggested in ISSUE-103
 sh:Closed
 	a sh:ClosedShapeConstraint ;
 	rdfs:label "Closed" ;
 	rdfs:comment "A singleton instance of sh:ClosedShapeConstraint that can be shared between multiple shape definitions." ; 
 .
 
+# TODO: This would become sh:not as suggested in ISSUE-103
 sh:NotConstraint
 	a sh:ConstraintTemplate ;
 	rdfs:subClassOf sh:TemplateConstraint ;
@@ -1812,6 +1779,7 @@ sh:NotConstraint
 		""" ;
 .
 
+# TODO: This would become sh:and as suggested in ISSUE-103
 sh:AndConstraint
 	a sh:ConstraintTemplate ;
 	rdfs:subClassOf sh:TemplateConstraint ;
@@ -1835,6 +1803,7 @@ sh:AndConstraint
 		""" ;
 .
 
+# TODO: This would become sh:or as suggested in ISSUE-103
 sh:OrConstraint
 	a sh:ConstraintTemplate ;
 	rdfs:subClassOf sh:TemplateConstraint ;
@@ -2089,7 +2058,7 @@ sh:hasShape
 	] ;
 	sh:argument [
 		sh:predicate sh:arg3 ;
-		sh:class sh:Graph ;
+		sh:nodeKind sh:IRI ;
 		rdfs:comment "The graph containing the shape definitions." ;
 	] ;
 	sh:argument [
@@ -2137,7 +2106,7 @@ sh:isIn
 	sh:argument [
 		sh:index 2 ;
 		sh:predicate sh:shapesGraph ;
-		sh:class sh:Graph ;
+		sh:nodeKind sh:IRI ;
 		rdfs:label "shapes graph" ;
 		rdfs:comment "The graph containing the rdf:List." ;
 	] ;
@@ -2152,28 +2121,6 @@ sh:isIn
 		}
 		""" ;
 .	
-
-sh:propertyValue
-	a sh:Function ;
-	rdfs:label "property value" ;
-	rdfs:comment "Gets the 'first' value of a given property (?arg2) at a given subject (?arg1). The behavior is arbitrary if multiple values are present." ;
-	sh:argument [
-		sh:predicate sh:arg1 ;
-		sh:class rdfs:Resource ;
-		rdfs:comment "The subject resource." ;
-	] ;
-	sh:argument [
-		sh:predicate sh:arg2 ;
-		sh:class rdf:Property ;
-		rdfs:comment "The property to get the value of." ;
-	] ;
-	sh:sparql """
-		SELECT ?object
-		WHERE {
-			$arg1 $arg2 ?object .
-		}
-		""" ;
-.
 
 sh:countShapesWithMatchResult
 	a sh:Function ;
@@ -2313,8 +2260,78 @@ sh:DefaultValueTypeRule
 		""" ;
 .
 
+
+# RDFS Vocabulary (redefinition for completeness) -----------------------------
+
+rdfs:Resource
+	a rdfs:Class ;
+	rdfs:label "Resource" ;
+.
+
+rdfs:Class
+	a rdfs:Class ;
+	rdfs:subClassOf rdfs:Resource ;
+	rdfs:label "Class" ;
+	rdfs:comment "The class of classes." ;
+.
+
+rdfs:Datatype
+	a rdfs:Class ;
+	rdfs:subClassOf rdfs:Class ;
+	rdfs:label "Datatype" ;
+	rdfs:comment "The class of RDF datatypes." ;
+.
+
+rdfs:Literal
+	a rdfs:Class ;
+	rdfs:subClassOf rdfs:Resource ;
+	rdfs:label "Literal" ;
+	rdfs:comment "The class of literal values, eg. textual strings and integers." ;
+.
+
+rdf:List
+	a rdfs:Class ;
+	rdfs:subClassOf rdfs:Resource ;
+	rdfs:label "List" ;
+	rdfs:comment "The class of RDF Lists." ;
+.
+
+rdf:Property
+	a rdfs:Class ;
+	rdfs:subClassOf rdfs:Resource ;
+	rdfs:label "Property" ;
+	rdfs:comment "The class of RDF properties." ;
+.
+
+owl:Ontology
+	a rdfs:Class ;
+.
+
+# Just a suggestion of commonly used datatypes - more should be added
+xsd:boolean a rdfs:Datatype ; rdfs:subClassOf rdfs:Literal ; rdfs:label "boolean" .
+xsd:date a rdfs:Datatype ; rdfs:subClassOf rdfs:Literal ; rdfs:label "date" .
+xsd:dateTime a rdfs:Datatype ; rdfs:subClassOf rdfs:Literal ; rdfs:label "dateTime" .
+xsd:decimal a rdfs:Datatype ; rdfs:subClassOf rdfs:Literal ; rdfs:label "decimal" .
+xsd:double a rdfs:Datatype ; rdfs:subClassOf rdfs:Literal ; rdfs:label "double" .
+xsd:float a rdfs:Datatype ; rdfs:subClassOf rdfs:Literal ; rdfs:label "float" .
+xsd:integer a rdfs:Datatype ; rdfs:subClassOf rdfs:Literal ; rdfs:label "integer" .
+xsd:string a rdfs:Datatype ; rdfs:subClassOf rdfs:Literal ; rdfs:label "string" .
+xsd:time a rdfs:Datatype ; rdfs:subClassOf rdfs:Literal ; rdfs:label "time" .
+rdf:langString a rdfs:Datatype ; rdfs:subClassOf rdfs:Literal ; rdfs:label "string with language" .
+
+
+# TODO: This may get deleted if ISSUE-104 is approved - sh:datatype (xsd:string rdf:langString )
+sh:text
+	a rdfs:Datatype ;
+	rdfs:subClassOf rdfs:Literal ;
+	rdfs:label "text" ;
+	rdfs:comment "The union of xsd:string and rdf:langString, to be used in cases where a property can either be a string or a string with a language tag. This type should never be used directly as the type of literals." ;
+.
+
+
 # System Property declarations ------------------------------------------------
 
+# TODO: This will likely become sh:scopeNode, attached to sh:Shape (ISSUE-61)
 # sh:nodeShape could alternatively be attached via sh:property to rdfs:Resource,
 # if validation is required.  However this would make it show up on all forms etc,
 # leading to a lot of extra filtering work.
@@ -2380,7 +2397,6 @@ sh:pattern a rdf:Property ; rdfs:label "pattern" .
 sh:predicate a rdf:Property ; rdfs:label "predicate" .
 sh:predicate1 a rdf:Property ; rdfs:label "predicate 1" .
 sh:predicate2 a rdf:Property ; rdfs:label "predicate 2" .
-sh:private a rdf:Property ; rdfs:label "private" .
 sh:property a rdf:Property ; rdfs:label "property" .
 sh:qualifiedMaxCount a rdf:Property ; rdfs:label "qualified max count" .
 sh:qualifiedMinCount a rdf:Property ; rdfs:label "qualified min count" .
