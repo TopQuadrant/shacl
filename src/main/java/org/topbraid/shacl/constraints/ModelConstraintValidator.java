@@ -138,7 +138,7 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 		else if(shape.hasProperty(SH.scopeClass)) {
 			return true;
 		}
-		else if(dataModel.contains(null, SH.nodeShape, shape)) {
+		else if(shape.hasProperty(SH.scopeNode)) {
 			return true;
 		}
 		else {

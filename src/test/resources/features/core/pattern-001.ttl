@@ -15,6 +15,11 @@
 
 ex:MyShape
 	a sh:Shape ;
+	sh:scopeNode ex:ValidResource1 ;
+	sh:scopeNode ex:ValidResource2 ;
+	sh:scopeNode ex:InvalidResource1 ;
+	sh:scopeNode ex:InvalidResource2 ;
+	sh:scopeNode ex:InvalidResource3 ;
 	sh:property [
 		sh:predicate ex:property ;
 		sh:pattern "^123" ;
@@ -26,30 +31,25 @@ ex:MyShape
 
 # Valid
 ex:ValidResource1
-	sh:nodeShape ex:MyShape ;
 	ex:property "12345" ;
 .
 
 # Valid
 ex:ValidResource2
-	sh:nodeShape ex:MyShape ;
 	ex:property 123 ;
 .
 
 # Invalid: does not start with 123
 ex:InvalidResource1
-	sh:nodeShape ex:MyShape ;
 	ex:property "The 123" ;
 .
 
 # Invalid: pattern not found
 ex:InvalidResource2
-	sh:nodeShape ex:MyShape ;
 	ex:property "132" ;
 .
 
 # Invalid: Blank node
 ex:InvalidResource3
-	sh:nodeShape ex:MyShape ;
 	ex:property [] ;
 .

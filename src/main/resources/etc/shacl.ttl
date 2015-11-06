@@ -1,7 +1,7 @@
 # baseURI: http://www.w3.org/ns/shacl
 
 # SHACL - Shapes Constraint Language
-# Draft last edited on 2015-10-30
+# Draft last edited on 2015-11-06
 # Editor: Holger Knublauch <holger@topquadrant.com>
 
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
@@ -59,6 +59,11 @@ sh:Shape
 		sh:class rdfs:Class ;
 		rdfs:label "scope class" ;
 		rdfs:comment "Links a Shape to a class, establishing that all instances of that class are expected to have this shape." ;
+	] ;
+	sh:property [
+		sh:predicate sh:scopeNode ;
+		rdfs:label "scope node" ;
+		rdfs:comment "Links a Shape to a node that is expected to have this shape." ;
 	] ;
 .
 
@@ -229,6 +234,9 @@ sh:Severity
 	rdfs:subClassOf rdfs:Resource ;
 	rdfs:label "Severity" ;
 	rdfs:comment "The class of severities. Consists of exactly: sh:Info, sh:Warning, sh:Violation." ;
+	sh:constraint [
+		sh:in ( sh:Info sh:Warning sh:Violation ) ;
+	] ;
 .
 
 sh:Info
@@ -1729,7 +1737,7 @@ sh:ClosedShapeConstraint
 		sh:class rdf:List ;
 		sh:optional true ;
 		rdfs:label "ignored properties" ;
-		rdfs:comment "A List of predicates that are permitted regardless of whether they have been declared as sh:property. Could be used to allow sh:nodeShape or rdf:type." ;
+		rdfs:comment "A List of predicates that are permitted regardless of whether they have been declared as sh:property. Could be used to allow rdf:type." ;
 	] ;
 	sh:sparql """
 		SELECT $this ($this AS ?subject) ?predicate ?object
@@ -2330,17 +2338,6 @@ sh:text
 
 
 # System Property declarations ------------------------------------------------
-
-# TODO: This will likely become sh:scopeNode, attached to sh:Shape (ISSUE-61)
-# sh:nodeShape could alternatively be attached via sh:property to rdfs:Resource,
-# if validation is required.  However this would make it show up on all forms etc,
-# leading to a lot of extra filtering work.
-sh:nodeShape
-	a rdf:Property ;
-	rdfs:label "node shape" ;
-	rdfs:comment "Links a resource with the shapes that it is supposed to have. All values of this property must be IRI nodes." ;
-	rdfs:range sh:Shape ;
-.
 
 rdf:type a rdf:Property ; rdfs:label "type" .
 rdfs:comment a rdf:Property ; rdfs:label "comment" .

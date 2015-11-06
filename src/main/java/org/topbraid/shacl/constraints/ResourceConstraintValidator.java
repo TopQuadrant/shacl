@@ -50,8 +50,8 @@ public class ResourceConstraintValidator extends AbstractConstraintValidator {
 	public Set<Resource> getShapesForResource(Resource resource, Dataset dataset, Model shapesModel) {
 		Set<Resource> shapes = new HashSet<Resource>();
 
-		// sh:nodeShape
-		shapes.addAll(JenaUtil.getResourceProperties(resource, SH.nodeShape));
+		// sh:scopeNode
+		shapes.addAll(shapesModel.listSubjectsWithProperty(SH.scopeNode, resource).toList());
 		
 		// rdf:type / sh:scopeClass
 		for(Resource type : JenaUtil.getAllTypes(resource)) {

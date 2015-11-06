@@ -15,6 +15,7 @@
 
 ex:MyShape
 	a sh:Shape ;
+	sh:scopeNode ex:Instance ;
 	sh:property [
 		sh:predicate ex:property ;
 		sh:valueShape ex:MyShape ;
@@ -24,5 +25,4 @@ ex:MyShape
 # Instances -------------------------------------------------------------------
 
 ex:Instance
-	sh:nodeShape ex:MyShape ;
 	ex:property ex:Instance .

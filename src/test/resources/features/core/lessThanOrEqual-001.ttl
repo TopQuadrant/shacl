@@ -16,6 +16,11 @@
 
 ex:MyShape
 	a sh:Shape ;
+	sh:scopeNode ex:ValidResource1 ;
+	sh:scopeNode ex:ValidResource2 ;
+	sh:scopeNode ex:ValidResource3 ;
+	sh:scopeNode ex:InvalidResource1 ;
+	sh:scopeNode ex:InvalidResource2 ;
 	sh:constraint [
 		a sh:LessThanOrEqualConstraint ;
 		sh:predicate1 ex:property1 ;
@@ -26,33 +31,28 @@ ex:MyShape
 # Instances -------------------------------------------------------------------
 
 ex:ValidResource1
-	sh:nodeShape ex:MyShape ;
 	ex:property1 4 ;
 	ex:property2 6 ;
 .
 
 ex:ValidResource2
-	sh:nodeShape ex:MyShape ;
 	ex:property1 3.1 ;
 	ex:property1 3.2 ;
 .
 
 ex:ValidResource3
-	sh:nodeShape ex:MyShape ;
 	ex:property1 5 ;
 	ex:property2 5 ;
 .
 
 # Invalid: Values >
 ex:InvalidResource1
-	sh:nodeShape ex:MyShape ;
 	ex:property1 5 ;
 	ex:property2 4 ;
 .
 
 # Invalid: One combination does not match
 ex:InvalidResource2
-	sh:nodeShape ex:MyShape ;
 	ex:property1 4 ;
 	ex:property1 6;
 	ex:property2 5 ;

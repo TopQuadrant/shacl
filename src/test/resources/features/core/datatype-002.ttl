@@ -15,6 +15,10 @@
 
 ex:MyShape
 	a sh:Shape ;
+	sh:scopeNode ex:ValidInstance1 ;
+	sh:scopeNode ex:ValidInstance2 ;
+	sh:scopeNode ex:ValidInstance3 ;
+	sh:scopeNode ex:InvalidInstance1 ;
 	sh:property [
 		sh:predicate ex:value ;
 		sh:datatype sh:text ;
@@ -25,21 +29,17 @@ ex:MyShape
 # Data ------------------------------------------------------------------------
 
 ex:ValidInstance1
-	sh:nodeShape ex:MyShape ;
 	ex:value "A" ;
 .
 
 ex:ValidInstance2
-	sh:nodeShape ex:MyShape ;
 	ex:value "A"^^xsd:string ;
 .
 
 ex:ValidInstance3
-	sh:nodeShape ex:MyShape ;
 	ex:value "A"@en ;
 .
 
 ex:InvalidInstance1
-	sh:nodeShape ex:MyShape ;
 	ex:value 42 ;
 .

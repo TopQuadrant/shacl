@@ -160,8 +160,6 @@ public class SH {
 
     public final static Property minInclusive = ResourceFactory.createProperty(NS + "minInclusive");
 
-    public final static Property nodeShape = ResourceFactory.createProperty(NS + "nodeShape");
-
     public final static Property nodeKind = ResourceFactory.createProperty(NS + "nodeKind");
 
     public final static Property object = ResourceFactory.createProperty(NS + "object");
@@ -181,6 +179,8 @@ public class SH {
     public final static Property scope = ResourceFactory.createProperty(NS + "scope");
     
     public final static Property scopeClass = ResourceFactory.createProperty(NS + "scopeClass");
+
+    public final static Property scopeNode = ResourceFactory.createProperty(NS + "scopeNode");
     
     public final static Property severity = ResourceFactory.createProperty(NS + "severity");
     

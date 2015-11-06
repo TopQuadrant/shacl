@@ -31,6 +31,8 @@ ex:Person
 
 ex:Polentoni
 	a sh:Shape ;
+	sh:scopeNode ex:Diego ;
+	sh:scopeNode ex:Enrico ;
 	rdfs:comment "A Polentoni is someone who lives in northern Italy and who only knows other Polentonis." ;
 	sh:property [
 		sh:predicate ex:livesIn ;
@@ -65,5 +67,5 @@ ex:Diego ex:knows ex:Alessandro .
 ex:Enrico ex:knows ex:John .
 ex:John ex:knows ex:Maurizio .
 
-ex:Diego sh:nodeShape ex:Polentoni .   # Undefined due to infinite loop (Diego -> Alessandro -> Diego)
-ex:Enrico sh:nodeShape ex:Polentoni .  # Incorrect (Enrico -> John -> Maurizio)
+# ex:Diego: Undefined due to infinite loop (Diego -> Alessandro -> Diego)
+# ex:Enrico: Incorrect (Enrico -> John -> Maurizio)

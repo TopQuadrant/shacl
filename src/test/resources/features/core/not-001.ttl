@@ -16,6 +16,8 @@
 
 ex:NotExampleShape
 	a sh:Shape ;
+	sh:scopeNode ex:ValidInstance1 ;
+	sh:scopeNode ex:InvalidInstance1 ;
 	sh:constraint [
 		a sh:NotConstraint ;
 		sh:shape [
@@ -30,12 +32,9 @@ ex:NotExampleShape
 
 # Instances -------------------------------------------------------------------
 
-ex:ValidInstance1
-	sh:nodeShape ex:NotExampleShape ;
-.
+# ex:ValidInstance1
 
 # Invalid: has value
 ex:InvalidInstance1
-	sh:nodeShape ex:NotExampleShape ;
   	ex:property "Some value" ;
 .

@@ -16,11 +16,10 @@
 
 ex:MyShape
 	a sh:Shape ;
+	sh:scopeNode ex:ValidInstance1 ;
+	sh:scopeNode ex:InvalidInstance1 ;
 	sh:property [
 		sh:predicate ex:someProperty ;
-	] ;
-	sh:property [
-		sh:predicate sh:nodeShape ;
 	] ;
 	sh:constraint sh:Closed ;
 .
@@ -28,14 +27,12 @@ ex:MyShape
 # Instances -------------------------------------------------------------------
 
 ex:ValidInstance1
-	sh:nodeShape ex:MyShape ;
   	ex:someProperty 3 ;
 .
 
 # Invalid: rdf:type and ex:otherProperty not listed in shape
 ex:InvalidInstance1
 	a ex:SomeClass ;
-	sh:nodeShape ex:MyShape ;
   	ex:otherProperty 4 ;
   	ex:someProperty 3 ;
 .

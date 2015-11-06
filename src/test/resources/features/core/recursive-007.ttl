@@ -16,6 +16,8 @@
 
 ex:S
 	a sh:Shape ;
+	sh:scopeNode ex:a ;
+	sh:scopeNode ex:b ;
 	sh:constraint [
 		a sh:NotConstraint ;
 		sh:shape [
@@ -32,6 +34,3 @@ ex:S
 
 ex:a ex:p ex:b .
 ex:b ex:p ex:a .
-
-ex:a sh:nodeShape ex:S .
-ex:b sh:nodeShape ex:S .

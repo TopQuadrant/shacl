@@ -13,6 +13,8 @@ public interface SHACLAbstractPropertyConstraint extends SHACLTemplateCall {
 	
 	/**
 	 * Gets the declared sh:valueClass, sh:directValueType or sh:datatype (if any).
+	 * If none is declared, falls back to sh:nodeKind, e.g. returning rdfs:Resource
+	 * if sh:nodeKind is sh:IRI.
 	 * @return the value type or data type
 	 */
 	Resource getValueTypeOrDatatype();

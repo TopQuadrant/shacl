@@ -48,12 +48,27 @@ public abstract class SHACLAbstractPropertyConstraintImpl extends SHACLTemplateC
 			return valueClass;
 		}
 		else {
-			Resource directValueType = JenaUtil.getResourceProperty(this, SH.directType);
-			if(directValueType != null) {
-				return directValueType;
+			Resource datatype = JenaUtil.getResourceProperty(this, SH.datatype);
+			if(datatype != null) {
+				return datatype;
 			}
 			else {
-				return JenaUtil.getResourceProperty(this, SH.datatype);
+				Resource directValueType = JenaUtil.getResourceProperty(this, SH.directType);
+				if(directValueType != null) {
+					return directValueType;
+				}
+				else {
+					Resource kind = JenaUtil.getResourceProperty(this, SH.nodeKind);
+					if(SH.IRI.equals(kind) || SH.BlankNode.equals(kind)) {
+						return RDFS.Resource.inModel(getModel());
+					}
+					else if(SH.Literal.equals(kind)) {
+						return RDFS.Literal.inModel(getModel());
+					}
+					else {
+						return null;
+					}
+				}
 			}
 		}
 	}

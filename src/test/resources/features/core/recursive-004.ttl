@@ -33,6 +33,7 @@ ex:Associate
 
 ex:Contact
 	a sh:Shape ;
+	sh:scopeNode ex:Alice ;
 	sh:property [
 		sh:predicate ex:name ;
 		sh:minCount 1 ;
@@ -55,7 +56,6 @@ ex:Person
 
 ex:Alice
 	a ex:Person ;
-	sh:nodeShape ex:Contact ;
 	ex:name "Alice" ;
 	ex:knows ex:Bob ;
 	ex:knows ex:Charlie ;

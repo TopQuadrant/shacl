@@ -15,6 +15,8 @@
 
 ex:S
 	a sh:Shape ;
+	sh:scopeNode ex:a ;
+	sh:scopeNode ex:c ;
 	sh:property [
 		sh:predicate ex:p ;
 		sh:valueShape ex:T ;
@@ -23,6 +25,8 @@ ex:S
 
 ex:T
 	a sh:Shape ;
+	sh:scopeNode ex:b ;
+	sh:scopeNode ex:d ;
 	sh:property [
 		sh:predicate ex:q ;
 		sh:valueShape ex:S ;
@@ -36,8 +40,3 @@ ex:b ex:q ex:a .
 ex:b ex:q ex:c .
 ex:c ex:p ex:d .
 ex:d ex:q ex:a .
-
-ex:a sh:nodeShape ex:S .
-ex:b sh:nodeShape ex:T .
-ex:c sh:nodeShape ex:S .
-ex:d sh:nodeShape ex:T .

@@ -30,6 +30,11 @@ ex:UniqueLanguagePropertyConstraint
 
 ex:UniqueLanguageShape
 	a sh:Shape ;
+	sh:scopeNode ex:ValidInstance1 ;
+	sh:scopeNode ex:ValidInstance2 ;
+	sh:scopeNode ex:ValidInstance3 ;
+	sh:scopeNode ex:InvalidInstance1 ;
+	sh:scopeNode ex:InvalidInstance2 ;
 	sh:property [
 		a ex:UniqueLanguagePropertyConstraint ;
 		sh:predicate rdfs:label ;
@@ -38,29 +43,23 @@ ex:UniqueLanguageShape
 
 # Data ------------------------------------------------------------------------
 
-ex:ValidInstance1
-	sh:nodeShape ex:UniqueLanguageShape ;
-.
+# ex:ValidInstance1
 
 ex:ValidInstance2
-	sh:nodeShape ex:UniqueLanguageShape ;
 	rdfs:label "English"@en ;
 .
 
 ex:ValidInstance3
-	sh:nodeShape ex:UniqueLanguageShape ;
 	rdfs:label "English"@en ;
 	rdfs:label "French"@fr ;
 .
 
 ex:InvalidInstance1
-	sh:nodeShape ex:UniqueLanguageShape ;
 	rdfs:label "English"@en ;
 	rdfs:label "British"@en ;
 .
 
 ex:InvalidInstance2
-	sh:nodeShape ex:UniqueLanguageShape ;
 	rdfs:label "French"@fr ;
 	rdfs:label "English"@en ;
 	rdfs:label "None" ;

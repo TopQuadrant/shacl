@@ -15,6 +15,9 @@
 
 ex:MyShape
 	a sh:Shape ;
+	sh:scopeNode ex:ValidInstance1 ;
+	sh:scopeNode ex:InvalidInstance1 ;
+	sh:scopeNode ex:InvalidInstance2 ;
 	sh:property [
 		sh:predicate ex:value ;
 		sh:directType ex:SuperClass ;
@@ -43,16 +46,13 @@ ex:SubInstance
 .
 
 ex:ValidInstance1
-	sh:nodeShape ex:MyShape ;
 	ex:value ex:SuperInstance ;
 .
 
 ex:InvalidInstance1
-	sh:nodeShape ex:MyShape ;
 	ex:value ex:SubInstance ;
 .
 
 ex:InvalidInstance2
-	sh:nodeShape ex:MyShape ;
 	ex:value ex:InvalidInstance2 ;
 .

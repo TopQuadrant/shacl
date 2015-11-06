@@ -130,7 +130,7 @@ class SPARQLSubstitutions {
 		StringBuffer buffer = new StringBuffer();
 		String labelTemplate = template.getLexicalForm();
 		for(int i = 0; i < labelTemplate.length(); i++) {
-			if(i < labelTemplate.length() - 3 && labelTemplate.charAt(i) == '{' && labelTemplate.charAt(i + 1) == '?') {
+			if(i < labelTemplate.length() - 3 && labelTemplate.charAt(i) == '{' && (labelTemplate.charAt(i + 1) == '?' || labelTemplate.charAt(i + 1) == '$')) {
 				int varEnd = i + 2;
 				while(varEnd < labelTemplate.length()) {
 					if(labelTemplate.charAt(varEnd) == '}') {
@@ -167,8 +167,8 @@ class SPARQLSubstitutions {
 		
 		List<String> scopes = new LinkedList<String>();
 		
-		if(dataset.getDefaultModel().contains(null, SH.nodeShape, shape)) {
-			scopes.add("        ?this <" + SH.nodeShape + "> <" + shape.getURI() + "> .\n");
+		if(shape.getModel().contains(shape, SH.scopeNode, (RDFNode)null)) {
+			scopes.add("        GRAPH $shapesGraph { <" + shape.getURI() + "> <" + SH.scopeNode + "> ?this } .\n");
 		}
 		
 		if(JenaUtil.hasIndirectType(shape, RDFS.Class)) {

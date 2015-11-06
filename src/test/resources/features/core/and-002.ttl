@@ -24,6 +24,9 @@ ex:SuperShape
 
 ex:AndShape
 	a sh:Shape ;
+	sh:scopeNode ex:ValidInstance1 ;
+	sh:scopeNode ex:InvalidInstance1 ;
+	sh:scopeNode ex:InvalidInstance2 ;
 	sh:constraint [
 		a sh:AndConstraint ;
 		sh:shapes (
@@ -41,18 +44,14 @@ ex:AndShape
 # Instances -------------------------------------------------------------------
 
 ex:ValidInstance1
-	sh:nodeShape ex:AndShape ;
 	ex:property "One" ;
 .
 
 # Invalid: missing property
-ex:InvalidInstance1
-	sh:nodeShape ex:AndShape ;
-.
+# ex:InvalidInstance1
 
 # Invalid: more than one property
 ex:InvalidInstance2
-	sh:nodeShape ex:AndShape ;
 	ex:property "One" ;
 	ex:property "Two" ;
 .

@@ -29,6 +29,7 @@ ex:sh
 
 ex:sha
 	a sh:Shape ;
+	sh:scopeNode ex:a ;
 	sh:constraint [
 		a sh:OrConstraint ;
 		sh:shapes (
@@ -56,5 +57,3 @@ ex:a ex:q ex:x .
 ex:a ex:r ex:y .
 ex:x ex:p ex:y .
 ex:y ex:p ex:x .
-
-ex:a sh:nodeShape ex:sha .

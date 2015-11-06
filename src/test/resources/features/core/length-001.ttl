@@ -15,6 +15,14 @@
 
 ex:MyShape
 	a sh:Shape ;
+	sh:scopeNode ex:ValidResource1 ;
+	sh:scopeNode ex:ValidResource2 ;
+	sh:scopeNode ex:ValidResource3 ;
+	sh:scopeNode ex:ValidResource4 ;
+	sh:scopeNode ex:InvalidResource1 ;
+	sh:scopeNode ex:InvalidResource2 ;
+	sh:scopeNode ex:InvalidResource3 ;
+	sh:scopeNode ex:InvalidResource4 ;
 	sh:property [
 		sh:predicate ex:property ;
 		sh:minLength 1 ;
@@ -27,48 +35,40 @@ ex:MyShape
 
 # Valid
 ex:ValidResource1
-	sh:nodeShape ex:MyShape ;
 	ex:property "a" ;
 .
 
 # Valid
 ex:ValidResource2
-	sh:nodeShape ex:MyShape ;
 	ex:property "abcde" ;
 .
 
 # Valid
 ex:ValidResource3
-	sh:nodeShape ex:MyShape ;
 	ex:property 12345 ;
 .
 
 # Valid
 ex:ValidResource4
-	sh:nodeShape ex:MyShape ;
 	ex:property <urn:a> ;
 .
 
 # Invalid: too short
 ex:InvalidResource1
-	sh:nodeShape ex:MyShape ;
 	ex:property "" ;
 .
 
 # Invalid: too long
 ex:InvalidResource2
-	sh:nodeShape ex:MyShape ;
 	ex:property "abcdef" ;
 .
 
 # Invalid: too long
 ex:InvalidResource3
-	sh:nodeShape ex:MyShape ;
 	ex:property 123456 ;
 .
 
 # Invalid: blank nodes don't have any length
 ex:InvalidResource4
-	sh:nodeShape ex:MyShape ;
 	ex:property [ ] ;
 .

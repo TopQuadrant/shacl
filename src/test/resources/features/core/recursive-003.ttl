@@ -16,6 +16,7 @@
 
 ex:recursionShapeExample
    a sh:Shape ;
+   sh:scopeNode ex:Instance1 ;
    sh:property [
       sh:predicate ex:someProperty ;
       sh:valueShape ex:hasAShape ;
@@ -75,7 +76,6 @@ ex:InstanceOfB
 .
 
 ex:Instance1
-	sh:nodeShape ex:recursionShapeExample ;
 	ex:someProperty ex:Instance2 ;
 .
 

@@ -16,6 +16,7 @@
 
 ex:APGARObservationShape
 	a sh:Shape ;
+	sh:scopeNode ex:Observation1 ;
 	sh:property [
 		sh:predicate ex:related ;
 		sh:qualifiedMinCount 3 ;

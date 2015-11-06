@@ -15,6 +15,10 @@
 
 ex:MyShape
 	a sh:Shape ;
+	sh:scopeNode ex:ValidResource1 ;
+	sh:scopeNode ex:ValidResource2 ;
+	sh:scopeNode ex:InvalidResource1 ;
+	sh:scopeNode ex:InvalidResource2 ;
 	sh:property [
 		sh:predicate ex:property ;
 		sh:maxInclusive 1 ;
@@ -26,24 +30,20 @@ ex:MyShape
 
 # Valid
 ex:ValidResource1
-	sh:nodeShape ex:MyShape ;
 	ex:property 0 ;
 .
 
 # Valid
 ex:ValidResource2
-	sh:nodeShape ex:MyShape ;
 	ex:property 1 ;
 .
 
 # Invalid: > value
 ex:InvalidResource1
-	sh:nodeShape ex:MyShape ;
 	ex:property 2 ;
 .
 
 # Invalid: cannot compare
 ex:InvalidResource2
-	sh:nodeShape ex:MyShape ;
 	ex:property "a" ;
 .
