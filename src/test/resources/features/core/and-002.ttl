@@ -28,8 +28,7 @@ ex:AndShape
 	sh:scopeNode ex:InvalidInstance1 ;
 	sh:scopeNode ex:InvalidInstance2 ;
 	sh:constraint [
-		a sh:AndConstraint ;
-		sh:shapes (
+		sh:and (
 			ex:SuperShape
 			[
 				sh:property [

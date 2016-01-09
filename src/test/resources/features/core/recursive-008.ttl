@@ -18,8 +18,7 @@ ex:S
 	a sh:Shape ;
 	sh:scopeNode ex:a ;
 	sh:constraint [
-		a sh:NotConstraint ;
-		sh:shape [
+		sh:not [
 			a sh:Shape ;
 			sh:property [
 				sh:predicate ex:p ;

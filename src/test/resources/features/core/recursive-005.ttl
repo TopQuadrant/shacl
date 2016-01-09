@@ -16,8 +16,7 @@
 ex:sh
 	a sh:Shape ;
 	sh:constraint [
-		a sh:NotConstraint ;
-		sh:shape [
+		sh:not [
 			a sh:Shape ;
 			sh:property [
 				sh:predicate ex:p ;
@@ -31,8 +30,7 @@ ex:sha
 	a sh:Shape ;
 	sh:scopeNode ex:a ;
 	sh:constraint [
-		a sh:OrConstraint ;
-		sh:shapes (
+		sh:or (
 			[
 				a sh:Shape ;
 				sh:property [

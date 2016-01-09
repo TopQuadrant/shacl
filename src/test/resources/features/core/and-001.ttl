@@ -18,8 +18,7 @@ ex:Rectangle
 	a sh:ShapeClass ;
 	rdfs:subClassOf rdfs:Resource ;
 	sh:constraint [
-		a sh:AndConstraint ;
-		sh:shapes (
+		sh:and (
 			[
 				sh:property [
 					sh:predicate ex:width ;

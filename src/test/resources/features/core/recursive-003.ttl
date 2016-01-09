@@ -25,29 +25,25 @@ ex:recursionShapeExample
 ex:hasAShape
    a sh:Shape ;
       sh:constraint [
-         a sh:AndConstraint ;
-         sh:shapes (ex:ValueTypeAShape ex:notBShape)
+         sh:and (ex:ValueTypeAShape ex:notBShape)
       ] .
 
 ex:hasBShape
    a sh:Shape ;
       sh:constraint [
-         a sh:AndConstraint ;
-         sh:shapes (ex:ValueTypeBShape ex:notAShape)
+         sh:and (ex:ValueTypeBShape ex:notAShape)
       ] .
 
 ex:notAShape
    a sh:Shape ;
    sh:constraint [
-      a sh:NotConstraint ;
-      sh:shape ex:hasAShape ;
+      sh:not ex:hasAShape ;
    ] .
 
 ex:notBShape
    a sh:Shape ;
    sh:constraint [
-      a sh:NotConstraint ;
-      sh:shape ex:hasBShape;
+      sh:not ex:hasBShape;
    ] .
 
 ex:ValueTypeAShape

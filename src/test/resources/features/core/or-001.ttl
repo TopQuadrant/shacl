@@ -18,8 +18,7 @@ ex:RectangleWithArea
 	a sh:ShapeClass ;
 	rdfs:subClassOf rdfs:Resource ;
 	sh:constraint [
-		a sh:OrConstraint ;
-		sh:shapes (
+		sh:or (
 		[
 			sh:property [
 				sh:predicate ex:width ;

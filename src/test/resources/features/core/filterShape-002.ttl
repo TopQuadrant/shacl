@@ -40,8 +40,7 @@ ex:ExampleClass
 	a sh:ShapeClass;
 	rdfs:subClassOf rdfs:Resource ;
 	sh:constraint [
-		a sh:AndConstraint ;
-		sh:shapes (
+		sh:and (
 			ex:ScopedExampleShape
 			ex:NotScopedExampleShape
 		)

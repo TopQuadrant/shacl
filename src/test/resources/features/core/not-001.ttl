@@ -19,8 +19,7 @@ ex:NotExampleShape
 	sh:scopeNode ex:ValidInstance1 ;
 	sh:scopeNode ex:InvalidInstance1 ;
 	sh:constraint [
-		a sh:NotConstraint ;
-		sh:shape [
+		sh:not [
 			a sh:Shape ;
 			sh:property [
 				sh:predicate ex:property ;
