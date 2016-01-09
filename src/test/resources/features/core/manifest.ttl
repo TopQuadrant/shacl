@@ -283,7 +283,7 @@
 		sh:severity sh:Violation ;
   		sh:focusNode ex:InvalidResource1 ;
   		sh:subject ex:InvalidResource1 ;
-  		sh:predicate ex:property2 ;
+  		sh:predicate ex:property1 ;
   		sh:object "B" ;
 	] ;
 	mf:result [
@@ -299,7 +299,7 @@
 		sh:severity sh:Violation ;
   		sh:focusNode ex:InvalidResource3 ;
   		sh:subject ex:InvalidResource3 ;
-  		sh:predicate ex:property2 ;
+  		sh:predicate ex:property1 ;
   		sh:object "A" ;
 	] ;
 	mf:result [

@@ -793,6 +793,40 @@ sh:AbstractDirectTypePropertyConstraint
 	sh:validationFunction sh:hasDirectType ;
 .
 
+sh:AbstractEqualsPropertyConstraint
+	a sh:ConstraintTemplate ;
+	rdfs:subClassOf sh:AbstractPropertyConstraint ;
+	rdfs:label "Abstract equals property constraint" ;
+	rdfs:comment "Reports an error for any value of the predicate that is not also a value of the specified other predicate and vice-versa, for the same focus node." ;
+	sh:abstract true ;
+	sh:argument [
+		sh:predicate sh:equals ;
+		sh:optionalWhenInherited true ;
+		sh:class rdf:Property ;
+		sh:name "equals" ;
+		sh:description "The property that is expected to have equal values." ;
+	] ;
+	sh:message "Value sets of {?predicate} and {?equals} must be equal" ;
+	sh:sparql """
+		SELECT $this ($this AS ?subject) $predicate ?object
+		WHERE {
+			{
+				$this $predicate ?object .
+				FILTER NOT EXISTS {
+					$this $equals ?object .
+				}
+			}
+			UNION
+			{
+				$this $equals ?object .
+				FILTER NOT EXISTS {
+					$this $predicate ?object .
+				}
+			}
+		}
+		"""
+.
+
 sh:AbstractHasValuePropertyConstraint
 	a sh:ConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractPropertyConstraint ;
@@ -830,6 +864,54 @@ sh:AbstractInPropertyConstraint
 	] ;
 	sh:message "Value is not one of the allowed values" ;
 	sh:validationFunction sh:isIn ;
+.
+
+sh:AbstractLessThanPropertyConstraint
+	a sh:ConstraintTemplate ;
+	rdfs:subClassOf sh:AbstractPropertyConstraint ;
+	rdfs:label "Abstract less than property constraint" ;
+	rdfs:comment "Reports an error for any pair of values of the two properties for the same focus node, where the first value is not less than the second value." ;
+	sh:abstract true ;
+	sh:argument [
+		sh:predicate sh:lessThan ;
+		sh:optionalWhenInherited true ;
+		sh:class rdf:Property ;
+		sh:name "less than" ;
+		sh:description "The property that must not have lesser values." ;
+	] ;
+	sh:message "Values of {?predicate} must be less than the values of {?lessThan}" ;
+	sh:sparql """
+		SELECT $this ($this AS ?subject) $predicate ?object
+		WHERE {
+			$this $predicate ?object .
+			$this $lessThan ?object2 .
+			FILTER (!(?object < ?object2)) .
+		}
+		"""
+.
+
+sh:AbstractLessThanOrEqualsPropertyConstraint
+	a sh:ConstraintTemplate ;
+	rdfs:subClassOf sh:AbstractPropertyConstraint ;
+	rdfs:label "Abstract less than or equals property constraint" ;
+	rdfs:comment "Reports an error for any pair of values of the two properties for the same focus node, where the first value is greater than the second value." ;
+	sh:abstract true ;
+	sh:argument [
+		sh:predicate sh:lessThanOrEquals ;
+		sh:optionalWhenInherited true ;
+		sh:class rdf:Property ;
+		sh:name "less than or equals" ;
+		sh:description "The property that must not have lesser or equal values." ;
+	] ;
+	sh:message "Values of {?predicate} must be less or equals than the values of {?lessThanOrEquals}" ;
+	sh:sparql """
+		SELECT $this ($this AS ?subject) $predicate ?object
+		WHERE {
+			$this $predicate ?object .
+			$this $lessThanOrEquals ?object2 .
+			FILTER (!(?object <= ?object2)) .
+		}
+		"""
 .
 
 sh:AbstractMaxCountPropertyConstraint
@@ -894,6 +976,29 @@ sh:AbstractNodeKindPropertyConstraint
 	] ;
 	sh:message "Values must be of kind {?nodeKind}" ;
 	sh:validationFunction sh:hasNodeKind ;
+.
+
+sh:AbstractNotEqualsPropertyConstraint
+	a sh:ConstraintTemplate ;
+	rdfs:subClassOf sh:AbstractPropertyConstraint ;
+	rdfs:label "Abstract not equals property constraint" ;
+	rdfs:comment "Reports an error for any value of the predicate that is also a value of the specified other predicate, for the same focus node." ;
+	sh:abstract true ;
+	sh:argument [
+		sh:predicate sh:notEquals ;
+		sh:optionalWhenInherited true ;
+		sh:class rdf:Property ;
+		sh:name "not equals" ;
+		sh:description "The property that must not have equal values." ;
+	] ;
+	sh:message "Value sets of {?predicate} and {?equals} must not share equal values" ;
+	sh:sparql """
+		SELECT $this ($this AS ?subject) $predicate ?object
+		WHERE {
+			$this $predicate ?object .
+			$this $notEquals ?object .
+		}
+		"""
 .
 
 sh:AbstractQualifiedCountPropertyConstraint
@@ -1155,8 +1260,11 @@ sh:PropertyConstraint
 	rdfs:subClassOf sh:AbstractDatatypePropertyConstraint ;
 	rdfs:subClassOf sh:AbstractDerivedPropertyConstraint ;
 	rdfs:subClassOf sh:AbstractDirectTypePropertyConstraint ;
+	rdfs:subClassOf sh:AbstractEqualsPropertyConstraint ;
 	rdfs:subClassOf sh:AbstractHasValuePropertyConstraint ;
 	rdfs:subClassOf sh:AbstractInPropertyConstraint ;
+	rdfs:subClassOf sh:AbstractLessThanPropertyConstraint ;
+	rdfs:subClassOf sh:AbstractLessThanOrEqualsPropertyConstraint ;
 	rdfs:subClassOf sh:AbstractMaxCountPropertyConstraint ;
 	rdfs:subClassOf sh:AbstractMinCountPropertyConstraint ;
 	rdfs:subClassOf sh:AbstractMaxExclusivePropertyConstraint ;
@@ -1166,6 +1274,7 @@ sh:PropertyConstraint
 	rdfs:subClassOf sh:AbstractMaxLengthPropertyConstraint ;
 	rdfs:subClassOf sh:AbstractMinLengthPropertyConstraint ;
 	rdfs:subClassOf sh:AbstractNodeKindPropertyConstraint ;
+	rdfs:subClassOf sh:AbstractNotEqualsPropertyConstraint ;
 	rdfs:subClassOf sh:AbstractPatternPropertyConstraint ;
 	rdfs:subClassOf sh:AbstractQualifiedMaxCountPropertyConstraint ;
 	rdfs:subClassOf sh:AbstractQualifiedMinCountPropertyConstraint ;
@@ -1357,110 +1466,6 @@ sh:AbstractDerivedInversePropertyConstraint
 	] ;
 .
 
-
-# Property Pair Constraint Templates ------------------------------------------
-# TODO: These are likely becoming integrated into sh:property, see ISSUE-103
-
-sh:AbstractPropertyPairConstraint
-	a sh:ConstraintTemplate ;
-	rdfs:subClassOf sh:TemplateConstraint ;
-	rdfs:label "Abstract property pair constraint" ;
-	rdfs:comment "Shared superclass for templates that take two predicates as some of their arguments." ;
-	sh:abstract true ;
-	sh:argument [
-		sh:predicate sh:predicate1 ;
-		sh:class rdf:Property ;
-		sh:name "predicate 1" ;
-		sh:description "The first Property being constrained." ;
-	] ;
-	sh:argument [
-		sh:predicate sh:predicate2 ;
-		sh:class rdf:Property ;
-		sh:name "predicate 2" ;
-		sh:description "The second Property being constrained." ;
-	] ;
-	sh:constraint [
-		a sh:NotEqualConstraint ;
-		sh:predicate1 sh:predicate1 ;
-		sh:predicate2 sh:predicate2 ;
-		sh:description "The two predicates must not be equal" ;
-	] ;
-.
-
-sh:EqualConstraint
-	a sh:ConstraintTemplate ;
-	rdfs:subClassOf sh:AbstractPropertyPairConstraint ;
-	rdfs:label "Equal property pair constraint" ;
-	rdfs:comment "Reports an error for any value of predicate 1 that is not also a value of predicate 2 and vice-versa, for the same focus node." ;
-	sh:message "Value sets of {?predicate1} and {?predicate2} must be equal" ;
-	sh:sparql """
-		SELECT $this ($this AS ?subject) ?predicate ?object
-		WHERE {
-			{
-				$this $predicate1 ?object .
-				FILTER NOT EXISTS {
-					$this $predicate2 ?object .
-				}
-				BIND ($predicate1 AS ?predicate) .
-			}
-			UNION
-			{
-				$this $predicate2 ?object .
-				FILTER NOT EXISTS {
-					$this $predicate1 ?object .
-				}
-				BIND ($predicate2 AS ?predicate) .
-			}
-		}
-		"""
-.
-
-sh:LessThanConstraint
-	a sh:ConstraintTemplate ;
-	rdfs:subClassOf sh:AbstractPropertyPairConstraint ;
-	rdfs:label "Less than property pair constraint" ;
-	rdfs:comment "Reports an error for any pair of values of the two properties for the same focus node, where the first value is not less than the second value." ;
-	sh:message "Values of {?predicate1} must be less than the values of {?predicate2}" ;
-	sh:sparql """
-		SELECT $this ($this AS ?subject) ($predicate1 AS ?predicate) ?object
-		WHERE {
-			$this $predicate1 ?object .
-			$this $predicate2 ?object2 .
-			FILTER (!(?object < ?object2)) .
-		}
-		"""
-.
-
-sh:LessThanOrEqualConstraint
-	a sh:ConstraintTemplate ;
-	rdfs:subClassOf sh:AbstractPropertyPairConstraint ;
-	rdfs:label "Less than or equal property pair constraint" ;
-	rdfs:comment "Reports an error for any pair of values of the two properties for the same focus node, where the first value is not less than or equal to the second value." ;
-	sh:message "Values of {?predicate1} must be less than or equal to the values of {?predicate2}" ;
-	sh:sparql """
-		SELECT $this ($this AS ?subject) ($predicate1 AS ?predicate) ?object
-		WHERE {
-			$this $predicate1 ?object .
-			$this $predicate2 ?object2 .
-			FILTER (!(?object <= ?object2)) .
-		}
-		"""
-.
-
-sh:NotEqualConstraint
-	a sh:ConstraintTemplate ;
-	rdfs:subClassOf sh:AbstractPropertyPairConstraint ;
-	rdfs:label "Not equal property pair constraint" ;
-	rdfs:comment "Reports an error for any pair of equal values of the two properties, for the same focus node." ;
-	sh:message "Values of {?predicate1} and {?predicate2} must not be equal" ;
-	sh:sparql """
-		SELECT $this ($this AS ?subject) ($predicate1 AS ?predicate) ?object
-		WHERE {
-			$this $predicate1 ?object .
-			$this $predicate2 ?object .
-		}
-		"""
-.
 
 # Node constraints ------------------------------------------------------------
 
@@ -2369,6 +2374,7 @@ sh:description a rdf:Property ; rdfs:label "description" .
 sh:directType a rdf:Property ; rdfs:label "direct type" .
 sh:detail a rdf:Property ; rdfs:label "detail" .
 sh:entailment a rdf:Property ; rdfs:label "entailment" .
+sh:equals a rdf:Property ; rdfs:label "equals" .
 sh:filterShape a rdf:Property ; rdfs:label "filter shape" .
 sh:flags a rdf:Property ; rdfs:label "flags" .
 sh:focusNode a rdf:Property ; rdfs:label "focus node" .

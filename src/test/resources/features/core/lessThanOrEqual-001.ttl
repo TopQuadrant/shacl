@@ -21,14 +21,16 @@ ex:MyShape
 	sh:scopeNode ex:ValidResource3 ;
 	sh:scopeNode ex:InvalidResource1 ;
 	sh:scopeNode ex:InvalidResource2 ;
-	sh:constraint [
-		a sh:LessThanOrEqualConstraint ;
-		sh:predicate1 ex:property1 ;
-		sh:predicate2 ex:property2 ;
-	] 
+	sh:property [
+		sh:predicate ex:property1 ;
+		sh:lessThanOrEquals ex:property2 ;
+	]
 .
 
 # Instances -------------------------------------------------------------------
+
+ex:property1 a rdf:Property .
+ex:property2 a rdf:Property .
 
 ex:ValidResource1
 	ex:property1 4 ;

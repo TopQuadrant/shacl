@@ -20,14 +20,16 @@ ex:MyShape
 	sh:scopeNode ex:ValidResource2 ;
 	sh:scopeNode ex:InvalidResource1 ;
 	sh:scopeNode ex:InvalidResource2 ;
-	sh:constraint [
-		a sh:NotEqualConstraint ;
-		sh:predicate1 ex:property1 ;
-		sh:predicate2 ex:property2 ;
+	sh:property [
+		sh:predicate ex:property1 ;
+		sh:notEquals ex:property2 ;
 	] 
 .
 
 # Instances -------------------------------------------------------------------
+
+ex:property1 a rdf:Property .
+ex:property2 a rdf:Property .
 
 ex:ValidResource1
 	ex:property1 "A" ;

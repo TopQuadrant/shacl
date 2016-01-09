@@ -22,23 +22,23 @@ ex:MyShape
 	sh:scopeNode ex:InvalidResource2 ;
 	sh:scopeNode ex:InvalidResource3 ;
 	sh:scopeNode ex:InvalidResource4 ;
-	sh:constraint [
-		a sh:EqualConstraint ;
-		sh:predicate1 ex:property1 ;
-		sh:predicate2 ex:property2 ;
+	sh:property [
+		sh:predicate ex:property1 ;
+		sh:equals ex:property2 ;
 	] 
 .
 
 # Instances -------------------------------------------------------------------
 
+ex:property1 a rdf:Property .
+ex:property2 a rdf:Property .
+
 ex:ValidResource1
-	sh:nodeShape ex:MyShape ;
 	ex:property1 "A" ;
 	ex:property2 "A" ;
 .
 
 ex:ValidResource2
-	sh:nodeShape ex:MyShape ;
 	ex:property1 "A" ;
 	ex:property1 "B" ;
 	ex:property2 "A" ;
@@ -46,23 +46,19 @@ ex:ValidResource2
 .
 
 ex:InvalidResource1
-	sh:nodeShape ex:MyShape ;
 	ex:property1 "A" ;
 	ex:property2 "B" ;
 .
 
 ex:InvalidResource2
-	sh:nodeShape ex:MyShape ;
 	ex:property1 "A" ;
 .
 
 ex:InvalidResource3
-	sh:nodeShape ex:MyShape ;
 	ex:property2 "A" ;
 .
 
 ex:InvalidResource4
-	sh:nodeShape ex:MyShape ;
 	ex:property1 "A" ;
 	ex:property1 "B" ;
 	ex:property2 "A" ;
