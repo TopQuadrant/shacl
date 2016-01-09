@@ -21,7 +21,7 @@ ex:MyShape
 	sh:scopeNode ex:InvalidInstance1 ;
 	sh:property [
 		sh:predicate ex:value ;
-		sh:datatype sh:text ;
+		sh:datatypeIn ( xsd:string rdf:langString ) ;
 	] ;
 .
 
