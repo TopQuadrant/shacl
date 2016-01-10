@@ -339,7 +339,7 @@ sh:ValidationFunctions
 	rdfs:label "Validation functions" ;
 	rdfs:comment "The recommended abstract superclass for all validation functions that take a value as an argument and return a boolean result (true if the value is OK)." ;
 	sh:argument [
-		sh:index 0 ;
+		sh:order 0 ;
 		sh:predicate sh:value ;
 		sh:description "The value to validate." ;
 	] ;
@@ -626,6 +626,19 @@ sh:TemplateConstraint
 # Property constraint sub-system ----------------------------------------------
 # -----------------------------------------------------------------------------
 
+sh:PropertyGroup
+	a rdfs:Class, sh:Shape ;
+	rdfs:subClassOf rdfs:Resource ;
+	rdfs:label "Property group" ;
+	rdfs:comment "Instances of this class represent groups of property constraints that belong together." ;
+	sh:property [
+		sh:predicate sh:order ;
+		sh:name "order" ;
+		sh:description "The relative order of the group when used in conjunction with other groups for the same focus node." ;
+		sh:datatype xsd:decimal ;
+	] ;
+.
+
 sh:AbstractPropertyConstraint
 	a sh:ConstraintTemplate ;
 	rdfs:subClassOf sh:TemplateConstraint ;
@@ -649,6 +662,21 @@ sh:AbstractPropertyConstraint
 		sh:datatypeIn ( xsd:string rdf:langString ) ;
 		sh:name "description" ;
 		sh:description "A description of the role of the predicate to users. Multiple values (for different languages) are supported." ;
+	] ;
+	sh:property [
+		sh:predicate sh:order ;
+		sh:name "order" ;
+		sh:description "The relative order of this property constraint for uses such as form building. Also used to determine the order of function arguments." ;
+		sh:datatype xsd:integer ;
+		sh:minInclusive 0 ;
+		sh:maxCount 1 ;
+	] ;
+	sh:property [
+		sh:predicate sh:group ;
+		sh:name "group" ;
+		sh:description "The group that this property constraint belongs to." ;
+		sh:class sh:PropertyGroup ;
+		sh:maxCount 1 ;
 	] ;
 .
 
@@ -699,14 +727,6 @@ sh:Argument
 	rdfs:label "Argument" ;
 	rdfs:comment "Declares an argument that gets mapped to a variable in the parameterized SPARQL query." ;
 	sh:labelTemplate "Argument {?predicate} : {?datatype}{?class}" ;
-	sh:property [
-		sh:predicate sh:index ;
-		sh:name "index" ;
-		sh:description "The index of this argument, especially to determine the order of arguments in a function call. Values should be 0, 1, 2 etc. The default index for sh:arg1 is 0 etc." ;
-		sh:datatype xsd:integer ;
-		sh:minInclusive 0 ;
-		sh:maxCount 1 ;
-	] ;
 	sh:constraint [
 		a sh:SPARQLConstraint ;
 		sh:message "Arguments cannot have both ?datatype and ?class" ;
@@ -1943,7 +1963,7 @@ sh:hasClass
 	rdfs:label "has class" ;
 	rdfs:comment "Checks whether a given node ($value) is an instance of a given class ($class) or its subclasses. Returns false if the value is a literal. Returns true if $class is rdfs:Resource. Returns true if $class is rdf:List and $value has a rdf:first value." ;
 	sh:argument [
-		sh:index 1 ;
+		sh:order 1 ;
 		sh:predicate sh:class ;
 		sh:class rdfs:Class ;
 		sh:description "The type that the node must have." ;
@@ -1967,13 +1987,13 @@ sh:hasClassIn
 	rdfs:label "has class in" ;
 	rdfs:comment "Checks whether a given node ($value) is an instance of a class from a given list ($classIn). Uses the same logic as sh:hasClass for each list member." ;
 	sh:argument [
-		sh:index 1 ;
+		sh:order 1 ;
 		sh:predicate sh:classIn ;
 		sh:class rdf:List ;
 		sh:description "The list of classes that the node may have." ;
 	] ;
 	sh:argument [
-		sh:index 2 ;
+		sh:order 2 ;
 		sh:predicate sh:shapesGraph ;
 		sh:nodeKind sh:IRI ;
 		sh:name "shapes graph" ;
@@ -2020,13 +2040,13 @@ sh:hasDatatypeIn
 	rdfs:label "has datatype in" ;
 	rdfs:comment "Checks whether a given node (?value) is a literal with a datatype from a given list (?datatypeIn). Uses the same logic as sh:hasDatatype for each list member." ;
 	sh:argument [
-		sh:index 1 ;
+		sh:order 1 ;
 		sh:predicate sh:datatypeIn ;
 		sh:class rdf:List ;
 		sh:description "The list of datatypes that the node may have." ;
 	] ;
 	sh:argument [
-		sh:index 2 ;
+		sh:order 2 ;
 		sh:predicate sh:shapesGraph ;
 		sh:nodeKind sh:IRI ;
 		sh:name "shapes graph" ;
@@ -2073,7 +2093,7 @@ sh:hasMaxLength
 	rdfs:comment "Checks whether a given string (?value) has a length within a given maximum string length." ;
 	sh:argument [
 		sh:predicate sh:maxLength ;
-		sh:index 1 ;
+		sh:order 1 ;
 		sh:datatype xsd:integer ;
 		sh:name "max length" ;
 		sh:description "The maximum string length." ;
@@ -2094,7 +2114,7 @@ sh:hasMinLength
 	rdfs:comment "Checks whether a given string (?value) has a length within a given minimum string length." ;
 	sh:argument [
 		sh:predicate sh:minLength ;
-		sh:index 1 ;
+		sh:order 1 ;
 		sh:datatype xsd:integer ;
 		sh:name "min length" ;
 		sh:description "The minimum string length." ;
@@ -2174,7 +2194,7 @@ sh:hasNodeKind
 	rdfs:label "has node kind" ;
 	rdfs:comment "Checks whether a given node (?value) has a given sh:NodeKind (?nodeKind). For example, sh:hasNodeKind(42, sh:Literal) = true." ;
 	sh:argument [
-		sh:index 1 ;
+		sh:order 1 ;
 		sh:predicate sh:nodeKind ;
 		sh:class sh:NodeKind ;
 		sh:description "The node kind that the node must have." ;
@@ -2195,13 +2215,13 @@ sh:hasPattern
 	rdfs:label "has pattern" ;
 	rdfs:comment "Checks whether the string representation of a given node (?value) matches a given regular expression (?pattern). Returns false if the value is a blank node." ;
 	sh:argument [
-		sh:index 1 ;
+		sh:order 1 ;
 		sh:predicate sh:pattern ;
 		sh:datatype xsd:string ;
 		sh:description "The regular expression to match." ;
 	] ;
 	sh:argument [
-		sh:index 2 ;
+		sh:order 2 ;
 		sh:predicate sh:flags ;
 		sh:datatype xsd:string ;
 		sh:optional true ;
@@ -2266,14 +2286,14 @@ sh:isIn
 	a sh:Function ;
 	rdfs:subClassOf sh:ValidationFunctions ;
 	sh:argument [
-		sh:index 1 ;
+		sh:order 1 ;
 		sh:predicate sh:in ;
 		sh:class rdf:List ;
 		sh:name "in" ;
 		sh:description "The rdf:List containing the allowed values." ;
 	] ;
 	sh:argument [
-		sh:index 2 ;
+		sh:order 2 ;
 		sh:predicate sh:shapesGraph ;
 		sh:nodeKind sh:IRI ;
 		sh:name "shapes graph" ;
@@ -2530,7 +2550,6 @@ sh:focusNode a rdf:Property ; rdfs:label "focus node" .
 sh:hasValue a rdf:Property ; rdfs:label "has value" .
 sh:ignoredProperties a rdf:Property ; rdfs:label "ignored properties" .
 sh:in a rdf:Property ; rdfs:label "in" .
-sh:index a rdf:Property ; rdfs:label "index" .
 sh:inverseProperty a rdf:Property ; rdfs:label "inverse property" .
 sh:labelTemplate a rdf:Property ; rdfs:label "label template" .
 sh:lessThan a rdf:Property ; rdfs:label "less than" .
@@ -2553,6 +2572,7 @@ sh:object a rdf:Property ; rdfs:label "object" .
 sh:optional a rdf:Property ; rdfs:label "optional" .
 sh:optionalWhenInherited a rdf:Property ; rdfs:label "optional when inherited" .
 sh:or a rdf:Property ; rdfs:label "or" .
+sh:order a rdf:Property ; rdfs:label "order" .
 sh:pattern a rdf:Property ; rdfs:label "pattern" .
 sh:predicate a rdf:Property ; rdfs:label "predicate" .
 sh:predicate1 a rdf:Property ; rdfs:label "predicate 1" .
