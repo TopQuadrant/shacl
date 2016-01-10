@@ -15,7 +15,7 @@
 # Shapes ----------------------------------------------------------------------
 
 ex:Issue
-	a sh:ShapeClass ;
+	a rdfs:Class, sh:Shape ;
 	rdfs:subClassOf rdfs:Resource ;
 	rdfs:label "Issue" ;
   	sh:property [
@@ -45,7 +45,7 @@ ex:Issue
 .
 
 ex:Person
-	a sh:ShapeClass ;
+	a rdfs:Class, sh:Shape ;
 	rdfs:subClassOf rdfs:Resource ;
 	rdfs:label "Person"^^xsd:string ;
 	sh:property [

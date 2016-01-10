@@ -15,7 +15,7 @@
 # Shapes ----------------------------------------------------------------------
 
 ex:Person
-	a sh:ShapeClass ;
+	a rdfs:Class, sh:Shape ;
 	rdfs:subClassOf rdfs:Resource ;
 	sh:property [
 		sh:predicate ex:livesIn ;

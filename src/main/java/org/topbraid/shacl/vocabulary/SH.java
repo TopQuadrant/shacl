@@ -76,8 +76,6 @@ public class SH {
     public final static Resource Scope = ResourceFactory.createResource(NS + "Scope");
 
     public final static Resource Shape = ResourceFactory.createResource(NS + "Shape");
-
-    public final static Resource ShapeClass = ResourceFactory.createResource(NS + "ShapeClass");
     
     public final static Resource SPARQLConstraint = ResourceFactory.createResource(NS + "SPARQLConstraint");
     
@@ -91,8 +89,6 @@ public class SH {
 
     public final static Resource Templates = ResourceFactory.createResource(NS + "Templates");
 
-    public final static Resource text = ResourceFactory.createResource(NS + "text");
-
     public final static Resource ValidationResult = ResourceFactory.createResource(NS + "ValidationResult");
 
     public final static Resource Violation = ResourceFactory.createResource(NS + "Violation");
@@ -101,6 +97,8 @@ public class SH {
 
     
     public final static Property abstract_ = ResourceFactory.createProperty(NS + "abstract");
+    
+    public final static Property and = ResourceFactory.createProperty(NS + "and");
 
     public final static Property argument = ResourceFactory.createProperty(NS + "argument");
 
@@ -115,6 +113,8 @@ public class SH {
     public final static Property defaultValueType = ResourceFactory.createProperty(NS + "defaultValueType");
 
     public final static Property derivedValues = ResourceFactory.createProperty(NS + "derivedValues");
+
+    public final static Property description = ResourceFactory.createProperty(NS + "description");
 
     public final static Property directType = ResourceFactory.createProperty(NS + "directType");
 
@@ -135,8 +135,6 @@ public class SH {
     public final static Property hasValue = ResourceFactory.createProperty(NS + "hasValue");
     
     public final static Property in = ResourceFactory.createProperty(NS + "in");
-
-    public final static Property index = ResourceFactory.createProperty(NS + "index");
 
     public final static Property inverse = ResourceFactory.createProperty(NS + "inverse");
 
@@ -160,7 +158,11 @@ public class SH {
 
     public final static Property minInclusive = ResourceFactory.createProperty(NS + "minInclusive");
 
+    public final static Property name = ResourceFactory.createProperty(NS + "name");
+
     public final static Property nodeKind = ResourceFactory.createProperty(NS + "nodeKind");
+    
+    public final static Property not = ResourceFactory.createProperty(NS + "not");
 
     public final static Property object = ResourceFactory.createProperty(NS + "object");
 
@@ -169,6 +171,10 @@ public class SH {
     public final static Property optional = ResourceFactory.createProperty(NS + "optional");
 
     public final static Property optionalWhenInherited = ResourceFactory.createProperty(NS + "optionalWhenInherited");
+    
+    public final static Property or = ResourceFactory.createProperty(NS + "or");
+
+    public final static Property order = ResourceFactory.createProperty(NS + "order");
 
     public final static Property predicate = ResourceFactory.createProperty(NS + "predicate");
 
@@ -185,8 +191,6 @@ public class SH {
     public final static Property severity = ResourceFactory.createProperty(NS + "severity");
     
     public final static Property shape = ResourceFactory.createProperty(NS + "shape");
-    
-    public final static Property shapes = ResourceFactory.createProperty(NS + "shapes");
 
     public final static Property shapesGraph = ResourceFactory.createProperty(NS + "shapesGraph");
 

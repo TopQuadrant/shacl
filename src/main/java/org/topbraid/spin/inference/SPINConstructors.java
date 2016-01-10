@@ -258,7 +258,8 @@ public class SPINConstructors {
 								}
 								if(explanations != null) {
 									Resource source = commandWrapper.getStatement().getSubject();
-									explanations.put(triple, explanationText, source.asNode());
+									explanations.put(triple, explanationText, source.asNode(),
+											commandWrapper.getSource() != null ? commandWrapper.getSource().asNode() : null);
 								}
 							}
 						}

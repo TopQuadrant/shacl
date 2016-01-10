@@ -15,7 +15,7 @@
 
 # Invalid: Missing sh:predicate, incorrect sh:datatype for sh:maxCount
 ex:MyClass
-	a sh:ShapeClass ;
+	a rdfs:Class, sh:Shape ;
 	rdfs:subClassOf rdfs:Class ;
 	sh:property [
 		a sh:PropertyConstraint ;

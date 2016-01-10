@@ -16,7 +16,7 @@ public interface SHACLArgument extends SHACLAbstractPropertyConstraint {
 	 * Gets the sh:index of this argument, falling back to 0 for sh:arg1, 1 for sh:arg2 etc.
 	 * @return the index or null if this doesn't have a sh:argX predicate and no sh:index is given
 	 */
-	Integer getIndex();
+	Integer getOrder();
 	
 	
 	boolean isOptional();

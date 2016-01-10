@@ -37,7 +37,7 @@ ex:NotScopedExampleShape
 .
 
 ex:ExampleClass
-	a sh:ShapeClass;
+	a rdfs:Class, sh:Shape;
 	rdfs:subClassOf rdfs:Resource ;
 	sh:constraint [
 		sh:and (

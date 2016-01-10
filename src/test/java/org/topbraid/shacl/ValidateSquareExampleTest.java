@@ -4,10 +4,9 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.UUID;
 
-import junit.framework.TestCase;
-
 import org.topbraid.shacl.arq.SHACLFunctions;
 import org.topbraid.shacl.constraints.ModelConstraintValidator;
+import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.util.JenaUtil;
@@ -18,6 +17,8 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.util.FileUtils;
+
+import junit.framework.TestCase;
 
 public class ValidateSquareExampleTest extends TestCase {
 
@@ -40,11 +41,14 @@ public class ValidateSquareExampleTest extends TestCase {
 			dataModel.getGraph()
 		});
 		Model shapesModel = ModelFactory.createModelForGraph(unionGraph);
-		
-		// Note that we don't perform validation of the shape definitions themselves.
-		// To do that, activate the following line to make sure that all required triples are present:
-		// dataModel = SHACLUtil.withDefaultValueTypeInferences(shapesModel);
 
+		// Set filtered to true to exclude schema-level constraint validation
+		boolean filtered = false;
+		if(!filtered) {
+			// If we want to validate the shapes too, then additional type triples are expected
+			dataModel = SHACLUtil.withDefaultValueTypeInferences(shapesModel);
+		}
+		
 		// Make sure all sh:Functions are registered
 		SHACLFunctions.registerFunctions(shapesModel);
 		
@@ -54,8 +58,10 @@ public class ValidateSquareExampleTest extends TestCase {
 		Dataset dataset = ARQFactory.get().getDataset(dataModel);
 		dataset.addNamedModel(shapesGraphURI.toString(), shapesModel);
 		
-		// Run the validator and print results
-		Model results = ModelConstraintValidator.get().validateModel(dataset, shapesGraphURI, null, false, null);
+		// Run the validator
+		Model results = ModelConstraintValidator.get().validateModel(dataset, shapesGraphURI, null, filtered, null);
+		
+		// Uncomment following line to see the validation results
 		// System.out.println(ModelPrinter.get().print(results));
 		
 		// Expecting 2 constraint violations (9 triples each)

@@ -81,6 +81,7 @@ public class JenaDatatypes {
 		otherDatatypeURIs.add(XSD.token.getURI());
 		otherDatatypeURIs.add(XSD.xboolean.getURI());
 		otherDatatypeURIs.add(XSD.xstring.getURI());
+		otherDatatypeURIs.add(RDFx.langString.getURI());
 		otherDatatypeURIs.add(RDFx.HTML.getURI());
 		otherDatatypeURIs.add(RDF.getURI() + "XMLLiteral");
 	}

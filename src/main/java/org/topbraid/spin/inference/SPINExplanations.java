@@ -21,6 +21,8 @@ import com.hp.hpl.jena.graph.Triple;
 public class SPINExplanations {
 	
 	private Map<Triple,Node> classes = new HashMap<Triple,Node>();
+	
+	private Map<Triple,Node> rules = new HashMap<Triple,Node>();
 
 	private Map<Triple,String> texts = new HashMap<Triple, String>();
 	
@@ -30,20 +32,14 @@ public class SPINExplanations {
 	 * @param triple  the inferred Triple
 	 * @param text  the query text to associate with the triple
 	 * @param cls  the class that was holding the rule
+	 * @param rule  the query or template call of the rule, or null
 	 */
-	public void put(Triple triple, String text, Node cls) {
+	public void put(Triple triple, String text, Node cls, Node rule) {
 		texts.put(triple, text);
 		classes.put(triple, cls);
-	}
-	
-	
-	/**
-	 * Gets the explanation text for a given inferred triple.
-	 * @param triple  the Triple to explain
-	 * @return the explanation or null if none found for triple
-	 */
-	public String getText(Triple triple) {
-		return texts.get(triple);
+		if(rule != null) {
+			rules.put(triple, rule);
+		}
 	}
 	
 	
@@ -54,5 +50,25 @@ public class SPINExplanations {
 	 */
 	public Node getClass(Triple triple) {
 		return classes.get(triple);
+	}
+	
+	
+	/**
+	 * Gets the rule resource defining the rule that inferred a given triple.
+	 * @param triple  the inferred Triple
+	 * @return the rule Node or null if this info is not available
+	 */
+	public Node getRule(Triple triple) {
+		return rules.get(triple);
+	}
+	
+	
+	/**
+	 * Gets the explanation text for a given inferred triple.
+	 * @param triple  the Triple to explain
+	 * @return the explanation or null if none found for triple
+	 */
+	public String getText(Triple triple) {
+		return texts.get(triple);
 	}
 }

@@ -40,9 +40,9 @@ public class SHACLArgumentImpl extends SHACLAbstractPropertyConstraintImpl imple
 
 	
 	@Override
-	public Integer getIndex() {
-		Integer index = JenaUtil.getIntegerProperty(this, SH.index);
-		if(index == null) {
+	public Integer getOrder() {
+		Integer order = JenaUtil.getIntegerProperty(this, SH.order);
+		if(order == null) {
 			Property predicate = getPredicate();
 			if(predicate != null && predicate.getURI().startsWith(SH_ARG)) {
 				try {
@@ -53,7 +53,7 @@ public class SHACLArgumentImpl extends SHACLAbstractPropertyConstraintImpl imple
 				}
 			}
 		}
-		return index;
+		return order;
 	}
 	
 

@@ -78,8 +78,8 @@ public class SHACLMacroImpl extends SHACLClassImpl implements SHACLMacro {
 				Property p1 = arg1.getPredicate();
 				Property p2 = arg2.getPredicate();
 				if(p1 != null && p2 != null) {
-					Integer index1 = arg1.getIndex();
-					Integer index2 = arg2.getIndex();
+					Integer index1 = arg1.getOrder();
+					Integer index2 = arg2.getOrder();
 					if(index1 != null) {
 						if(index2 != null) {
 							int comp = index1.compareTo(index2);

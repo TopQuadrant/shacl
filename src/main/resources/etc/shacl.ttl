@@ -1,7 +1,7 @@
 # baseURI: http://www.w3.org/ns/shacl
 
 # SHACL - Shapes Constraint Language
-# Draft last edited on 2016-01-10
+# Draft last edited on 2016-01-11
 # Editor: Holger Knublauch <holger@topquadrant.com>
 
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
@@ -20,7 +20,7 @@
 # Shape classes ---------------------------------------------------------------
 
 sh:Shape
-	a sh:ShapeClass ;
+	a rdfs:Class, sh:Shape ;
 	rdfs:subClassOf rdfs:Resource ;
 	rdfs:label "Shape" ;
 	rdfs:comment "The class of shapes." ;
@@ -67,15 +67,6 @@ sh:Shape
 	] ;
 .
 
-# TODO: Feature at risk, see ISSUE-23
-sh:ShapeClass
-	a rdfs:Class ;
-	rdfs:subClassOf rdfs:Class ;
-	rdfs:subClassOf sh:Shape ;
-	rdfs:label "Shape class" ;
-	rdfs:comment "The metaclass for classes that are also shapes. This is syntactic sugar for declaring an instance of both rdfs:Class and sh:Shape." ;
-.
-
 
 # Shapes that extend existing RDFS/OWL classes --------------------------------
 
@@ -116,7 +107,7 @@ sh:GraphShape
 # Node kind vocabulary --------------------------------------------------------
 
 sh:NodeKind
-	a sh:ShapeClass ;
+	a rdfs:Class, sh:Shape ;
 	rdfs:subClassOf rdfs:Resource ;
 	rdfs:label "Node kind" ;
 	rdfs:comment "The class of RDF node kinds: blank nodes, IRIs and literals." ;
@@ -148,7 +139,7 @@ sh:Literal
 # This vocabulary describes the output of constraint validation
 
 sh:AbstractResult
-	a sh:ShapeClass ;
+	a rdfs:Class, sh:Shape ;
 	rdfs:subClassOf rdfs:Resource ;
 	rdfs:label "Abstract Result" ;
 	rdfs:comment "Instances of subclasses of this class can be constructed during constraint validation." ;
@@ -223,14 +214,14 @@ sh:AbstractResult
 .
 
 sh:ValidationResult
-	a sh:ShapeClass ;
+	a rdfs:Class, sh:Shape ;
 	rdfs:subClassOf sh:AbstractResult ;
 	rdfs:label "Validation Result" ;
 	rdfs:comment "A validation result." ;
 .
 
 sh:Severity
-	a sh:ShapeClass ;
+	a rdfs:Class, sh:Shape ;
 	rdfs:subClassOf rdfs:Resource ;
 	rdfs:label "Severity" ;
 	rdfs:comment "The class of severities. Consists of exactly: sh:Info, sh:Warning, sh:Violation." ;
@@ -258,7 +249,7 @@ sh:Violation
 .
 
 sh:ResultAnnotation
-	a sh:ShapeClass ;
+	a rdfs:Class, sh:Shape ;
 	rdfs:subClassOf rdfs:Resource ;
 	rdfs:label "Result annotation" ;
 	rdfs:comment "Defines the rules to derive the values of a given annotation property as extra values for a constraint violation." ;
@@ -293,8 +284,8 @@ sh:ResultAnnotation
 # queries that can take arguments. 
 
 sh:Macro
-	a sh:ShapeClass ;
-	rdfs:subClassOf sh:ShapeClass ;
+	a rdfs:Class, sh:Shape ;
+	rdfs:subClassOf rdfs:Class ;
 	rdfs:label "Macro" ;
 	rdfs:comment "Abstract superclass of macro components of a SHACL library, especially Functions and Templates. Macros can take arguments, which are constraints that are different from PropertyConstraints in that they can only have at most one value." ;
 	sh:abstract true;
@@ -325,7 +316,7 @@ sh:Macro
 .
 
 sh:Function
-	a sh:ShapeClass ;
+	a rdfs:Class, sh:Shape ;
 	rdfs:subClassOf sh:SPARQLExecutable ;
 	rdfs:subClassOf sh:Macro ;
 	rdfs:label "Function" ;
@@ -346,7 +337,7 @@ sh:ValidationFunctions
 .
 
 sh:Template
-	a sh:ShapeClass ;
+	a rdfs:Class, sh:Shape ;
 	rdfs:subClassOf sh:Macro ;
 	rdfs:subClassOf sh:SPARQLExecutable ;
 	rdfs:label "Template" ;
@@ -364,7 +355,7 @@ sh:Template
 # Execution Support -----------------------------------------------------------
 
 sh:SPARQLExecutable
-	a sh:ShapeClass ;
+	a rdfs:Class, sh:Shape ;
 	rdfs:subClassOf rdfs:Class ;
 	sh:property [
 		sh:predicate sh:sparql ;
@@ -387,7 +378,7 @@ sh:Scope
 .
 
 sh:NativeScope
-	a sh:ShapeClass ;
+	a rdfs:Class, sh:Shape ;
 	sh:abstract true ;
 	rdfs:subClassOf sh:Scope ;
 	rdfs:label "Native scope" ;
@@ -395,7 +386,7 @@ sh:NativeScope
 .
 
 sh:SPARQLScope
-	a sh:ShapeClass ;
+	a rdfs:Class, sh:Shape ;
 	rdfs:subClassOf sh:NativeScope ;
 	rdfs:subClassOf sh:SPARQLExecutable ;
 	rdfs:label "SPARQL scope" ;
@@ -403,7 +394,7 @@ sh:SPARQLScope
 .
 
 sh:ScopeTemplate
-	a sh:ShapeClass ;
+	a rdfs:Class, sh:Shape ;
 	rdfs:subClassOf sh:Template ;
 	rdfs:label "Scope template" ;
 	rdfs:comment "A template that is used to compute a scope." ;
@@ -485,7 +476,7 @@ sh:PropertyScope
 # Constraint vocabulary -------------------------------------------------------
 
 sh:Constraint
-	a sh:ShapeClass ;
+	a rdfs:Class, sh:Shape ;
 	rdfs:subClassOf rdfs:Resource ;
 	rdfs:label "Constraint" ;
 	rdfs:comment "An abstract superclass of constraints. Constraints are either template calls or \"native\" constraints with an executable body." ;
@@ -506,7 +497,7 @@ sh:Constraint
 .
 
 sh:NativeConstraint
-	a sh:ShapeClass ;
+	a rdfs:Class, sh:Shape ;
 	rdfs:subClassOf sh:Constraint ;
 	rdfs:label "Native constraint" ;
 	rdfs:comment "A constraint that has a native executable body attached with it." ;
@@ -532,7 +523,7 @@ sh:NativeConstraint
 .
 
 sh:SPARQLConstraint
-	a sh:ShapeClass ;
+	a rdfs:Class, sh:Shape ;
 	rdfs:subClassOf sh:NativeConstraint ;
 	rdfs:subClassOf sh:SPARQLExecutable ;
 	rdfs:label "SPARQL constraint" ;
@@ -540,7 +531,7 @@ sh:SPARQLConstraint
 .
 
 sh:ConstraintTemplate
-	a sh:ShapeClass ;
+	a rdfs:Class, sh:Shape ;
 	rdfs:subClassOf sh:Template ;
 	rdfs:label "Constraint template" ;
 	rdfs:comment "A template that is used for constraint validation." ;
@@ -574,7 +565,7 @@ sh:ConstraintTemplate
 
 # TODO: This will likely removed, e.g. as suggested in ISSUE-95
 sh:AbstractValidationConstraintTemplate
-	a sh:ShapeClass ;
+	a rdfs:Class, sh:Shape ;
 	rdfs:subClassOf sh:ConstraintTemplate ;
 	rdfs:label "Abstract validation constraint template" ;
 	rdfs:comment "A constraint template that points to a function that validates one given value at a time." ;
@@ -591,7 +582,7 @@ sh:AbstractValidationConstraintTemplate
 
 # TODO: This will likely removed, e.g. as suggested in ISSUE-95
 sh:NodeConstraintTemplate
-	a sh:ShapeClass ;
+	a rdfs:Class, sh:Shape ;
 	rdfs:subClassOf sh:AbstractValidationConstraintTemplate ;
 	rdfs:label "Node constraint template" ;
 	rdfs:comment "A constraint template that validates the focus node using the validation function." ;
@@ -599,7 +590,7 @@ sh:NodeConstraintTemplate
 
 # TODO: This will likely removed, e.g. as suggested in ISSUE-95
 sh:PropertyValueConstraintTemplate
-	a sh:ShapeClass ;
+	a rdfs:Class, sh:Shape ;
 	rdfs:subClassOf sh:AbstractValidationConstraintTemplate ;
 	rdfs:label "Property value constraint template" ;
 	rdfs:comment "A constraint template that validates all objects of triples that have the given focus node as subject and the given predicate." ;
@@ -607,7 +598,7 @@ sh:PropertyValueConstraintTemplate
 
 # TODO: This will likely removed, e.g. as suggested in ISSUE-95
 sh:InversePropertyValueConstraintTemplate
-	a sh:ShapeClass ;
+	a rdfs:Class, sh:Shape ;
 	rdfs:subClassOf sh:AbstractValidationConstraintTemplate ;
 	rdfs:label "Inverse property value constraint template" ;
 	rdfs:comment "A constraint template that validates all subjects of triples that have the given focus node as object and the given predicate." ;
@@ -1510,7 +1501,7 @@ sh:InversePropertyConstraint
 # TODO: This feature has not been approved yet, see ISSUE-97
 
 sh:DerivedValuesTemplate
-	a sh:ShapeClass ;
+	a rdfs:Class, sh:Shape ;
 	rdfs:subClassOf sh:Template ;
 	rdfs:label "Derived values template" ;
 	rdfs:comment "The class of templates that can be used to derive (property) values." ;

@@ -324,7 +324,8 @@ public class SPINInferences {
 						newTriples.add(s);
 						if(explanations != null && commandWrapper.getStatement() != null) {
 							Resource source = commandWrapper.getStatement().getSubject();
-							explanations.put(s.asTriple(), explanationText, source.asNode());
+							explanations.put(s.asTriple(), explanationText, source.asNode(), 
+									commandWrapper.getSource() != null ? commandWrapper.getSource().asNode() : null);
 						}
 						
 						// New rdf:type triple -> run constructors later

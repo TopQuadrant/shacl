@@ -12,7 +12,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 schema:Person
-  rdf:type sh:ShapeClass ;
+  rdf:type rdfs:Class, sh:Shape ;
   rdfs:label "Person" ;
   rdfs:subClassOf rdfs:Resource ;
   sh:property [
@@ -64,7 +64,7 @@ ex:PositivePropertyValueConstraint
 		""" ;
 .
 ex:Rectangle
-  rdf:type sh:ShapeClass ;
+  rdf:type rdfs:Class, sh:Shape ;
   rdfs:label "Rectangle" ;
   rdfs:subClassOf rdfs:Resource ;
   sh:constraint [
@@ -106,7 +106,7 @@ ex:Rectangle
     ] ;
 .
 ex:Square
-  rdf:type sh:ShapeClass ;
+  rdf:type rdfs:Class, sh:Shape ;
   rdfs:label "Square" ;
   rdfs:subClassOf ex:Rectangle ;
   sh:constraint [
