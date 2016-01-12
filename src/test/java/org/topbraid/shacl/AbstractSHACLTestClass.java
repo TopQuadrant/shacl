@@ -3,13 +3,9 @@ package org.topbraid.shacl;
 import java.io.InputStream;
 import java.net.URI;
 
-import junit.framework.TestCase;
-
-import org.junit.Assert;
 import org.topbraid.shacl.arq.SHACLFunctions;
 import org.topbraid.shacl.util.ModelPrinter;
 import org.topbraid.shacl.util.SHACLUtil;
-import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.util.JenaDatatypes;
@@ -27,6 +23,8 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.util.FileUtils;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
+
+import junit.framework.TestCase;
 
 abstract class AbstractSHACLTestClass extends TestCase {
 	
@@ -48,10 +46,12 @@ abstract class AbstractSHACLTestClass extends TestCase {
 		String printed = ModelPrinter.get().print(results);
 		Statement resultS = testResource.getProperty(MF.result);
 		if(resultS == null || JenaDatatypes.TRUE.equals(resultS.getObject())) {
-			Assert.assertTrue("Expected no validation results for " + testResource + ", but found: " + results.size() + " triples:\n" + printed, results.isEmpty());
+			if(!results.isEmpty()) {
+				fail("Expected no validation results for " + testResource + ", but found: " + results.size() + " triples:\n" + printed);
+			}
 		}
 		else if(testResource.hasProperty(MF.result, SHT.Failure)) {
-			if(!results.contains(null, RDF.type, DASH.FailureResult)) {
+			if(!results.contains(null, SH.severity, SH.Violation)) {
 				fail("Validation was expected to produce failure for " + testResource);
 			}
 		}
