@@ -50,6 +50,11 @@ abstract class AbstractSHACLTestClass extends TestCase {
 				fail("Expected no validation results for " + testResource + ", but found: " + results.size() + " triples:\n" + printed);
 			}
 		}
+		else if(JenaDatatypes.FALSE.equals(resultS.getObject())) {
+			if(results.isEmpty()) {
+				fail("Validation was expected to produce validation results for " + testResource); 
+			}
+		}
 		else if(testResource.hasProperty(MF.result, SHT.Failure)) {
 			if(!results.contains(null, SH.severity, SH.Violation)) {
 				fail("Validation was expected to produce failure for " + testResource);
