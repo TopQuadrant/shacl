@@ -12,7 +12,8 @@ public class MatchNodeTestClass extends AbstractSHACLTestClass {
 	}
 	
 	
-	public void testRun() throws Exception {
+	@Override
+	protected void runTest() throws Throwable {
 		Model shapesModel = getShapesModel();
 		Model dataModel = getDataModel();
 		Resource action = testResource.getPropertyResourceValue(MF.action);

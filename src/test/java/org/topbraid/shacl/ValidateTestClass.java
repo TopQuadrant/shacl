@@ -12,7 +12,8 @@ public class ValidateTestClass extends AbstractSHACLTestClass {
 	}
 	
 	
-	public void testRun() throws Exception {
+	@Override
+	protected void runTest() throws Throwable {
 		Model results = ModelConstraintValidator.get().validateModel(createDataset(),
 				getShapesGraphURI(), null, false, null);
 		compareResults(results);

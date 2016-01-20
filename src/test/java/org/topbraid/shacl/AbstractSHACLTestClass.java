@@ -36,7 +36,7 @@ abstract class AbstractSHACLTestClass extends TestCase {
 	
 	
 	public AbstractSHACLTestClass(Resource testResource) {
-		super("testRun");
+		super(testResource.getURI());
 		this.testResource = testResource;
 		SHACLFunctions.registerFunctions(getSHACLModel());
 	}
