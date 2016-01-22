@@ -1573,6 +1573,48 @@ sh:AbstractClassInNodeConstraint
 	sh:validationFunction sh:hasClassIn ;
 .
 
+sh:AbstractClosedNodeConstraint
+	a sh:ConstraintTemplate ;
+	rdfs:subClassOf sh:TemplateConstraint ;
+	rdfs:label "Abstract closed node constraint" ;
+	rdfs:comment "Triggers an error for each triple of the focus node that has a predicate that is not explicitly enumerated using sh:property in the surrounding shape." ;
+	sh:labelTemplate "Closed shape" ;
+	sh:message "Invalid triple for closed shape" ;
+	sh:abstract true ;
+	sh:argument [
+		sh:predicate sh:closed ;
+		sh:optionalWhenInherited true ;
+		sh:datatype xsd:boolean ;
+		sh:name "closed" ;
+		sh:description "Set to true to specify that the shape is closed." ;
+	] ;
+	sh:argument [
+		sh:predicate sh:ignoredProperties ;
+		sh:class rdf:List ;
+		sh:optional true ;
+		sh:name "ignored properties" ;
+		sh:description "A List of predicates that are permitted regardless of whether they have been declared as sh:property. Could be used to allow rdf:type." ;
+	] ;
+	sh:sparql """
+		SELECT $this ($this AS ?subject) ?predicate ?object
+		WHERE {
+			{
+				FILTER ($closed) .
+			}
+			$this ?predicate ?object .
+			FILTER (NOT EXISTS {
+				GRAPH $shapesGraph {
+					$currentShape sh:property/sh:predicate ?predicate .
+				}
+			} && (!bound($ignoredProperties) || NOT EXISTS {
+				GRAPH $shapesGraph {
+					$ignoredProperties rdf:rest*/rdf:first ?predicate .
+				}
+			}))
+		}	
+		""" ;
+.
+
 # TODO: This would be combined into a validation function as suggested in ISSUE-95
 sh:AbstractDatatypeNodeConstraint
 	a sh:NodeConstraintTemplate ;
@@ -1872,6 +1914,7 @@ sh:NodeConstraint
 	a sh:ConstraintTemplate ;
 	rdfs:subClassOf sh:AbstractClassNodeConstraint ;
 	rdfs:subClassOf sh:AbstractClassInNodeConstraint ;
+	rdfs:subClassOf sh:AbstractClosedNodeConstraint ;
 	rdfs:subClassOf sh:AbstractDatatypeNodeConstraint ;
 	rdfs:subClassOf sh:AbstractDatatypeInNodeConstraint ;
 	rdfs:subClassOf sh:AbstractDirectTypeNodeConstraint ;
@@ -1903,46 +1946,11 @@ sh:NodeConstraint
 	] ;
 .
 
-
-# Other Constraint Templates --------------------------------------------------
-
-# TODO: This would become sh:closed as suggested in ISSUE-103
-sh:ClosedShapeConstraint
-	a sh:ConstraintTemplate ;
-	rdfs:subClassOf sh:TemplateConstraint ;
-	rdfs:label "Closed shape constraint" ;
-	rdfs:comment "Triggers an error for each triple of the focus node that has a predicate that is not explicitly enumerated using sh:property in the surrounding shape." ;
-	sh:labelTemplate "Closed shape" ;
-	sh:message "Invalid triple for closed shape" ;
-	sh:argument [
-		sh:predicate sh:ignoredProperties ;
-		sh:class rdf:List ;
-		sh:optional true ;
-		sh:name "ignored properties" ;
-		sh:description "A List of predicates that are permitted regardless of whether they have been declared as sh:property. Could be used to allow rdf:type." ;
-	] ;
-	sh:sparql """
-		SELECT $this ($this AS ?subject) ?predicate ?object
-		WHERE {
-			$this ?predicate ?object .
-			FILTER (NOT EXISTS {
-				GRAPH $shapesGraph {
-					$currentShape sh:property/sh:predicate ?predicate .
-				}
-			} && (!bound($ignoredProperties) || NOT EXISTS {
-				GRAPH $shapesGraph {
-					$ignoredProperties rdf:rest*/rdf:first ?predicate .
-				}
-			}))
-		}	
-		""" ;
-.
-
-# TODO: This would become sh:closed=true as suggested in ISSUE-103
 sh:Closed
-	a sh:ClosedShapeConstraint ;
+	a sh:NodeConstraint ;
 	rdfs:label "Closed" ;
-	rdfs:comment "A singleton instance of sh:ClosedShapeConstraint that can be shared between multiple shape definitions." ; 
+	rdfs:comment "A singleton instance of sh:NodeConstraint that can be shared between multiple shape definitions to indicate sh:closed=true." ;
+	sh:closed true ; 
 .
 
 
@@ -2440,6 +2448,20 @@ sh:DefaultValueTypeRule
 		""" ;
 .
 
+sh:ScopeClassRule
+	a sh:Template ;
+	rdfs:label "scope class inference rule" ;
+	rdfs:comment "A template encapsulating a query that can be used to construct sh:scopeClass triples for classes that are also shapes." ;
+	sh:sparql """
+		CONSTRUCT {
+			?class sh:scopeClass ?class .
+		}
+		WHERE {
+			?class rdfs:subClassOf*/rdf:type rdfs:Class .
+			?class rdfs:subClassOf*/rdf:type sh:Shape .
+		}	
+		""" ;
+.
 
 # RDFS Vocabulary (redefinition for completeness) -----------------------------
 

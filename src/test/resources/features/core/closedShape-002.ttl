@@ -22,7 +22,7 @@ ex:MyShape
 		sh:predicate ex:someProperty ;
 	] ;
 	sh:constraint [
-		a sh:ClosedShapeConstraint ;
+		sh:closed true ;
 		sh:ignoredProperties ( rdf:type ) ;
 	] ;
 .
