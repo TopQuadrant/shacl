@@ -168,12 +168,12 @@ class SPARQLSubstitutions {
 		List<String> scopes = new LinkedList<String>();
 		
 		if(shape.getModel().contains(shape, SH.scopeNode, (RDFNode)null)) {
-			scopes.add("        GRAPH $shapesGraph { <" + shape.getURI() + "> <" + SH.scopeNode + "> ?this } .\n");
+			scopes.add("        GRAPH $shapesGraph { $" + SH.currentShapeVar.getName() + " <" + SH.scopeNode + "> ?this } .\n");
 		}
 		
 		if(JenaUtil.hasIndirectType(shape, RDFS.Class)) {
 			String varName = "?CLASS_VAR";
-			scopes.add("        " + varName + " <" + RDFS.subClassOf + ">* <" + shape + "> .\n            ?this a " + varName + " .\n");
+			scopes.add("        " + varName + " <" + RDFS.subClassOf + ">* $" + SH.currentShapeVar.getName() + " .\n            ?this a " + varName + " .\n");
 		}
 		
 		for(Resource cls : JenaUtil.getResourceProperties(shape, SH.scopeClass)) {
@@ -206,7 +206,7 @@ class SPARQLSubstitutions {
 	
 	private static String createScopes(Resource shape) {
 		String scopeVar = "?scpe_" + (int)(Math.random() * 10000);
-		return  "        GRAPH ?shapesGraph { ?currentShape <" + SH.scope + "> " + scopeVar + "} .\n" +
-				"        (" + scopeVar + " ?shapesGraph) <" + ScopeContainsPFunction.URI + "> ?this .\n";
+		return  "        GRAPH $" + SH.shapesGraphVar.getName() + " { $" + SH.currentShapeVar.getName() + " <" + SH.scope + "> " + scopeVar + "} .\n" +
+				"        (" + scopeVar + " $" + SH.shapesGraphVar.getName() + ") <" + ScopeContainsPFunction.URI + "> ?this .\n";
 	}
  }

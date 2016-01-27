@@ -132,9 +132,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 			filters.add(SHACLFactory.asShape(filter));
 		}
 		if(focusNode == null) {
-			if(shape.isURIResource()) {
-				query = SPARQLSubstitutions.insertScopeAndFilterClauses(query, filters.size(), shape, dataset, bindings);
-			}
+			query = SPARQLSubstitutions.insertScopeAndFilterClauses(query, filters.size(), shape, dataset, bindings);
 		}
 		else if(!filters.isEmpty()) {
 			query = SPARQLSubstitutions.insertFilterClause(query, filters.size());
