@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.topbraid.spin.util.CommandWrapper;
 
-import com.hp.hpl.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Resource;
 
 /**
  * An interface for objects that can pre-process a set of rules, usually to optimize

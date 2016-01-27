@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.topbraid.shacl.vocabulary.SH;
 
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.vocabulary.OWL;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.vocabulary.OWL;
 
 /**
  * A singleton controlling which properties shall be used to expand imports.

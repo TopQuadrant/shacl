@@ -2,8 +2,8 @@ package org.topbraid.shacl.model.impl;
 
 import org.topbraid.shacl.model.SHACLFunction;
 
-import com.hp.hpl.jena.enhanced.EnhGraph;
-import com.hp.hpl.jena.graph.Node;
+import org.apache.jena.enhanced.EnhGraph;
+import org.apache.jena.graph.Node;
 
 /**
  * Default implementation of SHACLFunction.

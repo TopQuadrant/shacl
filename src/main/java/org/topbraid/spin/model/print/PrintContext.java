@@ -4,9 +4,9 @@
  *******************************************************************************/
 package org.topbraid.spin.model.print;
 
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.sparql.util.NodeToLabelMap;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.sparql.util.NodeToLabelMap;
 
 
 /**

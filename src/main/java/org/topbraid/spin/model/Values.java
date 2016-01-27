@@ -2,7 +2,7 @@ package org.topbraid.spin.model;
 
 import java.util.List;
 
-import com.hp.hpl.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.engine.binding.Binding;
 
 /**
  * A VALUES element (inside of a WHERE clause).

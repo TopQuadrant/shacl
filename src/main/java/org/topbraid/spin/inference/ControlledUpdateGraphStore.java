@@ -7,17 +7,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.jena.atlas.iterator.Iter;
-
-import com.hp.hpl.jena.graph.Graph;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.NodeFactory;
-import com.hp.hpl.jena.query.ARQ;
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.sparql.core.Quad;
-import com.hp.hpl.jena.sparql.util.Context;
-import com.hp.hpl.jena.update.GraphStore;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.query.ARQ;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.shared.Lock;
+import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.sparql.core.Quad;
+import org.apache.jena.sparql.util.Context;
 
 
 /**
@@ -26,7 +25,7 @@ import com.hp.hpl.jena.update.GraphStore;
  * 
  * @author Holger Knublauch
  */
-class ControlledUpdateGraphStore implements GraphStore {
+class ControlledUpdateGraphStore implements DatasetGraph {
 	
 	private Map<Graph,ControlledUpdateGraph> cugs = new HashMap<Graph,ControlledUpdateGraph>();
 	
@@ -42,6 +41,12 @@ class ControlledUpdateGraphStore implements GraphStore {
 	}
 	
 	
+	@Override
+	public void clear() {
+		// TODO Auto-generated method stub
+	}
+
+
 	private Graph getControlledUpdateGraph(Graph graph) {
 		Graph cug = cugs.get(graph);
 		if(cug != null) {
@@ -222,22 +227,6 @@ class ControlledUpdateGraphStore implements GraphStore {
 
 	@Override
 	public void close() {
-	}
-
-
-	@Override
-	public Dataset toDataset() {
-		return null;
-	}
-
-
-	@Override
-	public void startRequest() {
-	}
-
-
-	@Override
-	public void finishRequest() {
 	}
 
 

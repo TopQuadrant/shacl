@@ -6,7 +6,7 @@ package org.topbraid.spin.model;
 
 import org.topbraid.spin.model.print.Printable;
 
-import com.hp.hpl.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Resource;
 
 /**
  * Represents instances of sp:Command (Queries or Update requests).

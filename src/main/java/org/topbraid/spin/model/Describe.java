@@ -6,7 +6,7 @@ package org.topbraid.spin.model;
 
 import java.util.List;
 
-import com.hp.hpl.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Resource;
 
 
 /**

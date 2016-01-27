@@ -21,29 +21,29 @@ import org.topbraid.spin.statistics.SPINStatisticsManager;
 import org.topbraid.spin.util.JenaDatatypes;
 import org.topbraid.spin.util.JenaUtil;
 
-import com.hp.hpl.jena.graph.Graph;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.NodeFactory;
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.QuerySolutionMap;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.sparql.core.DatasetImpl;
-import com.hp.hpl.jena.sparql.core.Substitute;
-import com.hp.hpl.jena.sparql.engine.binding.Binding;
-import com.hp.hpl.jena.sparql.expr.Expr;
-import com.hp.hpl.jena.sparql.expr.ExprEvalException;
-import com.hp.hpl.jena.sparql.expr.ExprList;
-import com.hp.hpl.jena.sparql.expr.NodeValue;
-import com.hp.hpl.jena.sparql.function.FunctionEnv;
-import com.hp.hpl.jena.sparql.serializer.SerializationContext;
-import com.hp.hpl.jena.sparql.sse.SSE;
-import com.hp.hpl.jena.sparql.util.ExprUtils;
-import com.hp.hpl.jena.sparql.util.FmtUtils;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.QuerySolutionMap;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.sparql.core.DatasetImpl;
+import org.apache.jena.sparql.core.Substitute;
+import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.expr.ExprEvalException;
+import org.apache.jena.sparql.expr.ExprList;
+import org.apache.jena.sparql.expr.NodeValue;
+import org.apache.jena.sparql.function.FunctionEnv;
+import org.apache.jena.sparql.serializer.SerializationContext;
+import org.apache.jena.sparql.sse.SSE;
+import org.apache.jena.sparql.util.ExprUtils;
+import org.apache.jena.sparql.util.FmtUtils;
 
 
 /**
@@ -53,9 +53,9 @@ import com.hp.hpl.jena.sparql.util.FmtUtils;
  * 
  * @author Holger Knublauch
  */
-public class SHACLARQFunction implements com.hp.hpl.jena.sparql.function.Function, SPINFunctionFactory {
+public class SHACLARQFunction implements org.apache.jena.sparql.function.Function, SPINFunctionFactory {
 	
-	private com.hp.hpl.jena.query.Query arqQuery;
+	private org.apache.jena.query.Query arqQuery;
 	
 	private List<String> argNames = new ArrayList<String>();
 	
@@ -109,7 +109,7 @@ public class SHACLARQFunction implements com.hp.hpl.jena.sparql.function.Functio
 	}
 
 	
-	public com.hp.hpl.jena.sparql.function.Function create(String uri) {
+	public org.apache.jena.sparql.function.Function create(String uri) {
 		return this;
 	}
 
@@ -281,7 +281,7 @@ public class SHACLARQFunction implements com.hp.hpl.jena.sparql.function.Functio
 	 * Gets the Jena Query object for execution.
 	 * @return the Jena Query
 	 */
-	public com.hp.hpl.jena.query.Query getBodyQuery() {
+	public org.apache.jena.query.Query getBodyQuery() {
 		return arqQuery;
 	}
 	

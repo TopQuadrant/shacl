@@ -4,7 +4,7 @@
  *******************************************************************************/
 package org.topbraid.spin.statistics;
 
-import com.hp.hpl.jena.graph.Node;
+import org.apache.jena.graph.Node;
 
 
 /**

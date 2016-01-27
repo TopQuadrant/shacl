@@ -7,10 +7,10 @@ package org.topbraid.spin.model.impl;
 import org.topbraid.spin.model.Attribute;
 import org.topbraid.spin.vocabulary.SPL;
 
-import com.hp.hpl.jena.enhanced.EnhGraph;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Statement;
+import org.apache.jena.enhanced.EnhGraph;
+import org.apache.jena.graph.Node;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Statement;
 
 
 public class AttributeImpl extends AbstractAttributeImpl implements Attribute {

@@ -1,6 +1,6 @@
 package org.topbraid.spin.util;
 
-import com.hp.hpl.jena.graph.Graph;
+import org.apache.jena.graph.Graph;
 
 
 /**

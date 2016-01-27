@@ -7,8 +7,8 @@ package org.topbraid.spin.inference;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Triple;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
 
 
 /**

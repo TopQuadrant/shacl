@@ -7,7 +7,7 @@ package org.topbraid.spin.system;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.hp.hpl.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Resource;
 
 
 /**
@@ -23,7 +23,7 @@ public class ExtraPrefixes {
 	static {
 		map.put("afn", "http://jena.hpl.hp.com/ARQ/function#");
 		map.put("fn", "http://www.w3.org/2005/xpath-functions#");
-		map.put("jfn", "java:com.hp.hpl.jena.sparql.function.library.");
+		map.put("jfn", "java:org.apache.jena.sparql.function.library.");
 		map.put("pf", "http://jena.hpl.hp.com/ARQ/property#");
 		map.put("smf", "http://topbraid.org/sparqlmotionfunctions#");
 		map.put("tops", "http://www.topbraid.org/tops#");

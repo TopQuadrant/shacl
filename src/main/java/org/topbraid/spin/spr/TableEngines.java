@@ -6,7 +6,7 @@ import java.util.Map;
 import org.topbraid.spin.spr.spra.ATableEngine;
 import org.topbraid.spin.vocabulary.SPRA;
 
-import com.hp.hpl.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Resource;
 
 
 /**

@@ -1,9 +1,9 @@
 package org.topbraid.shacl.vocabulary;
 
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.sparql.core.Var;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.sparql.core.Var;
 
 /**
  * Vocabulary for http://www.w3.org/ns/shacl
@@ -104,9 +104,13 @@ public class SH {
 
     public final static Property class_ = ResourceFactory.createProperty(NS + "class");
 
+    public final static Property classIn = ResourceFactory.createProperty(NS + "classIn");
+
     public final static Property constraint = ResourceFactory.createProperty(NS + "constraint");
 
     public final static Property datatype = ResourceFactory.createProperty(NS + "datatype");
+
+    public final static Property datatypeIn = ResourceFactory.createProperty(NS + "datatypeIn");
 
     public final static Property defaultValue = ResourceFactory.createProperty(NS + "defaultValue");
 

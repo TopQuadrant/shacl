@@ -8,9 +8,9 @@ import org.topbraid.spin.model.Function;
 import org.topbraid.spin.util.JenaUtil;
 import org.topbraid.spin.vocabulary.SPIN;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.sparql.function.FunctionFactory;
-import com.hp.hpl.jena.sparql.pfunction.PropertyFunctionFactory;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.sparql.function.FunctionFactory;
+import org.apache.jena.sparql.pfunction.PropertyFunctionFactory;
 
 /**
  * A helper object that can be used to register SPARQL functions

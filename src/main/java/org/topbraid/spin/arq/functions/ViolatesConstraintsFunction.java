@@ -10,14 +10,14 @@ import org.topbraid.spin.model.QueryOrTemplateCall;
 import org.topbraid.spin.progress.NullProgressMonitor;
 import org.topbraid.spin.progress.ProgressMonitor;
 
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.sparql.expr.NodeValue;
-import com.hp.hpl.jena.sparql.function.Function;
-import com.hp.hpl.jena.sparql.function.FunctionEnv;
-import com.hp.hpl.jena.sparql.function.FunctionFactory;
+import org.apache.jena.graph.Node;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.sparql.expr.NodeValue;
+import org.apache.jena.sparql.function.Function;
+import org.apache.jena.sparql.function.FunctionEnv;
+import org.apache.jena.sparql.function.FunctionFactory;
 
 public class ViolatesConstraintsFunction extends AbstractFunction2  implements FunctionFactory {
 	

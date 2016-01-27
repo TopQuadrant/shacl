@@ -3,9 +3,9 @@ package org.topbraid.spin.util;
 import java.util.Iterator;
 import java.util.List;
 
-import com.hp.hpl.jena.graph.Graph;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.rdf.model.Model;
 
 /**
  * Utility methods that allow switching between the deprecated BulkUpdateHandler
@@ -26,22 +26,28 @@ import com.hp.hpl.jena.rdf.model.Model;
 public class GraphBulkUpdate {
 	
 	public static void add(Graph graph, Triple[] triples) {
-		graph.getBulkUpdateHandler().add(triples);
+		for(Triple triple : triples) {
+			graph.add(triple);
+		}
 	}
 
 	
 	public static void add(Graph graph, Iterator<Triple> triples) {
-		graph.getBulkUpdateHandler().add(triples);
+		while(triples.hasNext()) {
+			graph.add(triples.next());
+		}
 	}
 	
 	
 	public static void add(Graph graph, List<Triple> triples) {
-		graph.getBulkUpdateHandler().add(triples);
+		for(Triple triple : triples) {
+			graph.add(triple);
+		}
 	}
 	
 	
 	public static void addInto(Graph graph, Graph src) {
-		graph.getBulkUpdateHandler().add(src);
+		add(graph, src.find(Triple.ANY));
 	}
 	
 	
@@ -51,21 +57,27 @@ public class GraphBulkUpdate {
 	
 	
 	public static void delete(Graph graph, Triple[] triples) {
-		graph.getBulkUpdateHandler().delete(triples);
+		for(Triple triple : triples) {
+			graph.delete(triple);
+		}
 	}
 	
 	
 	public static void delete(Graph graph, Iterator<Triple> triples) {
-		graph.getBulkUpdateHandler().delete(triples);
+		while(triples.hasNext()) {
+			graph.delete(triples.next());
+		}
 	}
 	
 	
 	public static void delete(Graph graph, List<Triple> triples) {
-		graph.getBulkUpdateHandler().delete(triples);
+		for(Triple triple : triples) {
+			graph.delete(triple);
+		}
 	}
 	
 	
 	public static void deleteFrom(Graph graph, Graph src) {
-		graph.getBulkUpdateHandler().delete(src);
+		delete(graph, src.find(Triple.ANY));
 	}
 }

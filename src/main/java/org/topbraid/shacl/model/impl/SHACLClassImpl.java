@@ -4,8 +4,8 @@ import org.topbraid.shacl.model.SHACLClass;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaDatatypes;
 
-import com.hp.hpl.jena.enhanced.EnhGraph;
-import com.hp.hpl.jena.graph.Node;
+import org.apache.jena.enhanced.EnhGraph;
+import org.apache.jena.graph.Node;
 
 /**
  * Default implementation of SHACLClass.

@@ -2,8 +2,8 @@ package org.topbraid.shacl;
 
 import org.topbraid.shacl.constraints.ResourceConstraintValidator;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
 
 public class MatchNodeTestClass extends AbstractSHACLTestClass {
 

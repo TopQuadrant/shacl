@@ -10,8 +10,8 @@ import org.topbraid.spin.model.Aggregation;
 import org.topbraid.spin.model.FunctionCall;
 import org.topbraid.spin.model.Variable;
 
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
 
 
 /**

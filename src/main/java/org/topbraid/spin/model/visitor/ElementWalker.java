@@ -23,7 +23,7 @@ import org.topbraid.spin.model.TriplePattern;
 import org.topbraid.spin.model.Union;
 import org.topbraid.spin.model.Values;
 
-import com.hp.hpl.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.RDFNode;
 
 
 /**

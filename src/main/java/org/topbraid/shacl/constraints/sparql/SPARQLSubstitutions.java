@@ -15,15 +15,15 @@ import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.system.SPINLabels;
 import org.topbraid.spin.util.JenaUtil;
 
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryParseException;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.vocabulary.RDFS;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryParseException;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.vocabulary.RDFS;
 
 /**
  * Collects various dodgy helper algorithms currently used by the SPARQL execution language.
@@ -168,12 +168,12 @@ class SPARQLSubstitutions {
 		List<String> scopes = new LinkedList<String>();
 		
 		if(shape.getModel().contains(shape, SH.scopeNode, (RDFNode)null)) {
-			scopes.add("        GRAPH $shapesGraph { $" + SH.currentShapeVar.getName() + " <" + SH.scopeNode + "> ?this } .\n");
+			scopes.add("        GRAPH $shapesGraph { <" + shape.getURI() + "> <" + SH.scopeNode + "> ?this } .\n");
 		}
 		
 		if(JenaUtil.hasIndirectType(shape, RDFS.Class)) {
 			String varName = "?CLASS_VAR";
-			scopes.add("        " + varName + " <" + RDFS.subClassOf + ">* $" + SH.currentShapeVar.getName() + " .\n            ?this a " + varName + " .\n");
+			scopes.add("        " + varName + " <" + RDFS.subClassOf + ">* <" + shape + "> .\n            ?this a " + varName + " .\n");
 		}
 		
 		for(Resource cls : JenaUtil.getResourceProperties(shape, SH.scopeClass)) {
@@ -206,7 +206,7 @@ class SPARQLSubstitutions {
 	
 	private static String createScopes(Resource shape) {
 		String scopeVar = "?scpe_" + (int)(Math.random() * 10000);
-		return  "        GRAPH $" + SH.shapesGraphVar.getName() + " { $" + SH.currentShapeVar.getName() + " <" + SH.scope + "> " + scopeVar + "} .\n" +
-				"        (" + scopeVar + " $" + SH.shapesGraphVar.getName() + ") <" + ScopeContainsPFunction.URI + "> ?this .\n";
+		return  "        GRAPH ?shapesGraph { ?currentShape <" + SH.scope + "> " + scopeVar + "} .\n" +
+				"        (" + scopeVar + " ?shapesGraph) <" + ScopeContainsPFunction.URI + "> ?this .\n";
 	}
  }

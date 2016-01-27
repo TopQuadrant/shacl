@@ -3,7 +3,7 @@ package org.topbraid.shacl.arq.functions;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.hp.hpl.jena.graph.Node;
+import org.apache.jena.graph.Node;
 
 /**
  * A ThreadLocal structure to prevent infinite loops of sh:hasShape calls.

@@ -10,9 +10,9 @@ import java.util.Map;
 
 import org.topbraid.spin.vocabulary.SP;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.vocabulary.RDFS;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.vocabulary.RDFS;
 
 /**
  * Manages the registered SPARQL aggregations (such as SUM).

@@ -4,10 +4,10 @@ import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.SPINFunctionDrivers;
 import org.topbraid.spin.util.JenaUtil;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.sparql.function.FunctionFactory;
-import com.hp.hpl.jena.sparql.function.FunctionRegistry;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.sparql.function.FunctionFactory;
+import org.apache.jena.sparql.function.FunctionRegistry;
 
 /**
  * Manages globally registered SHACL functions, usually loaded from .shacl.* files.

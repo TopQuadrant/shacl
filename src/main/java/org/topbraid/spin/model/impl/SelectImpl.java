@@ -19,13 +19,13 @@ import org.topbraid.spin.model.print.PrintContext;
 import org.topbraid.spin.model.print.Printable;
 import org.topbraid.spin.vocabulary.SP;
 
-import com.hp.hpl.jena.enhanced.EnhGraph;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.rdf.model.RDFList;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.util.iterator.ExtendedIterator;
+import org.apache.jena.enhanced.EnhGraph;
+import org.apache.jena.graph.Node;
+import org.apache.jena.rdf.model.RDFList;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.util.iterator.ExtendedIterator;
 
 
 public class SelectImpl extends QueryImpl implements Select {
@@ -51,7 +51,7 @@ public class SelectImpl extends QueryImpl implements Select {
 		else {
 			String text = ARQ2SPIN.getTextOnly(this);
 			if(text != null) {
-				com.hp.hpl.jena.query.Query arqQuery = ARQFactory.get().createQuery(this);
+				org.apache.jena.query.Query arqQuery = ARQFactory.get().createQuery(this);
 				return arqQuery.getResultVars();
 			}
 			else {

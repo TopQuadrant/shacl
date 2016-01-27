@@ -8,12 +8,12 @@ import org.topbraid.spin.model.AbstractAttribute;
 import org.topbraid.spin.model.print.PrintContext;
 import org.topbraid.spin.vocabulary.SPL;
 
-import com.hp.hpl.jena.enhanced.EnhGraph;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.impl.PropertyImpl;
-import com.hp.hpl.jena.vocabulary.RDFS;
+import org.apache.jena.enhanced.EnhGraph;
+import org.apache.jena.graph.Node;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.impl.PropertyImpl;
+import org.apache.jena.vocabulary.RDFS;
 
 
 public abstract class AbstractAttributeImpl extends AbstractSPINResourceImpl implements AbstractAttribute {

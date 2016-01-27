@@ -2,9 +2,9 @@ package org.topbraid.shacl.model.impl;
 
 import org.topbraid.shacl.model.SHACLResource;
 
-import com.hp.hpl.jena.enhanced.EnhGraph;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
+import org.apache.jena.enhanced.EnhGraph;
+import org.apache.jena.graph.Node;
+import org.apache.jena.rdf.model.impl.ResourceImpl;
 
 /**
  * Default implementation of SHACLResource.

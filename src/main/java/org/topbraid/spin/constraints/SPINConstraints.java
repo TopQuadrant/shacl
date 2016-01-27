@@ -37,27 +37,27 @@ import org.topbraid.spin.util.SPINUtil;
 import org.topbraid.spin.vocabulary.SP;
 import org.topbraid.spin.vocabulary.SPIN;
 
-import com.hp.hpl.jena.graph.Graph;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.NodeFactory;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.graph.compose.MultiUnion;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QuerySolutionMap;
-import com.hp.hpl.jena.query.Syntax;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.sparql.core.BasicPattern;
-import com.hp.hpl.jena.sparql.core.Var;
-import com.hp.hpl.jena.sparql.syntax.Element;
-import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.RDFS;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.graph.compose.MultiUnion;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QuerySolutionMap;
+import org.apache.jena.query.Syntax;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.sparql.core.BasicPattern;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.syntax.Element;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 
 
 /**
@@ -383,7 +383,7 @@ public class SPINConstraints {
 		Syntax oldSyntax = Syntax.defaultSyntax; // Work-around to bug in ARQ
 		try {
 		    Syntax.defaultSyntax = ask.getSyntax();
-			Query construct = com.hp.hpl.jena.query.QueryFactory.create(ask);
+			Query construct = org.apache.jena.query.QueryFactory.create(ask);
 			construct.setQueryConstructType();
 			BasicPattern bgp = new BasicPattern();
 			Node cv = NodeFactory.createAnon();
@@ -403,7 +403,7 @@ public class SPINConstraints {
 			if(path != null && path.isURIResource()) {
 				bgp.add(Triple.create(cv, SPIN.violationPath.asNode(), path.asNode()));
 			}
-			com.hp.hpl.jena.sparql.syntax.Template template = new com.hp.hpl.jena.sparql.syntax.Template(bgp);
+			org.apache.jena.sparql.syntax.Template template = new org.apache.jena.sparql.syntax.Template(bgp);
 			construct.setConstructTemplate(template);
 			Element where = construct.getQueryPattern();
 			construct.setQueryPattern(where);

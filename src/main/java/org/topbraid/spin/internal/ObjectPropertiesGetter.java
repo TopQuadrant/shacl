@@ -15,10 +15,10 @@ import org.topbraid.spin.model.Variable;
 import org.topbraid.spin.model.visitor.AbstractTriplesVisitor;
 import org.topbraid.spin.vocabulary.SPIN;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
 
 
 /**

@@ -11,9 +11,9 @@ import org.topbraid.spin.util.JenaUtil;
 import org.topbraid.spin.util.CommandWrapper;
 import org.topbraid.spin.vocabulary.SPIN;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
 
 /**
  * A SPINRuleComparator using the spin:nextRuleProperty property.

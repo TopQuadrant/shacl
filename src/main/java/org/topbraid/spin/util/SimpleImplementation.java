@@ -6,9 +6,9 @@ package org.topbraid.spin.util;
 
 import java.lang.reflect.Constructor;
 
-import com.hp.hpl.jena.enhanced.EnhGraph;
-import com.hp.hpl.jena.enhanced.EnhNode;
-import com.hp.hpl.jena.graph.Node;
+import org.apache.jena.enhanced.EnhGraph;
+import org.apache.jena.enhanced.EnhNode;
+import org.apache.jena.graph.Node;
 
 /**
  * An extension of the Jena polymorphism mechanism.

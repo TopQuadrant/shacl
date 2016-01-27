@@ -4,9 +4,9 @@ import org.topbraid.shacl.model.SHACLNativeScope;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaUtil;
 
-import com.hp.hpl.jena.enhanced.EnhGraph;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.vocabulary.RDFS;
+import org.apache.jena.enhanced.EnhGraph;
+import org.apache.jena.graph.Node;
+import org.apache.jena.vocabulary.RDFS;
 
 /**
  * Default implementation of SHACLNativeConstraint.

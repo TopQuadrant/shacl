@@ -22,13 +22,13 @@ import org.topbraid.spin.model.update.Update;
 import org.topbraid.spin.system.SPINLabels;
 import org.topbraid.spin.vocabulary.SPIN;
 
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.update.UpdateRequest;
+import org.apache.jena.query.Query;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.update.UpdateRequest;
 
 
 /**
@@ -146,7 +146,7 @@ public class SPINQueryFinder {
 		}
 		else if(spinCommand instanceof Update) {
 			UpdateRequest updateRequest = ARQFactory.get().createUpdateRequest(queryString);
-			com.hp.hpl.jena.update.Update operation = updateRequest.getOperations().get(0);
+			org.apache.jena.update.Update operation = updateRequest.getOperations().get(0);
 			wrapper = new UpdateWrapper(operation, source, spinQueryText, (Update)spinCommand, label, s, thisUnbound, thisDepth);
 		}
 		return wrapper;

@@ -6,8 +6,8 @@ package org.topbraid.spin.model.impl;
 
 import org.topbraid.spin.model.Element;
 
-import com.hp.hpl.jena.enhanced.EnhGraph;
-import com.hp.hpl.jena.graph.Node;
+import org.apache.jena.enhanced.EnhGraph;
+import org.apache.jena.graph.Node;
 
 
 public abstract class ElementImpl extends AbstractSPINResourceImpl implements Element {

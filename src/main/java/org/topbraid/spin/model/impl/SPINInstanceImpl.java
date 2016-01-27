@@ -12,11 +12,11 @@ import org.topbraid.spin.model.SPINInstance;
 import org.topbraid.spin.util.JenaUtil;
 import org.topbraid.spin.util.SPINUtil;
 
-import com.hp.hpl.jena.enhanced.EnhGraph;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
+import org.apache.jena.enhanced.EnhGraph;
+import org.apache.jena.graph.Node;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.impl.ResourceImpl;
 
 
 public class SPINInstanceImpl extends ResourceImpl implements SPINInstance {

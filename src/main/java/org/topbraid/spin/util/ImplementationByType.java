@@ -4,10 +4,10 @@
  *******************************************************************************/
 package org.topbraid.spin.util;
 
-import com.hp.hpl.jena.enhanced.EnhGraph;
-import com.hp.hpl.jena.enhanced.Implementation;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.vocabulary.RDF;
+import org.apache.jena.enhanced.EnhGraph;
+import org.apache.jena.enhanced.Implementation;
+import org.apache.jena.graph.Node;
+import org.apache.jena.vocabulary.RDF;
 
 /**
  * Extended polymorphism support for Jena, checking whether the Node

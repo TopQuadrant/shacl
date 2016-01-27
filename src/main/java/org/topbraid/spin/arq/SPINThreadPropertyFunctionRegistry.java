@@ -2,8 +2,8 @@ package org.topbraid.spin.arq;
 
 import java.util.Iterator;
 
-import com.hp.hpl.jena.sparql.pfunction.PropertyFunctionFactory;
-import com.hp.hpl.jena.sparql.pfunction.PropertyFunctionRegistry;
+import org.apache.jena.sparql.pfunction.PropertyFunctionFactory;
+import org.apache.jena.sparql.pfunction.PropertyFunctionRegistry;
 
 /**
  * An ARQ PropertyFunctionRegistry that can be used to associate functions

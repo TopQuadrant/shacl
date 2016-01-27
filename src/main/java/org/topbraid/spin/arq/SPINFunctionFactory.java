@@ -1,6 +1,6 @@
 package org.topbraid.spin.arq;
 
-import com.hp.hpl.jena.sparql.function.FunctionFactory;
+import org.apache.jena.sparql.function.FunctionFactory;
 
 
 /**

@@ -8,17 +8,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.compose.MultiUnion;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.impl.Util;
+import org.apache.jena.shared.PrefixMapping;
+import org.apache.jena.shared.impl.PrefixMappingImpl;
+import org.apache.jena.sparql.util.FmtUtils;
+import org.apache.jena.sparql.util.NodeToLabelMap;
 import org.topbraid.spin.system.ExtraPrefixes;
-
-import com.hp.hpl.jena.graph.Graph;
-import com.hp.hpl.jena.graph.compose.MultiUnion;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.impl.Util;
-import com.hp.hpl.jena.shared.PrefixMapping;
-import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
-import com.hp.hpl.jena.sparql.util.FmtUtils;
-import com.hp.hpl.jena.sparql.util.NodeToLabelMap;
 
 
 /**
@@ -218,7 +217,7 @@ public class StringPrintContext implements PrintContext {
 		Graph graph = resource.getModel().getGraph();
 		if(graph instanceof MultiUnion) {
 			String uri = resource.getURI();
-	        int split = Util.splitNamespace(uri);
+	        int split = Util.splitNamespaceXML(uri);
 	        String local = uri.substring(split);
 	        if (local.length() == 0) {
 	        	return null;

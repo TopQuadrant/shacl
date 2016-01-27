@@ -2,9 +2,9 @@ package org.topbraid.spin.util;
 
 import org.topbraid.spin.model.Command;
 
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
+import org.apache.jena.query.Query;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
 
 
 /**

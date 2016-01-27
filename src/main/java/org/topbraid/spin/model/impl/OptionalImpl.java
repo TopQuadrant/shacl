@@ -8,8 +8,8 @@ import org.topbraid.spin.model.Optional;
 import org.topbraid.spin.model.print.PrintContext;
 import org.topbraid.spin.model.visitor.ElementVisitor;
 
-import com.hp.hpl.jena.enhanced.EnhGraph;
-import com.hp.hpl.jena.graph.Node;
+import org.apache.jena.enhanced.EnhGraph;
+import org.apache.jena.graph.Node;
 
 
 public class OptionalImpl extends ElementImpl implements Optional {

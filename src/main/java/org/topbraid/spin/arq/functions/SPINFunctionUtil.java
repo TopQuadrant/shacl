@@ -6,13 +6,13 @@ import java.util.Map;
 
 import org.topbraid.spin.model.TemplateCall;
 
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.query.QuerySolutionMap;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.sparql.expr.ExprEvalException;
-import com.hp.hpl.jena.sparql.pfunction.PropFuncArg;
+import org.apache.jena.graph.Node;
+import org.apache.jena.query.QuerySolutionMap;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.sparql.expr.ExprEvalException;
+import org.apache.jena.sparql.pfunction.PropFuncArg;
 
 public class SPINFunctionUtil {
 

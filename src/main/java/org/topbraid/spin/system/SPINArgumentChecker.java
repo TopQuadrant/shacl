@@ -7,11 +7,11 @@ import org.topbraid.spin.model.Argument;
 import org.topbraid.spin.model.Module;
 import org.topbraid.spin.util.JenaUtil;
 
-import com.hp.hpl.jena.query.QuerySolutionMap;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.vocabulary.RDFS;
-import com.hp.hpl.jena.vocabulary.XSD;
+import org.apache.jena.query.QuerySolutionMap;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.vocabulary.RDFS;
+import org.apache.jena.vocabulary.XSD;
 
 /**
  * A singleton that is used by SPINARQFunction to check whether all supplied arguments

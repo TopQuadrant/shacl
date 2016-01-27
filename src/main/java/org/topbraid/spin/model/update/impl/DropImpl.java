@@ -3,8 +3,8 @@ package org.topbraid.spin.model.update.impl;
 import org.topbraid.spin.model.print.PrintContext;
 import org.topbraid.spin.model.update.Drop;
 
-import com.hp.hpl.jena.enhanced.EnhGraph;
-import com.hp.hpl.jena.graph.Node;
+import org.apache.jena.enhanced.EnhGraph;
+import org.apache.jena.graph.Node;
 
 
 public class DropImpl extends UpdateImpl implements Drop {

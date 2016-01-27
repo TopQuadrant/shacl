@@ -4,8 +4,8 @@ import org.topbraid.spin.model.print.PrintContext;
 import org.topbraid.spin.model.update.DeleteWhere;
 import org.topbraid.spin.vocabulary.SP;
 
-import com.hp.hpl.jena.enhanced.EnhGraph;
-import com.hp.hpl.jena.graph.Node;
+import org.apache.jena.enhanced.EnhGraph;
+import org.apache.jena.graph.Node;
 
 
 public class DeleteWhereImpl extends UpdateImpl implements DeleteWhere {

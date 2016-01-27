@@ -5,15 +5,14 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.hp.hpl.jena.graph.Graph;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.sparql.core.Quad;
-import com.hp.hpl.jena.sparql.modify.request.UpdateDeleteWhere;
-import com.hp.hpl.jena.sparql.modify.request.UpdateModify;
-import com.hp.hpl.jena.update.Update;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.Node;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.sparql.core.Quad;
+import org.apache.jena.sparql.modify.request.UpdateDeleteWhere;
+import org.apache.jena.sparql.modify.request.UpdateModify;
+import org.apache.jena.update.Update;
 
 
 /**
@@ -26,56 +25,56 @@ public class UpdateUtil {
 	/**
 	 * Gets all Graphs that are potentially updated in a given Update request.
 	 * @param update  the Update (UpdateModify and UpdateDeleteWhere are supported)
-	 * @param dataset  the Dataset to get the Graphs from
+	 * @param dsg  the Dataset to get the Graphs from
 	 * @return the Graphs
 	 */
-	public static Collection<Graph> getUpdatedGraphs(Update update, Dataset dataset, Map<String,RDFNode> templateBindings) {
+	public static Collection<Graph> getUpdatedGraphs(Update update, DatasetGraph dsg, Map<String,RDFNode> templateBindings) {
 		Set<Graph> results = new HashSet<Graph>();
 		if(update instanceof UpdateModify) {
-			addUpdatedGraphs(results, (UpdateModify)update, dataset, templateBindings);
+			addUpdatedGraphs(results, (UpdateModify)update, dsg, templateBindings);
 		}
 		else if(update instanceof UpdateDeleteWhere) {
-			addUpdatedGraphs(results, (UpdateDeleteWhere)update, dataset, templateBindings);
+			addUpdatedGraphs(results, (UpdateDeleteWhere)update, dsg, templateBindings);
 		}
 		return results;
 	}
 
 	
-	private static void addUpdatedGraphs(Set<Graph> results, UpdateDeleteWhere update, Dataset dataset, Map<String,RDFNode> templateBindings) {
-		addUpdatedGraphs(results, update.getQuads(), dataset, templateBindings);
+	private static void addUpdatedGraphs(Set<Graph> results, UpdateDeleteWhere update, DatasetGraph dsg, Map<String,RDFNode> templateBindings) {
+		addUpdatedGraphs(results, update.getQuads(), dsg, templateBindings);
 	}
 	
 	
-	private static void addUpdatedGraphs(Set<Graph> results, UpdateModify update, Dataset dataset, Map<String,RDFNode> templateBindings) {
+	private static void addUpdatedGraphs(Set<Graph> results, UpdateModify update, DatasetGraph dsg, Map<String,RDFNode> templateBindings) {
 		Node withIRI = update.getWithIRI();
 		if(withIRI != null) {
-			results.add(dataset.getNamedModel(withIRI.getURI()).getGraph());
+			results.add(dsg.getGraph(withIRI));
 		}
-		addUpdatedGraphs(results, update.getDeleteQuads(), dataset, templateBindings);
-		addUpdatedGraphs(results, update.getInsertQuads(), dataset, templateBindings);
+		addUpdatedGraphs(results, update.getDeleteQuads(), dsg, templateBindings);
+		addUpdatedGraphs(results, update.getInsertQuads(), dsg, templateBindings);
 	}
 
 	
-	private static void addUpdatedGraphs(Set<Graph> results, Iterable<Quad> quads, Dataset graphStore, Map<String,RDFNode> templateBindings) {
+	private static void addUpdatedGraphs(Set<Graph> results, Iterable<Quad> quads, DatasetGraph dsg, Map<String,RDFNode> templateBindings) {
 		for(Quad quad : quads) {
 			if(quad.isDefaultGraph()) {
-				results.add(graphStore.getDefaultModel().getGraph());
+				results.add(dsg.getDefaultGraph());
 			}
 			else if(quad.getGraph().isVariable()) {
 				if(templateBindings != null) {
 					String varName = quad.getGraph().getName();
 					RDFNode binding = templateBindings.get(varName);
 					if(binding != null && binding.isURIResource()) {
-						results.add(graphStore.getNamedModel(binding.asNode().getURI()).getGraph());
+						results.add(dsg.getGraph(binding.asNode()));
 					}
 				}
 			}
 			else {
-				Model namedModel = graphStore.getNamedModel(quad.getGraph().getURI());
-				if(namedModel == null) {
+				Graph graph = dsg.getGraph(quad.getGraph());
+				if(graph == null) {
 					throw new IllegalArgumentException("Cannot resolve named graph " + quad.getGraph().getURI());
 				}
-				results.add(namedModel.getGraph());
+				results.add(graph);
 			}
 		}
 	}

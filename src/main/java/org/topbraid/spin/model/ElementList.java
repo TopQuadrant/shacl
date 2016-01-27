@@ -4,7 +4,7 @@
  *******************************************************************************/
 package org.topbraid.spin.model;
 
-import com.hp.hpl.jena.rdf.model.RDFList;
+import org.apache.jena.rdf.model.RDFList;
 
 /**
  * An RDFList representing a plain list of sub-Elements in a Query.

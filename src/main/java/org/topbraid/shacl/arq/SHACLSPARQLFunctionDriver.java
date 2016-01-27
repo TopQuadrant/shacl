@@ -4,7 +4,7 @@ import org.topbraid.shacl.model.SHACLFunction;
 import org.topbraid.spin.arq.SPINFunctionDriver;
 import org.topbraid.spin.arq.SPINFunctionFactory;
 
-import com.hp.hpl.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Resource;
 
 
 /**

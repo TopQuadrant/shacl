@@ -7,7 +7,7 @@ package org.topbraid.spin.model;
 import org.topbraid.spin.model.print.Printable;
 import org.topbraid.spin.model.visitor.ElementVisitor;
 
-import com.hp.hpl.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Resource;
 
 
 /**

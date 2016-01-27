@@ -4,8 +4,8 @@
  *******************************************************************************/
 package org.topbraid.spin.system;
 
-import com.hp.hpl.jena.graph.Graph;
-import com.hp.hpl.jena.graph.Node;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.Node;
 
 /**
  * A singleton used by the evaluation of magic properties

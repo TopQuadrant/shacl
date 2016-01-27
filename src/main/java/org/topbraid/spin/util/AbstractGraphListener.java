@@ -8,13 +8,12 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import com.hp.hpl.jena.graph.BulkUpdateHandler;
-import com.hp.hpl.jena.graph.Graph;
-import com.hp.hpl.jena.graph.GraphEvents;
-import com.hp.hpl.jena.graph.GraphListener;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.util.IteratorCollection;
-import com.hp.hpl.jena.util.iterator.ClosableIterator;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.GraphEvents;
+import org.apache.jena.graph.GraphListener;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.util.IteratorCollection;
+import org.apache.jena.util.iterator.ClosableIterator;
 
 /**
  * An abstract GraphListeners that forwards each call

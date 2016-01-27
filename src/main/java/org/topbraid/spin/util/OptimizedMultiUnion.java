@@ -2,7 +2,7 @@ package org.topbraid.spin.util;
 
 import java.util.List;
 
-import com.hp.hpl.jena.graph.Node;
+import org.apache.jena.graph.Node;
 
 /**
  * A Graph interface providing additional optimization features.

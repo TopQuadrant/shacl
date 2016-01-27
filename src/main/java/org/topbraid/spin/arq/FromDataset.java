@@ -6,11 +6,11 @@ import java.util.Set;
 
 import org.topbraid.spin.util.JenaUtil;
 
-import com.hp.hpl.jena.graph.compose.MultiUnion;
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
+import org.apache.jena.graph.compose.MultiUnion;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.Query;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 
 
 /**

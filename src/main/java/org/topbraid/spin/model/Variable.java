@@ -8,7 +8,7 @@ import java.util.Set;
 
 import org.topbraid.spin.model.print.Printable;
 
-import com.hp.hpl.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Resource;
 
 
 /**

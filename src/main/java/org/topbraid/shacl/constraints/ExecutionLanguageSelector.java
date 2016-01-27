@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.topbraid.shacl.constraints.sparql.SPARQLExecutionLanguage;
 
-import com.hp.hpl.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Resource;
 
 /**
  * Selects a suitable execution language for a given executable.

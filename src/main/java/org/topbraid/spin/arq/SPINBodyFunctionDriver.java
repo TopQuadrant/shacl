@@ -2,7 +2,7 @@ package org.topbraid.spin.arq;
 
 import org.topbraid.spin.model.Function;
 
-import com.hp.hpl.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Resource;
 
 
 /**

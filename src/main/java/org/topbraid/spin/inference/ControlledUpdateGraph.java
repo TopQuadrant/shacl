@@ -3,21 +3,18 @@ package org.topbraid.spin.inference;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.hp.hpl.jena.graph.BulkUpdateHandler;
-import com.hp.hpl.jena.graph.Capabilities;
-import com.hp.hpl.jena.graph.Graph;
-import com.hp.hpl.jena.graph.GraphEventManager;
-import com.hp.hpl.jena.graph.GraphStatisticsHandler;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.TransactionHandler;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.graph.TripleMatch;
-import com.hp.hpl.jena.graph.impl.GraphWithPerform;
-import com.hp.hpl.jena.graph.impl.SimpleBulkUpdateHandler;
-import com.hp.hpl.jena.shared.AddDeniedException;
-import com.hp.hpl.jena.shared.DeleteDeniedException;
-import com.hp.hpl.jena.shared.PrefixMapping;
-import com.hp.hpl.jena.util.iterator.ExtendedIterator;
+import org.apache.jena.graph.Capabilities;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.GraphEventManager;
+import org.apache.jena.graph.GraphStatisticsHandler;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.TransactionHandler;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.graph.impl.GraphWithPerform;
+import org.apache.jena.shared.AddDeniedException;
+import org.apache.jena.shared.DeleteDeniedException;
+import org.apache.jena.shared.PrefixMapping;
+import org.apache.jena.util.iterator.ExtendedIterator;
 
 
 /**
@@ -34,8 +31,6 @@ import com.hp.hpl.jena.util.iterator.ExtendedIterator;
  * @author Holger Knublauch
  */
 class ControlledUpdateGraph implements GraphWithPerform {
-	
-	private BulkUpdateHandler buh;
 
 	private Graph delegate;
 	
@@ -46,7 +41,6 @@ class ControlledUpdateGraph implements GraphWithPerform {
 	
 	ControlledUpdateGraph(Graph delegate) {
 		this.delegate = delegate;
-		this.buh = new SimpleBulkUpdateHandler(this);
 	}
 
 	
@@ -75,11 +69,6 @@ class ControlledUpdateGraph implements GraphWithPerform {
 	}
 
 	@Override
-	public BulkUpdateHandler getBulkUpdateHandler() {
-		return buh;
-	}
-
-	@Override
 	public Capabilities getCapabilities() {
 		return delegate.getCapabilities();
 	}
@@ -105,7 +94,7 @@ class ControlledUpdateGraph implements GraphWithPerform {
 	}
 
 	@Override
-	public ExtendedIterator<Triple> find(TripleMatch m) {
+	public ExtendedIterator<Triple> find(Triple m) {
 		return delegate.find(m);
 	}
 

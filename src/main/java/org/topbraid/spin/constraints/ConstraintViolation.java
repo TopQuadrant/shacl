@@ -9,8 +9,8 @@ import java.util.Collection;
 import org.topbraid.spin.model.TemplateCall;
 import org.topbraid.spin.vocabulary.SPIN;
 
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
 
 
 /**

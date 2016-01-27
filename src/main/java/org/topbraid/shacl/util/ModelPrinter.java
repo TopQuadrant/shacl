@@ -2,9 +2,9 @@ package org.topbraid.shacl.util;
 
 import java.io.StringWriter;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.RDFWriter;
-import com.hp.hpl.jena.util.FileUtils;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFWriter;
+import org.apache.jena.util.FileUtils;
 
 /**
  * A singleton that takes a Jena Model and prints it into a string.

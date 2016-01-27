@@ -18,13 +18,13 @@ import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaUtil;
 import org.topbraid.spin.util.SimpleImplementation;
 
-import com.hp.hpl.jena.enhanced.BuiltinPersonalities;
-import com.hp.hpl.jena.enhanced.Personality;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.sparql.function.FunctionRegistry;
-import com.hp.hpl.jena.sparql.pfunction.PropertyFunctionRegistry;
-import com.hp.hpl.jena.vocabulary.RDF;
+import org.apache.jena.enhanced.BuiltinPersonalities;
+import org.apache.jena.enhanced.Personality;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.sparql.function.FunctionRegistry;
+import org.apache.jena.sparql.pfunction.PropertyFunctionRegistry;
+import org.apache.jena.vocabulary.RDF;
 
 public class SHACLFactory {
     

@@ -13,6 +13,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QuerySolutionMap;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.update.Update;
+import org.apache.jena.update.UpdateExecutionFactory;
+import org.apache.jena.update.UpdateProcessor;
+import org.apache.jena.vocabulary.RDF;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.model.Command;
 import org.topbraid.spin.progress.ProgressMonitor;
@@ -26,23 +42,6 @@ import org.topbraid.spin.util.SPINUtil;
 import org.topbraid.spin.util.UpdateUtil;
 import org.topbraid.spin.util.UpdateWrapper;
 import org.topbraid.spin.vocabulary.SPIN;
-
-import com.hp.hpl.jena.graph.Graph;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QuerySolutionMap;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.update.Update;
-import com.hp.hpl.jena.update.UpdateExecutionFactory;
-import com.hp.hpl.jena.update.UpdateProcessor;
-import com.hp.hpl.jena.vocabulary.RDF;
 
 
 /**
@@ -345,7 +344,7 @@ public class SPINInferences {
 				Map<String,RDFNode> templateBindings = commandWrapper.getTemplateBinding();
 				Dataset dataset = ARQFactory.get().getDataset(queryModel);
 				Update update = updateWrapper.getUpdate();
-				Iterable<Graph> updateGraphs = UpdateUtil.getUpdatedGraphs(update, dataset, templateBindings);
+				Iterable<Graph> updateGraphs = UpdateUtil.getUpdatedGraphs(update, dataset.asDatasetGraph(), templateBindings);
 				ControlledUpdateGraphStore cugs = new ControlledUpdateGraphStore(dataset, updateGraphs);
 				
 				if(commandWrapper.isThisDeep() && needsClass) {
