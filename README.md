@@ -8,7 +8,7 @@ Can be used to perform SHACL constraint checking in any Jena-based Java applicat
 This API also serves as a reference implementation developed in parallel to the SHACL spec.
 **The code is totally not optimized for performance, just for correctness. And there are unfinished gaps!**
 
-The same code is used in the TopBraid products - which is also why we use this particular Jena version.
+The same code is used in the TopBraid products (currently ahead of the release cycle, TopBraid 5.2 will catch up).
 For interoperability with TopBraid, and during the transition period from SPIN to SHACL, this library
 uses code from org.topbraid.spin packages. These will eventually be refactored.
 Meanwhile, please don't rely on any class from the org.topbraid.spin packages directly. 
