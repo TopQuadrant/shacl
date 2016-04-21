@@ -107,16 +107,19 @@ public class SPINARQFunction implements org.apache.jena.sparql.function.Function
 	}
 	
 
-	public void build(String uri, ExprList args) {
+	@Override
+    public void build(String uri, ExprList args) {
 	}
 
 	
-	public org.apache.jena.sparql.function.Function create(String uri) {
+	@Override
+    public org.apache.jena.sparql.function.Function create(String uri) {
 		return this;
 	}
 
 	
-	public NodeValue exec(Binding binding, ExprList args, String uri, FunctionEnv env) {
+	@Override
+    public NodeValue exec(Binding binding, ExprList args, String uri, FunctionEnv env) {
 		
 		Graph activeGraph = env.getActiveGraph();
 		Model model = activeGraph != null ? 
@@ -224,45 +227,41 @@ public class SPINARQFunction implements org.apache.jena.sparql.function.Function
 		return executeBody(null, model, bindings);
 	}
 	
-	
-	public NodeValue executeBody(Dataset dataset, Model defaultModel, QuerySolution bindings) {
-		QueryExecution qexec;
-		if(dataset != null) {
-			Dataset newDataset = new DatasetWithDifferentDefaultModel(defaultModel, dataset);
-			qexec = ARQFactory.get().createQueryExecution(arqQuery, newDataset);
-		}
-		else {
-			qexec = ARQFactory.get().createQueryExecution(arqQuery, defaultModel);
-		}
-		qexec.setInitialBinding(bindings);
-		if(arqQuery.isAskType()) {
-			boolean result = qexec.execAsk();
-			qexec.close();
-			return NodeValue.makeBoolean(result);
-		}
-		else if(arqQuery.isSelectType()) {
-			ResultSet rs = qexec.execSelect();
-			try {
-				if(rs.hasNext()) {
-					QuerySolution s = rs.nextSolution();
-					List<String> resultVars = rs.getResultVars();
-					String varName = resultVars.get(0);
-					RDFNode resultNode = s.get(varName);
-					if(resultNode != null) {
-						return NodeValue.makeNode(resultNode.asNode());
-					}
-				}
-				throw new ExprEvalException("Empty result set for SPIN function " + queryString);
-			}
-			finally {
-				qexec.close();
-			}
-		}
-		else {
-			throw new ExprEvalException("Body must be ASK or SELECT query");
-		}
+	private QueryExecution createQueryExecution(Dataset dataset, Model defaultModel, QuerySolution bindings) {
+	    if(dataset == null) {
+	        return ARQFactory.get().createQueryExecution(arqQuery, defaultModel, bindings);
+	    }
+	    else {
+	    	Dataset newDataset = new DatasetWithDifferentDefaultModel(defaultModel, dataset);
+	    	return ARQFactory.get().createQueryExecution(arqQuery, newDataset, bindings);
+	    }
 	}
-	
+
+	public NodeValue executeBody(Dataset dataset, Model defaultModel, QuerySolution bindings) {
+	    try( QueryExecution qexec = createQueryExecution(dataset, defaultModel, bindings) ) {
+	        if(arqQuery.isAskType()) {
+	            boolean result = qexec.execAsk();
+	            return NodeValue.makeBoolean(result);
+	        }
+	        else if(arqQuery.isSelectType()) {
+	            ResultSet rs = qexec.execSelect();
+	            if(rs.hasNext()) {
+	                QuerySolution s = rs.nextSolution();
+	                List<String> resultVars = rs.getResultVars();
+	                String varName = resultVars.get(0);
+	                RDFNode resultNode = s.get(varName);
+	                if(resultNode != null) {
+	                    return NodeValue.makeNode(resultNode.asNode());
+	                }
+	            }
+	            throw new ExprEvalException("Empty result set for SPIN function");
+	        }
+	        else {
+	            throw new ExprEvalException("Body must be ASK or SELECT query");
+	        }
+	    }
+	}
+
 	
 	/**
 	 * Gets the names of the declared arguments, in order from left to right.

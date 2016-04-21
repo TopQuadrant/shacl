@@ -47,24 +47,19 @@ public class SPRResultSets {
 	
 	public static RDFNode getCell(Resource table, int row, int col) {
 		Model model = table.getModel();
-		QueryExecution qexec = ARQFactory.get().createQueryExecution(cellQuery, model);
 		QuerySolutionMap bindings = new QuerySolutionMap();
 		bindings.add("table", table);
 		bindings.add("row", JenaDatatypes.createInteger(row));
 		bindings.add("col", JenaDatatypes.createInteger(col));
-		qexec.setInitialBinding(bindings);
-		try {
-			ResultSet rs = qexec.execSelect();
-			if(rs.hasNext()) {
-				RDFNode result = rs.next().get("result");
-				return result;
-			}
-			else {
-				return null;
-			}
-		}
-		finally {
-			qexec.close();
+		try(QueryExecution qexec = ARQFactory.get().createQueryExecution(cellQuery, model, bindings)) {
+		    ResultSet rs = qexec.execSelect();
+		    if(rs.hasNext()) {
+		        RDFNode result = rs.next().get("result");
+		        return result;
+		    }
+		    else {
+		        return null;
+		    }
 		}
 	}
 
@@ -75,25 +70,20 @@ public class SPRResultSets {
 	
 	
 	public static String getColName(Resource table, int col) {
-		Model model = table.getModel();
-		QueryExecution qexec = ARQFactory.get().createQueryExecution(colNameQuery, model);
-		QuerySolutionMap bindings = new QuerySolutionMap();
-		bindings.add("table", table);
-		bindings.add("col", JenaDatatypes.createInteger(col));
-		qexec.setInitialBinding(bindings);
-		try {
-			ResultSet rs = qexec.execSelect();
-			if(rs.hasNext()) {
-				RDFNode result = rs.next().get("result");
-				if(result.isLiteral()) {
-					return ((Literal)result).getString();
-				}
-			} 
-			return null;
-		}
-		finally {
-			qexec.close();
-		}
+	    Model model = table.getModel();
+	    QuerySolutionMap bindings = new QuerySolutionMap();
+	    bindings.add("table", table);
+	    bindings.add("col", JenaDatatypes.createInteger(col));
+	    try(QueryExecution qexec = ARQFactory.get().createQueryExecution(colNameQuery, model, bindings)) {
+	        ResultSet rs = qexec.execSelect();
+	        if(rs.hasNext()) {
+	            RDFNode result = rs.next().get("result");
+	            if(result.isLiteral()) {
+	                return ((Literal)result).getString();
+	            }
+	        } 
+	        return null;
+	    }
 	}
 	
 
@@ -109,25 +99,21 @@ public class SPRResultSets {
 	
 	private static int getIntFromFunction(Resource table, Query query) {
 		Model model = table.getModel();
-		QueryExecution qexec = ARQFactory.get().createQueryExecution(query, model);
-		QuerySolutionMap bindings = new QuerySolutionMap();
-		bindings.add("table", table);
-		qexec.setInitialBinding(bindings);
-		try {
-			ResultSet rs = qexec.execSelect();
-			if(rs.hasNext()) {
-				RDFNode result = rs.next().get("result");
-				if(result.isLiteral()) {
-					return ((Literal)result).getInt();
-				}
-			} 
-			return 0;
+		try(QueryExecution qexec = ARQFactory.get().createQueryExecution(query, model)) {
+		    QuerySolutionMap bindings = new QuerySolutionMap();
+		    bindings.add("table", table);
+		    qexec.setInitialBinding(bindings);
+		        ResultSet rs = qexec.execSelect();
+		        if(rs.hasNext()) {
+		            RDFNode result = rs.next().get("result");
+		            if(result.isLiteral()) {
+		                return ((Literal)result).getInt();
+		            }
+		        } 
+		        return 0;
 		}
 		catch(Exception ex) {
 			throw new IllegalArgumentException("Error trying to query spr: result set " + table, ex);
-		}
-		finally {
-			qexec.close();
 		}
 	}
 

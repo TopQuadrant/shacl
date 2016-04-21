@@ -35,7 +35,8 @@ public class SelectImpl extends QueryImpl implements Select {
 	}
 	
 	
-	public List<String> getResultVariableNames() {
+	@Override
+    public List<String> getResultVariableNames() {
 		if(hasProperty(SP.resultVariables)) {
 			List<String> results = new LinkedList<String>();
 			for(Resource item : getResultVariables()) {
@@ -61,7 +62,8 @@ public class SelectImpl extends QueryImpl implements Select {
 	}
 
 	
-	public List<Resource> getResultVariables() {
+	@Override
+    public List<Resource> getResultVariables() {
 		List<Resource> results = new LinkedList<Resource>();
 		for(RDFNode node : getList(SP.resultVariables)) {
 			RDFNode e = SPINFactory.asExpression(node);
@@ -71,17 +73,20 @@ public class SelectImpl extends QueryImpl implements Select {
 	}
 
 
-	public boolean isDistinct() {
+	@Override
+    public boolean isDistinct() {
 		return hasProperty(SP.distinct, getModel().createTypedLiteral(true));
 	}
 	
 	
-	public boolean isReduced() {
+	@Override
+    public boolean isReduced() {
 		return hasProperty(SP.reduced, getModel().createTypedLiteral(true));
 	}
 
 
-	public void printSPINRDF(PrintContext p) {
+	@Override
+    public void printSPINRDF(PrintContext p) {
 		printComment(p);
 		printPrefixes(p);
 		p.printIndentation(p.getIndentation());

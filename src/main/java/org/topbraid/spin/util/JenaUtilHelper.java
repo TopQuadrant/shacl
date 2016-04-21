@@ -24,7 +24,6 @@ public class JenaUtilHelper {
 	
 	/**
 	 * Return a multiunion.
-	 * @return
 	 */
 	public MultiUnion createMultiUnion() {
 		return new MultiUnion();
@@ -33,7 +32,6 @@ public class JenaUtilHelper {
 	
 	/**
 	 * Return a multiunion, initialized with the given graphs.
-	 * @return
 	 */
 	public MultiUnion createMultiUnion(Iterator<Graph> graphs) {
 		return new MultiUnion(graphs);
@@ -42,7 +40,6 @@ public class JenaUtilHelper {
 	
 	/**
 	 * Return a multiunion, initialized with the given graphs.
-	 * @return
 	 */
 	public MultiUnion createMultiUnion(Graph[] graphs) {
 		return new MultiUnion(graphs);
@@ -75,7 +72,6 @@ public class JenaUtilHelper {
 	/**
 	 * The default implementation does nothing. In TB this is enforced.
 	 * @param m
-	 * @return
 	 */
 	public Model asReadOnlyModel(Model m) {
 		return m;
@@ -89,16 +85,6 @@ public class JenaUtilHelper {
 	
 	public OntModel createOntologyModel(OntModelSpec spec, Model base) {
 		return ModelFactory.createOntologyModel(spec, base);
-	}
-	
-	
-	public OntModel createOntologyModel() {
-		return ModelFactory.createOntologyModel();
-	}
-	
-	
-	public OntModel createOntologyModel(OntModelSpec spec) {
-		return ModelFactory.createOntologyModel(spec);
 	}
 	
 	

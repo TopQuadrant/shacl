@@ -5,12 +5,17 @@
 package org.topbraid.spin.constraints;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
-import org.topbraid.spin.model.TemplateCall;
-import org.topbraid.spin.vocabulary.SPIN;
-
+import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.topbraid.shacl.vocabulary.SH;
+import org.topbraid.spin.model.TemplateCall;
+import org.topbraid.spin.util.JenaUtil;
+import org.topbraid.spin.vocabulary.SPIN;
 
 
 /**
@@ -19,6 +24,14 @@ import org.apache.jena.rdf.model.Resource;
  * @author Holger Knublauch
  */
 public class ConstraintViolation {
+	
+	public static List<ConstraintViolation> shResults2ConstraintViolations(Model resultsModel) {
+		List<ConstraintViolation> results = new LinkedList<ConstraintViolation>();
+		for(Resource shResult : JenaUtil.getAllInstances(SH.ValidationResult.inModel(resultsModel))) {
+			results.add(new ConstraintViolation(shResult));
+		}
+		return results;
+	}
 	
 	private Collection<TemplateCall> fixes;
 	
@@ -57,8 +70,38 @@ public class ConstraintViolation {
 	}
 	
 	
+	/**
+	 * Produces a new ConstraintViolation from a SHACL validation result.
+	 * @param shResult
+	 */
+	public ConstraintViolation(Resource shResult) {
+		this.message = JenaUtil.getStringProperty(shResult, SH.message);
+		this.root = JenaUtil.getResourceProperty(shResult, SH.focusNode);
+		this.paths = new LinkedList<SimplePropertyPath>();
+		if(root != null) {
+			for(Resource predicate : JenaUtil.getResourceProperties(shResult, SH.predicate)) {
+				if(shResult.hasProperty(SH.subject, root)) {
+					paths.add(new ObjectPropertyPath(root, JenaUtil.asProperty(predicate)));
+				}
+				else if(shResult.hasProperty(SH.object, root)) {
+					paths.add(new SubjectPropertyPath(root, JenaUtil.asProperty(predicate)));
+				}
+			}
+		}
+		if(shResult.hasProperty(SH.severity, SH.Violation)) {
+			this.level = SPIN.Error;
+		}
+		else if(shResult.hasProperty(SH.severity, SH.Warning)) {
+			this.level = SPIN.Warning;
+		}
+		else if(shResult.hasProperty(SH.severity, SH.Info)) {
+			this.level = SPIN.Info;
+		}
+	}
+	
+	
 	public Collection<TemplateCall> getFixes() {
-		return fixes;
+		return fixes == null ? Collections.emptyList() : fixes;
 	}
 	
 	

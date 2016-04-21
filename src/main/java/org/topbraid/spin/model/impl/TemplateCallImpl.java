@@ -52,7 +52,8 @@ public class TemplateCallImpl extends ModuleCallImpl implements TemplateCall {
 	}
 
 
-	public Map<Argument,RDFNode> getArgumentsMap() {
+	@Override
+    public Map<Argument,RDFNode> getArgumentsMap() {
 		Map<Argument,RDFNode> map = new HashMap<Argument,RDFNode>();
 		Template template = getTemplate();
 		if(template != null) {
@@ -71,7 +72,8 @@ public class TemplateCallImpl extends ModuleCallImpl implements TemplateCall {
 	}
 
 
-	public Map<Property, RDFNode> getArgumentsMapByProperties() {
+	@Override
+    public Map<Property, RDFNode> getArgumentsMapByProperties() {
 		Map<Property,RDFNode> map = new HashMap<Property,RDFNode>();
 		Template template = getTemplate();
 		if(template != null) {
@@ -90,7 +92,8 @@ public class TemplateCallImpl extends ModuleCallImpl implements TemplateCall {
 	}
 
 
-	public Map<String, RDFNode> getArgumentsMapByVarNames() {
+	@Override
+    public Map<String, RDFNode> getArgumentsMapByVarNames() {
 		Map<String,RDFNode> map = new HashMap<String,RDFNode>();
 		Template template = getTemplate();
 		if(template != null) {
@@ -130,7 +133,8 @@ public class TemplateCallImpl extends ModuleCallImpl implements TemplateCall {
 	}
 
 
-	public String getQueryString() {
+	@Override
+    public String getQueryString() {
 		Map<String,RDFNode> map = getArgumentsMapByVarNames();
 		StringPrintContext p = new StringPrintContext(new StringBuilder(), map);
 		Template template = getTemplate();
@@ -140,7 +144,8 @@ public class TemplateCallImpl extends ModuleCallImpl implements TemplateCall {
 	}
 
 
-	public Template getTemplate() {
+	@Override
+    public Template getTemplate() {
 		Statement s = getProperty(RDF.type);
 		if(s != null && s.getObject().isURIResource()) {
 			return SPINModuleRegistry.get().getTemplate(s.getResource().getURI(), getModel());
@@ -151,7 +156,8 @@ public class TemplateCallImpl extends ModuleCallImpl implements TemplateCall {
 	}
 
 
-	public void print(PrintContext p) {
+	@Override
+    public void print(PrintContext p) {
 		Template template = getTemplate();
 		String str = template.getLabelTemplate();
 		if(str != null) {

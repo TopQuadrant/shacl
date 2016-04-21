@@ -19,7 +19,8 @@ public class InsertImpl extends UpdateImpl implements Insert {
 	}
 
 	
-	public void printSPINRDF(PrintContext p) {
+	@Override
+    public void printSPINRDF(PrintContext p) {
 		printComment(p);
 		printPrefixes(p);
 		p.printIndentation(p.getIndentation());

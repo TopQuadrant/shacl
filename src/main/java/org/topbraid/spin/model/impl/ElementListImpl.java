@@ -68,7 +68,8 @@ public class ElementListImpl extends RDFListImpl implements ElementList {
 	}
 
 	
-	public List<Element> getElements() {
+	@Override
+    public List<Element> getElements() {
 		List<Element> results = new LinkedList<Element>();
 		ExtendedIterator<RDFNode> it = iterator();
 		while(it.hasNext()) {
@@ -111,7 +112,8 @@ public class ElementListImpl extends RDFListImpl implements ElementList {
 	}
 	
 	
-	public void print(PrintContext p) {
+	@Override
+    public void print(PrintContext p) {
 		List<Element> elements = getElements();
 		
 		int oldI = -1;
@@ -202,7 +204,8 @@ public class ElementListImpl extends RDFListImpl implements ElementList {
 	}
 	
 	
-	public String toString() {
+	@Override
+    public String toString() {
 		StringBuilder sb = new StringBuilder();
 		PrintContext context = new StringPrintContext(sb);
 		print(context);
@@ -210,7 +213,8 @@ public class ElementListImpl extends RDFListImpl implements ElementList {
 	}
 
 
-	public void visit(ElementVisitor visitor) {
+	@Override
+    public void visit(ElementVisitor visitor) {
 		visitor.visit(this);
 	}
 }

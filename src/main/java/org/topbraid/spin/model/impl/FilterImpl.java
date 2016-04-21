@@ -23,7 +23,8 @@ public class FilterImpl extends ElementImpl implements Filter {
 	}
 
 	
-	public RDFNode getExpression() {
+	@Override
+    public RDFNode getExpression() {
 		Statement s = getProperty(SP.expression);
 		if(s != null) {
 			RDFNode object = s.getObject();
@@ -35,7 +36,8 @@ public class FilterImpl extends ElementImpl implements Filter {
 	}
 	
 	
-	public void print(PrintContext context) {
+	@Override
+    public void print(PrintContext context) {
 		context.printKeyword("FILTER");
 		context.print(" ");
 		RDFNode expression = getExpression();
@@ -48,7 +50,8 @@ public class FilterImpl extends ElementImpl implements Filter {
 	}
 
 
-	public void visit(ElementVisitor visitor) {
+	@Override
+    public void visit(ElementVisitor visitor) {
 		visitor.visit(this);
 	}
 }

@@ -22,7 +22,8 @@ public class ServiceImpl extends ElementImpl implements Service {
 	}
 
 	
-	public String getServiceURI() {
+	@Override
+    public String getServiceURI() {
 		Statement s = getProperty(SP.serviceURI);
 		if(s != null && s.getObject().isURIResource()) {
 			Variable variable = SPINFactory.asVariable(s.getResource());
@@ -47,7 +48,8 @@ public class ServiceImpl extends ElementImpl implements Service {
 	}
 
 
-	public void print(PrintContext p) {
+	@Override
+    public void print(PrintContext p) {
 		p.printKeyword("SERVICE");
 		Variable var = getServiceVariable();
 		if(var != null) {
@@ -65,7 +67,8 @@ public class ServiceImpl extends ElementImpl implements Service {
 	}
 
 
-	public void visit(ElementVisitor visitor) {
+	@Override
+    public void visit(ElementVisitor visitor) {
 		visitor.visit(this);
 	}
 }

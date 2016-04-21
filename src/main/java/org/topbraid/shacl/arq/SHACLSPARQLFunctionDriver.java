@@ -18,7 +18,7 @@ import org.apache.jena.rdf.model.Resource;
 public class SHACLSPARQLFunctionDriver implements SPINFunctionDriver {
 
 	@Override
-	public SPINFunctionFactory create(Resource spinFunction) {
-		return new SHACLARQFunction(spinFunction.as(SHACLFunction.class));
+	public SPINFunctionFactory create(Resource shaclFunction) {
+		return new SHACLARQFunction(shaclFunction.as(SHACLFunction.class));
 	}
 }

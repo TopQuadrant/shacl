@@ -21,7 +21,8 @@ public class TemplateImpl extends ModuleImpl implements Template {
 	}
 
 	
-	public String getLabelTemplate() {
+	@Override
+    public String getLabelTemplate() {
 		return getString(SPIN.labelTemplate);
 	}
 

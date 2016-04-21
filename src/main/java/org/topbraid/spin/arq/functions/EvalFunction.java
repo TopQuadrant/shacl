@@ -119,33 +119,30 @@ public class EvalFunction extends AbstractFunction implements FunctionFactory {
 			Dataset newDataset = new DatasetWithDifferentDefaultModel(model, DatasetImpl.wrap(env.getDataset()));
 			long startTime = System.currentTimeMillis();
 			if(spinQuery instanceof Select || spinQuery instanceof Ask) {
-				Query query = ARQFactory.get().createQuery(spinQuery);
-				QueryExecution qexec = ARQFactory.get().createQueryExecution(query, newDataset, bindings);
-				if(query.isAskType()) {
-					boolean result = qexec.execAsk();
-					if(SPINStatisticsManager.get().isRecording() && SPINStatisticsManager.get().isRecordingSPINFunctions()) {
-						addStatistics(nodes, env, startTime, "ASK...", result ? JenaDatatypes.TRUE : JenaDatatypes.FALSE);
-					}
-					return NodeValue.makeBoolean(result);
-				}
-				else {
-					ResultSet rs = qexec.execSelect();
-					try {
-						String var = rs.getResultVars().get(0);
-						if(rs.hasNext()) {
-							RDFNode result = rs.next().get(var);
-							if(SPINStatisticsManager.get().isRecording() && SPINStatisticsManager.get().isRecordingSPINFunctions()) {
-								addStatistics(nodes, env, startTime, "SELECT...", result);
-							}
-							if(result != null) {
-								return NodeValue.makeNode(result.asNode());
-							}
-						}
-					}
-					finally {
-						qexec.close();
-					}
-				}
+			    Query query = ARQFactory.get().createQuery(spinQuery);
+			    try(QueryExecution qexec = ARQFactory.get().createQueryExecution(query, newDataset, bindings)) {
+			        if(query.isAskType()) {
+			            boolean result = qexec.execAsk();
+			            if(SPINStatisticsManager.get().isRecording() && SPINStatisticsManager.get().isRecordingSPINFunctions()) {
+			                addStatistics(nodes, env, startTime, "ASK...", result ? JenaDatatypes.TRUE : JenaDatatypes.FALSE);
+			            }
+			            return NodeValue.makeBoolean(result);
+			        }
+			        else {
+			            ResultSet rs = qexec.execSelect();
+
+			            String var = rs.getResultVars().get(0);
+			            if(rs.hasNext()) {
+			                RDFNode result = rs.next().get(var);
+			                if(SPINStatisticsManager.get().isRecording() && SPINStatisticsManager.get().isRecordingSPINFunctions()) {
+			                    addStatistics(nodes, env, startTime, "SELECT...", result);
+			                }
+			                if(result != null) {
+			                    return NodeValue.makeNode(result.asNode());
+			                }
+			            }
+			        }
+			    }
 			}
 			else {
 				RDFNode expr = SPINFactory.asExpression(exprRDFNode);

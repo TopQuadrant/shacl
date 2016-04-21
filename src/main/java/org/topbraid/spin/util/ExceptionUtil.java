@@ -68,7 +68,7 @@ public class ExceptionUtil {
 	 * @param t The underlying problem.
 	 * @param clazz The class of exception to look for. This clazz must not be abstract and must have
 	 * either a no element constructor or a constructor with one argument being a throwable.
-	 * @param <Ex> The type of exception thrown by the constructor of V
+	 * @param  <EX> The type of exception thrown by the constructor of V
 	 * @throws Error If there is an underlying Error
 	 * @throws RuntimeException If there is an underlying RuntimeException and no exception of type EX
 	 * @throws EX If there is an appropriate exception or otherwise

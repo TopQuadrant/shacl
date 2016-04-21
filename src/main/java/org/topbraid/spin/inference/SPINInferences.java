@@ -300,20 +300,19 @@ public class SPINInferences {
 					StmtIterator it = queryModel.listStatements(null, RDF.type, cls);
 					while(it.hasNext()) {
 						Resource instance = it.next().getSubject();
-						QueryExecution qexec = ARQFactory.get().createQueryExecution(arq, queryModel);
 						bindings.add(SPIN.THIS_VAR_NAME, instance);
-						qexec.setInitialBinding(bindings);
-						qexec.execConstruct(cm);
-						qexec.close();
+						try(QueryExecution qexec = ARQFactory.get().createQueryExecution(arq, queryModel, bindings)) {
+    						qexec.execConstruct(cm);
+						}
 					}
 				}
 				else {
 					if(needsClass) {
 						bindings.add(SPINUtil.TYPE_CLASS_VAR_NAME, cls);
 					}
-					QueryExecution qexec = ARQFactory.get().createQueryExecution(arq, queryModel, bindings);
-					cm = qexec.execConstruct();
-					qexec.close();
+					try(QueryExecution qexec = ARQFactory.get().createQueryExecution(arq, queryModel, bindings)) {
+					    cm = qexec.execConstruct();
+					}
 				}
 				StmtIterator cit = cm.listStatements();
 				while(cit.hasNext()) {
@@ -418,7 +417,6 @@ public class SPINInferences {
 	 */
 	public static boolean runQueryOnInstance(QueryWrapper queryWrapper, Model queryModel, Model newTriples, Resource instance, boolean checkContains) {
 		boolean changed = false;
-		QueryExecution qexec = ARQFactory.get().createQueryExecution(queryWrapper.getQuery(), queryModel);
 		QuerySolutionMap bindings = new QuerySolutionMap();
 		bindings.add(SPIN.THIS_VAR_NAME, instance);
 		Map<String,RDFNode> initialBindings = queryWrapper.getTemplateBinding();
@@ -428,7 +426,7 @@ public class SPINInferences {
 				bindings.add(varName, value);
 			}
 		}
-		qexec.setInitialBinding(bindings);
+		QueryExecution qexec = ARQFactory.get().createQueryExecution(queryWrapper.getQuery(), queryModel, bindings);
 		Model cm = qexec.execConstruct();
 		StmtIterator cit = cm.listStatements();
 		while(cit.hasNext()) {

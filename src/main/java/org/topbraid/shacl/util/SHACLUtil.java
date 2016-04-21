@@ -1,23 +1,13 @@
 package org.topbraid.shacl.util;
 
+import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
-import org.topbraid.shacl.constraints.ExecutionLanguage;
-import org.topbraid.shacl.constraints.ExecutionLanguageSelector;
-import org.topbraid.shacl.model.SHACLArgument;
-import org.topbraid.shacl.model.SHACLFactory;
-import org.topbraid.shacl.model.SHACLPropertyConstraint;
-import org.topbraid.shacl.model.SHACLResult;
-import org.topbraid.shacl.model.SHACLTemplateCall;
-import org.topbraid.shacl.vocabulary.DASH;
-import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.arq.ARQFactory;
-import org.topbraid.spin.util.JenaUtil;
+import java.util.UUID;
 
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
@@ -38,6 +28,17 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
+import org.topbraid.shacl.constraints.ExecutionLanguage;
+import org.topbraid.shacl.constraints.ExecutionLanguageSelector;
+import org.topbraid.shacl.model.SHACLFactory;
+import org.topbraid.shacl.model.SHACLParameter;
+import org.topbraid.shacl.model.SHACLParameterizableScope;
+import org.topbraid.shacl.model.SHACLPropertyConstraint;
+import org.topbraid.shacl.model.SHACLResult;
+import org.topbraid.shacl.vocabulary.DASH;
+import org.topbraid.shacl.vocabulary.SH;
+import org.topbraid.spin.arq.ARQFactory;
+import org.topbraid.spin.util.JenaUtil;
 
 /**
  * Various SHACL-related utility methods that didn't fit elsewhere.
@@ -53,17 +54,22 @@ public class SHACLUtil {
 	private final static Set<Resource> classesWithDefaultType = new HashSet<Resource>();
 	static {
 		classesWithDefaultType.add(SH.NodeConstraint);
-		classesWithDefaultType.add(SH.Argument);
+		classesWithDefaultType.add(SH.Parameter);
 		classesWithDefaultType.add(SH.InversePropertyConstraint);
 		classesWithDefaultType.add(SH.PropertyConstraint);
 	}
 	
 	private final static List<Property> constraintProperties = new LinkedList<Property>();
 	static {
-		constraintProperties.add(SH.argument);
 		constraintProperties.add(SH.constraint);
 		constraintProperties.add(SH.inverseProperty);
 		constraintProperties.add(SH.property);
+	}
+	
+	private final static List<Property> constraintPropertiesIncludingParameter = new LinkedList<Property>();
+	static {
+		constraintPropertiesIncludingParameter.addAll(constraintProperties);
+		constraintPropertiesIncludingParameter.add(SH.parameter);
 	}
 	
 	private static Query propertyLabelQuery = ARQFactory.get().createQuery(
@@ -73,14 +79,14 @@ public class SHACLUtil {
 			"WHERE {\n" +
 			"    ?arg2 a ?type .\n" +
 			"    ?type rdfs:subClassOf* ?class .\n" +
-			"    ?shape sh:scopeClass* ?class .\n" +
-			"    ?shape sh:property|sh:argument ?p .\n" +
-			"    ?p sh:predicate ?arg1 .\n" +
+			"    ?shape <" + SH.scopeClass + ">* ?class .\n" +
+			"    ?shape <" + SH.property + ">|<" + SH.parameter + "> ?p .\n" +
+			"    ?p <" + SH.predicate + "> ?arg1 .\n" +
 			"    ?p rdfs:label ?label .\n" +
 			"}");
 
 	public static void addDirectPropertiesOfClass(Resource cls, Collection<Property> results) {
-		for(Resource argument : JenaUtil.getResourceProperties(cls, SH.argument)) {
+		for(Resource argument : JenaUtil.getResourceProperties(cls, SH.parameter)) {
 			Resource predicate = JenaUtil.getPropertyResourceValue(argument, SH.predicate);
 			if(predicate != null && predicate.isURIResource() && !results.contains(predicate)) {
 				results.add(JenaUtil.asProperty(predicate));
@@ -145,10 +151,10 @@ public class SHACLUtil {
 		});
 		Model unionModel = ModelFactory.createModelForGraph(multiUnion);
 		Query query = ARQFactory.get().createQuery(model, sparql);
-		QueryExecution qexec = ARQFactory.get().createQueryExecution(query, unionModel);
-		qexec.execConstruct(resultModel);
-		qexec.close();
-		return resultModel;
+		try(QueryExecution qexec = ARQFactory.get().createQueryExecution(query, unionModel)) {
+		    qexec.execConstruct(resultModel);
+		    return resultModel;    
+		}
 	}
 	
 	
@@ -177,8 +183,8 @@ public class SHACLUtil {
 	}
 
 
-	public static List<Property> getAllConstraintProperties() {
-		return constraintProperties;
+	public static List<Property> getAllConstraintProperties(boolean validateShapes) {
+		return validateShapes ? constraintPropertiesIncludingParameter : constraintProperties;
 	}
 	
 	
@@ -228,15 +234,21 @@ public class SHACLUtil {
 					getAllSuperClassesAndShapesStarHelper(it.next().getSubject(), results);
 				}
 			}
+			{
+				StmtIterator it = node.getModel().listStatements(null, SH.context, node);
+				while(it.hasNext()) {
+					getAllSuperClassesAndShapesStarHelper(it.next().getSubject(), results);
+				}
+			}
 		}
 	}
 	
 	
-	public static SHACLArgument getArgumentAtClass(Resource cls, Property predicate) {
+	public static SHACLParameter getParameterAtClass(Resource cls, Property predicate) {
 		for(Resource c : JenaUtil.getAllSuperClassesStar(cls)) {
-			for(Resource arg : JenaUtil.getResourceProperties(c, SH.argument)) {
+			for(Resource arg : JenaUtil.getResourceProperties(c, SH.parameter)) {
 				if(arg.hasProperty(SH.predicate, predicate)) {
-					return SHACLFactory.asArgument(arg);
+					return SHACLFactory.asParameter(arg);
 				}
 			}
 		}
@@ -244,9 +256,9 @@ public class SHACLUtil {
 	}
 	
 	
-	public static SHACLArgument getArgumentAtInstance(Resource instance, Property predicate) {
+	public static SHACLParameter getParameterAtInstance(Resource instance, Property predicate) {
 		for(Resource type : JenaUtil.getTypes(instance)) {
-			SHACLArgument argument = getArgumentAtClass(type, predicate);
+			SHACLParameter argument = getParameterAtClass(type, predicate);
 			if(argument != null) {
 				return argument;
 			}
@@ -255,7 +267,7 @@ public class SHACLUtil {
 	}
 
 	
-	public static Resource getDefaultTemplateType(Resource resource) {
+	public static Resource getResourceDefaultType(Resource resource) {
 		StmtIterator it = resource.getModel().listStatements(null, null, resource);
 		try {
 			while(it.hasNext()) {
@@ -286,19 +298,14 @@ public class SHACLUtil {
 		QuerySolutionMap binding = new QuerySolutionMap();
 		binding.add("arg1", property);
 		binding.add("arg2", context);
-		QueryExecution qexec = ARQFactory.get().createQueryExecution(propertyLabelQuery, property.getModel(), binding);
-		ResultSet rs = qexec.execSelect();
-		try {
-			if(rs.hasNext()) {
-				return rs.next().get("label").asLiteral().getLexicalForm();
-			}
-		}
-		finally {
-			qexec.close();
+		try(QueryExecution qexec = ARQFactory.get().createQueryExecution(propertyLabelQuery, property.getModel(), binding)) {
+		    ResultSet rs = qexec.execSelect();
+		    if(rs.hasNext()) {
+		        return rs.next().get("label").asLiteral().getLexicalForm();
+		    }
 		}
 		return null;
 	}
-	
 	
 	public static SHACLPropertyConstraint getPropertyConstraintAtClass(Resource cls, Property predicate) {
 		for(Resource c : JenaUtil.getAllSuperClassesStar(cls)) {
@@ -324,7 +331,7 @@ public class SHACLUtil {
 	
 	
 	/**
-	 * Gets all the predicates of all declared sh:properties and sh:arguments
+	 * Gets all the predicates of all declared sh:properties and sh:parameters
 	 * of a given class, including inherited ones.
 	 * @param cls  the class to get the predicates of
 	 * @return the declared predicates
@@ -346,23 +353,23 @@ public class SHACLUtil {
 	public static Iterable<RDFNode> getResourcesInScope(Resource scope, Dataset dataset) {
 		Resource type = JenaUtil.getType(scope);
 		Resource executable;
-		SHACLTemplateCall templateCall = null;
-		if(SHACLFactory.isNativeScope(scope)) {
+		SHACLParameterizableScope parameterizableScope = null;
+		if(SHACLFactory.isSPARQLScope(scope)) {
 			executable = scope;
 		}
 		else {
 			executable = type;
-			templateCall = SHACLFactory.asTemplateCall(scope);
+			parameterizableScope = SHACLFactory.asParameterizableScope(scope);
 		}
 		ExecutionLanguage language = ExecutionLanguageSelector.get().getLanguageForScope(executable);
-		return language.executeScope(dataset, executable, templateCall);
+		return language.executeScope(dataset, executable, parameterizableScope);
 	}
 	
 	
 	public static List<Resource> getTypes(Resource subject) {
 		List<Resource> types = JenaUtil.getTypes(subject);
 		if(types.isEmpty()) {
-			Resource defaultType = getDefaultTemplateType(subject);
+			Resource defaultType = getResourceDefaultType(subject);
 			if(defaultType != null) {
 				return Collections.singletonList(defaultType);
 			}
@@ -384,9 +391,9 @@ public class SHACLUtil {
 	}
 	
 	
-	public static boolean isArgumentAtInstance(Resource subject, Property predicate) {
+	public static boolean isParameterAtInstance(Resource subject, Property predicate) {
 		for(Resource type : getTypes(subject)) {
-			Resource arg = getArgumentAtClass(type, predicate);
+			Resource arg = getParameterAtClass(type, predicate);
 			if(arg != null) {
 				return true;
 			}
@@ -410,7 +417,7 @@ public class SHACLUtil {
 	public static boolean exists(Model model) {
     	return model != null &&
         		SH.NS.equals(model.getNsPrefixURI(SH.PREFIX)) && 
-        		model.contains(SH.NativeConstraint, RDF.type, (RDFNode)null);
+        		model.contains(SH.Shape, RDF.type, (RDFNode)null);
 	}
 	
 	
@@ -419,5 +426,47 @@ public class SHACLUtil {
 				model.getGraph(),
 				SHACLUtil.createDefaultValueTypesModel(model).getGraph()
 		}));
+	}
+
+
+	public static URI withShapesGraph(Dataset dataset) {
+		URI shapesGraphURI = URI.create("urn:x-shacl:" + UUID.randomUUID());
+		Model shapesModel = createShapesModel(dataset);
+		dataset.addNamedModel(shapesGraphURI.toString(), shapesModel);
+		return shapesGraphURI;
+	}
+
+
+	/**
+	 * Creates a shapes Model for a given input Model.
+	 * The shapes Model is the union of the input Model with all graphs referenced via
+	 * the sh:shapesGraph property (and transitive includes or shapesGraphs of those).
+	 * @param model  the Model to create the shapes Model for
+	 * @return a shapes graph Model
+	 */
+	private static Model createShapesModel(Dataset dataset) {
+		
+		Model model = dataset.getDefaultModel();
+		Set<Graph> graphs = new HashSet<Graph>();
+		Graph baseGraph = model.getGraph();
+		graphs.add(baseGraph);
+		
+		for(Statement s : model.listStatements(null, SH.shapesGraph, (RDFNode)null).toList()) {
+			if(s.getObject().isURIResource()) {
+				String graphURI = s.getResource().getURI();
+				Model sm = dataset.getNamedModel(graphURI);
+				graphs.add(sm.getGraph());
+				// TODO: Include includes of sm
+			}
+		}
+		
+		if(graphs.size() > 1) {
+			MultiUnion union = new MultiUnion(graphs.iterator());
+			union.setBaseGraph(baseGraph);
+			return ModelFactory.createModelForGraph(union);
+		}
+		else {
+			return model;
+		}
 	}
 }

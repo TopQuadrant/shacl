@@ -70,20 +70,16 @@ public abstract class AbstractWalkFunction extends AbstractFunction {
 		localBinding.addAll(initialBinding);
 		localBinding.add("arg1", model.asRDFNode(node));
 		Dataset dataset = new DatasetWithDifferentDefaultModel(model, oldDataset);
-		QueryExecution qexec = ARQFactory.get().createQueryExecution(query, dataset, localBinding);
-		ResultSet rs = qexec.execSelect();
-		try {
-			if(rs.hasNext()) {
-				List<String> resultVars = rs.getResultVars();
-				String varName = resultVars.get(0);
-				RDFNode resultNode = rs.next().get(varName);
-				if(resultNode != null) {
-					return resultNode.asNode();
-				}
-			}
-		} 
-		finally {
-			qexec.close();
+		try ( QueryExecution qexec = ARQFactory.get().createQueryExecution(query, dataset, localBinding) ) {
+		    ResultSet rs = qexec.execSelect();
+		    if(rs.hasNext()) {
+		        List<String> resultVars = rs.getResultVars();
+		        String varName = resultVars.get(0);
+		        RDFNode resultNode = rs.next().get(varName);
+		        if(resultNode != null) {
+		            return resultNode.asNode();
+		        }
+		    }
 		}
 		
 		// Recurse into parents

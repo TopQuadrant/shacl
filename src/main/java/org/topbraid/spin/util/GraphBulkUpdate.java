@@ -1,6 +1,7 @@
 package org.topbraid.spin.util;
 
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.jena.graph.Graph;
@@ -33,9 +34,12 @@ public class GraphBulkUpdate {
 
 	
 	public static void add(Graph graph, Iterator<Triple> triples) {
+		// Avoiding parallel traversal of Iterator (for now) -> copy into List first
+		List<Triple> list = new LinkedList<Triple>();
 		while(triples.hasNext()) {
-			graph.add(triples.next());
+			list.add(triples.next());
 		}
+		add(graph, list);
 	}
 	
 	
@@ -64,9 +68,12 @@ public class GraphBulkUpdate {
 	
 	
 	public static void delete(Graph graph, Iterator<Triple> triples) {
+		// Avoiding parallel traversal of Iterator (for now) -> copy into List first
+		List<Triple> list = new LinkedList<Triple>();
 		while(triples.hasNext()) {
-			graph.delete(triples.next());
+			list.add(triples.next());
 		}
+		delete(graph, list);
 	}
 	
 	

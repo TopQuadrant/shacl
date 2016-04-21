@@ -5,14 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.topbraid.shacl.model.SHACLConstraint;
-import org.topbraid.shacl.model.SHACLFactory;
-import org.topbraid.shacl.model.SHACLTemplateCall;
-import org.topbraid.shacl.util.SHACLUtil;
-import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.progress.ProgressMonitor;
-import org.topbraid.spin.util.JenaUtil;
-
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
@@ -20,6 +12,14 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.vocabulary.RDF;
+import org.topbraid.shacl.model.SHACLConstraint;
+import org.topbraid.shacl.model.SHACLFactory;
+import org.topbraid.shacl.model.SHACLParameterizableScope;
+import org.topbraid.shacl.util.SHACLUtil;
+import org.topbraid.shacl.vocabulary.SH;
+import org.topbraid.spin.progress.ProgressMonitor;
+import org.topbraid.spin.util.JenaUtil;
 
 /**
  * A SHACL constraint validator for individual resources - either against all shapes
@@ -53,12 +53,15 @@ public class ResourceConstraintValidator extends AbstractConstraintValidator {
 		// sh:scopeNode
 		shapes.addAll(shapesModel.listSubjectsWithProperty(SH.scopeNode, resource).toList());
 		
-		// rdf:type / sh:scopeClass
+		// rdf:type / sh:scopeClass|sh:context
 		for(Resource type : JenaUtil.getAllTypes(resource)) {
 			if(JenaUtil.hasIndirectType(type.inModel(shapesModel), SH.Shape)) {
 				shapes.add(type);
 			}
 			for(Statement s : shapesModel.listStatements(null, SH.scopeClass, type).toList()) {
+				shapes.add(s.getSubject());
+			}
+			for(Statement s : shapesModel.listStatements(null, SH.context, type).toList()) {
 				shapes.add(s.getSubject());
 			}
 		}
@@ -76,6 +79,7 @@ public class ResourceConstraintValidator extends AbstractConstraintValidator {
 	
 	/**
 	 * Validates all SHACL constraints for a given resource.
+	 * This always includes shapesGraph validation (sh:parameter etc).
 	 * @param dataset  the Dataset to operate on
 	 * @param shapesGraphURI  the URI of the shapes graph (must be in the dataset)
 	 * @param focusNode  the resource to validate
@@ -83,17 +87,20 @@ public class ResourceConstraintValidator extends AbstractConstraintValidator {
 	 * @param monitor  an optional progress monitor
 	 * @return a Model with constraint violations
 	 */
-	public Model validateNode(Dataset dataset, URI shapesGraphURI, Node focusNode, Resource minSeverity, ProgressMonitor monitor) {
+	public Model validateNode(Dataset dataset, URI shapesGraphURI, Node focusNode, Resource minSeverity, ProgressMonitor monitor) throws InterruptedException {
 		
 		Model results = JenaUtil.createMemoryModel();
 		
 		Model shapesModel = dataset.getNamedModel(shapesGraphURI.toString());
 		
-		List<Property> properties = SHACLUtil.getAllConstraintProperties();
+		List<Property> properties = SHACLUtil.getAllConstraintProperties(true);
 		
 		Resource resource = (Resource) dataset.getDefaultModel().asRDFNode(focusNode);
 		Set<Resource> shapes = getShapesForResource(resource, dataset, shapesModel);
 		for(Resource shape : shapes) {
+			if(monitor != null && monitor.isCanceled()) {
+				throw new InterruptedException();
+			}
 			addResourceViolations(dataset, shapesGraphURI, focusNode, shape.asNode(), properties, minSeverity, results, monitor);
 		}
 		
@@ -115,7 +122,7 @@ public class ResourceConstraintValidator extends AbstractConstraintValidator {
 		Model results = JenaUtil.createMemoryModel();
 		Model oldResults = getCurrentResultsModel();
 		setCurrentResultsModel(results);
-		addResourceViolations(dataset, shapesGraphURI, focusNode, shape, SHACLUtil.getAllConstraintProperties(), minSeverity, results, monitor);
+		addResourceViolations(dataset, shapesGraphURI, focusNode, shape, SHACLUtil.getAllConstraintProperties(true), minSeverity, results, monitor);
 		setCurrentResultsModel(oldResults);
 		return results;
 	}
@@ -136,7 +143,7 @@ public class ResourceConstraintValidator extends AbstractConstraintValidator {
 			if(SHACLUtil.hasMinSeverity(severity, minSeverity)) {
 				ExecutionLanguage lang = ExecutionLanguageSelector.get().getLanguageForConstraint(executable);
 				notifyValidationStarting(shape, executable, focusNode, lang, results);
-				lang.executeConstraint(dataset, shape, shapesGraphURI, constraint, executable, focusNode, results);
+				lang.executeConstraint(dataset, shape, shapesGraphURI, executable, focusNode, results);
 				notifyValidationFinished(shape, executable, focusNode, lang, results);
 			}
 		}
@@ -152,19 +159,13 @@ public class ResourceConstraintValidator extends AbstractConstraintValidator {
 		Resource shape = (Resource) shapesModel.asRDFNode(shapeNode);
 		for(Property constraintProperty : constraintProperties) {
 			for(Resource c : JenaUtil.getResourceProperties(shape, constraintProperty)) {
-				Resource type = JenaUtil.getType(c);
-				if(type == null) {
-					type = SHACLUtil.getDefaultTemplateType(c);
+				if(c.hasProperty(RDF.type, SH.SPARQLConstraint)) {
+					SHACLConstraint constraint = SHACLFactory.asSPARQLConstraint(c);
+					addQueryResults(results, constraint, shape, resource, dataset, shapesGraphURI, minSeverity, monitor);
 				}
-				if(type != null) {
-					if(JenaUtil.hasSuperClass(type,  SH.NativeConstraint)) {
-						SHACLConstraint constraint = SHACLFactory.asNativeConstraint(c);
-						addQueryResults(results, constraint, shape, resource, dataset, shapesGraphURI, minSeverity, monitor);
-					}
-					else if(JenaUtil.hasIndirectType(type, SH.ConstraintTemplate)) {
-						SHACLConstraint constraint = SHACLFactory.asTemplateConstraint(c);
-						addQueryResults(results, constraint, shape, resource, dataset, shapesGraphURI, minSeverity, monitor);
-					}
+				else if(SHACLFactory.isParameterizableConstraint(c)) {
+					SHACLConstraint constraint = SHACLFactory.asParameterizableConstraint(c);
+					addQueryResults(results, constraint, shape, resource, dataset, shapesGraphURI, minSeverity, monitor);
 				}
 			}
 		}
@@ -172,13 +173,13 @@ public class ResourceConstraintValidator extends AbstractConstraintValidator {
 	
 	
 	private boolean isInScope(Resource focusNode, Dataset dataset, Resource scope) {
-		SHACLTemplateCall templateCall = null;
+		SHACLParameterizableScope parameterizableScope = null;
 		Resource executable = scope;
-		if(SHACLFactory.isTemplateCall(scope)) {
-			templateCall = SHACLFactory.asTemplateCall(scope);
-			executable = templateCall.getTemplate();
+		if(SHACLFactory.isParameterizableInstance(scope)) {
+			parameterizableScope = SHACLFactory.asParameterizableScope(scope);
+			executable = parameterizableScope.getParameterizable();
 		}
 		ExecutionLanguage lang = ExecutionLanguageSelector.get().getLanguageForScope(executable);
-		return lang.isNodeInScope(focusNode, dataset, executable, templateCall);
+		return lang.isNodeInScope(focusNode, dataset, executable, parameterizableScope);
 	}
 }

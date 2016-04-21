@@ -24,7 +24,8 @@ public class BindImpl extends ElementImpl implements Bind {
 	}
 
 	
-	public RDFNode getExpression() {
+	@Override
+    public RDFNode getExpression() {
 		Statement s = getProperty(SP.expression);
 		if(s != null) {
 			return SPINFactory.asExpression(s.getObject());
@@ -35,7 +36,8 @@ public class BindImpl extends ElementImpl implements Bind {
 	}
 
 	
-	public Variable getVariable() {
+	@Override
+    public Variable getVariable() {
 		Statement s = getProperty(SP.variable);
 		if(s != null && s.getObject().isResource()) {
 			return s.getResource().as(Variable.class);
@@ -46,7 +48,8 @@ public class BindImpl extends ElementImpl implements Bind {
 	}
 	
 	
-	public void print(PrintContext context) {
+	@Override
+    public void print(PrintContext context) {
 		context.printKeyword("BIND");
 		context.print(" (");
 		RDFNode expression = getExpression();
@@ -70,7 +73,8 @@ public class BindImpl extends ElementImpl implements Bind {
 	}
 
 
-	public void visit(ElementVisitor visitor) {
+	@Override
+    public void visit(ElementVisitor visitor) {
 		visitor.visit(this);
 	}
 }

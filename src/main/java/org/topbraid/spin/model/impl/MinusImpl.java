@@ -18,12 +18,14 @@ public class MinusImpl extends ElementImpl implements Minus {
 	}
 
 	
-	public void visit(ElementVisitor visitor) {
+	@Override
+    public void visit(ElementVisitor visitor) {
 		visitor.visit(this);
 	}
 
 	
-	public void print(PrintContext p) {
+	@Override
+    public void print(PrintContext p) {
 		p.printKeyword("MINUS");
 		printNestedElementList(p);
 	}

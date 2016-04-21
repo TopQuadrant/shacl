@@ -50,7 +50,8 @@ public class DefaultSPINRuleComparator implements SPINRuleComparator {
 	}
 	
 
-	public int compare(CommandWrapper w1, CommandWrapper w2) {
+	@Override
+    public int compare(CommandWrapper w1, CommandWrapper w2) {
 		if(properties.size() > 1) {
 			Property p1 = w1.getStatement() != null ? w1.getStatement().getPredicate() : SPIN.rule;
 			Property p2 = w2.getStatement() != null ? w2.getStatement().getPredicate() : SPIN.rule;

@@ -16,6 +16,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.shared.Lock;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.Quad;
+import org.apache.jena.sparql.core.TransactionalNotSupported;
 import org.apache.jena.sparql.util.Context;
 
 
@@ -25,7 +26,7 @@ import org.apache.jena.sparql.util.Context;
  * 
  * @author Holger Knublauch
  */
-class ControlledUpdateGraphStore implements DatasetGraph {
+class ControlledUpdateGraphStore extends TransactionalNotSupported implements DatasetGraph {
 	
 	private Map<Graph,ControlledUpdateGraph> cugs = new HashMap<Graph,ControlledUpdateGraph>();
 	

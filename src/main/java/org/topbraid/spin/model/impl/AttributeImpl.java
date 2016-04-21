@@ -20,17 +20,20 @@ public class AttributeImpl extends AbstractAttributeImpl implements Attribute {
 	}
 
 
-	public boolean isOptional() {
+	@Override
+    public boolean isOptional() {
 		return getMinCount() == 0;
 	}
 
 
-	public RDFNode getDefaultValue() {
+	@Override
+    public RDFNode getDefaultValue() {
 		return getRDFNode(SPL.defaultValue);
 	}
 
 
-	public Integer getMaxCount() {
+	@Override
+    public Integer getMaxCount() {
 		Statement s = getProperty(SPL.maxCount);
 		if(s != null && s.getObject().isLiteral()) {
 			return s.getInt();
@@ -41,7 +44,8 @@ public class AttributeImpl extends AbstractAttributeImpl implements Attribute {
 	}
 
 
-	public int getMinCount() {
+	@Override
+    public int getMinCount() {
 		Statement s = getProperty(SPL.minCount);
 		if(s != null && s.getObject().isLiteral()) {
 			return s.getInt();

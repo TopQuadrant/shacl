@@ -5,7 +5,7 @@ import java.util.List;
 import org.topbraid.shacl.constraints.ConstraintExecutable;
 
 /**
- * Shared interface of SHACLNativeConstraint and SHACLTemplateConstraint.
+ * Shared interface of SHACLSPARQLConstraint and SHACLParameterizableConstraint.
  * 
  * @author Holger Knublauch
  */

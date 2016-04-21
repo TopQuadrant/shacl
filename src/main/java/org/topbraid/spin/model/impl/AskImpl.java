@@ -18,7 +18,8 @@ public class AskImpl extends QueryImpl implements Ask {
 	}
 	
 	
-	public void printSPINRDF(PrintContext context) {
+	@Override
+    public void printSPINRDF(PrintContext context) {
 		printComment(context);
 		printPrefixes(context);
 		context.printIndentation(context.getIndentation());

@@ -26,7 +26,8 @@ public class SPINInstanceImpl extends ResourceImpl implements SPINInstance {
 	}
 
 	
-	public List<QueryOrTemplateCall> getQueriesAndTemplateCalls(Property predicate) {
+	@Override
+    public List<QueryOrTemplateCall> getQueriesAndTemplateCalls(Property predicate) {
 		List<QueryOrTemplateCall> results = new LinkedList<QueryOrTemplateCall>();
 		for(Resource cls : JenaUtil.getAllTypes(this)) {
 			SPINUtil.addQueryOrTemplateCalls(cls, predicate, results);

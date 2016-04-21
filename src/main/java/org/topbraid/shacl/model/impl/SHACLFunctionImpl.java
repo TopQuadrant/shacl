@@ -1,18 +1,19 @@
 package org.topbraid.shacl.model.impl;
 
-import org.topbraid.shacl.model.SHACLFunction;
-
 import org.apache.jena.enhanced.EnhGraph;
 import org.apache.jena.graph.Node;
+import org.topbraid.shacl.model.SHACLFunction;
+import org.topbraid.shacl.vocabulary.SH;
+import org.topbraid.spin.util.JenaUtil;
 
-/**
- * Default implementation of SHACLFunction.
- * 
- * @author Holger Knublauch
- */
-public class SHACLFunctionImpl extends SHACLMacroImpl implements SHACLFunction {
+public class SHACLFunctionImpl extends SHACLParameterizableImpl implements SHACLFunction {
 	
 	public SHACLFunctionImpl(Node node, EnhGraph graph) {
 		super(node, graph);
+	}
+
+	@Override
+	public String getSPARQL() {
+		return JenaUtil.getStringProperty(this, SH.sparql);
 	}
 }

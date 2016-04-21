@@ -23,7 +23,8 @@ public class NamedGraphImpl extends ElementImpl implements NamedGraph {
 	}
 	
 	
-	public Resource getNameNode() {
+	@Override
+    public Resource getNameNode() {
 		Resource r = getResource(SP.graphNameNode);
 		if(r != null) {
 			Variable variable = SPINFactory.asVariable(r);
@@ -40,7 +41,8 @@ public class NamedGraphImpl extends ElementImpl implements NamedGraph {
 	}
 
 
-	public void print(PrintContext p) {
+	@Override
+    public void print(PrintContext p) {
 		p.printKeyword("GRAPH");
 		p.print(" ");
 		printVarOrResource(p, getNameNode());
@@ -48,7 +50,8 @@ public class NamedGraphImpl extends ElementImpl implements NamedGraph {
 	}
 
 
-	public void visit(ElementVisitor visitor) {
+	@Override
+    public void visit(ElementVisitor visitor) {
 		visitor.visit(this);
 	}
 }

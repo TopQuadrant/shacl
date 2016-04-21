@@ -36,7 +36,8 @@ public class SPINResourceImpl extends ResourceImpl implements SPINResource {
 	}
 
 	
-	public Literal getLiteral(Property predicate) {
+	@Override
+    public Literal getLiteral(Property predicate) {
 		Statement s = getProperty(predicate);
 		if(s != null && s.getObject().isLiteral()) {
 			return s.getLiteral();
@@ -47,7 +48,8 @@ public class SPINResourceImpl extends ResourceImpl implements SPINResource {
 	}
 
 
-	public Long getLong(Property predicate) {
+	@Override
+    public Long getLong(Property predicate) {
 		Literal literal = getLiteral(predicate);
 		if(literal != null) {
 			return literal.getLong();
@@ -58,7 +60,8 @@ public class SPINResourceImpl extends ResourceImpl implements SPINResource {
 	}
 
 
-	public RDFNode getRDFNode(Property predicate) {
+	@Override
+    public RDFNode getRDFNode(Property predicate) {
 		Statement s = getProperty(predicate);
 		if(s != null) {
 			return s.getObject();
@@ -69,7 +72,8 @@ public class SPINResourceImpl extends ResourceImpl implements SPINResource {
 	}
 
 
-	public Resource getResource(Property predicate) {
+	@Override
+    public Resource getResource(Property predicate) {
 		Statement s = getProperty(predicate);
 		if(s != null && s.getObject().isResource()) {
 			return s.getResource();
@@ -80,7 +84,8 @@ public class SPINResourceImpl extends ResourceImpl implements SPINResource {
 	}
 
 
-	public String getString(Property predicate) {
+	@Override
+    public String getString(Property predicate) {
 		Statement s = getProperty(predicate);
 		if(s != null && s.getObject().isLiteral()) {
 			return s.getString();

@@ -1,0 +1,40 @@
+# baseURI: http://datashapes.org/sh/tests/core/constraint/not-001
+# imports: http://datashapes.org/dash
+# prefix: ex
+
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix ex: <http://datashapes.org/sh/tests/core/constraint/not-001#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://datashapes.org/sh/tests/core/constraint/not-001>
+  rdf:type owl:Ontology ;
+  owl:imports <http://datashapes.org/dash> ;
+  owl:versionInfo "Created with TopBraid Composer"^^xsd:string ;
+.
+ex:InvalidResource1
+  rdf:type rdfs:Resource ;
+  ex:property "some value" ;
+.
+ex:TestShape
+  rdf:type rdfs:Class, sh:Shape ;
+  rdfs:label "Test shape"^^xsd:string ;
+  rdfs:subClassOf rdfs:Resource ;
+  sh:constraint [
+      sh:not [
+          rdf:type sh:Shape ;
+          sh:property [
+              sh:minCount 1 ;
+              sh:predicate ex:property ;
+            ] ;
+        ] ;
+    ] ;
+  sh:scopeNode ex:InvalidResource1 ;
+  sh:scopeNode ex:ValidResource1 ;
+.
+ex:ValidResource1
+  rdf:type rdfs:Resource ;
+.

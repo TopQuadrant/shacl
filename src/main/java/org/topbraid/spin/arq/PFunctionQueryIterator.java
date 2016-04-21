@@ -75,7 +75,8 @@ class PFunctionQueryIterator extends QueryIteratorBase {
 	}
 
 
-	public void output(IndentedWriter out, SerializationContext sCxt) {
+	@Override
+    public void output(IndentedWriter out, SerializationContext sCxt) {
 	}
 
 

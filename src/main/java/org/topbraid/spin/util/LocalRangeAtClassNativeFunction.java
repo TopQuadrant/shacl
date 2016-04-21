@@ -188,7 +188,7 @@ public class LocalRangeAtClassNativeFunction extends AbstractFunction2 {
 		if(!(graph instanceof OptimizedMultiUnion) || ((OptimizedMultiUnion)graph).getIncludesSHACL()) {
 			
 			{
-				ExtendedIterator<Triple> it = graph.find(type, SH.argument.asNode(), Node.ANY);
+				ExtendedIterator<Triple> it = graph.find(type, SH.parameter.asNode(), Node.ANY);
 				while(it.hasNext()) {
 					Node constraint = it.next().getObject();
 					if(constraint.isBlank() || constraint.isURI()) {

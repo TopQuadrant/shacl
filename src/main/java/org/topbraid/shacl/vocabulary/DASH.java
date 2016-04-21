@@ -6,8 +6,6 @@ import org.apache.jena.rdf.model.ResourceFactory;
 
 /**
  * Vocabulary for http://datashapes.org/dash
- *
- * Automatically generated with TopBraid Composer.
  */
 public class DASH {
 
@@ -30,8 +28,6 @@ public class DASH {
 
     public final static Resource InferencingTestCase = ResourceFactory.createResource(NS + "InferencingTestCase");
 
-    public final static Resource PrimaryKeyPropertyConstraint = ResourceFactory.createResource(NS + "PrimaryKeyPropertyConstraint");
-
     public final static Resource QueryTestCase = ResourceFactory.createResource(NS + "QueryTestCase");
 
     public final static Resource SuccessResult = ResourceFactory.createResource(NS + "SuccessResult");
@@ -42,6 +38,8 @@ public class DASH {
 
     public final static Resource ValidationTestCase = ResourceFactory.createResource(NS + "ValidationTestCase");
 
+
+    public final static Property abstract_ = ResourceFactory.createProperty(NS + "abstract");
 
     public final static Property cachable = ResourceFactory.createProperty(NS + "cachable");
     
@@ -56,8 +54,6 @@ public class DASH {
     public final static Property testCase = ResourceFactory.createProperty(NS + "testCase");
 
     public final static Property testGraph = ResourceFactory.createProperty(NS + "testGraph");
-
-    public final static Property uriStart = ResourceFactory.createProperty(NS + "uriStart");
 
 
     public static String getURI() {

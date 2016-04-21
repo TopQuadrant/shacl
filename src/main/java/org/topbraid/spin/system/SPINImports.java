@@ -79,7 +79,6 @@ public class SPINImports {
 	 * been loaded before.
 	 * @param model  the base Model to operate on
 	 * @return either model or the union of model and its spin:imports
-	 * @ 
 	 */
 	public Model getImportsModel(Model model) throws IOException  {
 		Set<String> uris = new HashSet<String>();

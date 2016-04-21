@@ -42,12 +42,14 @@ public class SimpleParameterProvider implements ParameterProvider {
 	}
 
 
-	public String getParameter(String key) {
+	@Override
+    public String getParameter(String key) {
 		return map.get(key);
 	}
 
 
-	public Iterator<String> listParameterNames() {
+	@Override
+    public Iterator<String> listParameterNames() {
 		return map.keySet().iterator();
 	}
 }

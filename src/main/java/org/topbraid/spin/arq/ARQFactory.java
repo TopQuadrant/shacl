@@ -11,17 +11,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.topbraid.spin.model.print.StringPrintContext;
-import org.topbraid.spin.model.update.Update;
-import org.topbraid.spin.system.ExtraPrefixes;
-import org.topbraid.spin.util.JenaUtil;
-import org.topbraid.spin.util.SPINExpressions;
-
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.Syntax;
@@ -34,8 +27,14 @@ import org.apache.jena.sparql.engine.http.QueryEngineHTTP;
 import org.apache.jena.sparql.syntax.ElementNamedGraph;
 import org.apache.jena.sparql.syntax.ElementVisitorBase;
 import org.apache.jena.sparql.syntax.ElementWalker;
-import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateRequest;
+import org.topbraid.spin.model.print.StringPrintContext;
+import org.topbraid.spin.model.update.Update;
+import org.topbraid.spin.query.QueryExecutionFactoryFilter;
+import org.topbraid.spin.query.UpdateFactoryFilter;
+import org.topbraid.spin.system.ExtraPrefixes;
+import org.topbraid.spin.util.JenaUtil;
+import org.topbraid.spin.util.SPINExpressions;
 
 
 /**
@@ -328,7 +327,7 @@ public class ARQFactory {
 			return createQueryExecution(query, dataset, initialBinding);
 		}
 		else {
-			QueryExecution qexec = QueryExecutionFactory.create(query, model, initialBinding);
+			QueryExecution qexec = QueryExecutionFactoryFilter.get().create(query, model, initialBinding);
 			adjustQueryExecution(qexec);
 			return qexec;
 		}
@@ -344,7 +343,7 @@ public class ARQFactory {
 		if(!query.getGraphURIs().isEmpty() || !query.getNamedGraphURIs().isEmpty()) {
 			dataset = new FromDataset(dataset, query);
 		}
-		QueryExecution qexec = QueryExecutionFactory.create(query, dataset, initialBinding);
+		QueryExecution qexec = QueryExecutionFactoryFilter.get().create(query, dataset, initialBinding);
 		adjustQueryExecution(qexec);
 		return qexec;
 	}
@@ -378,7 +377,7 @@ public class ARQFactory {
 			List<String> namedGraphURIs, 
 			String user, 
 			char[] password) {
-		QueryEngineHTTP qexec = (QueryEngineHTTP) QueryExecutionFactory.sparqlService(service, query);
+		QueryEngineHTTP qexec = (QueryEngineHTTP) QueryExecutionFactoryFilter.get().sparqlService(service, query);
 		if( defaultGraphURIs.size() > 0 ) {
 			qexec.setDefaultGraphURIs(defaultGraphURIs);
 		}
@@ -395,7 +394,7 @@ public class ARQFactory {
 	public UpdateRequest createUpdateRequest(String parsableString) {
 		UpdateRequest result = string2Update.get(parsableString);
 		if(result == null) {
-			result = UpdateFactory.create(parsableString);
+			result = UpdateFactoryFilter.get().create(parsableString);
 			if(useCaches) {
 				string2Update.put(parsableString, result);
 			}

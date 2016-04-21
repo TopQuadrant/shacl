@@ -27,7 +27,8 @@ public class DescribeImpl extends QueryImpl implements Describe {
 	}
 
 	
-	public List<Resource> getResultNodes() {
+	@Override
+    public List<Resource> getResultNodes() {
 		List<Resource> results = new LinkedList<Resource>();
 		for(RDFNode node : getList(SP.resultNodes)) {
 			Variable variable = SPINFactory.asVariable(node);
@@ -42,7 +43,8 @@ public class DescribeImpl extends QueryImpl implements Describe {
 	}
 	
 	
-	public void printSPINRDF(PrintContext context) {
+	@Override
+    public void printSPINRDF(PrintContext context) {
 		printComment(context);
 		printPrefixes(context);
 		context.printKeyword("DESCRIBE");

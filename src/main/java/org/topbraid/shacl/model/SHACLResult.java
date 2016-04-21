@@ -13,12 +13,12 @@ public interface SHACLResult extends SHACLResource {
 
 	
 	Resource getSourceConstraint();
+	
+	
+	Resource getSourceConstraintComponent();
 
 	
 	Resource getSourceShape();
-
-	
-	Resource getSourceTemplate();
 	
 	
 	Resource getSubject();

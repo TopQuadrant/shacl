@@ -30,7 +30,7 @@ import org.apache.jena.sparql.function.FunctionRegistry;
 import org.apache.jena.sparql.util.FmtUtils;
 
 /**
- * The function sh:invoke (and spif:invoke).
+ * The function spif:invoke.
  * 
  * @author Holger Knublauch
  */
@@ -68,19 +68,15 @@ public class InvokeFunction	extends AbstractFunction {
 				
 				Model model = ModelFactory.createModelForGraph(env.getActiveGraph());
 				Query arq = ARQFactory.get().createQuery(model, sb.toString());
-				QueryExecution qexec = ARQFactory.get().createQueryExecution(arq, model);
-				ResultSet rs = qexec.execSelect();
-				try {
-					if(rs.hasNext()) {
-						RDFNode result = rs.next().get(varName);
-						if(result != null) {
-							return NodeValue.makeNode(result.asNode());
-						}
-					}
-					throw new ExprEvalException("Failed to evaluate function - empty result set");
-				}
-				finally {
-					qexec.close();
+				try(QueryExecution qexec = ARQFactory.get().createQueryExecution(arq, model)) {
+				    ResultSet rs = qexec.execSelect();
+				    if(rs.hasNext()) {
+				        RDFNode result = rs.next().get(varName);
+				        if(result != null) {
+				            return NodeValue.makeNode(result.asNode());
+				        }
+				    }
+				    throw new ExprEvalException("Failed to evaluate function - empty result set");
 				}
 			}
 		}

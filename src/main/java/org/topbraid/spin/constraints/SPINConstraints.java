@@ -5,6 +5,7 @@
 package org.topbraid.spin.constraints;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -14,6 +15,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.graph.compose.MultiUnion;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QuerySolutionMap;
+import org.apache.jena.query.Syntax;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.sparql.core.BasicPattern;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.syntax.Element;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
+import org.topbraid.shacl.constraints.ModelConstraintValidator;
+import org.topbraid.shacl.constraints.ResourceConstraintValidator;
+import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.model.Argument;
 import org.topbraid.spin.model.Ask;
@@ -37,36 +63,19 @@ import org.topbraid.spin.util.SPINUtil;
 import org.topbraid.spin.vocabulary.SP;
 import org.topbraid.spin.vocabulary.SPIN;
 
-import org.apache.jena.graph.Graph;
-import org.apache.jena.graph.Node;
-import org.apache.jena.graph.NodeFactory;
-import org.apache.jena.graph.Triple;
-import org.apache.jena.graph.compose.MultiUnion;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QuerySolutionMap;
-import org.apache.jena.query.Syntax;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
-import org.apache.jena.sparql.core.BasicPattern;
-import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.syntax.Element;
-import org.apache.jena.vocabulary.RDF;
-import org.apache.jena.vocabulary.RDFS;
-
 
 /**
  * Performs SPIN constraint checking on one or more instances, based
  * on the spin:constraints defined on the types of those instances.
  * 
+ * Optionally, SHACL constraints are also checked.
+ * 
  * @author Holger Knublauch
  */
 public class SPINConstraints {
+	
+	// Set to true to activate SHACL checking too
+	public static boolean INCLUDE_SHACL = false;
 	
 	private static List<TemplateCall> NO_FIXES = Collections.emptyList();
 	
@@ -82,6 +91,18 @@ public class SPINConstraints {
 			}
 			else if(qot.getQuery() != null) {
 				addQueryResults(results, qot, instance, matchValue, stats, monitor);
+			}
+		}
+		
+		if(INCLUDE_SHACL && SHACLUtil.exists(instance.getModel())) {
+			Dataset dataset = ARQFactory.get().getDataset(SHACLUtil.withDefaultValueTypeInferences(instance.getModel()));
+			URI shapesGraphURI = SHACLUtil.withShapesGraph(dataset);
+			Model resultsModel;
+			try {
+				resultsModel = ResourceConstraintValidator.get().validateNode(dataset, shapesGraphURI, instance.asNode(), null, monitor);
+				results.addAll(ConstraintViolation.shResults2ConstraintViolations(resultsModel));
+			} 
+			catch (InterruptedException e) {
 			}
 		}
 	}
@@ -171,9 +192,7 @@ public class SPINConstraints {
 		
 		Query arq = ARQFactory.get().createQuery(queryString);
 		Model model = resource.getModel();
-		QueryExecution qexec = ARQFactory.get().createQueryExecution(arq, model);
-		
-		qexec.setInitialBinding(arqBindings);
+		QueryExecution qexec = ARQFactory.get().createQueryExecution(arq, model, arqBindings);
 		
 		long startTime = System.currentTimeMillis();
 		if(arq.isAskType()) {
@@ -257,8 +276,7 @@ public class SPINConstraints {
 				
 				Model model = resource.getModel();
 				Query arq = ARQFactory.get().createQuery(spinQuery);
-				QueryExecution qexec = ARQFactory.get().createQueryExecution(arq, model);
-				qexec.setInitialBinding(bindings);
+				QueryExecution qexec = ARQFactory.get().createQueryExecution(arq, model, bindings);
 				
 				if(spinQuery instanceof Ask) {
 					if(qexec.execAsk() != matchValue) {
@@ -386,7 +404,7 @@ public class SPINConstraints {
 			Query construct = org.apache.jena.query.QueryFactory.create(ask);
 			construct.setQueryConstructType();
 			BasicPattern bgp = new BasicPattern();
-			Node cv = NodeFactory.createAnon();
+			Node cv = NodeFactory.createBlankNode();
 			bgp.add(Triple.create(cv, RDF.type.asNode(), SPIN.ConstraintViolation.asNode()));
 			Node thisVar = Var.alloc(SPIN.THIS_VAR_NAME);
 			bgp.add(Triple.create(cv, SPIN.violationRoot.asNode(), thisVar));
@@ -580,6 +598,18 @@ public class SPINConstraints {
 				monitor.worked(1);
 			}
 		}
+		
+		if(INCLUDE_SHACL && SHACLUtil.exists(model)) {
+			Dataset dataset = ARQFactory.get().getDataset(SHACLUtil.withDefaultValueTypeInferences(model));
+			URI shapesGraphURI = SHACLUtil.withShapesGraph(dataset);
+			try {
+				Model resultsModel = ModelConstraintValidator.get().validateModel(dataset, shapesGraphURI, null, true, monitor);
+				results.addAll(ConstraintViolation.shResults2ConstraintViolations(resultsModel));
+			}
+			catch (InterruptedException e) {
+				return;
+			}
+		}
 	}
 	
 	
@@ -607,15 +637,15 @@ public class SPINConstraints {
 				while(it.hasNext()) {
 					Resource instance = it.next().getSubject();
 					arqBindings.add(SPIN.THIS_VAR_NAME, instance);
-					QueryExecution qexec = ARQFactory.get().createQueryExecution(arq, model, arqBindings);
-					qexec.execConstruct(cm);
-					qexec.close();
+					try(QueryExecution qexec = ARQFactory.get().createQueryExecution(arq, model, arqBindings)) {
+					    qexec.execConstruct(cm);
+					}
 				}
 			}
 			else {
-				QueryExecution qexec = ARQFactory.get().createQueryExecution(arq, model, arqBindings);
-				qexec.execConstruct(cm);
-				qexec.close();
+				try(QueryExecution qexec = ARQFactory.get().createQueryExecution(arq, model, arqBindings)) {
+				    qexec.execConstruct(cm);
+				}
 			}
 			
 			long endTime = System.currentTimeMillis();

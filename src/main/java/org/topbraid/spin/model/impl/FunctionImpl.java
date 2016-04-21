@@ -21,7 +21,8 @@ public class FunctionImpl extends ModuleImpl implements Function {
 	}
 
 	
-	public Resource getReturnType() {
+	@Override
+    public Resource getReturnType() {
 		return getResource(SPIN.returnType);
 	}
 

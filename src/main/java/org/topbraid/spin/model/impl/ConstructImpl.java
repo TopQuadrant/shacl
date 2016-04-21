@@ -24,7 +24,8 @@ public class ConstructImpl extends QueryImpl implements Construct {
 	}
 
 	
-	public List<TripleTemplate> getTemplates() {
+	@Override
+    public List<TripleTemplate> getTemplates() {
 		List<TripleTemplate> results = new LinkedList<TripleTemplate>();
 		for(RDFNode next : getList(SP.templates)) {
 			if(next != null && next.isResource()) {
@@ -35,7 +36,8 @@ public class ConstructImpl extends QueryImpl implements Construct {
 	}
 
 
-	public void printSPINRDF(PrintContext context) {
+	@Override
+    public void printSPINRDF(PrintContext context) {
 		printComment(context);
 		printPrefixes(context);
 		context.printIndentation(context.getIndentation());

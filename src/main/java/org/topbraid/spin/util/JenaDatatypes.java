@@ -9,8 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.topbraid.spin.vocabulary.RDFx;
-
 import org.apache.jena.datatypes.TypeMapper;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
@@ -18,6 +16,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.XSD;
+import org.topbraid.spin.vocabulary.RDFx;
 
 
 /**
@@ -37,12 +36,6 @@ public class JenaDatatypes {
 
 	static {
 		numericDatatypeURIs.add(XSD.decimal.getURI());
-		numericDatatypeURIs.add(XSD.duration.getURI());
-		numericDatatypeURIs.add(XSD.gDay.getURI());
-		numericDatatypeURIs.add(XSD.gMonth.getURI());
-		numericDatatypeURIs.add(XSD.gMonthDay.getURI());
-		numericDatatypeURIs.add(XSD.gYear.getURI());
-		numericDatatypeURIs.add(XSD.gYearMonth.getURI());
 		numericDatatypeURIs.add(XSD.integer.getURI());
 		numericDatatypeURIs.add(XSD.negativeInteger.getURI());
 		numericDatatypeURIs.add(XSD.nonNegativeInteger.getURI());
@@ -65,8 +58,15 @@ public class JenaDatatypes {
 		otherDatatypeURIs.add(XSD.anyURI.getURI());
 		otherDatatypeURIs.add(XSD.base64Binary.getURI());
 		otherDatatypeURIs.add(XSD.date.getURI());
+		// PLAT-921 : Add XSD.dateTimeStamp here.
 		otherDatatypeURIs.add(XSD.dateTime.getURI());
+		otherDatatypeURIs.add(XSD.duration.getURI());
 		otherDatatypeURIs.add(XSD.ENTITY.getURI());
+		otherDatatypeURIs.add(XSD.gDay.getURI());
+		otherDatatypeURIs.add(XSD.gMonth.getURI());
+		otherDatatypeURIs.add(XSD.gMonthDay.getURI());
+		otherDatatypeURIs.add(XSD.gYear.getURI());
+		otherDatatypeURIs.add(XSD.gYearMonth.getURI());
 		otherDatatypeURIs.add(XSD.hexBinary.getURI());
 		otherDatatypeURIs.add(XSD.ID.getURI());
 		otherDatatypeURIs.add(XSD.IDREF.getURI());
@@ -81,9 +81,9 @@ public class JenaDatatypes {
 		otherDatatypeURIs.add(XSD.token.getURI());
 		otherDatatypeURIs.add(XSD.xboolean.getURI());
 		otherDatatypeURIs.add(XSD.xstring.getURI());
-		otherDatatypeURIs.add(RDFx.langString.getURI());
-		otherDatatypeURIs.add(RDFx.HTML.getURI());
-		otherDatatypeURIs.add(RDF.getURI() + "XMLLiteral");
+		otherDatatypeURIs.add(RDF.langString.getURI());
+		otherDatatypeURIs.add(RDF.HTML.getURI());
+		otherDatatypeURIs.add(RDF.xmlLiteral.getURI()) ;
 	}
 
 	

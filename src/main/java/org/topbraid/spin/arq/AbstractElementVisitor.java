@@ -33,69 +33,85 @@ import org.apache.jena.sparql.syntax.ElementVisitor;
 public abstract class AbstractElementVisitor implements ElementVisitor {
 
 
-	public void visit(ElementBind el) {
+	@Override
+    public void visit(ElementBind el) {
 	}
 
 
-	public void visit(ElementData el) {
+	@Override
+    public void visit(ElementData el) {
 	}
 
 
-	public void visit(ElementExists arg0) {
+	@Override
+    public void visit(ElementExists arg0) {
 	}
 
 
-	public void visit(ElementNotExists arg0) {
+	@Override
+    public void visit(ElementNotExists arg0) {
 	}
 
 
-	public void visit(ElementAssign arg0) {
+	@Override
+    public void visit(ElementAssign arg0) {
 	}
 
 
-	public void visit(ElementMinus el) {
+	@Override
+    public void visit(ElementMinus el) {
 	}
 
 
-	public void visit(ElementSubQuery arg0) {
+	@Override
+    public void visit(ElementSubQuery arg0) {
 	}
 
 
-	public void visit(ElementPathBlock arg0) {
+	@Override
+    public void visit(ElementPathBlock arg0) {
 	}
 
 
-	public void visit(ElementTriplesBlock el) {
+	@Override
+    public void visit(ElementTriplesBlock el) {
 	}
 
 	
-	public void visit(ElementDataset dataset) {
+	@Override
+    public void visit(ElementDataset dataset) {
 	}
 	
 	
-	public void visit(ElementFilter filter) {
+	@Override
+    public void visit(ElementFilter filter) {
 	}
 
 	
-	public void visit(ElementGroup group) {
+	@Override
+    public void visit(ElementGroup group) {
 		for(Element element : group.getElements()) {
 			element.visit(this);
 		}
 	}
 
 	
-	public void visit(ElementNamedGraph arg0) {
+	@Override
+    public void visit(ElementNamedGraph arg0) {
 	}
 
 	
-	public void visit(ElementOptional arg0) {
+	@Override
+    public void visit(ElementOptional arg0) {
 	}
 
 	
-	public void visit(ElementService service) {
+	@Override
+    public void visit(ElementService service) {
 	}
 
 	
-	public void visit(ElementUnion arg0) {
+	@Override
+    public void visit(ElementUnion arg0) {
 	}
 }

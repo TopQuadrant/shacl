@@ -1,0 +1,52 @@
+# baseURI: http://datashapes.org/sh/tests/core/property/datatype-text-001.test
+# imports: http://datashapes.org/dash
+# prefix: ex
+
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix ex: <http://datashapes.org/sh/tests/core/property/datatype-text-001.test#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://datashapes.org/sh/tests/core/property/datatype-text-001.test>
+  rdf:type owl:Ontology ;
+  rdfs:label "Test of datatype-text-001" ;
+  owl:imports <http://datashapes.org/dash> ;
+  owl:versionInfo "Created with TopBraid Composer"^^xsd:string ;
+.
+ex:InvalidInstance1
+  rdf:type ex:TestShape ;
+  ex:langProperty "Without language"^^xsd:string ;
+  ex:stringProperty "With language"@de ;
+  ex:textProperty 1 ;
+  rdfs:label "Invalid instance1"^^xsd:string ;
+.
+ex:TestShape
+  rdf:type rdfs:Class, sh:Shape ;
+  rdfs:label "Test shape"^^xsd:string ;
+  sh:property [
+      rdfs:label "lang property"^^xsd:string ;
+      sh:datatype rdf:langString ;
+      sh:predicate ex:langProperty ;
+    ] ;
+  sh:property [
+      rdfs:label "string property"^^xsd:string ;
+      sh:datatype xsd:string ;
+      sh:predicate ex:stringProperty ;
+    ] ;
+  sh:property [
+      rdfs:label "text property"^^xsd:string ;
+      sh:datatype sh:text ;
+      sh:predicate ex:textProperty ;
+    ] ;
+.
+ex:ValidInstance1
+  rdf:type ex:TestShape ;
+  ex:langProperty "with language"@en ;
+  ex:stringProperty "string"^^xsd:string ;
+  ex:textProperty "a string"^^xsd:string ;
+  ex:textProperty "lingual string"@de ;
+  rdfs:label "Valid instance1"^^xsd:string ;
+.

@@ -5,29 +5,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-
-import org.topbraid.shacl.constraints.ConstraintExecutable;
-import org.topbraid.shacl.constraints.ExecutionLanguage;
-import org.topbraid.shacl.constraints.FailureLog;
-import org.topbraid.shacl.constraints.ModelConstraintValidator;
-import org.topbraid.shacl.constraints.SHACLException;
-import org.topbraid.shacl.constraints.TemplateConstraintExecutable;
-import org.topbraid.shacl.model.SHACLArgument;
-import org.topbraid.shacl.model.SHACLConstraint;
-import org.topbraid.shacl.model.SHACLFactory;
-import org.topbraid.shacl.model.SHACLFunction;
-import org.topbraid.shacl.model.SHACLShape;
-import org.topbraid.shacl.model.SHACLTemplateCall;
-import org.topbraid.shacl.vocabulary.DASH;
-import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.arq.ARQFactory;
-import org.topbraid.spin.statistics.SPINStatistics;
-import org.topbraid.spin.statistics.SPINStatisticsManager;
-import org.topbraid.spin.system.SPINLabels;
-import org.topbraid.spin.util.JenaDatatypes;
-import org.topbraid.spin.util.JenaUtil;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
@@ -44,6 +22,24 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
+import org.topbraid.shacl.constraints.ComponentConstraintExecutable;
+import org.topbraid.shacl.constraints.ConstraintExecutable;
+import org.topbraid.shacl.constraints.ExecutionLanguage;
+import org.topbraid.shacl.constraints.FailureLog;
+import org.topbraid.shacl.constraints.ModelConstraintValidator;
+import org.topbraid.shacl.constraints.SHACLException;
+import org.topbraid.shacl.model.SHACLConstraint;
+import org.topbraid.shacl.model.SHACLFactory;
+import org.topbraid.shacl.model.SHACLParameterizableScope;
+import org.topbraid.shacl.model.SHACLShape;
+import org.topbraid.shacl.vocabulary.DASH;
+import org.topbraid.shacl.vocabulary.SH;
+import org.topbraid.spin.arq.ARQFactory;
+import org.topbraid.spin.statistics.SPINStatistics;
+import org.topbraid.spin.statistics.SPINStatisticsManager;
+import org.topbraid.spin.system.SPINLabels;
+import org.topbraid.spin.util.JenaDatatypes;
+import org.topbraid.spin.util.JenaUtil;
 
 /**
  * The ExecutionLanguage for SPARQL-based SHACL constraints.
@@ -61,18 +57,21 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 	
 	@Override
 	public boolean canExecuteConstraint(ConstraintExecutable executable) {
-		if(executable.getResource().hasProperty(SH.sparql)) {
+		if(JenaUtil.hasIndirectType(executable.getConstraint(), SH.SPARQLConstraint) &&
+				executable.getConstraint().hasProperty(SH.sparql)) {
 			return true;
 		}
-		else if(executable instanceof TemplateConstraintExecutable) {
-			Resource function = ((TemplateConstraintExecutable)executable).getValidationFunction();
-			if(function != null && function.hasProperty(SH.sparql)) {
+		else if(executable instanceof ComponentConstraintExecutable) {
+			ComponentConstraintExecutable cce = (ComponentConstraintExecutable)executable;
+			Resource validator = cce.getValidator();
+			if(validator != null && validator.hasProperty(SH.sparql)) {
 				return true;
 			}
-			if(executable.getResource().equals(SH.AbstractDerivedPropertyConstraint) ||
-					executable.getResource().equals(SH.AbstractDerivedInversePropertyConstraint)) {
-				Resource derivedValues = executable.getTemplateCall().getPropertyResourceValue(SH.derivedValues);
-				return derivedValues != null && derivedValues.hasProperty(SH.sparql);
+			if(SH.DerivedValuesConstraintComponent.equals(cce.getComponent())) {
+				Resource valuesDeriver = (Resource)cce.getParameterValue();
+				return  valuesDeriver != null && 
+						valuesDeriver.hasProperty(RDF.type, SH.SPARQLValuesDeriver) &&
+						valuesDeriver.hasProperty(SH.sparql);
 			}
 		}
 		return false;
@@ -80,25 +79,68 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 
 	
 	@Override
-	public boolean canExecuteScope(Resource executable) {
-		return executable.hasProperty(SH.sparql);
+	public boolean canExecuteScope(Resource scope) {
+		return scope.hasProperty(SH.sparql);
+	}
+	
+	
+	private String createDerivedValuesSPARQL(Resource valuesDeriver, boolean inverse) {
+		String sparql = JenaUtil.getStringProperty(valuesDeriver, SH.sparql);
+		StringBuffer sb = new StringBuffer("SELECT ?this ");
+		if(inverse) {
+			sb.append("($this AS ?object) $predicate (?value AS ?subject) ?message");
+			sb.append("\nWHERE {\n");
+			sb.append("    {\n");
+			sb.append("        ?value $predicate $this .\n");
+			sb.append("        FILTER NOT EXISTS {\n");
+			sb.append(sparql);
+			sb.append("        }\n");
+			sb.append("        BIND (\"Existing value is not among inverse derived values\" AS ?message) .\n");
+			sb.append("    }\n");
+			sb.append("    UNION {\n");
+			sb.append(sparql);
+			sb.append("\n");
+			sb.append("        FILTER NOT EXISTS {\n");
+			sb.append("            ?value $predicate $this .\n");
+			sb.append("        }\n");
+			sb.append("        BIND (\"Derived value is not among existing inverse values\" AS ?message) .\n");
+			sb.append("    }\n");
+			sb.append("}");
+		}
+		else {
+			sb.append("($this AS ?subject) $predicate (?value AS ?object) ?message");
+			sb.append("\nWHERE {\n");
+			sb.append("    {\n");
+			sb.append("        $this $predicate ?value .\n");
+			sb.append("        FILTER NOT EXISTS {\n");
+			sb.append(sparql);
+			sb.append("        }\n");
+			sb.append("        BIND (\"Existing value is not among derived values\" AS ?message) .\n");
+			sb.append("    }\n");
+			sb.append("    UNION {\n");
+			sb.append(sparql);
+			sb.append("\n");
+			sb.append("        FILTER NOT EXISTS {\n");
+			sb.append("            $this $predicate ?value .\n");
+			sb.append("        }\n");
+			sb.append("        BIND (\"Derived value is not among existing values\" AS ?message) .\n");
+			sb.append("    }\n");
+			sb.append("}");
+		}
+		return sb.toString();
 	}
 
 
 	@Override
 	public void executeConstraint(Dataset dataset, Resource shape, URI shapesGraphURI,
-			SHACLConstraint constraint, ConstraintExecutable executable,
-			RDFNode focusNode, Model results) {
+			ConstraintExecutable executable, RDFNode focusNode, Model results) {
 		
-		Resource resource = executable.getResource();
-		String sparql = JenaUtil.getStringProperty(resource, SH.sparql);
-		if(sparql == null && executable instanceof TemplateConstraintExecutable) {
-			sparql = createSPARQLFromValidationFunctionOrDerivedValues((TemplateConstraintExecutable)executable);
-		}
+		String sparql = getSPARQL(executable);
+		SHACLConstraint constraint = executable.getConstraint();
 		if(sparql == null) {
-			String message = "Missing " + SH.PREFIX + ":" + SH.sparql.getLocalName() + " of " + SPINLabels.get().getLabel(resource);
-			if(resource.isAnon()) {
-				StmtIterator it = resource.getModel().listStatements(null, null, resource);
+			String message = "Missing " + SH.PREFIX + ":" + SH.sparql.getLocalName() + " of " + SPINLabels.get().getLabel(constraint);
+			if(constraint.isAnon()) {
+				StmtIterator it = constraint.getModel().listStatements(null, null, constraint);
 				if(it.hasNext()) {
 					Statement s = it.next();
 					it.close();
@@ -109,7 +151,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 			throw new SHACLException(message);
 		}
 
-		String queryString = ARQFactory.get().createPrefixDeclarations(resource.getModel()) + sparql;
+		String queryString = ARQFactory.get().createPrefixDeclarations(constraint.getModel()) + sparql;
 		Query query;
 		try {
 			query = ARQFactory.get().createQuery(queryString);
@@ -123,9 +165,8 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		}
 		
 		QuerySolutionMap bindings = new QuerySolutionMap();
-		SHACLTemplateCall templateCall = executable.getTemplateCall();
-		if(templateCall != null) {
-			templateCall.addBindings(bindings);
+		if(executable instanceof ComponentConstraintExecutable) {
+			((ComponentConstraintExecutable)executable).addBindings(bindings);
 		}
 		List<SHACLShape> filters = executable.getFilterShapes();
 		for(Resource filter : JenaUtil.getResourceProperties(shape, SH.filterShape)) {
@@ -147,7 +188,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 			bindings.add(ModelConstraintValidator.FILTER_VAR_NAME + i, filters.get(i));
 		}
 		
-		QueryExecution qexec = ARQFactory.get().createQueryExecution(query, dataset, bindings);
+		QueryExecution qexec = SPARQLSubstitutions.createQueryExecution(query, dataset, bindings);
 
 		long startTime = System.currentTimeMillis();
 		int violationCount = executeSelectQuery(results, constraint, shape, focusNode, executable, qexec);
@@ -164,9 +205,33 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 				}
 			}
 			SPINStatistics stats = new SPINStatistics(label, sparql, duration, startTime, 
-					focusNode != null ? focusNode.asNode() : resource.asNode());
+					focusNode != null ? focusNode.asNode() : constraint.asNode());
 			SPINStatisticsManager.get().add(Collections.singletonList(stats));
 		}
+	}
+
+
+	private String getSPARQL(ConstraintExecutable executable) {
+		SHACLConstraint constraint = executable.getConstraint();
+		if(JenaUtil.hasIndirectType(constraint, SH.SPARQLConstraint)) {
+			return JenaUtil.getStringProperty(constraint, SH.sparql);
+		}
+		else if(executable instanceof ComponentConstraintExecutable) {
+			ComponentConstraintExecutable cce = (ComponentConstraintExecutable) executable;
+			Resource validator = cce.getValidator();
+			if(validator != null) {
+				if(JenaUtil.hasIndirectType(validator, SH.SPARQLAskValidator)) {
+					return createSPARQLFromAskValidator(cce, validator);
+				}
+				else if(JenaUtil.hasIndirectType(validator, SH.SPARQLSelectValidator)) {
+					return JenaUtil.getStringProperty(validator, SH.sparql);
+				}
+			}
+			else if (SH.DerivedValuesConstraintComponent.equals(cce.getComponent())) {
+				return createDerivedValuesSPARQL((Resource)cce.getParameterValue(), SHACLFactory.isInversePropertyConstraint(constraint));
+			}
+		}
+		return null;
 	}
 	
 
@@ -186,9 +251,9 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 				RDFNode selectMessage = sol.get(SH.message.getLocalName());
 				if(JenaDatatypes.TRUE.equals(sol.get(SH.failureVar.getName()))) {
 					resultType = DASH.FailureResult;
-					String message = "Constraint " + SPINLabels.get().getLabel(executable.getResource());
-					if(executable.getTemplateCall() != null) {
-						message += " of type " + SPINLabels.get().getLabel(executable.getTemplateCall().getTemplate());
+					String message = "Constraint " + SPINLabels.get().getLabel(executable.getConstraint());
+					if(executable instanceof ComponentConstraintExecutable) {
+						message += " at component " + SPINLabels.get().getLabel(((ComponentConstraintExecutable)executable).getComponent());
 					}
 					message += " has produced ?" + SH.failureVar.getName();
 					if(focusNode != null) {
@@ -208,8 +273,8 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 				result.addProperty(SH.severity, severity);
 				result.addProperty(SH.sourceConstraint, constraint);
 				result.addProperty(SH.sourceShape, shape);
-				if(executable instanceof TemplateConstraintExecutable) {
-					result.addProperty(SH.sourceTemplate, ((TemplateConstraintExecutable)executable).getResource());
+				if(executable instanceof ComponentConstraintExecutable) {
+					result.addProperty(SH.sourceConstraintComponent, ((ComponentConstraintExecutable)executable).getComponent());
 				}
 				
 				if(selectMessage != null) {
@@ -217,7 +282,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 				}
 				else {
 					for(Literal defaultMessage : defaultMessages) {
-						if(executable.getTemplateCall() != null) {
+						if(executable instanceof ComponentConstraintExecutable) {
 							QuerySolutionMap map = new QuerySolutionMap();
 							Iterator<String> varNames = sol.varNames();
 							while(varNames.hasNext()) {
@@ -227,12 +292,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 									map.add(varName, value);
 								}
 							}
-							Map<String,RDFNode> args = ((TemplateConstraintExecutable)executable).getTemplateCall().getArgumentsMapByVarNames();
-							for(String varName : args.keySet()) {
-								if(!map.contains(varName)) {
-									map.add(varName, args.get(varName));
-								}
-							}
+							((ComponentConstraintExecutable)executable).addBindings(map);
 							sol = map;
 						}
 						result.addProperty(SH.message, SPARQLSubstitutions.withSubstitutions(defaultMessage, sol));
@@ -271,45 +331,43 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 
 	
 	@Override
-	public Iterable<RDFNode> executeScope(Dataset dataset, Resource executable, SHACLTemplateCall templateCall) {
+	public Iterable<RDFNode> executeScope(Dataset dataset, Resource scope, SHACLParameterizableScope parameterizableScope) {
 
-		String sparql = JenaUtil.getStringProperty(executable, SH.sparql);
-		String queryString = ARQFactory.get().createPrefixDeclarations(executable.getModel()) + sparql;
+		String sparql = JenaUtil.getStringProperty(scope, SH.sparql);
+		String queryString = ARQFactory.get().createPrefixDeclarations(scope.getModel()) + sparql;
 		Query query;
 		try {
-			query = getSPARQLWithSelect(executable);
+			query = getSPARQLWithSelect(scope);
 		}
 		catch(QueryParseException ex) {
 			throw new SHACLException("Invalid SPARQL scope (" + ex.getLocalizedMessage() + "):\n" + queryString);
 		}
 		
-		QueryExecution qexec = ARQFactory.get().createQueryExecution(query, dataset);
-
-		if(templateCall != null) {
-			QuerySolutionMap bindings = new QuerySolutionMap();
-			templateCall.addBindings(bindings);
-			qexec.setInitialBinding(bindings);
+		QuerySolutionMap bindings = null;
+		if(parameterizableScope != null) {
+			bindings = new QuerySolutionMap();
+			parameterizableScope.addBindings(bindings);
 		}
-
-		Set<RDFNode> results = new HashSet<RDFNode>();
-		ResultSet rs = qexec.execSelect();
-		List<String> varNames = rs.getResultVars();
-		while(rs.hasNext()) {
-			QuerySolution qs = rs.next();
-			for(String varName : varNames) {
-				RDFNode value = qs.get(varName);
-				if(value != null) {
-					results.add(value);
-				}
-			}
+		try(QueryExecution qexec = SPARQLSubstitutions.createQueryExecution(query, dataset, bindings)) {
+		    Set<RDFNode> results = new HashSet<RDFNode>();
+		    ResultSet rs = qexec.execSelect();
+		    List<String> varNames = rs.getResultVars();
+		    while(rs.hasNext()) {
+		        QuerySolution qs = rs.next();
+		        for(String varName : varNames) {
+		            RDFNode value = qs.get(varName);
+		            if(value != null) {
+		                results.add(value);
+		            }
+		        }
+		    }
+		    return results;
 		}
-		qexec.close();
-		return results;
 	}
 
 	
 	@Override
-	public boolean isNodeInScope(RDFNode focusNode, Dataset dataset, Resource executable, SHACLTemplateCall templateCall) {
+	public boolean isNodeInScope(RDFNode focusNode, Dataset dataset, Resource executable, SHACLParameterizableScope parameterizableScope) {
 
 		// If sh:sparql exists only, then we expect run the query with ?this pre-bound
 		String sparql = JenaUtil.getStringProperty(executable, SH.sparql);
@@ -324,14 +382,14 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 
 		QuerySolutionMap bindings = new QuerySolutionMap();
 		bindings.add(SH.thisVar.getVarName(), focusNode);
-		if(templateCall != null) {
-			templateCall.addBindings(bindings);
+		if(parameterizableScope != null) {
+			parameterizableScope.addBindings(bindings);
 		}
-		QueryExecution qexec = ARQFactory.get().createQueryExecution(query, dataset, bindings);
-		ResultSet rs = qexec.execSelect();
-		boolean hasNext = rs.hasNext();
-		qexec.close();
-		return hasNext;
+		try(QueryExecution qexec = SPARQLSubstitutions.createQueryExecution(query, dataset, bindings)) {
+		    ResultSet rs = qexec.execSelect();
+		    boolean hasNext = rs.hasNext();
+		    return hasNext;
+		}
 
 		/* Alternative: a stupid brute-force algorithm
 		Iterator<Resource> it = getResourcesInScope(dataset, executable, templateCall).iterator();
@@ -344,54 +402,25 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 	}
 	
 	
-	private String createSPARQLFromValidationFunctionOrDerivedValues(TemplateConstraintExecutable executable) {
-		Resource function = executable.getValidationFunction();
+	private String createSPARQLFromAskValidator(ComponentConstraintExecutable executable, Resource validator) {
+		String valueVar = "?value";
+		while(executable.getComponent().getParametersMap().containsKey(valueVar)) {
+			valueVar += "_";
+		}
 		StringBuffer sb = new StringBuffer("SELECT ?this ");
-		if(executable.getResource().equals(SH.AbstractDerivedPropertyConstraint)) {
-
-			sb.append("($this AS ?subject) $predicate (?value AS ?object) ?message");
-
-			String sparql = executable.getTemplateCall().getPropertyResourceValue(SH.derivedValues).getProperty(SH.sparql).getLiteral().getLexicalForm();
+		if(SHACLFactory.isNodeConstraint(executable.getConstraint())) {
 			sb.append("\nWHERE {\n");
-			sb.append("    {\n");
-			sb.append("        $this $predicate ?value .\n");
-			sb.append("        FILTER NOT EXISTS {\n");
-			sb.append(sparql);
-			sb.append("        }\n");
-			sb.append("        BIND (\"Existing value is not among derived values\" AS ?message) .\n");
-			sb.append("    }\n");
-			sb.append("    UNION {\n");
-			sb.append(sparql);
-			sb.append("\n");
-			sb.append("        FILTER NOT EXISTS {\n");
-			sb.append("            $this $predicate ?value .\n");
-			sb.append("        }\n");
-			sb.append("        BIND (\"Derived value is not among existing values\" AS ?message) .\n");
-			sb.append("    }\n");
-			sb.append("}");
-		}
-		else if(executable.getTemplateCall().hasProperty(RDF.type, SH.AbstractDerivedInversePropertyConstraint)) {
-			// TODO
-		}
-		else if(JenaUtil.hasIndirectType(executable.getResource(), SH.NodeConstraintTemplate)) {
-			sb.append("\nWHERE {\n");
-			sb.append("    FILTER (!<" + function + ">(?this");
-			SHACLFunction f = SHACLFactory.asFunction(function);
-			Iterator<SHACLArgument> args = f.getOrderedArguments().iterator();
-			args.next(); // Skip ?value
-			while(args.hasNext()) {
-				sb.append(", ?");
-				sb.append(args.next().getVarName());
-			}
-			sb.append(")) .\n}");
+			sb.append("    BIND ($this AS ");
+			sb.append(valueVar);
+			sb.append(") .\n");
 		}
 		else {
-			boolean pvc = JenaUtil.hasIndirectType(executable.getResource(), SH.PropertyValueConstraintTemplate);
-			if(pvc) {
-				sb.append("(?this AS ?subject) ?predicate (?value AS ?object)");
+			boolean inverse = SHACLFactory.isInversePropertyConstraint(executable.getConstraint());
+			if(inverse) {
+				sb.append("(" + valueVar + " AS ?subject) $predicate ($this AS ?object)");
 			}
 			else {
-				sb.append("(?value AS ?subject) ?predicate (?this AS ?object)");
+				sb.append("($this AS ?subject) $predicate (" + valueVar + " AS ?object)");
 			}
 			
 			// Collect other variables used in sh:messages
@@ -408,34 +437,20 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 			
 			// Create body
 			sb.append("\nWHERE {\n");
-			if(pvc) {
-				sb.append("    ?this ?predicate ?value .\n");
+			if(inverse) {
+				sb.append("    " + valueVar + " $predicate $this .\n");
 			}
 			else {
-				sb.append("    ?value ?predicate ?this .\n");
+				sb.append("    $this $predicate " + valueVar + " .\n");
 			}
-			
-			sb.append("    FILTER (!<" + function + ">(?value");
-			SHACLFunction f = SHACLFactory.asFunction(function);
-			Iterator<SHACLArgument> args = f.getOrderedArguments().iterator();
-			args.next(); // Skip ?value
-			while(args.hasNext()) {
-				sb.append(", ?");
-				sb.append(args.next().getVarName());
-			}
-			sb.append(")) .\n}");
-			
-			/* TODO: Faster variation: insert the body of the ASK query directly.
-			 * Was causing unknown issues with Jena when executed for a given resource, requires investigation
-			sb.append("    FILTER NOT EXISTS {");
-			String sparql = JenaUtil.getStringProperty(function, SH.sparql);
-			int startIndex = sparql.indexOf('{');
-			int endIndex = sparql.lastIndexOf('}');
-			String body = sparql.substring(startIndex + 1, endIndex);
-			sb.append(body);
-			sb.append("\n    }\n}");
-			 */
 		}
+
+		String sparql = JenaUtil.getStringProperty(validator, SH.sparql);
+		int firstIndex = sparql.indexOf('{');
+		int lastIndex = sparql.lastIndexOf('}');
+		// Temp hack injecting a dummy BIND to work-around ISSUE in jena if optFilterPlacement is on
+		String body = "{ BIND(true AS ?qyueyru). " + sparql.substring(firstIndex + 1, lastIndex + 1);
+		sb.append("    FILTER NOT EXISTS " + body + "\n}");
 		
 		return sb.toString();
 	}

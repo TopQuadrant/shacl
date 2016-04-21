@@ -11,10 +11,5 @@ import org.apache.jena.vocabulary.RDF;
  * @author Holger Knublauch
  */
 public class RDFx {
-
-	public final static Resource HTML = ResourceFactory.createResource(RDF.getURI() + "HTML");
-
-	public final static Resource langString = ResourceFactory.createResource(RDF.getURI() + "langString");
-
 	public final static Resource PlainLiteral = ResourceFactory.createResource(RDF.getURI() + "PlainLiteral");
 }

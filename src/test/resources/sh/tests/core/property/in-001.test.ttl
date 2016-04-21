@@ -1,0 +1,59 @@
+# baseURI: http://datashapes.org/sh/tests/core/property/in-001.test
+# imports: http://datashapes.org/dash
+# prefix: ex
+
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix ex: <http://datashapes.org/sh/tests/core/property/in-001.test#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://datashapes.org/sh/tests/core/property/in-001.test>
+  rdf:type owl:Ontology ;
+  owl:versionInfo "Created with TopBraid Composer"^^xsd:string ;
+  owl:imports <http://datashapes.org/dash> ;
+.
+ex:GraphValidationTestCase
+  rdf:type dash:GraphValidationTestCase ;
+  dash:expectedResult [
+      rdf:type sh:ValidationResult ;
+      sh:focusNode ex:InvalidInstance1 ;
+      sh:object "D"^^xsd:string ;
+      sh:predicate ex:property ;
+      sh:severity sh:Violation ;
+      sh:subject ex:InvalidInstance1 ;
+    ] ;
+.
+ex:InvalidInstance1
+  rdf:type ex:ShapeClass ;
+  ex:property "D"^^xsd:string ;
+  rdfs:label "Invalid instance1"^^xsd:string ;
+.
+ex:ShapeClass
+  rdf:type rdfs:Class, sh:Shape ;
+  rdfs:label "Shape class"^^xsd:string ;
+  sh:property [
+      rdfs:label "property"^^xsd:string ;
+      sh:datatype xsd:string ;
+      sh:in (
+          "A"^^xsd:string
+          "B"^^xsd:string
+          "C"^^xsd:string
+        ) ;
+      sh:predicate ex:property ;
+    ] ;
+.
+ex:ValidInstance1
+  rdf:type ex:ShapeClass ;
+  ex:property "A"^^xsd:string ;
+  rdfs:label "Valid instance1"^^xsd:string ;
+.
+ex:ValidInstance2
+  rdf:type ex:ShapeClass ;
+  ex:property "A"^^xsd:string ;
+  ex:property "B"^^xsd:string ;
+  ex:property "C"^^xsd:string ;
+  rdfs:label "Valid instance2"^^xsd:string ;
+.

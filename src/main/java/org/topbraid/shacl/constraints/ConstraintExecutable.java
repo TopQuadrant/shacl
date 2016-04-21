@@ -2,27 +2,25 @@ package org.topbraid.shacl.constraints;
 
 import java.util.List;
 
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Resource;
+import org.topbraid.shacl.model.SHACLConstraint;
 import org.topbraid.shacl.model.SHACLShape;
-import org.topbraid.shacl.model.SHACLTemplateCall;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaUtil;
 
-import org.apache.jena.rdf.model.Literal;
-import org.apache.jena.rdf.model.Resource;
-
 /**
- * Encapsulates a single constraint that can be executed, possibly together with pre-bound
- * variables stemming from template calls.
+ * Encapsulates a single constraint that can be executed.
  * 
  * @author Holger Knublauch
  */
 public abstract class ConstraintExecutable {
 	
-	private Resource resource;
+	private SHACLConstraint constraint;
 	
 	
-	public ConstraintExecutable(Resource resource) {
-		this.resource = resource;
+	public ConstraintExecutable(SHACLConstraint constraint) {
+		this.constraint = constraint;
 	}
 	
 	
@@ -37,13 +35,11 @@ public abstract class ConstraintExecutable {
 	 * Gets the specified sh:messages, to be used for constructed results.
 	 * @return the messages (may be empty)
 	 */
-	public List<Literal> getMessages() {
-		return JenaUtil.getLiteralProperties(getResource(), SH.message);
-	}
+	public abstract List<Literal> getMessages();
 	
 	
-	public Resource getResource() {
-		return resource;
+	public SHACLConstraint getConstraint() {
+		return constraint;
 	}
 
 	
@@ -52,10 +48,7 @@ public abstract class ConstraintExecutable {
 	 * @return the level class, never null
 	 */
 	public Resource getSeverity() {
-		Resource result = JenaUtil.getResourceProperty(getResource(), SH.severity);
+		Resource result = JenaUtil.getResourceProperty(getConstraint(), SH.severity);
 		return result == null ? SH.Violation : result;
 	}
-	
-	
-	public abstract SHACLTemplateCall getTemplateCall();
 }

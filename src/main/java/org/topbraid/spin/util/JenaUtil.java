@@ -11,9 +11,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.topbraid.spin.arq.ARQFactory;
-import org.topbraid.spin.progress.ProgressMonitor;
-
 import org.apache.jena.enhanced.EnhGraph;
 import org.apache.jena.graph.Factory;
 import org.apache.jena.graph.Graph;
@@ -47,6 +44,8 @@ import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.XSD;
+import org.topbraid.spin.arq.ARQFactory;
+import org.topbraid.spin.progress.ProgressMonitor;
 
 
 /**
@@ -936,7 +935,7 @@ public class JenaUtil {
 	 * This indicates that no further changes to the model are needed.
 	 * Some implementations may give runtime exceptions if this is violated.
 	 * @param m
-	 * @return
+	 * @return A read-only model
 	 */
 	public static Model asReadOnlyModel(Model m) {
 		return helper.asReadOnlyModel(m);
@@ -946,8 +945,8 @@ public class JenaUtil {
 	/**
 	 * This indicates that no further changes to the graph are needed.
 	 * Some implementations may give runtime exceptions if this is violated.
-	 * @param m
-	 * @return
+	 * @param g
+	 * @return a read-only graph
 	 */
 	public static Graph asReadOnlyGraph(Graph g) {
 		return helper.asReadOnlyGraph(g);
@@ -957,18 +956,6 @@ public class JenaUtil {
 	// Internal to TopBraid only
 	public static OntModel createOntologyModel(OntModelSpec spec, Model base) {
 		return helper.createOntologyModel(spec,base);
-	}
-
-	
-	// Internal to TopBraid only
-	public static OntModel createOntologyModel() {
-		return helper.createOntologyModel();
-	}
-
-
-	// Internal to TopBraid only
-	public static OntModel createOntologyModel(OntModelSpec spec) {
-		return helper.createOntologyModel(spec);
 	}
 
 	
@@ -1040,19 +1027,19 @@ public class JenaUtil {
 	        dataset = ARQFactory.get().getDataset(ModelFactory.createDefaultModel());
 	    }
 	    Query query = ARQFactory.get().createExpressionQuery(expression);
-	    QueryExecution qexec = ARQFactory.get().createQueryExecution(query, dataset, initialBinding);
-	    ResultSet rs = qexec.execSelect();
-	    Node result = null;
-	    if (rs.hasNext()) {
-	        QuerySolution qs = rs.next();
-	        String firstVarName = rs.getResultVars().get(0);
-	        RDFNode rdfNode = qs.get(firstVarName);
-	        if (rdfNode != null) {
-	            result = rdfNode.asNode();
+	    try(QueryExecution qexec = ARQFactory.get().createQueryExecution(query, dataset, initialBinding)) {
+	        ResultSet rs = qexec.execSelect();
+	        Node result = null;
+	        if (rs.hasNext()) {
+	            QuerySolution qs = rs.next();
+	            String firstVarName = rs.getResultVars().get(0);
+	            RDFNode rdfNode = qs.get(firstVarName);
+	            if (rdfNode != null) {
+	                result = rdfNode.asNode();
+	            }
 	        }
+	        return result;
 	    }
-	    qexec.close();
-	    return result;
 	}
 
 

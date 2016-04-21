@@ -37,6 +37,7 @@ import org.topbraid.spin.model.update.InsertData;
 import org.topbraid.spin.model.update.Load;
 import org.topbraid.spin.model.update.Modify;
 import org.topbraid.spin.model.update.Update;
+import org.topbraid.spin.query.UpdateFactoryFilter;
 import org.topbraid.spin.system.ExtraPrefixes;
 import org.topbraid.spin.system.SPINPreferences;
 import org.topbraid.spin.util.JenaDatatypes;
@@ -115,7 +116,6 @@ import org.apache.jena.sparql.syntax.ElementSubQuery;
 import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 import org.apache.jena.sparql.syntax.ElementUnion;
 import org.apache.jena.sparql.syntax.Template;
-import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateRequest;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.XSD;
@@ -548,7 +548,8 @@ public class ARQ2SPIN {
 				}
 	
 				
-				public void visit(ElementPathBlock block) {
+				@Override
+                public void visit(ElementPathBlock block) {
 					visitElements(block.patternElts());
 				}
 	
@@ -569,14 +570,16 @@ public class ARQ2SPIN {
 				}
 
 
-				public void visit(ElementSubQuery subQuery) {
+				@Override
+                public void visit(ElementSubQuery subQuery) {
 					Query arq = subQuery.getQuery();
 					org.topbraid.spin.model.Query spinQuery = createQuery(arq, null);
 					members.add(SPINFactory.createSubQuery(model, spinQuery));
 				}
 
 
-				public void visit(ElementTriplesBlock el) {
+				@Override
+                public void visit(ElementTriplesBlock el) {
 					visitElements(el.patternElts());
 				}
 
@@ -1141,7 +1144,7 @@ public class ARQ2SPIN {
 	 */
 	public static org.topbraid.spin.model.update.Update parseUpdate(String str, Model model) {
 		String prefixes = ARQFactory.get().createPrefixDeclarations(model);
-		UpdateRequest request = UpdateFactory.create(prefixes + str);
+		UpdateRequest request = UpdateFactoryFilter.get().create(prefixes + str);
 		ARQ2SPIN a2s = new ARQ2SPIN(model);
 		return a2s.createUpdate(request.getOperations().get(0), null);
 	}

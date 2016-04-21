@@ -18,12 +18,14 @@ public class NotExistsImpl extends ElementImpl implements NotExists {
 	}
 
 	
-	public void visit(ElementVisitor visitor) {
+	@Override
+    public void visit(ElementVisitor visitor) {
 		visitor.visit(this);
 	}
 
 	
-	public void print(PrintContext p) {
+	@Override
+    public void print(PrintContext p) {
 		p.printKeyword("NOT EXISTS");
 		printNestedElementList(p);
 	}

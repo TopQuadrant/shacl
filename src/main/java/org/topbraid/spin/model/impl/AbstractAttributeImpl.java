@@ -23,7 +23,8 @@ public abstract class AbstractAttributeImpl extends AbstractSPINResourceImpl imp
 	}
 
 	
-	public Property getPredicate() {
+	@Override
+    public Property getPredicate() {
 		Resource r = getResource(SPL.predicate);
 		if(r != null && r.isURIResource()) {
 			return new PropertyImpl(r.asNode(), (EnhGraph)r.getModel());
@@ -34,17 +35,20 @@ public abstract class AbstractAttributeImpl extends AbstractSPINResourceImpl imp
 	}
 
 
-	public Resource getValueType() {
+	@Override
+    public Resource getValueType() {
 		return getResource(SPL.valueType);
 	}
 	
 	
-	public String getComment() {
+	@Override
+    public String getComment() {
 		return getString(RDFS.comment);
 	}
 
 
-	public void print(PrintContext p) {
+	@Override
+    public void print(PrintContext p) {
 		// TODO Auto-generated method stub
 
 	}

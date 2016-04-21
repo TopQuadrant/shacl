@@ -37,22 +37,26 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 	}
 
 
-	public List<String> getFrom() {
+	@Override
+    public List<String> getFrom() {
 		return getStringList(SP.from);
 	}
 
 
-	public List<String> getFromNamed() {
+	@Override
+    public List<String> getFromNamed() {
 		return getStringList(SP.fromNamed);
 	}
 	
 	
-	public Long getLimit() {
+	@Override
+    public Long getLimit() {
 		return getLong(SP.limit);
 	}
 
 
-	public Long getOffset() {
+	@Override
+    public Long getOffset() {
 		return getLong(SP.offset);
 	}
 
@@ -85,7 +89,8 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 	}
 
 
-	public ElementList getWhere() {
+	@Override
+    public ElementList getWhere() {
 		Statement whereS = getProperty(SP.where);
 		if(whereS != null) {
 			Element element = SPINFactory.asElement(whereS.getResource());
@@ -97,7 +102,8 @@ public abstract class QueryImpl extends AbstractSPINResourceImpl implements Solu
 	}
 
 
-	public List<Element> getWhereElements() {
+	@Override
+    public List<Element> getWhereElements() {
 		return getElements(SP.where);
 	}
 

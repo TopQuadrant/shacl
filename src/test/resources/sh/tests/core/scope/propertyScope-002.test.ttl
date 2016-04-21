@@ -1,0 +1,66 @@
+# baseURI: http://datashapes.org/sh/tests/core/scope/propertyScope-002.test
+# imports: http://datashapes.org/dash
+# prefix: ex
+
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix ex: <http://datashapes.org/sh/tests/core/scope/propertyScope-002.test#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://datashapes.org/sh/tests/core/scope/propertyScope-002.test>
+  rdf:type owl:Ontology ;
+  rdfs:label "Test of propertyScope-002" ;
+  owl:imports <http://datashapes.org/dash> ;
+  owl:versionInfo "Created with TopBraid Composer" ;
+.
+ex:GraphValidationTestCase
+  rdf:type dash:GraphValidationTestCase ;
+  dash:expectedResult [
+      rdf:type sh:ValidationResult ;
+      sh:predicate ex:myProperty ;
+      sh:focusNode ex:InvalidInstance1 ;
+      sh:severity sh:Violation ;
+      sh:subject ex:InvalidInstance1 ;
+    ] ;
+  dash:expectedResult [
+      rdf:type sh:ValidationResult ;
+      sh:predicate ex:myProperty ;
+      sh:focusNode ex:InvalidInstance2 ;
+      sh:severity sh:Violation ;
+      sh:subject ex:InvalidInstance2 ;
+    ] ;
+.
+ex:InvalidInstance1
+  rdf:type ex:MyClass ;
+  ex:myProperty "A" ;
+  ex:myProperty "B" ;
+.
+ex:InvalidInstance2
+  ex:myProperty "A" ;
+  ex:myProperty "B" ;
+.
+ex:MyClass
+  rdf:type rdfs:Class ;
+.
+ex:MyShape
+  rdf:type sh:Shape ;
+  sh:property [
+      sh:predicate ex:myProperty ;
+      sh:maxCount 1 ;
+    ] ;
+  sh:scope [
+      rdf:type sh:PropertyScope ;
+      sh:predicate ex:myProperty ;
+    ] ;
+  sh:scopeClass ex:MyClass ;
+.
+ex:ValidInstance1
+  rdf:type ex:MyClass ;
+  ex:myProperty "A" ;
+.
+ex:ValidInstance2
+  ex:myProperty "A" ;
+.

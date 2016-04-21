@@ -23,7 +23,8 @@ public class UnionImpl extends ElementImpl implements Union {
 	}
 	
 	
-	public void print(PrintContext p) {
+	@Override
+    public void print(PrintContext p) {
 		List<Element> elements = getElements();
 		for(Iterator<Element> it = elements.iterator(); it.hasNext(); ) {
 			Element element = it.next();
@@ -45,7 +46,8 @@ public class UnionImpl extends ElementImpl implements Union {
 	}
 
 
-	public void visit(ElementVisitor visitor) {
+	@Override
+    public void visit(ElementVisitor visitor) {
 		visitor.visit(this);
 	}
 }

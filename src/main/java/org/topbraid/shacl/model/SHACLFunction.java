@@ -1,6 +1,4 @@
 package org.topbraid.shacl.model;
 
-public interface SHACLFunction extends SHACLMacro {
-
-	
+public interface SHACLFunction extends SHACLParameterizable, SHACLSPARQLExecutable {
 }

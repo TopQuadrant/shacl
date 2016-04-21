@@ -25,19 +25,22 @@ public class SimpleProgressMonitor implements ProgressMonitor {
 	}
 
 	
-	public void beginTask(String label, int totalWork) {
+	@Override
+    public void beginTask(String label, int totalWork) {
 		println("Beginning task " + label + " (" + totalWork + ")");
 		this.totalWork = totalWork;
 		this.currentWork = 0;
 	}
 
 	
-	public void done() {
+	@Override
+    public void done() {
 		println("Done");
 	}
 
 	
-	public boolean isCanceled() {
+	@Override
+    public boolean isCanceled() {
 		return false;
 	}
 	
@@ -58,12 +61,14 @@ public class SimpleProgressMonitor implements ProgressMonitor {
 	}
 
 
-	public void subTask(String label) {
+	@Override
+    public void subTask(String label) {
 		println("Subtask: " + label);
 	}
 
 	
-	public void worked(int amount) {
+	@Override
+    public void worked(int amount) {
 		currentWork += amount;
 		println("Worked " + currentWork + " / " + totalWork);
 	}

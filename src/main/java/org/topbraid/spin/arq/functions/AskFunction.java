@@ -55,9 +55,9 @@ public class AskFunction extends AbstractFunction implements FunctionFactory {
 		}
 		Dataset dataset = new DatasetWithDifferentDefaultModel(model, DatasetImpl.wrap(env.getDataset()));
 		org.apache.jena.query.Query arqQuery = ARQFactory.get().createQuery(spinQuery);
-		QueryExecution qexec = ARQFactory.get().createQueryExecution(arqQuery, dataset, initialBinding);
-		boolean result = qexec.execAsk();
-		qexec.close();
-		return NodeValue.makeBoolean(result);
+		try (QueryExecution qexec = ARQFactory.get().createQueryExecution(arqQuery, dataset, initialBinding)) {
+		    boolean result = qexec.execAsk();
+		    return NodeValue.makeBoolean(result);
+		}
 	}
 }

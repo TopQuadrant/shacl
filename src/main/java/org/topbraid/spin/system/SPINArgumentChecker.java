@@ -61,7 +61,7 @@ public abstract class SPINArgumentChecker {
 					}
 					else if(!RDFS.Literal.equals(valueType)) {
 						String datatypeURI = value.asLiteral().getDatatypeURI();
-						if(datatypeURI == null) {
+						if(value.asLiteral().getLanguage().length() > 0) {
 							datatypeURI = XSD.xstring.getURI();
 						}
 						if(!valueType.getURI().equals(datatypeURI)) {

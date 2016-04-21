@@ -22,7 +22,8 @@ public class ArgumentImpl extends AbstractAttributeImpl implements Argument {
 	}
 	
 	
-	public Integer getArgIndex() {
+	@Override
+    public Integer getArgIndex() {
 		String varName = getVarName();
 		if(varName != null) {
 			return SP.getArgPropertyIndex(varName);
@@ -33,7 +34,8 @@ public class ArgumentImpl extends AbstractAttributeImpl implements Argument {
 	}
 
 
-	public RDFNode getDefaultValue() {
+	@Override
+    public RDFNode getDefaultValue() {
 		Statement s = getProperty(SPL.defaultValue);
 		if(s != null) {
 			return s.getObject();
@@ -44,7 +46,8 @@ public class ArgumentImpl extends AbstractAttributeImpl implements Argument {
 	}
 
 
-	public String getVarName() {
+	@Override
+    public String getVarName() {
 		Property argProperty = getPredicate();
 		if(argProperty != null) {
 			return argProperty.getLocalName();
@@ -55,7 +58,8 @@ public class ArgumentImpl extends AbstractAttributeImpl implements Argument {
 	}
 
 
-	public boolean isOptional() {
+	@Override
+    public boolean isOptional() {
 		Statement s = getProperty(SPL.optional);
 		if(s != null && s.getObject().isLiteral()) {
 			return s.getBoolean();

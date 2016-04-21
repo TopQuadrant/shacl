@@ -30,7 +30,8 @@ public class ExpressionWalker implements ExpressionVisitor {
 	}
 
 	
-	public void visit(Aggregation aggregation) {
+	@Override
+    public void visit(Aggregation aggregation) {
 		visitor.visit(aggregation);
 		Variable as = aggregation.getAs();
 		if(as != null) {
@@ -43,7 +44,8 @@ public class ExpressionWalker implements ExpressionVisitor {
 	}
 
 
-	public void visit(FunctionCall functionCall) {
+	@Override
+    public void visit(FunctionCall functionCall) {
 		visitor.visit(functionCall);
 		List<RDFNode> args = functionCall.getArguments();
 		for(RDFNode arg : args) {
@@ -52,12 +54,14 @@ public class ExpressionWalker implements ExpressionVisitor {
 	}
 
 	
-	public void visit(RDFNode node) {
+	@Override
+    public void visit(RDFNode node) {
 		visitor.visit(node);
 	}
 
 	
-	public void visit(Variable variable) {
+	@Override
+    public void visit(Variable variable) {
 		visitor.visit(variable);
 	}
 }

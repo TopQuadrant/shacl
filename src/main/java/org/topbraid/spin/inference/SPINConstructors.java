@@ -229,15 +229,14 @@ public class SPINConstructors {
 					Query arqQuery = queryWrapper.getQuery();
 					if(arqQuery.isConstructType()) {
 						
-						QueryExecution qexec = ARQFactory.get().createQueryExecution(arqQuery, queryModel);
-						qexec.setInitialBinding(bindings);
-						
-						// Execute construct and remember the order in which triples were inserted
-						// Note that this does not work yet since Jena appears to have random order
-						Model resultModel = ModelFactory.createDefaultModel();
-						resultModel.getGraph().getEventManager().register(listener);
-						qexec.execConstruct(resultModel);
-						qexec.close();
+						try(QueryExecution qexec = ARQFactory.get().createQueryExecution(arqQuery, queryModel, bindings)) {
+    						
+    						// Execute construct and remember the order in which triples were inserted
+    						// Note that this does not work yet since Jena appears to have random order
+    						Model resultModel = ModelFactory.createDefaultModel();
+    						resultModel.getGraph().getEventManager().register(listener);
+    						qexec.execConstruct(resultModel);
+						}
 						
 						StringBuffer sb = new StringBuffer();
 						sb.append("Inferred by SPIN constructor at class ");

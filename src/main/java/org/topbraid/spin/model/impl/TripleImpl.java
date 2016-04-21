@@ -20,12 +20,14 @@ public abstract class TripleImpl extends TupleImpl implements Triple {
 	}
 
 
-	public Resource getPredicate() {
+	@Override
+    public Resource getPredicate() {
 		return (Resource) getRDFNodeOrVariable(SP.predicate);
 	}
 	
 	
-	public void print(PrintContext p) {
+	@Override
+    public void print(PrintContext p) {
 		print(getSubject(), p);
 		p.print(" ");
 		print(getPredicate(), p, true);

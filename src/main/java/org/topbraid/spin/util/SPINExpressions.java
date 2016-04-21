@@ -1,17 +1,5 @@
 package org.topbraid.spin.util;
 
-import org.topbraid.spin.arq.ARQ2SPIN;
-import org.topbraid.spin.arq.ARQFactory;
-import org.topbraid.spin.model.Aggregation;
-import org.topbraid.spin.model.FunctionCall;
-import org.topbraid.spin.model.SPINFactory;
-import org.topbraid.spin.model.Variable;
-import org.topbraid.spin.model.impl.AbstractSPINResourceImpl;
-import org.topbraid.spin.model.print.PrintContext;
-import org.topbraid.spin.model.print.StringPrintContext;
-import org.topbraid.spin.system.SPINModuleRegistry;
-import org.topbraid.spin.vocabulary.SP;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -24,9 +12,20 @@ import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.function.FunctionRegistry;
-import org.apache.jena.sparql.syntax.ElementAssign;
+import org.apache.jena.sparql.syntax.ElementBind;
 import org.apache.jena.sparql.syntax.ElementGroup;
 import org.apache.jena.sparql.util.FmtUtils;
+import org.topbraid.spin.arq.ARQ2SPIN;
+import org.topbraid.spin.arq.ARQFactory;
+import org.topbraid.spin.model.Aggregation;
+import org.topbraid.spin.model.FunctionCall;
+import org.topbraid.spin.model.SPINFactory;
+import org.topbraid.spin.model.Variable;
+import org.topbraid.spin.model.impl.AbstractSPINResourceImpl;
+import org.topbraid.spin.model.print.PrintContext;
+import org.topbraid.spin.model.print.StringPrintContext;
+import org.topbraid.spin.system.SPINModuleRegistry;
+import org.topbraid.spin.vocabulary.SP;
 
 
 /**
@@ -89,8 +88,7 @@ public class SPINExpressions {
 		}
 		else {
 			Query arq = ARQFactory.get().createExpressionQuery(expression);
-			QueryExecution qexec = ARQFactory.get().createQueryExecution(arq, dataset);
-			qexec.setInitialBinding(bindings);
+			QueryExecution qexec = ARQFactory.get().createQueryExecution(arq, dataset, bindings);
 			return SPINUtil.getFirstResult(qexec);
 		}
 	}
@@ -150,10 +148,10 @@ public class SPINExpressions {
 
 
 	public static Expr parseARQExpression(String str, Model model) {
-		String queryString = "ASK WHERE { LET (?xqoe := (" + str + ")) }";
+		String queryString = "ASK WHERE { BIND ((" + str + ") AS ?xqoe) }";
 		Query arq = ARQFactory.get().createQuery(model, queryString);
 		ElementGroup group = (ElementGroup) arq.getQueryPattern();
-		ElementAssign assign = (ElementAssign) group.getElements().get(0);
+		ElementBind assign = (ElementBind) group.getElements().get(0);
 		Expr expr = assign.getExpr();
 		return expr;
 	}

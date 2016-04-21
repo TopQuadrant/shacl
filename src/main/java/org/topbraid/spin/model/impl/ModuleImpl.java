@@ -41,7 +41,8 @@ public class ModuleImpl extends AbstractSPINResourceImpl implements Module {
 	}
 
 	
-	public List<Argument> getArguments(boolean ordered) {
+	@Override
+    public List<Argument> getArguments(boolean ordered) {
 		List<Argument> results = new ArrayList<Argument>();
 		StmtIterator it = null;
 		JenaUtil.setGraphReadOptimization(true);
@@ -65,7 +66,8 @@ public class ModuleImpl extends AbstractSPINResourceImpl implements Module {
 		
 		if(ordered) {
 			Collections.sort(results, new Comparator<Argument>() {
-				public int compare(Argument o1, Argument o2) {
+				@Override
+                public int compare(Argument o1, Argument o2) {
 					Property p1 = o1.getPredicate();
 					Property p2 = o2.getPredicate();
 					if(p1 != null && p2 != null) {
@@ -110,7 +112,8 @@ public class ModuleImpl extends AbstractSPINResourceImpl implements Module {
 	}
 
 
-	public Map<String, Argument> getArgumentsMap() {
+	@Override
+    public Map<String, Argument> getArgumentsMap() {
 		Map<String,Argument> results = new HashMap<String,Argument>();
 		for(Argument argument : getArguments(false)) {
 			Property property = argument.getPredicate();
@@ -122,7 +125,8 @@ public class ModuleImpl extends AbstractSPINResourceImpl implements Module {
 	}
 
 
-	public Command getBody() {
+	@Override
+    public Command getBody() {
 		RDFNode node = ModulesUtil.getBody(this);
 		if(node instanceof Resource) {
 			return SPINFactory.asCommand((Resource)node);
@@ -133,17 +137,20 @@ public class ModuleImpl extends AbstractSPINResourceImpl implements Module {
 	}
 	
 	
-	public String getComment() {
+	@Override
+    public String getComment() {
 		return getString(RDFS.comment);
 	}
 
 
-	public boolean isAbstract() {
+	@Override
+    public boolean isAbstract() {
 		return SPINFactory.isAbstract(this);
 	}
 
 
-	public void print(PrintContext p) {
+	@Override
+    public void print(PrintContext p) {
 		// TODO Auto-generated method stub
 
 	}

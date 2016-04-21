@@ -76,7 +76,8 @@ public class QueryOrTemplateCall {
 	 * Gets a human-readable text of either the query or the template call.
 	 * Can also be used for sorting alphabetically.
 	 */
-	public String toString() {
+	@Override
+    public String toString() {
 		if(getTemplateCall() != null) {
 			return SPINLabels.get().getLabel(getTemplateCall());
 		}

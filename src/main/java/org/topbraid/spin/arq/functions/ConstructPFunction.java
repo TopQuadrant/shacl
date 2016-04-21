@@ -69,21 +69,21 @@ public class ConstructPFunction extends PropertyFunctionBase {
 		}
 		org.apache.jena.query.Query arqQuery = ARQFactory.get().createQuery(spinQuery);
 		Dataset dataset = new DatasetWithDifferentDefaultModel(model, DatasetImpl.wrap(execCxt.getDataset()));
-		QueryExecution qexec = ARQFactory.get().createQueryExecution(arqQuery, dataset, initialBinding);
-		Model result = qexec.execConstruct();
-		QueryIterConcat concat = new QueryIterConcat(execCxt);
-		for(Triple triple : GraphUtil.findAll(result.getGraph()).toList()) {
-			BindingMap bindingMap = new BindingHashMap(binding);
-			if(perhapsAdd(objects.get(0), triple.getSubject(), bindingMap)) {
-				if(perhapsAdd(objects.get(1), triple.getPredicate(), bindingMap)) {
-					if(perhapsAdd(objects.get(2), triple.getObject(), bindingMap)) {
-						concat.add(IterLib.result(bindingMap, execCxt));
-					}
-				}
-			}
+		try(QueryExecution qexec = ARQFactory.get().createQueryExecution(arqQuery, dataset, initialBinding)) {
+		    Model result = qexec.execConstruct();
+		    QueryIterConcat concat = new QueryIterConcat(execCxt);
+		    for(Triple triple : GraphUtil.findAll(result.getGraph()).toList()) {
+		        BindingMap bindingMap = new BindingHashMap(binding);
+		        if(perhapsAdd(objects.get(0), triple.getSubject(), bindingMap)) {
+		            if(perhapsAdd(objects.get(1), triple.getPredicate(), bindingMap)) {
+		                if(perhapsAdd(objects.get(2), triple.getObject(), bindingMap)) {
+		                    concat.add(IterLib.result(bindingMap, execCxt));
+		                }
+		            }
+		        }
+		    }
+		    return concat;
 		}
-		qexec.close();
-		return concat;
 	}
 	
 	

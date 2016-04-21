@@ -28,19 +28,23 @@ import org.topbraid.spin.model.Values;
 public abstract class AbstractElementVisitor implements ElementVisitor {
 
 
-	public void visit(Bind let) {
+	@Override
+    public void visit(Bind let) {
 	}
 
 	
-	public void visit(ElementList elementList) {
+	@Override
+    public void visit(ElementList elementList) {
 	}
 
 	
-	public void visit(Exists exists) {
+	@Override
+    public void visit(Exists exists) {
 	}
 
 
-	public void visit(Filter filter) {
+	@Override
+    public void visit(Filter filter) {
 	}
 
 
@@ -49,35 +53,43 @@ public abstract class AbstractElementVisitor implements ElementVisitor {
 	}
 
 
-	public void visit(NamedGraph namedGraph) {
+	@Override
+    public void visit(NamedGraph namedGraph) {
 	}
 	
 	
-	public void visit(NotExists notExists) {
+	@Override
+    public void visit(NotExists notExists) {
 	}
 
 
-	public void visit(Optional optional) {
+	@Override
+    public void visit(Optional optional) {
 	}
 
 
-	public void visit(Service service) {
+	@Override
+    public void visit(Service service) {
 	}
 
 
-	public void visit(SubQuery subQuery) {
+	@Override
+    public void visit(SubQuery subQuery) {
 	}
 
 
-	public void visit(TriplePath triplePath) {
+	@Override
+    public void visit(TriplePath triplePath) {
 	}
 
 
-	public void visit(TriplePattern triplePattern) {
+	@Override
+    public void visit(TriplePattern triplePattern) {
 	}
 
 
-	public void visit(Union union) {
+	@Override
+    public void visit(Union union) {
 	}
 
 

@@ -18,7 +18,8 @@ public class TriplePatternImpl extends TripleImpl implements TriplePattern {
 	}
 
 
-	public void visit(ElementVisitor visitor) {
+	@Override
+    public void visit(ElementVisitor visitor) {
 		visitor.visit(this);
 	}
 }

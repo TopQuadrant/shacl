@@ -99,7 +99,8 @@ public class SPINARQPFunction extends PropertyFunctionBase implements PropertyFu
 	}
 
 	
-	public PropertyFunction create(String arg0) {
+	@Override
+    public PropertyFunction create(String arg0) {
 		return this;
 	}
 
@@ -111,8 +112,8 @@ public class SPINARQPFunction extends PropertyFunctionBase implements PropertyFu
 		argObject = Substitute.substitute(argObject, binding);
 		argSubject = Substitute.substitute(argSubject, binding);
 		
-		ExprList subjectExprList = argSubject.asExprList(argSubject);
-		ExprList objectExprList = argObject.asExprList(argObject);
+		ExprList subjectExprList = argSubject.asExprList();
+		ExprList objectExprList = argObject.asExprList();
 		
 		QueryIterConcat existingValues = null;
 		MagicPropertyPolicy.Policy policy = MagicPropertyPolicy.Policy.QUERY_RESULTS_ONLY;

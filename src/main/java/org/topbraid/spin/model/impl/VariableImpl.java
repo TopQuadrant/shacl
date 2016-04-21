@@ -35,12 +35,14 @@ public class VariableImpl extends AbstractSPINResourceImpl implements Variable {
 	}
 
 	
-	public String getName() {
+	@Override
+    public String getName() {
 		return getString(SP.varName);
 	}
 
 
-	public Set<TriplePattern> getTriplePatterns() {
+	@Override
+    public Set<TriplePattern> getTriplePatterns() {
 		Set<TriplePattern> results = new HashSet<TriplePattern>();
 		addTriplePatterns(SP.subject, results);
 		addTriplePatterns(SP.predicate, results);
@@ -49,7 +51,8 @@ public class VariableImpl extends AbstractSPINResourceImpl implements Variable {
 	}
 	
 	
-	public boolean isBlankNodeVar() {
+	@Override
+    public boolean isBlankNodeVar() {
 		String name = getName();
 		if(name != null) {
 			return name.startsWith("?");
@@ -60,7 +63,8 @@ public class VariableImpl extends AbstractSPINResourceImpl implements Variable {
 	}
 
 
-	public void print(PrintContext p) {
+	@Override
+    public void print(PrintContext p) {
 		String name = getName();
 		if(name.startsWith("?")) {
 			p.print("_:");

@@ -19,13 +19,15 @@ public class OptionalImpl extends ElementImpl implements Optional {
 	}
 
 
-	public void print(PrintContext p) {
+	@Override
+    public void print(PrintContext p) {
 		p.printKeyword("OPTIONAL");
 		printNestedElementList(p);
 	}
 
 
-	public void visit(ElementVisitor visitor) {
+	@Override
+    public void visit(ElementVisitor visitor) {
 		visitor.visit(this);
 	}
 }

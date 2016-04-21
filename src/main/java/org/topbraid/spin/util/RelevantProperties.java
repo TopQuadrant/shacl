@@ -80,7 +80,7 @@ public class RelevantProperties {
 		if(SHACLUtil.exists(instance.getModel())) {
 			List<Resource> types = JenaUtil.getTypes(instance);
 			if(types.isEmpty()) {
-				Resource defaultType = SHACLUtil.getDefaultTemplateType(instance);
+				Resource defaultType = SHACLUtil.getResourceDefaultType(instance);
 				if(defaultType != null) {
 					List<Property> properties = getRelevantSHACLPropertiesOfClass(defaultType);
 					properties.remove(RDF.type);

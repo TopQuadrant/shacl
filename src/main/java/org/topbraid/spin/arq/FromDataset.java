@@ -4,13 +4,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.topbraid.spin.util.JenaUtil;
-
 import org.apache.jena.graph.compose.MultiUnion;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.topbraid.spin.util.JenaUtil;
 
 
 /**
@@ -29,10 +28,11 @@ public class FromDataset extends DelegatingDataset {
 	private Set<String> namedGraphs;
 	
 	
-	public FromDataset(Dataset delegate, Query query) {
+	public FromDataset(Dataset delegate, Query query) throws GraphNotFoundException {
 		super(delegate);
 		defaultGraphs = new HashSet<String>(query.getGraphURIs());
 		namedGraphs = new HashSet<String>(query.getNamedGraphURIs());
+		initDefaultModel();
 	}
 
 
@@ -49,25 +49,33 @@ public class FromDataset extends DelegatingDataset {
 
 	@Override
 	public Model getDefaultModel() {
+		return defaultModel;
+	}
+
+
+	private void initDefaultModel() throws GraphNotFoundException {
 		if(defaultGraphs.isEmpty()) {
-			return super.getDefaultModel();
+			defaultModel = super.getDefaultModel();
 		}
 		else {
-			if(defaultModel == null) {
-				if(defaultGraphs.size() == 1) {
-					String defaultGraphURI = defaultGraphs.iterator().next();
-					defaultModel = getNamedModel(defaultGraphURI);
-				}
-				else {
-					MultiUnion multiUnion = JenaUtil.createMultiUnion();
-					for(String baseURI : defaultGraphs) {
-						Model model = getNamedModel(baseURI);
-						multiUnion.addGraph(model.getGraph());
-					}
-					defaultModel = ModelFactory.createModelForGraph(multiUnion);
+			if(defaultGraphs.size() == 1) {
+				String defaultGraphURI = defaultGraphs.iterator().next();
+				defaultModel = getNamedModel(defaultGraphURI);
+				if(defaultModel == null) {
+					throw new GraphNotFoundException("Named graph " + defaultGraphURI + " not found");
 				}
 			}
-			return defaultModel;
+			else {
+				MultiUnion multiUnion = JenaUtil.createMultiUnion();
+				for(String graphURI : defaultGraphs) {
+					Model model = getNamedModel(graphURI);
+					if(model == null) {
+						throw new GraphNotFoundException("Named graph " + graphURI + " not found");
+					}
+					multiUnion.addGraph(model.getGraph());
+				}
+				defaultModel = ModelFactory.createModelForGraph(multiUnion);
+			}
 		}
 	}
 

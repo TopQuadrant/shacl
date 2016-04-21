@@ -1,20 +1,14 @@
 package org.topbraid.shacl.model.impl;
 
-import org.topbraid.shacl.model.SHACLResult;
-import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.util.JenaUtil;
-
 import org.apache.jena.enhanced.EnhGraph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.topbraid.shacl.model.SHACLResult;
+import org.topbraid.shacl.vocabulary.SH;
+import org.topbraid.spin.util.JenaUtil;
 
-/**
- * Default implementation of SHACLResult.
- * 
- * @author Holger Knublauch
- */
 public class SHACLResultImpl extends SHACLResourceImpl implements SHACLResult {
 	
 	public SHACLResultImpl(Node node, EnhGraph graph) {
@@ -23,8 +17,8 @@ public class SHACLResultImpl extends SHACLResourceImpl implements SHACLResult {
 
 	
 	@Override
-	public Resource getFocusNode() {
-		return JenaUtil.getResourceProperty(this, SH.focusNode);
+	public RDFNode getFocusNode() {
+		return JenaUtil.getProperty(this, SH.focusNode);
 	}
 
 	
@@ -59,14 +53,14 @@ public class SHACLResultImpl extends SHACLResourceImpl implements SHACLResult {
 
 	
 	@Override
-	public Resource getSourceShape() {
-		return JenaUtil.getResourceProperty(this, SH.sourceShape);
+	public Resource getSourceConstraintComponent() {
+		return JenaUtil.getResourceProperty(this, SH.sourceConstraintComponent);
 	}
 
 	
 	@Override
-	public Resource getSourceTemplate() {
-		return JenaUtil.getResourceProperty(this, SH.sourceTemplate);
+	public Resource getSourceShape() {
+		return JenaUtil.getResourceProperty(this, SH.sourceShape);
 	}
 
 	

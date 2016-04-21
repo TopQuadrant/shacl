@@ -45,25 +45,29 @@ public class ElementWalker implements ElementVisitor {
 	}
 
 
-	public void visit(Bind bind) {
+	@Override
+    public void visit(Bind bind) {
 		elementVisitor.visit(bind);
 		visitExpression(bind.getExpression());
 	}
 
 	
-	public void visit(ElementList elementList) {
+	@Override
+    public void visit(ElementList elementList) {
 		elementVisitor.visit(elementList);
 		visitChildren(elementList);
 	}
 
 
-	public void visit(Exists exists) {
+	@Override
+    public void visit(Exists exists) {
 		elementVisitor.visit(exists);
 		visitChildren(exists);
 	}
 
 
-	public void visit(Filter filter) {
+	@Override
+    public void visit(Filter filter) {
 		elementVisitor.visit(filter);
 		visitExpression(filter.getExpression());
 	}
@@ -76,52 +80,61 @@ public class ElementWalker implements ElementVisitor {
 	}
 
 
-	public void visit(NamedGraph namedGraph) {
+	@Override
+    public void visit(NamedGraph namedGraph) {
 		elementVisitor.visit(namedGraph);
 		visitChildren(namedGraph);
 	}
 
 
-	public void visit(NotExists notExists) {
+	@Override
+    public void visit(NotExists notExists) {
 		elementVisitor.visit(notExists);
 		visitChildren(notExists);
 	}
 
 
-	public void visit(Optional optional) {
+	@Override
+    public void visit(Optional optional) {
 		elementVisitor.visit(optional);
 		visitChildren(optional);
 	}
 
 
-	public void visit(Service service) {
+	@Override
+    public void visit(Service service) {
 		elementVisitor.visit(service);
 		visitChildren(service);
 	}
 
 
-	public void visit(SubQuery subQuery) {
+	@Override
+    public void visit(SubQuery subQuery) {
 		elementVisitor.visit(subQuery);
 	}
 
 
-	public void visit(TriplePath triplePath) {
+	@Override
+    public void visit(TriplePath triplePath) {
 		elementVisitor.visit(triplePath);
 	}
 
 
-	public void visit(TriplePattern triplePattern) {
+	@Override
+    public void visit(TriplePattern triplePattern) {
 		elementVisitor.visit(triplePattern);
 	}
 
 
-	public void visit(Union union) {
+	@Override
+    public void visit(Union union) {
 		elementVisitor.visit(union);
 		visitChildren(union);
 	}
 
 
-	public void visit(Values values) {
+	@Override
+    public void visit(Values values) {
 		elementVisitor.visit(values);
 	}
 	

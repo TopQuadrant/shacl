@@ -18,18 +18,22 @@ import org.apache.jena.rdf.model.RDFNode;
  */
 public class AbstractExpressionVisitor implements ExpressionVisitor {
 
-	public void visit(Aggregation aggregation) {
+	@Override
+    public void visit(Aggregation aggregation) {
 	}
 
 	
-	public void visit(FunctionCall functionCall) {
+	@Override
+    public void visit(FunctionCall functionCall) {
 	}
 
 
-	public void visit(RDFNode node) {
+	@Override
+    public void visit(RDFNode node) {
 	}
 
 
-	public void visit(Variable variable) {
+	@Override
+    public void visit(Variable variable) {
 	}
 }

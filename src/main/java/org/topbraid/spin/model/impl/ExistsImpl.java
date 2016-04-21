@@ -18,12 +18,14 @@ public class ExistsImpl extends ElementImpl implements Exists {
 	}
 
 	
-	public void visit(ElementVisitor visitor) {
+	@Override
+    public void visit(ElementVisitor visitor) {
 		visitor.visit(this);
 	}
 
 	
-	public void print(PrintContext p) {
+	@Override
+    public void print(PrintContext p) {
 		p.printKeyword("EXISTS");
 		printNestedElementList(p);
 	}

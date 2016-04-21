@@ -13,12 +13,14 @@ import org.apache.jena.util.iterator.ExtendedIterator;
 public class WalkObjectsFunction extends AbstractWalkFunction {
 
 
-	protected ExtendedIterator<Triple> createIterator(Graph graph, Node node, Node predicate) {
+	@Override
+    protected ExtendedIterator<Triple> createIterator(Graph graph, Node node, Node predicate) {
 		return graph.find(node, predicate, null);
 	}
 
 	
-	protected Node getNext(Triple triple) {
+	@Override
+    protected Node getNext(Triple triple) {
 		return triple.getObject();
 	}
 }

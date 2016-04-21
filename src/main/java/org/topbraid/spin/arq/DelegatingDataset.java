@@ -1,21 +1,15 @@
 package org.topbraid.spin.arq;
 
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 
-import org.apache.jena.graph.Graph;
-import org.apache.jena.graph.Node;
-import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.LabelExistsException;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.shared.Lock;
 import org.apache.jena.sparql.core.DatasetGraph;
-import org.apache.jena.sparql.core.DatasetGraphBase;
-import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.sparql.util.Context;
+import org.topbraid.spin.util.DatasetWrappingDatasetGraph;
 
 /**
  * A Dataset that simply delegates all its calls, allowing to wrap an existing
@@ -33,85 +27,7 @@ public abstract class DelegatingDataset implements Dataset {
 
 	@Override
 	public DatasetGraph asDatasetGraph() {
-		return new DatasetGraphBase() {
-
-			@Override
-			public void close() {
-				DelegatingDataset.this.close();
-			}
-
-			@Override
-			public boolean containsGraph(Node graphNode) {
-				return DelegatingDataset.this.containsNamedModel(graphNode.getURI());
-			}
-
-			@Override
-			public Graph getDefaultGraph() {
-				Model defaultModel = DelegatingDataset.this.getDefaultModel();
-				if(defaultModel != null) {
-					return defaultModel.getGraph();
-				}
-				else {
-					return null;
-				}
-			}
-
-			@Override
-			public Graph getGraph(Node graphNode) {
-				Model model = DelegatingDataset.this.getNamedModel(graphNode.getURI());
-				if(model != null) {
-					return model.getGraph();
-				}
-				else {
-					return null;
-				}
-			}
-
-			@Override
-			public Lock getLock() {
-				return DelegatingDataset.this.getLock();
-			}
-
-			@Override
-			public Iterator<Node> listGraphNodes() {
-				List<Node> results = new LinkedList<Node>();
-				Iterator<String> names = DelegatingDataset.this.listNames();
-				while(names.hasNext()) {
-					String name = names.next();
-					results.add(NodeFactory.createURI(name));
-				}
-				return results.iterator();
-			}
-
-			@Override
-			public long size() {
-				int count = 0;
-				Iterator<Node> it = listGraphNodes();
-				while(it.hasNext()) {
-					it.next();
-					count++;
-				}
-				return count;
-			}
-
-			@Override
-			public Iterator<Quad> find(Node g, Node s, Node p, Node o) {
-				return null;
-			}
-
-			@Override
-			public Iterator<Quad> findNG(Node g, Node s, Node p, Node o) {
-				return null;
-			}
-
-			@Override
-			public void addGraph(Node arg0, Graph arg1) {
-			}
-
-			@Override
-			public void removeGraph(Node arg0) {
-			}
-		};
+		return new DatasetWrappingDatasetGraph(this);
 	}
 
 	
@@ -193,6 +109,11 @@ public abstract class DelegatingDataset implements Dataset {
 	}
 
 	
+	@Override
+	public boolean supportsTransactionAbort() {
+		return delegate.supportsTransactionAbort();
+	}
+
 	@Override
 	public void begin(ReadWrite readWrite) {
 		delegate.begin(readWrite);

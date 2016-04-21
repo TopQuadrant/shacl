@@ -1,0 +1,63 @@
+# baseURI: http://datashapes.org/sh/tests/core/property/pattern-001.test
+# imports: http://datashapes.org/dash
+# prefix: ex
+
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix ex: <http://datashapes.org/sh/tests/core/property/pattern-001.test#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://datashapes.org/sh/tests/core/property/pattern-001.test>
+  rdf:type owl:Ontology ;
+  rdfs:label "Test of pattern-001" ;
+  owl:imports <http://datashapes.org/dash> ;
+  owl:versionInfo "Created with TopBraid Composer"^^xsd:string ;
+.
+ex:GraphValidationTestCase
+  rdf:type dash:GraphValidationTestCase ;
+  dash:expectedResult [
+      rdf:type sh:ValidationResult ;
+      sh:focusNode ex:InvalidInstance1 ;
+      sh:object "Maria"^^xsd:string ;
+      sh:predicate ex:property ;
+      sh:severity sh:Violation ;
+      sh:subject ex:InvalidInstance1 ;
+    ] ;
+  dash:expectedResult [
+      rdf:type sh:ValidationResult ;
+      sh:focusNode ex:InvalidInstance2 ;
+      sh:object "john"^^xsd:string ;
+      sh:predicate ex:property ;
+      sh:severity sh:Violation ;
+      sh:subject ex:InvalidInstance2 ;
+    ] ;
+.
+ex:InvalidInstance1
+  rdf:type ex:TestShape ;
+  ex:property "Maria"^^xsd:string ;
+  rdfs:label "Invalid instance1"^^xsd:string ;
+.
+ex:InvalidInstance2
+  rdf:type ex:TestShape ;
+  ex:property "john"^^xsd:string ;
+  rdfs:label "Invalid instance2"^^xsd:string ;
+.
+ex:TestShape
+  rdf:type rdfs:Class, sh:Shape ;
+  rdfs:label "Test shape"^^xsd:string ;
+  sh:property [
+      rdfs:label "property"^^xsd:string ;
+      sh:datatype xsd:string ;
+      sh:pattern "Joh"^^xsd:string ;
+      sh:predicate ex:property ;
+    ] ;
+.
+ex:ValidInstance1
+  rdf:type ex:TestShape ;
+  ex:property "Hi Joh"^^xsd:string ;
+  ex:property "John"^^xsd:string ;
+  rdfs:label "Valid instance1"^^xsd:string ;
+.

@@ -1,12 +1,27 @@
 package org.topbraid.shacl.constraints.sparql;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.jena.graph.Node;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryParseException;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.syntax.syntaxtransform.QueryTransformOps;
+import org.apache.jena.vocabulary.RDFS;
 import org.topbraid.shacl.arq.functions.ScopeContainsPFunction;
 import org.topbraid.shacl.constraints.ModelConstraintValidator;
 import org.topbraid.shacl.constraints.SHACLException;
@@ -14,16 +29,6 @@ import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.system.SPINLabels;
 import org.topbraid.spin.util.JenaUtil;
-
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryParseException;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.rdf.model.Literal;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.ResourceFactory;
-import org.apache.jena.vocabulary.RDFS;
 
 /**
  * Collects various dodgy helper algorithms currently used by the SPARQL execution language.
@@ -33,6 +38,9 @@ import org.apache.jena.vocabulary.RDFS;
  * @author Holger Knublauch
  */
 class SPARQLSubstitutions {
+
+	private static boolean USE_TRANSFORM = true;
+	
 	
 	public static void addMessageVarNames(String labelTemplate, Set<String> results) {
 		for(int i = 0; i < labelTemplate.length(); i++) {
@@ -50,6 +58,23 @@ class SPARQLSubstitutions {
 				}
 				i = varEnd;
 			}
+		}
+	}
+	
+	
+	static QueryExecution createQueryExecution(Query query, Dataset dataset, QuerySolution bindings) {
+		if(USE_TRANSFORM && bindings != null) {
+			Map<Var,Node> substitutions = new HashMap<Var,Node>();
+			Iterator<String> varNames = bindings.varNames();
+			while(varNames.hasNext()) {
+				String varName = varNames.next();
+				substitutions.put(Var.alloc(varName), bindings.get(varName).asNode());
+			}
+			Query newQuery = QueryTransformOps.transform(query, substitutions);
+			return ARQFactory.get().createQueryExecution(newQuery, dataset);
+		}
+		else {
+			return ARQFactory.get().createQueryExecution(query, dataset, bindings);
 		}
 	}
 
@@ -178,6 +203,11 @@ class SPARQLSubstitutions {
 		
 		for(Resource cls : JenaUtil.getResourceProperties(shape, SH.scopeClass)) {
 			String varName = "?SHAPE_CLASS_VAR";
+			scopes.add("        " + varName + " <" + RDFS.subClassOf + ">* <" + cls + "> .\n            ?this a " + varName + " .\n");
+		}
+		
+		for(Resource cls : JenaUtil.getResourceProperties(shape, SH.context)) {
+			String varName = "?CONTEXT_VAR";
 			scopes.add("        " + varName + " <" + RDFS.subClassOf + ">* <" + cls + "> .\n            ?this a " + varName + " .\n");
 		}
 		

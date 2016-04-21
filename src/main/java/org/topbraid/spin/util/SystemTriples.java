@@ -8,9 +8,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.topbraid.spin.vocabulary.RDFx;
-import org.topbraid.spin.vocabulary.SP;
-
 import org.apache.jena.datatypes.xsd.impl.XMLLiteralType;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
@@ -19,6 +16,7 @@ import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.XSD;
+import org.topbraid.spin.vocabulary.SP;
 
 /**
  * Provides access to the RDF/RDFS/OWL system triples.
@@ -97,7 +95,7 @@ public class SystemTriples {
 				}
 			}
 			
-			vocabulary.add(RDFx.HTML, RDFS.label, "HTML");
+			vocabulary.add(RDF.HTML, RDFS.label, "HTML");
 			
 			// Triples were formally in OWL 1, but dropped from OWL 2
 			vocabulary.add(RDFS.comment, RDF.type, OWL.AnnotationProperty);

@@ -204,7 +204,7 @@ public class SPINUtil {
 	 * @param usePrefixes  true to use qname abbreviations
 	 * @return the String representation of node
 	 * @throws IllegalArgumentException  if the node is not a valid SPIN Query or a String
-	 * @deprecated for the same reason as {@link TemplateCall.getQueryString}
+	 * @deprecated for the same reason as {@link TemplateCall#getQueryString}
 	 */
 	public static String getQueryString(RDFNode node, boolean usePrefixes) {
 		if(node.isLiteral()) {
@@ -245,7 +245,7 @@ public class SPINUtil {
 	 * @param subject  the subject to get the values of
 	 * @param property  the property to query
 	 * @return a Set of query strings
-	 * @deprecated for the same reasons as {@link TemplateCall.getQueryString}
+	 * @deprecated for the same reasons as {@link TemplateCall#getQueryString}
 	 */
 	public static Collection<String> getQueryStrings(Resource subject, Property property) {
 		JenaUtil.setGraphReadOptimization(true);

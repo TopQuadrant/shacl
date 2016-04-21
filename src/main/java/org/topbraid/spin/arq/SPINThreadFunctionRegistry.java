@@ -54,7 +54,8 @@ public class SPINThreadFunctionRegistry extends FunctionRegistry {
 	static {
 		// Suppress multi-threading (PatternStage-stuff)
 		StageBuilder.setGenerator(ARQ.getContext(), new StageGenerator() {
-			public QueryIterator execute(BasicPattern pattern, QueryIterator input,
+			@Override
+            public QueryIterator execute(BasicPattern pattern, QueryIterator input,
 					ExecutionContext execCxt) {
 				return QueryIterBlockTriples.create(input, pattern, execCxt);
 			}

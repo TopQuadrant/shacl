@@ -32,7 +32,8 @@ public class ModifyImpl extends UpdateImpl implements Modify {
 	}
 
 	
-	public void printSPINRDF(PrintContext p) {
+	@Override
+    public void printSPINRDF(PrintContext p) {
 		printComment(p);
 		printPrefixes(p);
 		

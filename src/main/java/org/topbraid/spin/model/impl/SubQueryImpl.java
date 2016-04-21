@@ -24,7 +24,8 @@ public class SubQueryImpl extends ElementImpl implements SubQuery {
 	}
 
 	
-	public Query getQuery() {
+	@Override
+    public Query getQuery() {
 		Resource r = getResource(SP.query);
 		if(r != null) {
 			return SPINFactory.asQuery(r);
@@ -35,7 +36,8 @@ public class SubQueryImpl extends ElementImpl implements SubQuery {
 	}
 
 	
-	public void print(PrintContext p) {
+	@Override
+    public void print(PrintContext p) {
 		p.print("{");
 		p.println();
 		Query query = getQuery();
@@ -56,7 +58,8 @@ public class SubQueryImpl extends ElementImpl implements SubQuery {
 	}
 
 	
-	public void visit(ElementVisitor visitor) {
+	@Override
+    public void visit(ElementVisitor visitor) {
 		visitor.visit(this);
 	}
 }

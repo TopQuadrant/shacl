@@ -35,9 +35,9 @@ public class SuccessRecordingValidationListener implements ValidationListener {
 		if(results.size() == oldSize) {
 			Resource success = model.createResource(DASH.SuccessResult);
 			success.addProperty(SH.sourceShape, shape);
-			success.addProperty(SH.sourceConstraint, executable.getTemplateCall() != null ? executable.getTemplateCall() : executable.getResource());
-			if(executable instanceof TemplateConstraintExecutable) {
-				success.addProperty(SH.sourceTemplate, ((TemplateConstraintExecutable)executable).getResource());
+			success.addProperty(SH.sourceConstraint, executable.getConstraint());
+			if(executable instanceof ComponentConstraintExecutable) {
+				success.addProperty(SH.sourceConstraintComponent, ((ComponentConstraintExecutable)executable).getComponent());
 			}
 			if(focusNode != null) {
 				success.addProperty(SH.focusNode, focusNode);

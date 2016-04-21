@@ -28,7 +28,8 @@ public class AggregationImpl extends AbstractSPINResourceImpl implements Aggrega
 	}
 
 	
-	public Variable getAs() {
+	@Override
+    public Variable getAs() {
 		Resource as = getResource(SP.as);
 		if(as != null) {
 			return SPINFactory.asVariable(as);
@@ -39,17 +40,20 @@ public class AggregationImpl extends AbstractSPINResourceImpl implements Aggrega
 	}
 
 	
-	public Resource getExpression() {
+	@Override
+    public Resource getExpression() {
 		return getResource(SP.expression);
 	}
 
 	
-	public boolean isDistinct() {
+	@Override
+    public boolean isDistinct() {
 		return hasProperty(SP.distinct, getModel().createTypedLiteral(true));
 	}
 
 	
-	public void print(PrintContext p) {
+	@Override
+    public void print(PrintContext p) {
 		
 		Variable asVar = getAs(); 
 		if(asVar != null) {

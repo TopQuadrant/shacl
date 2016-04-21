@@ -178,7 +178,8 @@ public abstract class AbstractSPINResourceImpl extends org.topbraid.spin.model.S
 	}
 
 	
-	public String toString() {
+	@Override
+    public String toString() {
 		StringPrintContext p = new StringPrintContext();
 		print(p);
 		return p.getString();

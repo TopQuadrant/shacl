@@ -68,7 +68,8 @@ public class StringPrintContext implements PrintContext {
 	}
 	
 	
-	public PrintContext clone() {
+	@Override
+    public PrintContext clone() {
 		StringPrintContext cl = new StringPrintContext(sb);
 		cl.setIndentation(getIndentation());
 		cl.setNested(isNested());
@@ -80,7 +81,8 @@ public class StringPrintContext implements PrintContext {
 	}
 	
 
-	public int getIndentation() {
+	@Override
+    public int getIndentation() {
 		return indentation;
 	}
 	
@@ -91,7 +93,8 @@ public class StringPrintContext implements PrintContext {
 	}
 
 
-	public NodeToLabelMap getNodeToLabelMap() {
+	@Override
+    public NodeToLabelMap getNodeToLabelMap() {
 		if(nodeToLabelMap == null) {
 			nodeToLabelMap = new NodeToLabelMap();
 		}
@@ -99,7 +102,8 @@ public class StringPrintContext implements PrintContext {
 	}
 
 
-	public boolean getPrintPrefixes() {
+	@Override
+    public boolean getPrintPrefixes() {
 		return printPrefixes;
 	}
 
@@ -114,12 +118,14 @@ public class StringPrintContext implements PrintContext {
 	}
 
 
-	public boolean getUseExtraPrefixes() {
+	@Override
+    public boolean getUseExtraPrefixes() {
 		return useExtraPrefixes;
 	}
 	
 	
-	public boolean getUsePrefixes() {
+	@Override
+    public boolean getUsePrefixes() {
 		return usePrefixes;
 	}
 	
@@ -136,7 +142,8 @@ public class StringPrintContext implements PrintContext {
 	}
 
 
-	public boolean isNested() {
+	@Override
+    public boolean isNested() {
 		return nested;
 	}
 	
@@ -144,29 +151,34 @@ public class StringPrintContext implements PrintContext {
 	/**
 	 * @param str Non-null string.
 	 */
-	public void print(String str) {
+	@Override
+    public void print(String str) {
 		sb.append(str.toString());
 	}
 
 
-	public void printIndentation(int depth) {
+	@Override
+    public void printIndentation(int depth) {
 		for(int i = 0; i < depth; i++) {
 			print(indentationString);
 		}
 	}
 
 
-	public void printKeyword(String str) {
+	@Override
+    public void printKeyword(String str) {
 		print(str);
 	}
 
 
-	public void println() {
+	@Override
+    public void println() {
 		print("\n");
 	}
 
 
-	public void printVariable(String str) {
+	@Override
+    public void printVariable(String str) {
 		RDFNode binding = getInitialBinding(str);
 		if(binding == null || binding.isAnon()) {
 			print("?" + str);
@@ -181,7 +193,8 @@ public class StringPrintContext implements PrintContext {
 	}
 
 
-	public void printURIResource(Resource resource) {
+	@Override
+    public void printURIResource(Resource resource) {
 		if(getUsePrefixes()) {
 			String qname = qnameFor(resource);
 			if(qname != null) {
@@ -248,7 +261,8 @@ public class StringPrintContext implements PrintContext {
 	}
 
 
-	public void setIndentation(int value) {
+	@Override
+    public void setIndentation(int value) {
 		this.indentation = value;
 	}
 	
@@ -264,22 +278,26 @@ public class StringPrintContext implements PrintContext {
 	}
 
 
-	public void setNested(boolean value) {
+	@Override
+    public void setNested(boolean value) {
 		this.nested = value;
 	}
 
 
-	public void setPrintPrefixes(boolean value) {
+	@Override
+    public void setPrintPrefixes(boolean value) {
 		this.printPrefixes = value;
 	}
 
 
-	public void setUseExtraPrefixes(boolean value) {
+	@Override
+    public void setUseExtraPrefixes(boolean value) {
 		this.useExtraPrefixes = value;
 	}
 	
 	
-	public void setUsePrefixes(boolean value) {
+	@Override
+    public void setUsePrefixes(boolean value) {
 		this.usePrefixes = value;
 	}
 }

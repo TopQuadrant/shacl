@@ -29,11 +29,13 @@ import org.apache.jena.sparql.util.FmtUtils;
  */
 public abstract class AbstractFunction implements Function {
 
-	public void build(String uri, ExprList args) {
+	@Override
+    public void build(String uri, ExprList args) {
 	}
 
 	
-	public NodeValue exec(Binding binding, ExprList args, String uri, FunctionEnv env) {
+	@Override
+    public NodeValue exec(Binding binding, ExprList args, String uri, FunctionEnv env) {
 		Node[] nodes = new Node[args.size()];
 		for(int i = 0; i < args.size(); i++) {
             Expr e = args.get(i);

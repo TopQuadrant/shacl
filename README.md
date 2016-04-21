@@ -18,4 +18,4 @@ https://groups.google.com/forum/#!forum/topbraid-users
 Please prefix your messages with [SHACL API]
 
 To get started, look at the classes ModelConstraintValidator and ResourceConstraintValidator in
-the package org.topbraid.shacl.constraints. There is also an [Example Test Case](../master/src/test/java/org/topbraid/shacl/ValidateSquareExampleTest.java)
+the package org.topbraid.shacl.constraints. There is also an [Example Test Case](../master/src/test/java/org/topbraid/shacl/ValidationExample.java)

@@ -5,16 +5,16 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.topbraid.shacl.arq.SHACLSPARQLFunctionDriver;
-import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.util.JenaDatatypes;
-import org.topbraid.spin.util.JenaUtil;
-import org.topbraid.spin.vocabulary.SPIN;
-
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.topbraid.shacl.arq.SHACLSPARQLFunctionDriver;
+import org.topbraid.shacl.vocabulary.DASH;
+import org.topbraid.shacl.vocabulary.SH;
+import org.topbraid.spin.util.JenaDatatypes;
+import org.topbraid.spin.util.JenaUtil;
+import org.topbraid.spin.vocabulary.SPIN;
 
 
 /**
@@ -102,7 +102,7 @@ public class SPINFunctionDrivers implements SPINFunctionDriver {
 	
 	private SPINFunctionDriver getDirectDriver(Resource spinFunction) {
 		if(!spinFunction.hasProperty(SPIN.abstract_, JenaDatatypes.TRUE) &&
-			!spinFunction.hasProperty(SH.abstract_, JenaDatatypes.TRUE)) {
+			!spinFunction.hasProperty(DASH.abstract_, JenaDatatypes.TRUE)) {
 			StmtIterator it = spinFunction.listProperties();
 			while(it.hasNext()) {
 				Statement s = it.next();

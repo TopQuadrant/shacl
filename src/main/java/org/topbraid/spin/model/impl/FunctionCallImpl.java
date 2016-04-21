@@ -44,7 +44,8 @@ public class FunctionCallImpl extends ModuleCallImpl implements FunctionCall {
 	}
 	
 	
-	public List<RDFNode> getArguments() {
+	@Override
+    public List<RDFNode> getArguments() {
 		Map<Property,RDFNode> values = getArgumentsMap();
 		Property[] ps = getArgumentProperties(values);
 		List<RDFNode> results = new ArrayList<RDFNode>(ps.length);
@@ -86,7 +87,8 @@ public class FunctionCallImpl extends ModuleCallImpl implements FunctionCall {
 	}
 	
 	
-	public Map<Property, RDFNode> getArgumentsMap() {
+	@Override
+    public Map<Property, RDFNode> getArgumentsMap() {
 		final Map<Property,RDFNode> values = new HashMap<Property,RDFNode>();
 		StmtIterator it = listProperties();
 		while(it.hasNext()) {
@@ -99,7 +101,8 @@ public class FunctionCallImpl extends ModuleCallImpl implements FunctionCall {
 	}
 	
 	
-	public Resource getFunction() {
+	@Override
+    public Resource getFunction() {
 		
 		// Need to iterate over rdf:types - some may have been inferred
 		// Return the most specific type, i.e. the one that does not have
@@ -167,7 +170,8 @@ public class FunctionCallImpl extends ModuleCallImpl implements FunctionCall {
 	}
 	
 	
-	public void print(PrintContext p) {
+	@Override
+    public void print(PrintContext p) {
 		Resource function = getFunction();
 		List<RDFNode> args = getArguments();
 		
