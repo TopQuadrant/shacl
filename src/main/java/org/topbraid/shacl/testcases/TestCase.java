@@ -45,10 +45,4 @@ public abstract class TestCase {
 	
 	
 	public abstract void run(Model results) throws Exception;
-	
-	
-	@Override
-	public String toString() {
-		return resource.getURI();
-	}
 }

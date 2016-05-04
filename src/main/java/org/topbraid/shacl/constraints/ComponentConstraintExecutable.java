@@ -9,7 +9,6 @@ import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.vocabulary.RDF;
 import org.topbraid.shacl.model.SHACLConstraintComponent;
 import org.topbraid.shacl.model.SHACLFactory;
 import org.topbraid.shacl.model.SHACLParameter;
@@ -55,9 +54,9 @@ public class ComponentConstraintExecutable extends ConstraintExecutable {
 	public void addBindings(QuerySolutionMap map) {
 		
 		// Bind ?predicate with sh:predicate (if applicable)
-		if(constraint.hasProperty(RDF.type, SH.PropertyConstraint) ||
-				constraint.hasProperty(RDF.type, SH.InversePropertyConstraint) ||
-				constraint.hasProperty(RDF.type, SH.Parameter)) {
+		if(SHACLFactory.isPropertyConstraint(constraint) ||
+		   SHACLFactory.isInversePropertyConstraint(constraint) ||
+		   SHACLFactory.isParameter(constraint)) {
 			RDFNode predicate = JenaUtil.getResourceProperty(constraint, SH.predicate);
 			String varName = SH.predicateVar.getVarName();
 			if(predicate != null && !map.contains(varName)) {

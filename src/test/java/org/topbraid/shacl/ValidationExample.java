@@ -12,7 +12,6 @@ import org.apache.jena.util.FileUtils;
 import org.topbraid.shacl.arq.SHACLFunctions;
 import org.topbraid.shacl.constraints.ModelConstraintValidator;
 import org.topbraid.shacl.util.ModelPrinter;
-import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.util.JenaUtil;
 
@@ -35,8 +34,6 @@ public class ValidationExample {
 			dataModel.getGraph()
 		});
 		Model shapesModel = ModelFactory.createModelForGraph(unionGraph);
-		
-		shapesModel = SHACLUtil.withDefaultValueTypeInferences(shapesModel);
 
 		// Make sure all sh:Functions are registered
 		SHACLFunctions.registerFunctions(shapesModel);

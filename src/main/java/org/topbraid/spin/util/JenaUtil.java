@@ -64,7 +64,7 @@ public class JenaUtil {
 	
 	private static Model dummyModel = JenaUtil.createDefaultModel();
 	
-	private static final String WITH_IMPORTS_PREFIX = "http://rdfex.org/withImports?uri=";
+	public static final String WITH_IMPORTS_PREFIX = "http://rdfex.org/withImports?uri=";
 	
 	
 

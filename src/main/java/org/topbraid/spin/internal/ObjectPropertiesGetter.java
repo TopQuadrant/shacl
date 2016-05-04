@@ -8,17 +8,16 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
 import org.topbraid.spin.model.Element;
 import org.topbraid.spin.model.SPINFactory;
 import org.topbraid.spin.model.TriplePattern;
 import org.topbraid.spin.model.Variable;
 import org.topbraid.spin.model.visitor.AbstractTriplesVisitor;
 import org.topbraid.spin.vocabulary.SPIN;
-
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
 
 
 /**
@@ -49,7 +48,7 @@ public class ObjectPropertiesGetter extends AbstractTriplesVisitor {
 	@Override
 	protected void handleTriplePattern(TriplePattern triplePattern, Map<Property, RDFNode> bindings) {
 		boolean valid = false;
-		Resource subject = triplePattern.getSubject();
+		RDFNode subject = triplePattern.getSubject();
 		if(SPIN._this.equals(subject)) {
 			valid = true;
 		}

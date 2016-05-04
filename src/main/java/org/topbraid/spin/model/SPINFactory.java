@@ -9,6 +9,19 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.jena.enhanced.EnhGraph;
+import org.apache.jena.graph.Node;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFList;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.sparql.algebra.Table;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.vocabulary.RDF;
 import org.topbraid.spin.arq.Aggregations;
 import org.topbraid.spin.model.impl.TriplePatternImpl;
 import org.topbraid.spin.model.update.Clear;
@@ -27,20 +40,6 @@ import org.topbraid.spin.util.JenaUtil;
 import org.topbraid.spin.vocabulary.SP;
 import org.topbraid.spin.vocabulary.SPIN;
 import org.topbraid.spin.vocabulary.SPL;
-
-import org.apache.jena.enhanced.EnhGraph;
-import org.apache.jena.graph.Node;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFList;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
-import org.apache.jena.sparql.algebra.Table;
-import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.engine.binding.Binding;
-import org.apache.jena.vocabulary.RDF;
 
 
 /**
@@ -615,7 +614,7 @@ public class SPINFactory {
 	 * @param object  the object (not null)
 	 * @return a new TriplePattern
 	 */
-	public static TriplePattern createTriplePattern(Model model, Resource subject, Resource predicate, RDFNode object) {
+	public static TriplePattern createTriplePattern(Model model, RDFNode subject, Resource predicate, RDFNode object) {
 		// No rdf:type sp:TriplePattern needed - engine looks for sp:predicate
 		TriplePattern triplePattern = model.createResource().as(TriplePattern.class);
 		triplePattern.addProperty(SP.subject, subject);

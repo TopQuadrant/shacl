@@ -5,7 +5,6 @@
 package org.topbraid.spin.model;
 
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
 
 
 /**
@@ -19,7 +18,7 @@ public interface TriplePath extends Element {
 	 * Gets the subject.
 	 * @return the subject
 	 */
-	Resource getSubject();
+	RDFNode getSubject();
 	
 	
 	/**

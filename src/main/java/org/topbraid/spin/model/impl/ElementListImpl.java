@@ -8,6 +8,13 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.jena.enhanced.EnhGraph;
+import org.apache.jena.graph.Node;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.impl.RDFListImpl;
+import org.apache.jena.util.iterator.ExtendedIterator;
+import org.apache.jena.vocabulary.RDF;
 import org.topbraid.spin.model.Element;
 import org.topbraid.spin.model.ElementList;
 import org.topbraid.spin.model.SPINFactory;
@@ -16,14 +23,6 @@ import org.topbraid.spin.model.Variable;
 import org.topbraid.spin.model.print.PrintContext;
 import org.topbraid.spin.model.print.StringPrintContext;
 import org.topbraid.spin.model.visitor.ElementVisitor;
-
-import org.apache.jena.enhanced.EnhGraph;
-import org.apache.jena.graph.Node;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.impl.RDFListImpl;
-import org.apache.jena.util.iterator.ExtendedIterator;
-import org.apache.jena.vocabulary.RDF;
 
 
 public class ElementListImpl extends RDFListImpl implements ElementList {
@@ -41,8 +40,8 @@ public class ElementListImpl extends RDFListImpl implements ElementList {
 			TriplePattern firstPattern = (TriplePattern) elements.get(i);
 			TriplePattern secondPattern = (TriplePattern) elements.get(i + 1);
 			if(RDF.first.equals(firstPattern.getPredicate()) && RDF.rest.equals(secondPattern.getPredicate())) {
-				Resource firstSubject = firstPattern.getSubject();
-				Resource secondSubject = secondPattern.getSubject();
+				RDFNode firstSubject = firstPattern.getSubject();
+				RDFNode secondSubject = secondPattern.getSubject();
 				if(firstSubject instanceof Variable && secondSubject instanceof Variable) {
 					Variable firstVar = (Variable) firstSubject;
 					Variable secondVar = (Variable) secondSubject;
@@ -94,8 +93,8 @@ public class ElementListImpl extends RDFListImpl implements ElementList {
 			if(mainVar.isBlankNodeVar()) {
 				TriplePattern nextPattern = (TriplePattern)elements.get(i + 1);
 				TriplePattern lastPattern = (TriplePattern)elements.get(i + 2);
-				Resource nextSubject = nextPattern.getSubject();
-				Resource lastSubject = lastPattern.getSubject();
+				RDFNode nextSubject = nextPattern.getSubject();
+				RDFNode lastSubject = lastPattern.getSubject();
 				if(nextSubject instanceof Variable && 
 				   lastSubject instanceof Variable &&
 						RDF.first.equals(nextPattern.getPredicate()) &&

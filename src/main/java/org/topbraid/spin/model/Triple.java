@@ -21,7 +21,7 @@ public interface Triple extends Printable, Resource {
 	 * Gets the subject of this Triple, downcasting it into Variable if appropriate.
 	 * @return the subject
 	 */
-	Resource getSubject();
+	RDFNode getSubject();
 	
 
 	/**

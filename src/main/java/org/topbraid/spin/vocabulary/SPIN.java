@@ -51,6 +51,8 @@ public class SPIN {
 
 	public final static Resource eval = ResourceFactory.createResource(NS + "eval");
 
+	public final static Resource evalInGraph = ResourceFactory.createResource(NS + "evalInGraph");
+
 	public final static Resource Fatal = ResourceFactory.createProperty(NS + "Fatal");
 
 	public final static Resource Function = ResourceFactory.createResource(NS + "Function");

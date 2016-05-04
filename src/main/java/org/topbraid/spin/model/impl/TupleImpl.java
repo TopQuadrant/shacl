@@ -44,8 +44,8 @@ abstract class TupleImpl extends AbstractSPINResourceImpl {
 	}
 	
 	
-	public Resource getSubject() {
-		return (Resource) getRDFNodeOrVariable(SP.subject);
+	public RDFNode getSubject() {
+		return getRDFNodeOrVariable(SP.subject);
 	}
 	
 	

@@ -10,24 +10,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.topbraid.spin.arq.PropertyChainHelperPFunction;
-import org.topbraid.spin.arq.SPINARQPFunction;
-import org.topbraid.spin.arq.SPINARQPFunctionFactory;
-import org.topbraid.spin.arq.SPINFunctionDrivers;
-import org.topbraid.spin.arq.SPINFunctionFactory;
-import org.topbraid.spin.arq.functions.AskFunction;
-import org.topbraid.spin.arq.functions.ConstructPFunction;
-import org.topbraid.spin.arq.functions.ConstructViolationsPFunction;
-import org.topbraid.spin.arq.functions.EvalFunction;
-import org.topbraid.spin.arq.functions.SelectPFunction;
-import org.topbraid.spin.arq.functions.ViolatesConstraintsFunction;
-import org.topbraid.spin.model.Function;
-import org.topbraid.spin.model.SPINFactory;
-import org.topbraid.spin.model.Template;
-import org.topbraid.spin.util.JenaUtil;
-import org.topbraid.spin.vocabulary.SPIN;
-import org.topbraid.spin.vocabulary.SPL;
-
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.compose.MultiUnion;
@@ -38,6 +20,24 @@ import org.apache.jena.sparql.function.FunctionFactory;
 import org.apache.jena.sparql.function.FunctionRegistry;
 import org.apache.jena.sparql.pfunction.PropertyFunctionFactory;
 import org.apache.jena.sparql.pfunction.PropertyFunctionRegistry;
+import org.topbraid.spin.arq.PropertyChainHelperPFunction;
+import org.topbraid.spin.arq.SPINARQPFunction;
+import org.topbraid.spin.arq.SPINARQPFunctionFactory;
+import org.topbraid.spin.arq.SPINFunctionDrivers;
+import org.topbraid.spin.arq.SPINFunctionFactory;
+import org.topbraid.spin.arq.functions.AskFunction;
+import org.topbraid.spin.arq.functions.ConstructPFunction;
+import org.topbraid.spin.arq.functions.ConstructViolationsPFunction;
+import org.topbraid.spin.arq.functions.EvalFunction;
+import org.topbraid.spin.arq.functions.EvalInGraphFunction;
+import org.topbraid.spin.arq.functions.SelectPFunction;
+import org.topbraid.spin.arq.functions.ViolatesConstraintsFunction;
+import org.topbraid.spin.model.Function;
+import org.topbraid.spin.model.SPINFactory;
+import org.topbraid.spin.model.Template;
+import org.topbraid.spin.util.JenaUtil;
+import org.topbraid.spin.vocabulary.SPIN;
+import org.topbraid.spin.vocabulary.SPL;
 
 
 /**
@@ -184,6 +184,7 @@ public class SPINModuleRegistry {
 
 		FunctionRegistry.get().put(SPIN.ask.getURI(), new AskFunction());
 		FunctionRegistry.get().put(SPIN.eval.getURI(), new EvalFunction());
+		FunctionRegistry.get().put(SPIN.evalInGraph.getURI(), new EvalInGraphFunction());
 		FunctionRegistry.get().put(SPIN.violatesConstraints.getURI(), new ViolatesConstraintsFunction());
 		PropertyFunctionRegistry.get().put(SPIN.construct.getURI(), ConstructPFunction.class);
 		PropertyFunctionRegistry.get().put(SPIN.constructViolations.getURI(), ConstructViolationsPFunction.class);
