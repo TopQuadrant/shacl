@@ -6,6 +6,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.vocabulary.OWL;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.spin.internal.ObjectPropertiesGetter;
 import org.topbraid.spin.model.Ask;
@@ -20,18 +28,12 @@ import org.topbraid.spin.model.TemplateCall;
 import org.topbraid.spin.vocabulary.SP;
 import org.topbraid.spin.vocabulary.SPIN;
 
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
-import org.apache.jena.vocabulary.OWL;
-import org.apache.jena.vocabulary.RDF;
-import org.apache.jena.vocabulary.RDFS;
-
 
 /**
  * Control logic that determines "relevant" properties for given classes or instances.
+ * 
+ * Note that this only looks at "directly" associated properties for a class,
+ * not those "inherited" from superclasses.
  * 
  * @author Holger Knublauch
  */
@@ -64,42 +66,6 @@ public class RelevantProperties {
 			}				
 		}
 	}
-
-
-	public static List<Property> getRelevantSHACLPropertiesOfClass(Resource cls) {
-		if(SHACLUtil.exists(cls.getModel())) {
-			return SHACLUtil.getPropertiesOfClass(cls);
-		}
-		else {
-			return null;
-		}
-	}
-	
-	
-	public static Collection<Property> getRelevantSHACLPropertiesOfInstance(Resource instance) {
-		if(SHACLUtil.exists(instance.getModel())) {
-			List<Resource> types = JenaUtil.getTypes(instance);
-			if(types.isEmpty()) {
-				Resource defaultType = SHACLUtil.getResourceDefaultType(instance);
-				if(defaultType != null) {
-					List<Property> properties = getRelevantSHACLPropertiesOfClass(defaultType);
-					properties.remove(RDF.type);
-					return properties;
-				}
-			}
-			if(types.size() == 1) {
-				return getRelevantSHACLPropertiesOfClass(types.get(0));
-			}
-			else if(types.size() > 1) {
-				Set<Property> results = new HashSet<Property>();
-				for(Resource type : types) {
-					results.addAll(getRelevantSHACLPropertiesOfClass(type));
-				}
-				return results;
-			}
-		}
-		return null;
-	}
 	
 	
 	public static Set<Property> getRelevantPropertiesOfClass(Resource cls) {
@@ -126,16 +92,11 @@ public class RelevantProperties {
 
 			Set<Property> others = RelevantProperties.getRelevantSPINPropertiesOfClass(cls);
 			if(others != null) {
-				for(Property other : others) {
-					results.add(other);
-				}
+				results.addAll(others);
 			}
 
-			Collection<Property> shacls = RelevantProperties.getRelevantSHACLPropertiesOfClass(cls);
-			if(shacls != null) {
-				for(Property other : shacls) {
-					results.add(other);
-				}
+			if(SHACLUtil.exists(cls.getModel())) {
+				SHACLUtil.addDirectPropertiesOfClass(cls, results);
 			}
 		}
 		finally {
@@ -143,6 +104,42 @@ public class RelevantProperties {
 		}
 		
 		return results;
+	}
+
+
+	public static List<Property> getRelevantSHACLPropertiesOfClass(Resource cls) {
+		if(SHACLUtil.exists(cls.getModel())) {
+			return SHACLUtil.getAllPropertiesOfClass(cls);
+		}
+		else {
+			return null;
+		}
+	}
+	
+	
+	public static Collection<Property> getRelevantSHACLPropertiesOfInstance(Resource instance) {
+		if(SHACLUtil.exists(instance.getModel())) {
+			List<Resource> types = JenaUtil.getTypes(instance);
+			if(types.isEmpty()) {
+				Resource defaultType = SHACLUtil.getResourceDefaultType(instance);
+				if(defaultType != null) {
+					List<Property> properties = SHACLUtil.getAllPropertiesOfClass(defaultType);
+					properties.remove(RDF.type);
+					return properties;
+				}
+			}
+			if(types.size() == 1) {
+				return SHACLUtil.getAllPropertiesOfClass(types.get(0));
+			}
+			else if(types.size() > 1) {
+				Set<Property> results = new HashSet<Property>();
+				for(Resource type : types) {
+					results.addAll(SHACLUtil.getAllPropertiesOfClass(type));
+				}
+				return results;
+			}
+		}
+		return null;
 	}
 
 

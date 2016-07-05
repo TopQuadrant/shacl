@@ -12,42 +12,42 @@
 
 <http://datashapes.org/sh/tests/core/property/maxCount-001.test>
   rdf:type owl:Ontology ;
-  owl:versionInfo "Created with TopBraid Composer"^^xsd:string ;
   owl:imports <http://datashapes.org/dash> ;
+  owl:versionInfo "Created with TopBraid Composer" ;
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidPerson ;
-      sh:predicate ex:firstName ;
+      sh:path ex:firstName ;
       sh:severity sh:Violation ;
-      sh:subject ex:InvalidPerson ;
+      sh:sourceConstraintComponent sh:MaxCountConstraintComponent ;
     ] ;
 .
 ex:InvalidPerson
   rdf:type ex:Person ;
-  ex:firstName "George"^^xsd:string ;
-  ex:firstName "John"^^xsd:string ;
-  rdfs:label "Invalid person"^^xsd:string ;
+  ex:firstName "George" ;
+  ex:firstName "John" ;
+  rdfs:label "Invalid person" ;
 .
 ex:Person
-  rdf:type rdfs:Class, sh:Shape ;
-  rdfs:label "Person"^^xsd:string ;
+  rdf:type rdfs:Class ;
+  rdfs:label "Person" ;
   rdfs:subClassOf rdfs:Resource ;
 .
 ex:PersonShape
   rdf:type sh:Shape ;
   sh:property [
+      sh:predicate ex:firstName ;
       sh:datatype xsd:string ;
       sh:maxCount 1 ;
-      sh:predicate ex:firstName ;
     ] ;
   sh:scopeClass ex:Person ;
   sh:scopeNode ex:ValidResource ;
 .
 ex:ValidResource
   rdf:type ex:Person ;
-  ex:firstName "John"^^xsd:string ;
-  rdfs:label "Valid resource"^^xsd:string ;
+  ex:firstName "John" ;
+  rdfs:label "Valid resource" ;
 .

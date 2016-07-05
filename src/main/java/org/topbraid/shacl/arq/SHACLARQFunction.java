@@ -34,10 +34,10 @@ import org.apache.jena.sparql.serializer.SerializationContext;
 import org.apache.jena.sparql.sse.SSE;
 import org.apache.jena.sparql.util.ExprUtils;
 import org.apache.jena.sparql.util.FmtUtils;
-import org.topbraid.shacl.model.SHACLConstraintComponent;
-import org.topbraid.shacl.model.SHACLFunction;
-import org.topbraid.shacl.model.SHACLParameter;
-import org.topbraid.shacl.model.SHACLParameterizable;
+import org.topbraid.shacl.model.SHConstraintComponent;
+import org.topbraid.shacl.model.SHFunction;
+import org.topbraid.shacl.model.SHParameter;
+import org.topbraid.shacl.model.SHParameterizable;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.ARQFactory;
@@ -71,7 +71,7 @@ public class SHACLARQFunction implements org.apache.jena.sparql.function.Functio
 	
 	private String queryString;
 	
-	private SHACLFunction shaclFunction;
+	private SHFunction shaclFunction;
 	
 
 	/**
@@ -80,14 +80,14 @@ public class SHACLARQFunction implements org.apache.jena.sparql.function.Functio
 	 * @param component  the constraint component (defining the sh:parameters)
 	 * @param askValidator  the sh:SPARQLAskValidator resource
 	 */
-	public SHACLARQFunction(SHACLConstraintComponent component, Resource askValidator) {
+	public SHACLARQFunction(SHConstraintComponent component, Resource askValidator) {
 		
 		try {
-			queryString = JenaUtil.getStringProperty(askValidator, SH.sparql);
+			queryString = JenaUtil.getStringProperty(askValidator, SH.ask);
 			arqQuery = ARQFactory.get().createQuery(askValidator.getModel(), queryString);
 		}
 		catch(Exception ex) {
-			throw new IllegalArgumentException("Function " + shaclFunction.getURI() + " does not define a valid body", ex);
+			throw new IllegalArgumentException("Validator " + askValidator + " does not define a valid body", ex);
 		}
 		if(!arqQuery.isAskType()) {
             throw new ExprEvalException("Body must be ASK query");
@@ -105,7 +105,7 @@ public class SHACLARQFunction implements org.apache.jena.sparql.function.Functio
 	 * the triples of its definition.
 	 * @param shaclFunction  the SHACL function
 	 */
-	public SHACLARQFunction(SHACLFunction shaclFunction) {
+	public SHACLARQFunction(SHFunction shaclFunction) {
 		
 		this.shaclFunction = shaclFunction;
 		
@@ -126,10 +126,10 @@ public class SHACLARQFunction implements org.apache.jena.sparql.function.Functio
 	}
 
 
-	private void addParameters(SHACLParameterizable parameterizable) {
+	private void addParameters(SHParameterizable parameterizable) {
 		JenaUtil.setGraphReadOptimization(true);
 		try {
-			for(SHACLParameter param : parameterizable.getOrderedParameters()) {
+			for(SHParameter param : parameterizable.getOrderedParameters()) {
 				String varName = param.getVarName();
 				if(varName == null) {
 					throw new IllegalStateException("Parameter " + param + " of " + parameterizable + " does not have a valid predicate");
@@ -308,7 +308,7 @@ public class SHACLARQFunction implements org.apache.jena.sparql.function.Functio
 	 * Gets the underlying SHACLFunction Model object for this ARQ function.
 	 * @return the SHACLFunction (may be null)
 	 */
-	public SHACLFunction getSHACLFunction() {
+	public SHFunction getSHACLFunction() {
 		return shaclFunction;
 	}
 	

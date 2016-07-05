@@ -12,46 +12,46 @@
 
 <http://datashapes.org/sh/tests/core/property/hasValue-001.test>
   rdf:type owl:Ontology ;
-  owl:versionInfo "Created with TopBraid Composer"^^xsd:string ;
   owl:imports <http://datashapes.org/dash> ;
+  owl:versionInfo "Created with TopBraid Composer" ;
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidMalePerson ;
-      sh:predicate ex:gender ;
+      sh:path ex:gender ;
       sh:severity sh:Violation ;
-      sh:subject ex:InvalidMalePerson ;
+      sh:sourceConstraintComponent sh:HasValueConstraintComponent ;
     ] ;
 .
 ex:InvalidMalePerson
   rdf:type ex:MalePerson ;
-  ex:gender "female"^^xsd:string ;
-  rdfs:label "Invalid male person"^^xsd:string ;
+  ex:gender "female" ;
+  rdfs:label "Invalid male person" ;
 .
 ex:MalePerson
   rdf:type rdfs:Class ;
-  rdfs:label "Male person"^^xsd:string ;
+  rdfs:label "Male person" ;
   rdfs:subClassOf rdfs:Resource ;
 .
 ex:PersonShape
   rdf:type sh:Shape ;
-  rdfs:label "Person shape"^^xsd:string ;
+  rdfs:label "Person shape" ;
   sh:property [
-      rdfs:label "gender"^^xsd:string ;
-      sh:datatype xsd:string ;
-      sh:hasValue "male"^^xsd:string ;
       sh:predicate ex:gender ;
+      rdfs:label "gender" ;
+      sh:datatype xsd:string ;
+      sh:hasValue "male" ;
     ] ;
   sh:scopeClass ex:MalePerson ;
 .
 ex:ValidMalePerson1
   rdf:type ex:MalePerson ;
-  ex:gender "male"^^xsd:string ;
+  ex:gender "male" ;
 .
 ex:ValidMalePerson2
   rdf:type ex:MalePerson ;
-  ex:gender "female"^^xsd:string ;
-  ex:gender "male"^^xsd:string ;
+  ex:gender "female" ;
+  ex:gender "male" ;
 .

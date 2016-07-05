@@ -5,7 +5,6 @@
 package org.topbraid.spin.constraints;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -20,7 +19,6 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.graph.compose.MultiUnion;
-import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QuerySolutionMap;
@@ -37,9 +35,6 @@ import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
-import org.topbraid.shacl.constraints.ModelConstraintValidator;
-import org.topbraid.shacl.constraints.ResourceConstraintValidator;
-import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.model.Argument;
 import org.topbraid.spin.model.Ask;
@@ -60,6 +55,7 @@ import org.topbraid.spin.util.PropertyPathsGetter;
 import org.topbraid.spin.util.QueryWrapper;
 import org.topbraid.spin.util.SPINQueryFinder;
 import org.topbraid.spin.util.SPINUtil;
+import org.topbraid.spin.util.SPLUtil;
 import org.topbraid.spin.vocabulary.SP;
 import org.topbraid.spin.vocabulary.SPIN;
 
@@ -68,41 +64,26 @@ import org.topbraid.spin.vocabulary.SPIN;
  * Performs SPIN constraint checking on one or more instances, based
  * on the spin:constraints defined on the types of those instances.
  * 
- * Optionally, SHACL constraints are also checked.
- * 
  * @author Holger Knublauch
  */
 public class SPINConstraints {
 	
-	// Set to true to activate SHACL checking too
-	public static boolean INCLUDE_SHACL = false;
-	
 	private static List<TemplateCall> NO_FIXES = Collections.emptyList();
 	
 
-	public static void addConstraintViolations(List<ConstraintViolation> results, SPINInstance instance, Property predicate, boolean matchValue, List<SPINStatistics> stats, ProgressMonitor monitor) {
-		if(predicate == null) {
-			predicate = SPIN.constraint;
+	public static void addConstraintViolations(List<ConstraintViolation> results, SPINInstance instance, Property spinPredicate, boolean matchValue, final Property onProperty, List<SPINStatistics> stats, ProgressMonitor monitor) {
+		if(spinPredicate == null) {
+			spinPredicate = SPIN.constraint;
 		}
-		List<QueryOrTemplateCall> qots = instance.getQueriesAndTemplateCalls(predicate);
+		List<QueryOrTemplateCall> qots = instance.getQueriesAndTemplateCalls(spinPredicate);
 		for(QueryOrTemplateCall qot : qots) {
 			if(qot.getTemplateCall() != null) {
-				addTemplateCallResults(results, qot, instance, matchValue, monitor);
+				if(onProperty == null || SPLUtil.isOnProperty(qot.getTemplateCall(), onProperty)) {
+					addTemplateCallResults(results, qot, instance, matchValue, monitor);
+				}
 			}
-			else if(qot.getQuery() != null) {
+			else if(qot.getQuery() != null && onProperty == null) {
 				addQueryResults(results, qot, instance, matchValue, stats, monitor);
-			}
-		}
-		
-		if(INCLUDE_SHACL && SHACLUtil.exists(instance.getModel())) {
-			Dataset dataset = ARQFactory.get().getDataset(SHACLUtil.withDefaultValueTypeInferences(instance.getModel()));
-			URI shapesGraphURI = SHACLUtil.withShapesGraph(dataset);
-			Model resultsModel;
-			try {
-				resultsModel = ResourceConstraintValidator.get().validateNode(dataset, shapesGraphURI, instance.asNode(), null, monitor);
-				results.addAll(ConstraintViolation.shResults2ConstraintViolations(resultsModel));
-			} 
-			catch (InterruptedException e) {
 			}
 		}
 	}
@@ -305,33 +286,38 @@ public class SPINConstraints {
 	 * @return a List of ConstraintViolations (empty if all is OK)
 	 */
 	public static List<ConstraintViolation> check(Resource resource, ProgressMonitor monitor) {
-		return check(resource, SPIN.constraint, new LinkedList<SPINStatistics>(), monitor);
+		return check(resource, SPIN.constraint, null, monitor);
 	}
 
 	
 	/**
 	 * Checks all spin:constraints for a given Resource.
 	 * @param resource  the instance to run constraint checks on
-	 * @param predicate  the system property, e.g. a sub-property of spin:constraint 
+	 * @param spinPredicate  the system property, e.g. a sub-property of spin:constraint 
 	 *                   or null for the default (spin:constraint)
 	 * @param monitor  an (optional) progress monitor (currently ignored)
 	 * @return a List of ConstraintViolations (empty if all is OK)
 	 */
-	public static List<ConstraintViolation> check(Resource resource, Property predicate, ProgressMonitor monitor) {
-		return check(resource, predicate, new LinkedList<SPINStatistics>(), monitor);
+	public static List<ConstraintViolation> check(Resource resource, Property spinPredicate, ProgressMonitor monitor) {
+		return check(resource, spinPredicate, null, monitor);
 	}
 
 	
 	/**
 	 * Checks all spin:constraints for a given Resource.
 	 * @param resource  the instance to run constraint checks on
-	 * @param predicate  the system property, i.e. spin:constraint or a sub-property thereof
+	 * @param spinPredicate  the system property, i.e. spin:constraint or a sub-property thereof
 	 *                   or null for the default (spin:constraint)
 	 * @param stats  an (optional) List to add statistics to
 	 * @param monitor  an (optional) progress monitor (currently ignored)
 	 * @return a List of ConstraintViolations (empty if all is OK)
 	 */
-	public static List<ConstraintViolation> check(Resource resource, Property predicate, List<SPINStatistics> stats, ProgressMonitor monitor) {
+	public static List<ConstraintViolation> check(Resource resource, Property spinPredicate, List<SPINStatistics> stats, ProgressMonitor monitor) {
+		return check(resource, spinPredicate, null, stats, monitor);
+	}
+	
+	
+	public static List<ConstraintViolation> check(Resource resource, Property spinPredicate, Property onProperty, List<SPINStatistics> stats, ProgressMonitor monitor) {
 		List<ConstraintViolation> results = new LinkedList<ConstraintViolation>();
 		
 		// If spin:imports exist, then continue with the union model
@@ -346,7 +332,7 @@ public class SPINConstraints {
 		}
 		
 		SPINInstance instance = resource.as(SPINInstance.class);
-		addConstraintViolations(results, instance, predicate, false, stats, monitor);
+		addConstraintViolations(results, instance, spinPredicate, false, onProperty, stats, monitor);
 		return results;
 	}
 	
@@ -596,18 +582,6 @@ public class SPINConstraints {
 			}
 			if(monitor != null) {
 				monitor.worked(1);
-			}
-		}
-		
-		if(INCLUDE_SHACL && SHACLUtil.exists(model)) {
-			Dataset dataset = ARQFactory.get().getDataset(SHACLUtil.withDefaultValueTypeInferences(model));
-			URI shapesGraphURI = SHACLUtil.withShapesGraph(dataset);
-			try {
-				Model resultsModel = ModelConstraintValidator.get().validateModel(dataset, shapesGraphURI, null, true, monitor);
-				results.addAll(ConstraintViolation.shResults2ConstraintViolations(resultsModel));
-			}
-			catch (InterruptedException e) {
-				return;
 			}
 		}
 	}

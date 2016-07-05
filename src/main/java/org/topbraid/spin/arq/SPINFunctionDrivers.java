@@ -41,7 +41,8 @@ public class SPINFunctionDrivers implements SPINFunctionDriver {
 	
 	SPINFunctionDrivers() {
 		register(SPIN.body, new SPINBodyFunctionDriver());
-		register(SH.sparql, new SHACLSPARQLFunctionDriver());
+		register(SH.ask, new SHACLSPARQLFunctionDriver());
+		register(SH.select, new SHACLSPARQLFunctionDriver());
 	}
 
 

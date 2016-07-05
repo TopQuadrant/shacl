@@ -49,6 +49,7 @@ public class FunctionTestCaseType implements TestCaseType {
 					if(expectedResultS != null) {
 						createFailure(results,
 								"Expression returned no result, but expected: " + expectedResultS.getObject());
+						return;
 					}
 				}
 				else {
@@ -57,11 +58,13 @@ public class FunctionTestCaseType implements TestCaseType {
 						if(result != null) {
 							createFailure(results,
 									"Expression returned a result, but none expected: " + result);
+							return;
 						}
 					}
 					else if(!expectedResultS.getObject().equals(result)) {
 						createFailure(results,
 								"Mismatching result. Expected: " + expectedResultS.getObject() + ". Found: " + result);
+						return;
 					}
 				}
 			}

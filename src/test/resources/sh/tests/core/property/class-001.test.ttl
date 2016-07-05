@@ -14,31 +14,31 @@
   rdf:type owl:Ontology ;
   rdfs:label "Test of class-001" ;
   owl:imports <http://datashapes.org/dash> ;
-  owl:versionInfo "Created with TopBraid Composer"^^xsd:string ;
+  owl:versionInfo "Created with TopBraid Composer" ;
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidResource1 ;
-      sh:object ex:InvalidResource1 ;
-      sh:predicate ex:testProperty ;
+      sh:path ex:testProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InvalidResource1 ;
+      sh:sourceConstraintComponent sh:ClassConstraintComponent ;
+      sh:value ex:InvalidResource1 ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidResource1 ;
-      sh:object "A string"^^xsd:string ;
-      sh:predicate ex:testProperty ;
+      sh:path ex:testProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InvalidResource1 ;
+      sh:sourceConstraintComponent sh:ClassConstraintComponent ;
+      sh:value "A string" ;
     ] ;
 .
 ex:InvalidResource1
   rdf:type rdfs:Resource ;
   ex:testProperty ex:InvalidResource1 ;
-  ex:testProperty "A string"^^xsd:string ;
+  ex:testProperty "A string" ;
 .
 ex:SubClass
   rdf:type rdfs:Class ;
@@ -56,15 +56,25 @@ ex:SuperClassInstance
 ex:TestShape
   rdf:type sh:Shape ;
   sh:property [
-      rdfs:label "test property"^^xsd:string ;
-      sh:class ex:SuperClass ;
       sh:predicate ex:testProperty ;
+      rdfs:label "test property" ;
+      sh:class ex:SuperClass ;
     ] ;
   sh:scopeNode ex:InvalidResource1 ;
   sh:scopeNode ex:ValidResource1 ;
+  sh:scopeNode ex:ValidResource2 ;
 .
 ex:ValidResource1
   rdf:type rdfs:Resource ;
   ex:testProperty ex:SubClassInstance ;
   ex:testProperty ex:SuperClassInstance ;
+.
+ex:ValidResource2
+  rdf:type rdfs:Resource ;
+  ex:testProperty [
+      rdf:type ex:SubClass ;
+    ] ;
+  ex:testProperty [
+      rdf:type ex:SuperClass ;
+    ] ;
 .

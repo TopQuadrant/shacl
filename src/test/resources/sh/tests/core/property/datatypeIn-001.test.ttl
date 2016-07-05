@@ -14,17 +14,17 @@
   rdf:type owl:Ontology ;
   rdfs:label "Test of datatypeIn-001" ;
   owl:imports <http://datashapes.org/dash> ;
-  owl:versionInfo "Created with TopBraid Composer"^^xsd:string ;
+  owl:versionInfo "Created with TopBraid Composer" ;
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidNode1 ;
-      sh:object 42 ;
-      sh:predicate ex:property ;
+      sh:path ex:property ;
       sh:severity sh:Violation ;
-      sh:subject ex:InvalidNode1 ;
+      sh:sourceConstraintComponent sh:DatatypeInConstraintComponent ;
+      sh:value 42 ;
     ] ;
 .
 ex:InvalidNode1
@@ -32,18 +32,18 @@ ex:InvalidNode1
   ex:property 42 ;
   ex:property "german"@de ;
   ex:property "test" ;
-  rdfs:label "Invalid node1"^^xsd:string ;
+  rdfs:label "Invalid node1" ;
 .
 ex:TestShape
   rdf:type sh:Shape ;
-  rdfs:label "Test shape"^^xsd:string ;
+  rdfs:label "Test shape" ;
   sh:property [
+      sh:predicate ex:property ;
       sh:datatypeIn (
           xsd:string
           rdf:langString
         ) ;
-      sh:name "property"^^xsd:string ;
-      sh:predicate ex:property ;
+      sh:name "property" ;
     ] ;
   sh:scopeNode ex:InvalidNode1 ;
   sh:scopeNode ex:ValidNode1 ;
@@ -52,5 +52,5 @@ ex:ValidNode1
   rdf:type rdfs:Resource ;
   ex:property "german"@de ;
   ex:property "test" ;
-  rdfs:label "Valid node1"^^xsd:string ;
+  rdfs:label "Valid node1" ;
 .

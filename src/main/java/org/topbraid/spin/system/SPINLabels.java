@@ -6,12 +6,11 @@ package org.topbraid.spin.system;
 
 import java.util.Map;
 
-import org.topbraid.spin.util.JenaUtil;
-
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDFS;
+import org.topbraid.spin.util.JenaUtil;
 
 
 /**
@@ -81,6 +80,16 @@ public class SPINLabels {
 		}
 		else {
 			return resource.toString();
+		}
+	}
+	
+	
+	public String getNodeLabel(RDFNode node) {
+		if(node.isLiteral()) {
+			return node.asNode().getLiteralLexicalForm();
+		}
+		else {
+			return getLabel((Resource)node);
 		}
 	}
 

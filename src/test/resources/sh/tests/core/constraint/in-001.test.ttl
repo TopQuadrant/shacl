@@ -14,23 +14,34 @@
   rdf:type owl:Ontology ;
   rdfs:label "Test of in-001" ;
   owl:imports <http://datashapes.org/dash> ;
-  owl:versionInfo "Created with TopBraid Composer"^^xsd:string ;
+  owl:versionInfo "Created with TopBraid Composer" ;
+.
+ex:GraphValidationTestCase
+  rdf:type dash:GraphValidationTestCase ;
+  dash:expectedResult [
+      rdf:type sh:ValidationResult ;
+      sh:focusNode ex:InvalidInstance ;
+      sh:severity sh:Violation ;
+      sh:sourceConstraintComponent sh:InConstraintComponent ;
+      sh:value ex:InvalidInstance ;
+    ] ;
 .
 ex:Green
   rdf:type ex:TestShape ;
-  rdfs:label "Green"^^xsd:string ;
+  rdfs:label "Green" ;
 .
 ex:InvalidInstance
   rdf:type ex:TestShape ;
-  rdfs:label "Invalid instance"^^xsd:string ;
+  rdfs:label "Invalid instance" ;
 .
 ex:Red
   rdf:type ex:TestShape ;
-  rdfs:label "Red"^^xsd:string ;
+  rdfs:label "Red" ;
 .
 ex:TestShape
-  rdf:type rdfs:Class, sh:Shape ;
-  rdfs:label "Test shape"^^xsd:string ;
+  rdf:type rdfs:Class ;
+  rdf:type sh:Shape ;
+  rdfs:label "Test shape" ;
   sh:constraint [
       rdf:type sh:NodeConstraint ;
       sh:in (
@@ -42,5 +53,5 @@ ex:TestShape
 .
 ex:Yellow
   rdf:type ex:TestShape ;
-  rdfs:label "Yellow"^^xsd:string ;
+  rdfs:label "Yellow" ;
 .

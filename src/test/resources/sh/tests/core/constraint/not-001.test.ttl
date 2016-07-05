@@ -13,22 +13,33 @@
 <http://datashapes.org/sh/tests/core/constraint/not-001>
   rdf:type owl:Ontology ;
   owl:imports <http://datashapes.org/dash> ;
-  owl:versionInfo "Created with TopBraid Composer"^^xsd:string ;
+  owl:versionInfo "Created with TopBraid Composer" ;
+.
+ex:GraphValidationTestCase
+  rdf:type dash:GraphValidationTestCase ;
+  dash:expectedResult [
+      rdf:type sh:ValidationResult ;
+      sh:focusNode ex:InvalidResource1 ;
+      sh:severity sh:Violation ;
+      sh:sourceConstraintComponent sh:NotConstraintComponent ;
+      sh:value ex:InvalidResource1 ;
+    ] ;
 .
 ex:InvalidResource1
   rdf:type rdfs:Resource ;
   ex:property "some value" ;
 .
 ex:TestShape
-  rdf:type rdfs:Class, sh:Shape ;
-  rdfs:label "Test shape"^^xsd:string ;
+  rdf:type rdfs:Class ;
+  rdf:type sh:Shape ;
+  rdfs:label "Test shape" ;
   rdfs:subClassOf rdfs:Resource ;
   sh:constraint [
       sh:not [
           rdf:type sh:Shape ;
           sh:property [
-              sh:minCount 1 ;
               sh:predicate ex:property ;
+              sh:minCount 1 ;
             ] ;
         ] ;
     ] ;

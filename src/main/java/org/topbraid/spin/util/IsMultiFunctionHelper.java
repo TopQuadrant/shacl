@@ -5,20 +5,26 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.topbraid.spin.vocabulary.ARG;
-import org.topbraid.spin.vocabulary.SPIN;
-import org.topbraid.spin.vocabulary.SPL;
-
 import org.apache.jena.datatypes.TypeMapper;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.XSD;
+import org.topbraid.shacl.model.SHPropertyConstraint;
+import org.topbraid.shacl.model.SHShape;
+import org.topbraid.shacl.util.SHACLUtil;
+import org.topbraid.shacl.vocabulary.SH;
+import org.topbraid.spin.vocabulary.ARG;
+import org.topbraid.spin.vocabulary.SPIN;
+import org.topbraid.spin.vocabulary.SPL;
 
 /**
  * An internal helper object for the algorithm that determines whether a property
@@ -90,7 +96,19 @@ class IsMultiFunctionHelper {
 					}
 				}
 			}
-		}		
+		}
+		
+		if(SHACLUtil.exists(graph)) {
+			Model model = ModelFactory.createModelForGraph(graph);
+			Resource cls = (Resource) model.asRDFNode(type);
+			for(SHShape shape : SHACLUtil.getDirectShapesAtClassOrShape(cls)) {
+				if(!shape.isDeactivated()) {
+					if(hasShapeMaxCount1(shape, property)) {
+						return false;
+					}
+				}
+			}
+		}
 
 		List<Node> superClasses = new LinkedList<Node>();
 		{
@@ -109,7 +127,7 @@ class IsMultiFunctionHelper {
 					superClasses.add(restriction);
 				}
 			}
-		}		
+		}
 		
 		for(Node superClass : superClasses) {
 			if(!classes.contains(superClass)) {
@@ -120,5 +138,18 @@ class IsMultiFunctionHelper {
 		}
 		
 		return true;
+	}
+
+
+	private static boolean hasShapeMaxCount1(SHShape shape, Node predicateNode) {
+		for(SHPropertyConstraint c : shape.getPropertyConstraints(shape.getModel().asRDFNode(predicateNode))) {
+			if(!c.isDeactivated()) {
+				Integer maxCount = JenaUtil.getIntegerProperty(c, SH.maxCount);
+				if(maxCount != null && maxCount < 2) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }

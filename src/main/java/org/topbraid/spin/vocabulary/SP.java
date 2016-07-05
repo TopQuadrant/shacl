@@ -6,7 +6,7 @@ package org.topbraid.spin.vocabulary;
 
 import java.io.InputStream;
 
-import org.topbraid.shacl.model.SHACLFactory;
+import org.topbraid.shacl.model.SHFactory;
 import org.topbraid.spin.model.Aggregation;
 import org.topbraid.spin.model.Argument;
 import org.topbraid.spin.model.Ask;
@@ -423,7 +423,7 @@ public class SP {
     	p.add(Variable.class, new SimpleImplementation(Variable.asNode(), VariableImpl.class));
     	
     	// Also make sure SHACL is started up
-    	new SHACLFactory();
+    	new SHFactory();
     }
     
     

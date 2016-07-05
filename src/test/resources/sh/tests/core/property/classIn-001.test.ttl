@@ -14,62 +14,66 @@
   rdf:type owl:Ontology ;
   rdfs:label "Test of classIn-001" ;
   owl:imports <http://datashapes.org/dash> ;
-  owl:versionInfo "Created with TopBraid Composer"^^xsd:string ;
+  owl:versionInfo "Created with TopBraid Composer" ;
 .
 ex:Employee
-  rdf:type rdfs:Class, sh:Shape ;
-  rdfs:label "Employee"^^xsd:string ;
+  rdf:type rdfs:Class ;
+  rdf:type sh:Shape ;
+  rdfs:label "Employee" ;
   rdfs:subClassOf rdfs:Resource ;
 .
 ex:Employee_1
   rdf:type ex:Employee ;
-  rdfs:label "Employee 1"^^xsd:string ;
+  rdfs:label "Employee 1" ;
 .
 ex:FemalePerson
-  rdf:type rdfs:Class, sh:Shape ;
-  rdfs:label "Female person"^^xsd:string ;
+  rdf:type rdfs:Class ;
+  rdf:type sh:Shape ;
+  rdfs:label "Female person" ;
   rdfs:subClassOf ex:Person ;
 .
 ex:FemalePerson_1
   rdf:type ex:FemalePerson ;
-  rdfs:label "Female person 1"^^xsd:string ;
+  rdfs:label "Female person 1" ;
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidNode1 ;
-      sh:object rdfs:Resource ;
-      sh:predicate ex:property ;
+      sh:path ex:property ;
       sh:severity sh:Violation ;
-      sh:subject ex:InvalidNode1 ;
+      sh:sourceConstraintComponent sh:ClassInConstraintComponent ;
+      sh:value rdfs:Resource ;
     ] ;
 .
 ex:InvalidNode1
   rdf:type rdfs:Resource ;
   ex:property rdfs:Resource ;
-  rdfs:label "Invalid node1"^^xsd:string ;
+  rdfs:label "Invalid node1" ;
 .
 ex:MalePerson
-  rdf:type rdfs:Class, sh:Shape ;
-  rdfs:label "Male person"^^xsd:string ;
+  rdf:type rdfs:Class ;
+  rdf:type sh:Shape ;
+  rdfs:label "Male person" ;
   rdfs:subClassOf ex:Person ;
 .
 ex:Person
-  rdf:type rdfs:Class, sh:Shape ;
-  rdfs:label "Person"^^xsd:string ;
+  rdf:type rdfs:Class ;
+  rdf:type sh:Shape ;
+  rdfs:label "Person" ;
   rdfs:subClassOf rdfs:Resource ;
 .
 ex:TestShape
   rdf:type sh:Shape ;
-  rdfs:label "Test shape"^^xsd:string ;
+  rdfs:label "Test shape" ;
   sh:property [
+      sh:predicate ex:property ;
       sh:classIn (
           ex:Person
           ex:Employee
         ) ;
-      sh:name "property"^^xsd:string ;
-      sh:predicate ex:property ;
+      sh:name "property" ;
     ] ;
   sh:scopeNode ex:InvalidNode1 ;
   sh:scopeNode ex:ValidNode1 ;
@@ -78,5 +82,5 @@ ex:ValidNode1
   rdf:type rdfs:Resource ;
   ex:property ex:Employee_1 ;
   ex:property ex:FemalePerson_1 ;
-  rdfs:label "Valid node1"^^xsd:string ;
+  rdfs:label "Valid node1" ;
 .

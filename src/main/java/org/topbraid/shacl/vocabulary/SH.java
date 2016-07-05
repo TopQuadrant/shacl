@@ -1,3 +1,4 @@
+
 package org.topbraid.shacl.vocabulary;
 
 import org.apache.jena.rdf.model.Property;
@@ -37,11 +38,11 @@ public class SH {
 
     public final static Resource Info = ResourceFactory.createResource(NS + "Info");
 
-    public final static Resource InversePropertyConstraint = ResourceFactory.createResource(NS + "InversePropertyConstraint");
-
     public final static Resource IRI = ResourceFactory.createResource(NS + "IRI");
 
     public final static Resource Literal = ResourceFactory.createResource(NS + "Literal");
+
+    public final static Resource MaxCountConstraintComponent = ResourceFactory.createResource(NS + "MaxCountConstraintComponent");
 
     public final static Resource NodeConstraint = ResourceFactory.createResource(NS + "NodeConstraint");
     
@@ -60,6 +61,8 @@ public class SH {
     public final static Resource SPARQLAskValidator = ResourceFactory.createResource(NS + "SPARQLAskValidator");
     
     public final static Resource SPARQLConstraint = ResourceFactory.createResource(NS + "SPARQLConstraint");
+
+    public final static Resource SPARQLFunction = ResourceFactory.createResource(NS + "SPARQLFunction");
     
     public final static Resource SPARQLSelectValidator = ResourceFactory.createResource(NS + "SPARQLSelectValidator");
     
@@ -68,19 +71,27 @@ public class SH {
     public final static Resource SPARQLValuesDeriver = ResourceFactory.createResource(NS + "SPARQLValuesDeriver");
     
     public final static Resource ValidationResult = ResourceFactory.createResource(NS + "ValidationResult");
+    
+    public final static Resource Validator = ResourceFactory.createResource(NS + "Validator");
 
     public final static Resource Violation = ResourceFactory.createResource(NS + "Violation");
 
     public final static Resource Warning = ResourceFactory.createResource(NS + "Warning");
 
+
+    public final static Property alternativePath = ResourceFactory.createProperty(NS + "alternativePath");
     
     public final static Property and = ResourceFactory.createProperty(NS + "and");
+
+    public final static Property ask = ResourceFactory.createProperty(NS + "ask");
 
     public final static Property class_ = ResourceFactory.createProperty(NS + "class");
 
     public final static Property classIn = ResourceFactory.createProperty(NS + "classIn");
 
     public final static Property constraint = ResourceFactory.createProperty(NS + "constraint");
+
+    public final static Property construct = ResourceFactory.createProperty(NS + "construct");
 
     public final static Property context = ResourceFactory.createProperty(NS + "context");
 
@@ -110,9 +121,7 @@ public class SH {
     
     public final static Property in = ResourceFactory.createProperty(NS + "in");
 
-    public final static Property inverseProperty = ResourceFactory.createProperty(NS + "inverseProperty");
-
-    public final static Property inversePropertyValidator = ResourceFactory.createProperty(NS + "inversePropertyValidator");
+    public final static Property inversePath = ResourceFactory.createProperty(NS + "inversePath");
 
     public final static Property labelTemplate = ResourceFactory.createProperty(NS + "labelTemplate");
 
@@ -140,7 +149,7 @@ public class SH {
     
     public final static Property not = ResourceFactory.createProperty(NS + "not");
 
-    public final static Property object = ResourceFactory.createProperty(NS + "object");
+    public final static Property oneOrMorePath = ResourceFactory.createProperty(NS + "oneOrMorePath");
 
     public final static Property optional = ResourceFactory.createProperty(NS + "optional");
 
@@ -149,6 +158,8 @@ public class SH {
     public final static Property order = ResourceFactory.createProperty(NS + "order");
 
     public final static Property parameter = ResourceFactory.createProperty(NS + "parameter");
+
+    public final static Property path = ResourceFactory.createProperty(NS + "path");
 
     public final static Property predicate = ResourceFactory.createProperty(NS + "predicate");
 
@@ -161,9 +172,15 @@ public class SH {
     public final static Property scope = ResourceFactory.createProperty(NS + "scope");
     
     public final static Property scopeClass = ResourceFactory.createProperty(NS + "scopeClass");
+    
+    public final static Property scopeInverseProperty = ResourceFactory.createProperty(NS + "scopeInverseProperty");
 
     public final static Property scopeNode = ResourceFactory.createProperty(NS + "scopeNode");
     
+    public final static Property scopeProperty = ResourceFactory.createProperty(NS + "scopeProperty");
+
+    public final static Property select = ResourceFactory.createProperty(NS + "select");
+
     public final static Property severity = ResourceFactory.createProperty(NS + "severity");
     
     public final static Property shape = ResourceFactory.createProperty(NS + "shape");
@@ -178,24 +195,32 @@ public class SH {
 
     public final static Property sparql = ResourceFactory.createProperty(NS + "sparql");
 
-    public final static Property subject = ResourceFactory.createProperty(NS + "subject");
-    
-    public final static Property valueShape = ResourceFactory.createProperty(NS + "valueShape");
+    public final static Property update = ResourceFactory.createProperty(NS + "update");
+
+    public final static Property validator = ResourceFactory.createProperty(NS + "validator");
+
+    public final static Property value = ResourceFactory.createProperty(NS + "value");
+
+    public final static Property zeroOrMorePath = ResourceFactory.createProperty(NS + "zeroOrMorePath");
+
+    public final static Property zeroOrOnePath = ResourceFactory.createProperty(NS + "zeroOrOnePath");
 
 	
 	public static final Var currentShapeVar = Var.alloc("currentShape");
 
 	public static final Var failureVar = Var.alloc("failure");
 
-	public static final Var objectVar = Var.alloc(object.getLocalName());
+	public static final Var PATHVar = Var.alloc("PATH");
+
+	public static final Var pathVar = Var.alloc(path.getLocalName());
 
 	public static final Var predicateVar = Var.alloc(predicate.getLocalName());
 
 	public static final Var shapesGraphVar = Var.alloc("shapesGraph");
-
-	public static final Var subjectVar = Var.alloc(subject.getLocalName());
 	
 	public static final Var thisVar = Var.alloc("this");
+	
+	public static final Var valueVar = Var.alloc("value");
 
 
     public static String getURI() {

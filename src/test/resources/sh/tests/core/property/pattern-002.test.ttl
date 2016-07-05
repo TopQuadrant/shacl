@@ -14,42 +14,43 @@
   rdf:type owl:Ontology ;
   rdfs:label "Test of pattern-002" ;
   owl:imports <http://datashapes.org/dash> ;
-  owl:versionInfo "Created with TopBraid Composer"^^xsd:string ;
+  owl:versionInfo "Created with TopBraid Composer" ;
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidInstance1 ;
-      sh:object "Maria"^^xsd:string ;
-      sh:predicate ex:property ;
+      sh:path ex:property ;
       sh:severity sh:Violation ;
-      sh:subject ex:InvalidInstance1 ;
+      sh:sourceConstraintComponent sh:PatternConstraintComponent ;
+      sh:value "Maria" ;
     ] ;
 .
 ex:InvalidInstance1
   rdf:type ex:TestShape ;
-  ex:property "Maria"^^xsd:string ;
-  rdfs:label "Invalid instance1"^^xsd:string ;
+  ex:property "Maria" ;
+  rdfs:label "Invalid instance1" ;
 .
 ex:TestShape
-  rdf:type rdfs:Class, sh:Shape ;
-  rdfs:label "Test shape"^^xsd:string ;
+  rdf:type rdfs:Class ;
+  rdf:type sh:Shape ;
+  rdfs:label "Test shape" ;
   sh:property [
-      rdfs:label "property"^^xsd:string ;
-      sh:datatype xsd:string ;
-      sh:flags "i"^^xsd:string ;
-      sh:pattern "joh"^^xsd:string ;
       sh:predicate ex:property ;
+      rdfs:label "property" ;
+      sh:datatype xsd:string ;
+      sh:flags "i" ;
+      sh:pattern "joh" ;
     ] ;
 .
 ex:ValidInstance1
   rdf:type ex:TestShape ;
-  ex:property "Hi Joh"^^xsd:string ;
-  ex:property "John"^^xsd:string ;
-  rdfs:label "Valid instance1"^^xsd:string ;
+  ex:property "Hi Joh" ;
+  ex:property "John" ;
+  rdfs:label "Valid instance1" ;
 .
 ex:ValidInstance2
   rdf:type ex:TestShape ;
-  ex:property "john"^^xsd:string ;
+  ex:property "john" ;
 .

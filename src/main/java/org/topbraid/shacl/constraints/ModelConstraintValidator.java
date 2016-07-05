@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
@@ -13,8 +14,8 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDFS;
-import org.topbraid.shacl.model.SHACLConstraint;
-import org.topbraid.shacl.model.SHACLFactory;
+import org.topbraid.shacl.model.SHConstraint;
+import org.topbraid.shacl.model.SHFactory;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.progress.ProgressMonitor;
@@ -54,7 +55,7 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 	 * @param monitor  an optional ProgressMonitor
 	 * @return a Model containing violation results - empty if OK
 	 */
-	public Model validateModel(Dataset dataset, URI shapesGraphURI, Resource minSeverity, boolean validateShapes, ProgressMonitor monitor) throws InterruptedException {
+	public Model validateModel(Dataset dataset, URI shapesGraphURI, Resource minSeverity, boolean validateShapes, Function<RDFNode,String> labelFunction, ProgressMonitor monitor) throws InterruptedException {
 		
 		if(dataset.getDefaultModel() == null) {
 			throw new IllegalArgumentException("Dataset requires a default model");
@@ -67,7 +68,7 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 		}
 		
 		List<Property> constraintProperties = SHACLUtil.getAllConstraintProperties(validateShapes);
-		Map<Resource,List<SHACLConstraint>> map = buildShape2ConstraintsMap(shapesModel, dataset.getDefaultModel(), constraintProperties, validateShapes);
+		Map<Resource,List<SHConstraint>> map = buildShape2ConstraintsMap(shapesModel, dataset.getDefaultModel(), constraintProperties, validateShapes);
 		if(monitor != null) {
 			monitor.subTask("");
 		}
@@ -77,9 +78,10 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 		}
 		
 		Model results = JenaUtil.createMemoryModel();
+		results.setNsPrefixes(dataset.getDefaultModel());
 		for(Resource shape : map.keySet()) {
-			for(SHACLConstraint constraint : map.get(shape)) {
-				validateConstraintForShape(dataset, shapesGraphURI, minSeverity, constraint, shape, results, monitor);
+			for(SHConstraint constraint : map.get(shape)) {
+				validateConstraintForShape(dataset, shapesGraphURI, minSeverity, constraint, shape, results, labelFunction, monitor);
 				if(monitor != null) {
 					monitor.worked(1);
 					if(monitor.isCanceled()) {
@@ -93,16 +95,16 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 	}
 	
 	
-	private Map<Resource,List<SHACLConstraint>> buildShape2ConstraintsMap(Model shapesModel, Model dataModel, List<Property> constraintProperties, boolean validateShapes) {
-		Map<Resource,List<SHACLConstraint>> map = new HashMap<Resource,List<SHACLConstraint>>();
+	private Map<Resource,List<SHConstraint>> buildShape2ConstraintsMap(Model shapesModel, Model dataModel, List<Property> constraintProperties, boolean validateShapes) {
+		Map<Resource,List<SHConstraint>> map = new HashMap<Resource,List<SHConstraint>>();
 		for(Property constraintProperty : constraintProperties) {
 			for(Statement s : shapesModel.listStatements(null, constraintProperty, (RDFNode)null).toList()) {
 				if(s.getObject().isResource()) {
 					Resource shape = s.getSubject();
 					if(hasScope(shape, dataModel, validateShapes)) {
-						List<SHACLConstraint> list = map.get(shape);
+						List<SHConstraint> list = map.get(shape);
 						if(list == null) {
-							list = new LinkedList<SHACLConstraint>();
+							list = new LinkedList<SHConstraint>();
 							map.put(shape, list);
 						}
 						Resource c = s.getResource(); 
@@ -112,12 +114,12 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 						}
 						if(type != null) {
 							if(JenaUtil.hasIndirectType(c, SH.SPARQLConstraint)) {
-								list.add(SHACLFactory.asSPARQLConstraint(c));
+								list.add(SHFactory.asSPARQLConstraint(c));
 							}
 							else if(JenaUtil.hasSuperClass(type, SH.Constraint)) {
 								// Only execute property constraints if sh:predicate is present
-								if(SH.constraint.equals(constraintProperty) || c.hasProperty(SH.predicate)) {
-									list.add(SHACLFactory.asParameterizableConstraint(c));
+								if(SH.constraint.equals(constraintProperty) || c.hasProperty(SH.predicate) || c.hasProperty(SH.path)) {
+									list.add(SHFactory.asParameterizableConstraint(c));
 								}
 							}
 						}
@@ -140,6 +142,12 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 		else if(shape.hasProperty(SH.scopeClass)) {
 			return true;
 		}
+		else if(shape.hasProperty(SH.scopeProperty)) {
+			return true;
+		}
+		else if(shape.hasProperty(SH.scopeInverseProperty)) {
+			return true;
+		}
 		else if(shape.hasProperty(SH.scopeNode)) {
 			return true;
 		}
@@ -152,7 +160,7 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 	}
 	
 	
-	private void validateConstraintForShape(Dataset dataset, URI shapesGraphURI, Resource minSeverity, SHACLConstraint constraint, Resource shape, Model results, ProgressMonitor monitor) {
+	private void validateConstraintForShape(Dataset dataset, URI shapesGraphURI, Resource minSeverity, SHConstraint constraint, Resource shape, Model results, Function<RDFNode,String> labelFunction, ProgressMonitor monitor) {
 		for(ConstraintExecutable executable : constraint.getExecutables()) {
 			Resource severity = executable.getSeverity();
 			if(SHACLUtil.hasMinSeverity(severity, minSeverity)) {
@@ -161,7 +169,7 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 				}
 				ExecutionLanguage lang = ExecutionLanguageSelector.get().getLanguageForConstraint(executable);
 				notifyValidationStarting(shape, executable, null, lang, results);
-				lang.executeConstraint(dataset, shape, shapesGraphURI, executable, null, results);
+				lang.executeConstraint(dataset, shape, shapesGraphURI, executable, null, results, labelFunction);
 				notifyValidationFinished(shape, executable, null, lang, results);
 			}
 		}

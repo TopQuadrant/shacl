@@ -18,4 +18,7 @@ public interface OptimizedMultiUnion {
 	
 	
 	List<Node> getLabelProperties();
+	
+	
+	void resetOptimizations();
 }

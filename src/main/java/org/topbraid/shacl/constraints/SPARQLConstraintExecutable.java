@@ -1,13 +1,9 @@
 package org.topbraid.shacl.constraints;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.jena.rdf.model.Literal;
-import org.apache.jena.rdf.model.Resource;
-import org.topbraid.shacl.model.SHACLFactory;
-import org.topbraid.shacl.model.SHACLSPARQLConstraint;
-import org.topbraid.shacl.model.SHACLShape;
+import org.topbraid.shacl.model.SHSPARQLConstraint;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaUtil;
 
@@ -20,18 +16,8 @@ import org.topbraid.spin.util.JenaUtil;
 public class SPARQLConstraintExecutable extends ConstraintExecutable {
 	
 	
-	public SPARQLConstraintExecutable(SHACLSPARQLConstraint resource) {
+	public SPARQLConstraintExecutable(SHSPARQLConstraint resource) {
 		super(resource);
-	}
-
-
-	@Override
-	public List<SHACLShape> getFilterShapes() {
-		List<SHACLShape> results = new LinkedList<SHACLShape>();
-		for(Resource scope : JenaUtil.getResourceProperties(getConstraint(), SH.filterShape)) {
-			results.add(SHACLFactory.asShape(scope));
-		}
-		return results;
 	}
 
 	

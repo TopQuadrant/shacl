@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,11 +17,11 @@ import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.syntax.syntaxtransform.QueryTransformOps;
 import org.apache.jena.vocabulary.RDFS;
 import org.topbraid.shacl.arq.functions.ScopeContainsPFunction;
 import org.topbraid.shacl.constraints.ModelConstraintValidator;
@@ -37,9 +38,10 @@ import org.topbraid.spin.util.JenaUtil;
  *
  * @author Holger Knublauch
  */
-class SPARQLSubstitutions {
+public class SPARQLSubstitutions {
 
-	private static boolean USE_TRANSFORM = true;
+	// Currently switched to old setInitialBinding solution
+	private static boolean USE_TRANSFORM = false;
 	
 	
 	public static void addMessageVarNames(String labelTemplate, Set<String> results) {
@@ -70,7 +72,7 @@ class SPARQLSubstitutions {
 				String varName = varNames.next();
 				substitutions.put(Var.alloc(varName), bindings.get(varName).asNode());
 			}
-			Query newQuery = QueryTransformOps.transform(query, substitutions);
+			Query newQuery = JenaUtil.queryWithSubstitutions(query, substitutions);
 			return ARQFactory.get().createQueryExecution(newQuery, dataset);
 		}
 		else {
@@ -78,9 +80,9 @@ class SPARQLSubstitutions {
 		}
 	}
 
-	
+
 	// TODO: Algorithm incorrect, e.g. if { is included as a comment
-	static Query insertFilterClause(Query query, int scopeCount) {
+	static Query insertFilterClause(Query query, int filterCount) {
 		String str = query.toString();
 		Pattern pattern = Pattern.compile("(?i)WHERE\\s*\\{");
 		Matcher matcher = pattern.matcher(str);
@@ -89,7 +91,7 @@ class SPARQLSubstitutions {
 			StringBuilder sb = new StringBuilder(str);
 			
 			StringBuffer s = new StringBuffer();
-			for(int i = 0; i < scopeCount; i++) {
+			for(int i = 0; i < filterCount; i++) {
 				s.append("{ FILTER <");
 				s.append(SH.hasShape.getURI());
 				s.append(">(?this, ?");
@@ -116,7 +118,7 @@ class SPARQLSubstitutions {
 			StringBuilder sb = new StringBuilder(str);
 			
 			StringBuffer s = new StringBuffer();
-			s.append("    {\n        SELECT DISTINCT ?" + SH.thisVar.getName() + " ?" + SH.shapesGraphVar.getName() + " ?" + SH.currentShapeVar.getName());
+			s.append("    {{\n        SELECT DISTINCT ?" + SH.thisVar.getName() + " ?" + SH.shapesGraphVar.getName() + " ?" + SH.currentShapeVar.getName());
 
 			// We need to enumerate template call arguments here because Jena would otherwise drop the pre-bound variables
 			Iterator<String> varNames = binding.varNames();
@@ -135,6 +137,7 @@ class SPARQLSubstitutions {
 				s.append(ModelConstraintValidator.FILTER_VAR_NAME + i);
 				s.append(", ?" + SH.shapesGraphVar.getVarName() + ") .");
 			}
+			s.append("}");
 			
 			sb.insert(index, s.toString());
 			try {
@@ -149,9 +152,16 @@ class SPARQLSubstitutions {
 			throw new IllegalArgumentException("Cannot find first '{' in query string: " + str);
 		}
 	}
+	
+	
+	public static Query substitutePaths(Query query, String pathString, Model model) {
+		// TODO: This is a bad algorithm - should be operating on syntax tree, not string
+		String str = query.toString().replaceAll(" \\?" + SH.PATHVar.getVarName() + " ", pathString);
+		return ARQFactory.get().createQuery(model, str);
+	}
 
 	
-	static Literal withSubstitutions(Literal template, QuerySolution bindings) {
+	public static Literal withSubstitutions(Literal template, QuerySolution bindings, Function<RDFNode,String> labelFunction) {
 		StringBuffer buffer = new StringBuffer();
 		String labelTemplate = template.getLexicalForm();
 		for(int i = 0; i < labelTemplate.length(); i++) {
@@ -161,7 +171,10 @@ class SPARQLSubstitutions {
 					if(labelTemplate.charAt(varEnd) == '}') {
 						String varName = labelTemplate.substring(i + 2, varEnd);
 						RDFNode varValue = bindings.get(varName);
-						if(varValue instanceof Resource) {
+						if(labelFunction != null) {
+							buffer.append(labelFunction.apply(varValue));
+						}
+						else if(varValue instanceof Resource) {
 							buffer.append(SPINLabels.get().getLabel((Resource)varValue));
 						}
 						else if(varValue instanceof Literal) {
@@ -204,6 +217,14 @@ class SPARQLSubstitutions {
 		for(Resource cls : JenaUtil.getResourceProperties(shape, SH.scopeClass)) {
 			String varName = "?SHAPE_CLASS_VAR";
 			scopes.add("        " + varName + " <" + RDFS.subClassOf + ">* <" + cls + "> .\n            ?this a " + varName + " .\n");
+		}
+
+		int index = 0;
+		for(Resource property : JenaUtil.getResourceProperties(shape, SH.scopeProperty)) {
+			scopes.add("        ?this <" + property + "> ?ANY_VALUE_" + index++ + " .\n");
+		}
+		for(Resource property : JenaUtil.getResourceProperties(shape, SH.scopeInverseProperty)) {
+			scopes.add("        ?ANY_VALUE_" + index++ + "  <" + property + "> ?this .\n");
 		}
 		
 		for(Resource cls : JenaUtil.getResourceProperties(shape, SH.context)) {

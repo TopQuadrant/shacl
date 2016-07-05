@@ -2,12 +2,13 @@ package org.topbraid.shacl.constraints;
 
 import java.net.URI;
 import java.util.Collections;
+import java.util.function.Function;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.topbraid.shacl.model.SHACLParameterizableScope;
+import org.topbraid.shacl.model.SHParameterizableScope;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 
@@ -36,7 +37,7 @@ public class FallbackExecutionLanguage implements ExecutionLanguage {
 	@Override
 	public void executeConstraint(Dataset dataset, Resource shape,
 			URI shapesGraphURI, ConstraintExecutable executable,
-			RDFNode focusNode, Model results) {
+			RDFNode focusNode, Model results, Function<RDFNode,String> labelFunction) {
 		Resource result = results.createResource(DASH.FailureResult);
 		result.addProperty(SH.message, "No suitable validator found for constraint");
 		result.addProperty(SH.sourceConstraint, executable.getConstraint());
@@ -52,14 +53,14 @@ public class FallbackExecutionLanguage implements ExecutionLanguage {
 
 	@Override
 	public Iterable<RDFNode> executeScope(Dataset dataset,
-			Resource executable, SHACLParameterizableScope parameterizableScope) {
+			Resource executable, SHParameterizableScope parameterizableScope) {
 		return Collections.emptyList();
 	}
 
 
 	@Override
 	public boolean isNodeInScope(RDFNode focusNode, Dataset dataset,
-			Resource executable, SHACLParameterizableScope parameterizableScope) {
+			Resource executable, SHParameterizableScope parameterizableScope) {
 		return false;
 	}
 }

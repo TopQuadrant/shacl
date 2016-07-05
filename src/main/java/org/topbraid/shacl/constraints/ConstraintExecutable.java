@@ -1,11 +1,13 @@
 package org.topbraid.shacl.constraints;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Resource;
-import org.topbraid.shacl.model.SHACLConstraint;
-import org.topbraid.shacl.model.SHACLShape;
+import org.topbraid.shacl.model.SHConstraint;
+import org.topbraid.shacl.model.SHFactory;
+import org.topbraid.shacl.model.SHShape;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaUtil;
 
@@ -16,10 +18,10 @@ import org.topbraid.spin.util.JenaUtil;
  */
 public abstract class ConstraintExecutable {
 	
-	private SHACLConstraint constraint;
+	private SHConstraint constraint;
 	
 	
-	public ConstraintExecutable(SHACLConstraint constraint) {
+	public ConstraintExecutable(SHConstraint constraint) {
 		this.constraint = constraint;
 	}
 	
@@ -28,7 +30,13 @@ public abstract class ConstraintExecutable {
 	 * Gets the specified sh:filterShapes, to be used as pre-conditions.
 	 * @return the filter shapes
 	 */
-	public abstract List<SHACLShape> getFilterShapes();
+    public List<SHShape> getFilterShapes() {
+		List<SHShape> results = new LinkedList<SHShape>();
+		for(Resource scope : JenaUtil.getResourceProperties(constraint, SH.filterShape)) {
+			results.add(SHFactory.asShape(scope));
+		}
+		return results;
+	}
 	
 	
 	/**
@@ -38,7 +46,7 @@ public abstract class ConstraintExecutable {
 	public abstract List<Literal> getMessages();
 	
 	
-	public SHACLConstraint getConstraint() {
+	public SHConstraint getConstraint() {
 		return constraint;
 	}
 

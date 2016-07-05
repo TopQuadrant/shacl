@@ -2,14 +2,6 @@ package org.topbraid.shacl.arq.functions;
 
 import java.net.URI;
 
-import org.topbraid.shacl.constraints.AbstractConstraintValidator;
-import org.topbraid.shacl.constraints.FailureLog;
-import org.topbraid.shacl.constraints.ResourceConstraintValidator;
-import org.topbraid.shacl.vocabulary.DASH;
-import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.arq.AbstractFunction4;
-import org.topbraid.spin.util.JenaDatatypes;
-
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
@@ -21,6 +13,13 @@ import org.apache.jena.sparql.expr.ExprEvalException;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.function.FunctionEnv;
 import org.apache.jena.vocabulary.RDF;
+import org.topbraid.shacl.constraints.AbstractConstraintValidator;
+import org.topbraid.shacl.constraints.FailureLog;
+import org.topbraid.shacl.constraints.ResourceConstraintValidator;
+import org.topbraid.shacl.vocabulary.DASH;
+import org.topbraid.shacl.vocabulary.SH;
+import org.topbraid.spin.arq.AbstractFunction4;
+import org.topbraid.spin.util.JenaDatatypes;
 
 /**
  * The native implementation of the sh:hasShape function.
@@ -84,6 +83,6 @@ public class HasShapeFunction extends AbstractFunction4 {
 	protected Model doRun(RDFNode resource, Resource shape, Dataset dataset,
 			Node shapesGraphNode) {
 		return ResourceConstraintValidator.get().validateNodeAgainstShape(
-				dataset, URI.create(shapesGraphNode.getURI()), resource.asNode(), shape.asNode(), SH.Violation, null);
+				dataset, URI.create(shapesGraphNode.getURI()), resource.asNode(), shape.asNode(), SH.Violation, null, null, null);
 	}
 }

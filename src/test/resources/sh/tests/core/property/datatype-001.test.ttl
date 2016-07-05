@@ -14,25 +14,25 @@
   rdf:type owl:Ontology ;
   rdfs:label "Test of datatype-001" ;
   owl:imports <http://datashapes.org/dash> ;
-  owl:versionInfo "Created with TopBraid Composer"^^xsd:string ;
+  owl:versionInfo "Created with TopBraid Composer" ;
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidResource1 ;
-      sh:object 11.1 ;
-      sh:predicate ex:integerProperty ;
+      sh:path ex:dateProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InvalidResource1 ;
+      sh:sourceConstraintComponent sh:DatatypeConstraintComponent ;
+      sh:value "2011-01-01"^^xsd:dateTime ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidResource1 ;
-      sh:object "2011-01-01"^^xsd:dateTime ;
-      sh:predicate ex:dateProperty ;
+      sh:path ex:integerProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InvalidResource1 ;
+      sh:sourceConstraintComponent sh:DatatypeConstraintComponent ;
+      sh:value 11.1 ;
     ] ;
 .
 ex:InvalidResource1
@@ -41,17 +41,18 @@ ex:InvalidResource1
   ex:integerProperty 11.1 ;
 .
 ex:TestShape
-  rdf:type rdfs:Class, sh:Shape ;
-  rdfs:label "Test shape"^^xsd:string ;
+  rdf:type rdfs:Class ;
+  rdf:type sh:Shape ;
+  rdfs:label "Test shape" ;
   sh:property [
-      rdfs:label "date property"^^xsd:string ;
-      sh:datatype xsd:date ;
       sh:predicate ex:dateProperty ;
+      rdfs:label "date property" ;
+      sh:datatype xsd:date ;
     ] ;
   sh:property [
-      rdfs:label "integer property"^^xsd:string ;
-      sh:datatype xsd:integer ;
       sh:predicate ex:integerProperty ;
+      rdfs:label "integer property" ;
+      sh:datatype xsd:integer ;
     ] ;
 .
 ex:ValidResource
@@ -59,5 +60,5 @@ ex:ValidResource
   ex:dateProperty "2014-09-01"^^xsd:date ;
   ex:integerProperty 0 ;
   ex:integerProperty 1234 ;
-  rdfs:label "Valid resource"^^xsd:string ;
+  rdfs:label "Valid resource" ;
 .

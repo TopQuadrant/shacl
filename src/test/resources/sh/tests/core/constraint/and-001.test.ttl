@@ -22,11 +22,13 @@ ex:GraphValidationTestCase
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidRectangle1 ;
       sh:severity sh:Violation ;
+      sh:sourceConstraintComponent sh:AndConstraintComponent ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidRectangle2 ;
       sh:severity sh:Violation ;
+      sh:sourceConstraintComponent sh:AndConstraintComponent ;
     ] ;
 .
 ex:InvalidRectangle1

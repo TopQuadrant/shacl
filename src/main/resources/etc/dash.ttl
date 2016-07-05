@@ -1,4 +1,5 @@
 # baseURI: http://datashapes.org/dash
+# imports: http://topbraid.org/tosh
 # imports: http://www.w3.org/ns/shacl#
 # prefix: dash
 
@@ -15,16 +16,40 @@
 
 DASH is also a SHACL library for frequently needed features and design patterns. All features in this library are 100% standards compliant and will work on any engine that fully supports SHACL.""" ;
   rdfs:label "DASH Data Shapes Library" ;
+  owl:imports <http://topbraid.org/tosh> ;
   owl:imports sh: ;
 .
-dash:Closed
-  rdf:type sh:NodeConstraint ;
-  rdfs:comment "An instance of sh:NodeConstraint that ignores rdf:type triples." ;
-  rdfs:label "Closed" ;
-  sh:closed "true"^^xsd:boolean ;
-  sh:ignoredProperties (
-      rdf:type
-    ) ;
+dash:AllObjects
+  rdf:type dash:AllObjectsScope ;
+  rdfs:comment "A reusable instance of dash:AllObjectsScope." ;
+  rdfs:label "All objects" ;
+.
+dash:AllObjectsScope
+  rdf:type sh:SPARQLScopeType ;
+  rdfs:comment "A scope containing all objects in the data graph as focus nodes." ;
+  rdfs:label "All objects scope" ;
+  rdfs:subClassOf sh:Scope ;
+  sh:labelTemplate "All objects" ;
+  sh:select """SELECT DISTINCT ?this
+WHERE {
+    ?anyS ?anyP ?this .
+}""" ;
+.
+dash:AllSubjects
+  rdf:type dash:AllSubjectsScope ;
+  rdfs:comment "A reusable instance of dash:AllSubjectsScope." ;
+  rdfs:label "All subjects" ;
+.
+dash:AllSubjectsScope
+  rdf:type sh:SPARQLScopeType ;
+  rdfs:comment "A scope containing all subjects in the data graph as focus nodes." ;
+  rdfs:label "All subjects scope" ;
+  rdfs:subClassOf sh:Scope ;
+  sh:labelTemplate "All subjects" ;
+  sh:select """SELECT DISTINCT ?this
+WHERE {
+    ?this ?anyP ?anyO .
+}""" ;
 .
 dash:FailureResult
   rdf:type rdfs:Class ;
@@ -60,6 +85,12 @@ dash:FunctionTestCase
       sh:name "expression" ;
     ] ;
 .
+dash:GraphUpdate
+  rdf:type rdfs:Class ;
+  rdf:type sh:Shape ;
+  rdfs:label "Graph update" ;
+  rdfs:subClassOf dash:Suggestion ;
+.
 dash:GraphValidationTestCase
   rdf:type rdfs:Class ;
   rdf:type sh:Shape ;
@@ -93,16 +124,24 @@ dash:MemberShapeConstraintComponent
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
       sh:message "List member {?member} does not have the shape {$memberShape}" ;
-      sh:sparql """
-		SELECT $this ($this AS ?subject) $predicate ?object ?failure ?member
+      sh:select """
+		SELECT $this ?value ?failure ?member
 		WHERE {
-			$this $predicate ?object .
-			?object rdf:rest*/rdf:first ?member .
+			$this $PATH ?value .
+			?value rdf:rest*/rdf:first ?member .
 			BIND (sh:hasShape(?member, $memberShape, $shapesGraph) AS ?hasShape) .
 			BIND (!bound(?hasShape) AS ?failure) .
 			FILTER (?failure || !?hasShape) .
 		}
 """ ;
+    ] ;
+.
+dash:None
+  rdf:type sh:Shape ;
+  rdfs:comment "A Shape that is violated for every possible focus node. This can be used in sh:filterShape statements to essentially deactivate other shapes or constraints." ;
+  rdfs:label "None" ;
+  sh:constraint [
+      sh:in () ;
     ] ;
 .
 dash:PrimaryKeyConstraintComponent
@@ -119,23 +158,29 @@ dash:PrimaryKeyConstraintComponent
     ] ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
-      sh:sparql """SELECT $this ($this AS ?subject) $predicate (?value AS ?object) ?message
+      sh:select """SELECT $this ?value ?message
 WHERE {
     {
         FILTER NOT EXISTS {
-            ?this $predicate ?any .
+            ?this $PATH ?any .
         } .
         BIND (\"Missing value for primary key property\" AS ?message) .
     }
     UNION
     {
-        FILTER (dash:valueCount(?this, $predicate) > 1) .
+        FILTER EXISTS {
+			?this $PATH ?value1 .
+			?this $PATH ?value2 .
+			FILTER (?value1 != ?value2) .
+		}
         BIND (\"Multiple values of primary key property\" AS ?message) .
     }
     UNION
     {
-        FILTER (dash:valueCount(?this, $predicate) = 1) .
-        ?this $predicate ?value .
+		{
+        	?this $PATH ?value .
+			FILTER NOT EXISTS { ?this $PATH ?value2 . FILTER (?value != ?value2) }
+		}
         BIND (CONCAT($uriStart, ENCODE_FOR_URI(str(?value))) AS ?uri) .
         FILTER (str(?this) != ?uri) .
         BIND (CONCAT(\"Primary key value \", str(?value), \" does not align with the expected URI \", ?uri) AS ?message) .
@@ -158,7 +203,7 @@ dash:QueryTestCase
       sh:name "expected result" ;
     ] ;
   sh:property [
-      sh:predicate sh:sparql ;
+      sh:predicate sh:select ;
       sh:datatype xsd:string ;
       sh:description "The SPARQL SELECT query to execute." ;
       sh:maxCount 1 ;
@@ -166,23 +211,58 @@ dash:QueryTestCase
       sh:name "SPARQL query" ;
     ] ;
 .
+dash:RootClassConstraintComponent
+  rdf:type sh:ConstraintComponent ;
+  rdfs:comment "A constraint component defining the parameter dash:rootClass, which restricts the values to be either the root class itself or one of its subclasses. This is typically used in conjunction with properties that have rdfs:Class as their type." ;
+  rdfs:label "Root class constraint component" ;
+  sh:context sh:NodeConstraint ;
+  sh:context sh:PropertyConstraint ;
+  sh:labelTemplate "Root class {$rootClass}" ;
+  sh:parameter [
+      sh:predicate dash:rootClass ;
+      sh:class rdfs:Class ;
+      sh:description "The root class." ;
+      sh:name "root class" ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+  sh:validator dash:hasRootClass ;
+.
+dash:SPARQLUpdateSuggestionGenerator
+  rdf:type rdfs:Class ;
+  rdfs:comment """A SuggestionGenerator based on a SPARQL UPDATE query (sh:update), producing an instance of dash:GraphUpdate. The INSERTs become dash:addedTriple and the DELETEs become dash:deletedTriple. The WHERE clause operates on the data graph with the pre-bound variables $subject, $predicate and $object, as well as the other pre-bound variables for the parameters of the constraint.
+
+In many cases, there may be multiple possible suggestions to fix a problem. For example, with sh:maxLength there are many ways to slice a string. In those cases, the system will first iterate through the result variables from a SELECT query (sh:select) and apply these results as pre-bound variables into the UPDATE query.""" ;
+  rdfs:label "SPARQL UPDATE suggestion generator" ;
+  rdfs:subClassOf dash:SuggestionGenerator ;
+  rdfs:subClassOf sh:SPARQLSelectExecutable ;
+  rdfs:subClassOf sh:SPARQLUpdateExecutable ;
+.
 dash:SuccessResult
   rdf:type rdfs:Class ;
-  rdf:type sh:Shape ;
   rdfs:comment "A result representing a successfully validated constraint." ;
   rdfs:label "Success result" ;
   rdfs:subClassOf sh:AbstractResult ;
 .
 dash:SuccessTestCaseResult
   rdf:type rdfs:Class ;
-  rdf:type sh:Shape ;
   rdfs:comment "Represents a successful run of a test case." ;
   rdfs:label "Success test case result" ;
   rdfs:subClassOf dash:TestCaseResult ;
 .
+dash:Suggestion
+  rdf:type rdfs:Class ;
+  rdfs:comment "Base class of suggestions that modify a graph to \"fix\" the source of a validation result." ;
+  rdfs:label "Suggestion" ;
+  rdfs:subClassOf rdfs:Resource ;
+.
+dash:SuggestionGenerator
+  rdf:type rdfs:Class ;
+  rdfs:comment "Base class of objects that can generate suggestions (added or deleted triples) for a validation result of a given constraint component." ;
+  rdfs:label "Suggestion generator" ;
+  rdfs:subClassOf rdfs:Resource ;
+.
 dash:TestCase
   rdf:type rdfs:Class ;
-  rdf:type sh:Shape ;
   rdfs:comment "A test case to verify that a (SHACL-based) feature works as expected." ;
   rdfs:label "Test case" ;
   rdfs:subClassOf rdfs:Resource ;
@@ -225,6 +305,13 @@ dash:ValidationTestCase
       sh:name "expected result" ;
     ] ;
 .
+dash:addedTriple
+  rdf:type rdf:Property ;
+  rdfs:comment "May link a dash:GraphUpdate with one or more triples (represented as instances of rdf:Statement) that should be added to fix the source of the result." ;
+  rdfs:domain dash:GraphUpdate ;
+  rdfs:label "added triple" ;
+  rdfs:range rdf:Statement ;
+.
 dash:countShapesWithMatchResult
   rdf:type sh:SPARQLFunction ;
   rdfs:comment "Counts the number of shapes from a given rdf:List (?arg2) defined in a given shapes graph (?arg3) where sh:hasShape returns the provided match value (true or false, ?arg4) for a given focus node (?arg1). The function produces a failure if one of the shapes validated to a failure." ;
@@ -254,7 +341,7 @@ dash:countShapesWithMatchResult
       sh:order 2 ;
     ] ;
   sh:returnType xsd:integer ;
-  sh:sparql """
+  sh:select """
 		# The SUM will fail with an error if one of the operands is not a number
 		# (this mechanism is used to propagate errors from sh:hasShape calls)
 		SELECT (SUM(?s) AS ?result)
@@ -267,191 +354,241 @@ dash:countShapesWithMatchResult
 		}
 		""" ;
 .
+dash:deletedTriple
+  rdf:type rdf:Property ;
+  rdfs:comment "May link a dash:GraphUpdate result with one or more triples (represented as instances of rdf:Statement) that should be deleted to fix the source of the result." ;
+  rdfs:domain dash:GraphUpdate ;
+  rdfs:label "deleted triple" ;
+  rdfs:range rdf:Statement ;
+.
 dash:hasClass
   rdf:type sh:SPARQLAskValidator ;
   rdfs:label "has class" ;
-  sh:message "Value does not have class {$class}" ;
-  sh:sparql """
+  sh:ask """
 		ASK {
-			FILTER EXISTS { $value rdf:type/rdfs:subClassOf* $class }
+			$value rdf:type/rdfs:subClassOf* $class .
 		}
 		""" ;
+  sh:message "Value does not have class {$class}" ;
 .
 dash:hasClassIn
   rdf:type sh:SPARQLAskValidator ;
   rdfs:comment "Checks whether a given node ($value) is an instance of a class from a given list ($classIn). Uses the same logic as sh:hasClass for each list member." ;
   rdfs:label "has class in" ;
-  sh:message "Value does not have one of the classes {$classIn}" ;
-  sh:sparql """
+  sh:ask """
 		ASK {
-			FILTER EXISTS {
-				GRAPH $shapesGraph {
-					$classIn (rdf:rest*)/rdf:first ?class .
-				}
-				FILTER dash:hasClass($value, ?class)
+			GRAPH $shapesGraph {
+				$classIn (rdf:rest*)/rdf:first ?class .
 			}
+			$value rdf:type/rdfs:subClassOf* ?class .
 		}
 		""" ;
+  sh:message "Value does not have one of the classes {$classIn}" ;
 .
 dash:hasDatatype
   rdf:type sh:SPARQLAskValidator ;
   rdfs:comment "Checks whether a given node ($value) is a literal with a given datatype ($datatype)." ;
   rdfs:label "has datatype" ;
-  sh:message "Value does not have datatype {$datatype}" ;
-  sh:sparql """
+  sh:ask """
 		ASK {
-			{
-				FILTER isLiteral($value) .
-			} .
-			BIND (datatype($value) AS ?valueDatatype) .
-			FILTER (?valueDatatype = $datatype) .
+			FILTER (datatype($value) = $datatype) .
 		}
 		""" ;
+  sh:message "Value does not have datatype {$datatype}" ;
 .
 dash:hasDatatypeIn
   rdf:type sh:SPARQLAskValidator ;
   rdfs:comment "Checks whether a given node ($value) is a literal with a datatype from a given list ($datatypeIn). Uses the same logic as sh:hasDatatype for each list member." ;
   rdfs:label "has datatype in" ;
-  sh:message "Value does not have one of the datatypes {$datatypeIn}" ;
-  sh:sparql """
+  sh:ask """
 		ASK {
-			FILTER EXISTS {
-				GRAPH $shapesGraph {
-					$datatypeIn (rdf:rest*)/rdf:first ?datatype .
-				}
-				FILTER dash:hasDatatype($value, ?datatype)
+			GRAPH $shapesGraph {
+				$datatypeIn (rdf:rest*)/rdf:first ?datatype .
 			}
+			FILTER (datatype($value)  = ?datatype) .
 		}
 		""" ;
-.
-dash:hasDirectType
-  rdf:type sh:SPARQLAskValidator ;
-  rdfs:comment "Checks whether a given node (?value) has a given class ($directType) as its rdf:type." ;
-  rdfs:label "has direct type" ;
-  sh:message "Value does not have direct type {$directType}" ;
-  sh:sparql """
-		ASK {
-			$value a $directType .
-		}
-		""" ;
+  sh:message "Value does not have one of the datatypes {$datatypeIn}" ;
 .
 dash:hasMaxExclusive
   rdf:type sh:SPARQLAskValidator ;
   rdfs:comment "Checks whether a given node (?value) has value less than (<) the provided ?maxExclusive. Returns false if this cannot be determined, e.g. because values do not have comparable types." ;
   rdfs:label "has max exclusive" ;
+  sh:ask "ASK { FILTER ($value < $maxExclusive) }" ;
   sh:message "Value is not < {$maxExclusive}" ;
-  sh:sparql "ASK { FILTER ($value < $maxExclusive) }" ;
 .
 dash:hasMaxInclusive
   rdf:type sh:SPARQLAskValidator ;
   rdfs:comment "Checks whether a given node (?value) has value less than or equal to (<=) the provided ?maxInclusive. Returns false if this cannot be determined, e.g. because values do not have comparable types." ;
   rdfs:label "has max inclusive" ;
+  sh:ask "ASK { FILTER ($value <= $maxInclusive) }" ;
   sh:message "Value is not <= {$maxInclusive}" ;
-  sh:sparql "ASK { FILTER ($value <= $maxInclusive) }" ;
 .
 dash:hasMaxLength
   rdf:type sh:SPARQLAskValidator ;
   rdfs:comment "Checks whether a given string (?value) has a length within a given maximum string length." ;
   rdfs:label "has max length" ;
-  sh:message "Value has more than {$maxLength} characters" ;
-  sh:sparql """
+  sh:ask """
 		ASK {
-			BIND (STRLEN(str($value)) AS ?valueLength) .
-			FILTER (bound(?valueLength) && ?valueLength <= $maxLength) .
+			FILTER (STRLEN(str($value)) <= $maxLength) .
 		}
 		""" ;
+  sh:message "Value has more than {$maxLength} characters" ;
 .
 dash:hasMinExclusive
   rdf:type sh:SPARQLAskValidator ;
   rdfs:comment "Checks whether a given node (?value) has value greater than (>) the provided ?minExclusive. Returns false if this cannot be determined, e.g. because values do not have comparable types." ;
   rdfs:label "has min exclusive" ;
+  sh:ask "ASK { FILTER ($value > $minExclusive) }" ;
   sh:message "Value is not > {$minExclusive}" ;
-  sh:sparql "ASK { FILTER ($value > $minExclusive) }" ;
 .
 dash:hasMinInclusive
   rdf:type sh:SPARQLAskValidator ;
   rdfs:comment "Checks whether a given node (?value) has value greater than or equal to (>=) the provided ?minInclusive. Returns false if this cannot be determined, e.g. because values do not have comparable types." ;
   rdfs:label "has min inclusive" ;
+  sh:ask "ASK { FILTER ($value >= $minInclusive) }" ;
   sh:message "Value is not >= {$minInclusive}" ;
-  sh:sparql "ASK { FILTER ($value >= $minInclusive) }" ;
 .
 dash:hasMinLength
   rdf:type sh:SPARQLAskValidator ;
   rdfs:comment "Checks whether a given string (?value) has a length within a given minimum string length." ;
   rdfs:label "has min length" ;
-  sh:message "Value has less than {$minLength} characters" ;
-  sh:sparql """
+  sh:ask """
 		ASK {
-			BIND (STRLEN(str($value)) AS ?valueLength) .
-			FILTER (bound(?valueLength) && ?valueLength >= $minLength) .
+			FILTER (STRLEN(str($value)) >= $minLength) .
 		}
 		""" ;
+  sh:message "Value has less than {$minLength} characters" ;
 .
 dash:hasNodeKind
   rdf:type sh:SPARQLAskValidator ;
   rdfs:comment "Checks whether a given node (?value) has a given sh:NodeKind (?nodeKind). For example, sh:hasNodeKind(42, sh:Literal) = true." ;
   rdfs:label "has node kind" ;
-  sh:message "Value has not node kind {$nodeKind}" ;
-  sh:sparql """
+  sh:ask """
 		ASK {
 			FILTER ((isIRI($value) && $nodeKind IN ( sh:IRI, sh:BlankNodeOrIRI, sh:IRIOrLiteral ) ) ||
 				(isLiteral($value) && $nodeKind IN ( sh:Literal, sh:BlankNodeOrLiteral, sh:IRIOrLiteral ) ) ||
 				(isBlank($value)   && $nodeKind IN ( sh:BlankNode, sh:BlankNodeOrIRI, sh:BlankNodeOrLiteral ) )) .
 		}
 		""" ;
+  sh:message "Value has not node kind {$nodeKind}" ;
 .
 dash:hasPattern
   rdf:type sh:SPARQLAskValidator ;
   rdfs:comment "Checks whether the string representation of a given node (?value) matches a given regular expression (?pattern). Returns false if the value is a blank node." ;
   rdfs:label "has pattern" ;
-  sh:message "Value does not match pattern {$pattern}" ;
-  sh:sparql "ASK { FILTER (!isBlank($value) && IF(bound($flags), regex(str($value), $pattern, $flags), regex(str($value), $pattern))) }" ;
+  sh:ask "ASK { FILTER (!isBlank($value) && IF(bound($flags), regex(str($value), $pattern, $flags), regex(str($value), $pattern))) }" ;
+  sh:message "Value does not match pattern \"{$pattern}\"" ;
+.
+dash:hasRootClass
+  rdf:type sh:SPARQLAskValidator ;
+  rdfs:label "has root class" ;
+  sh:ask """ASK {
+    $value rdfs:subClassOf* $rootClass .
+}""" ;
 .
 dash:hasStem
   rdf:type sh:SPARQLAskValidator ;
   rdfs:comment "Checks whether a given node is an IRI starting with a given stem." ;
   rdfs:label "has stem" ;
+  sh:ask "ASK { FILTER (isIRI($value) && STRSTARTS(str($value), $stem)) }" ;
   sh:message "Value does not have stem {$stem}" ;
-  sh:sparql "ASK { FILTER (isIRI($value) && STRSTARTS(str($value), $stem)) }" ;
 .
-dash:inverseValueCount
+dash:isDeactivated
   rdf:type sh:SPARQLFunction ;
-  rdfs:comment "Computes the number of subjects for a given object/predicate combination." ;
-  rdfs:label "inverse value count" ;
+  rdfs:comment "Checks whether a given shape or constraint has been marked as \"deactivated\". This relies on the coding convention to have sh:filterShape dash:None." ;
+  sh:ask """ASK {
+    ?constraintOrShape sh:filterShape dash:None .
+}""" ;
   sh:parameter [
-      sh:predicate dash:object ;
-      sh:class rdfs:Resource ;
-      sh:description "The object to get the number of subjects of." ;
-      sh:name "object" ;
-      sh:order 0 ;
+      sh:predicate dash:constraintOrShape ;
+      sh:description "The sh:Constraint or sh:Shape to test." ;
+      sh:name "constraint or shape" ;
     ] ;
-  sh:parameter [
-      sh:predicate dash:predicate ;
-      sh:class rdfs:Resource ;
-      sh:description "The predicate to get the number of subjects of." ;
-      sh:name "predicate" ;
-      sh:order 1 ;
-    ] ;
-  sh:returnType xsd:integer ;
-  sh:sparql """
-		SELECT (COUNT(?subject) AS ?result)
-		WHERE {
-    		?subject $predicate $object .
-		}
-""" ;
+  sh:returnType xsd:boolean ;
 .
 dash:isIn
   rdf:type sh:SPARQLAskValidator ;
-  sh:message "Value is not in {$in}" ;
-  sh:sparql """
+  sh:ask """
 		ASK {
-			FILTER EXISTS {
-				GRAPH $shapesGraph {
-					$in (rdf:rest*)/rdf:first $value .
-				}
+			GRAPH $shapesGraph {
+				$in (rdf:rest*)/rdf:first $value .
 			}
 		}
 		""" ;
+  sh:message "Value is not in {$in}" ;
+.
+dash:isNodeKindBlankNode
+  rdf:type sh:SPARQLFunction ;
+  dash:cachable "true"^^xsd:boolean ;
+  rdfs:comment "Checks if a given sh:NodeKind is one that includes BlankNodes." ;
+  rdfs:label "is NodeKind BlankNode" ;
+  sh:ask """ASK {
+	FILTER ($nodeKind IN ( sh:BlankNode, sh:BlankNodeOrIRI, sh:BlankNodeOrLiteral ))
+}""" ;
+  sh:parameter [
+      sh:predicate dash:nodeKind ;
+      sh:class sh:NodeKind ;
+      sh:description "The sh:NodeKind to check." ;
+      sh:name "node kind" ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+  sh:returnType xsd:boolean ;
+.
+dash:isNodeKindIRI
+  rdf:type sh:SPARQLFunction ;
+  dash:cachable "true"^^xsd:boolean ;
+  rdfs:comment "Checks if a given sh:NodeKind is one that includes IRIs." ;
+  rdfs:label "is NodeKind IRI" ;
+  sh:ask """ASK {
+	FILTER ($nodeKind IN ( sh:IRI, sh:BlankNodeOrIRI, sh:IRIOrLiteral ))
+}""" ;
+  sh:parameter [
+      sh:predicate dash:nodeKind ;
+      sh:class sh:NodeKind ;
+      sh:description "The sh:NodeKind to check." ;
+      sh:name "node kind" ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+  sh:returnType xsd:boolean ;
+.
+dash:isNodeKindLiteral
+  rdf:type sh:SPARQLFunction ;
+  dash:cachable "true"^^xsd:boolean ;
+  rdfs:comment "Checks if a given sh:NodeKind is one that includes Literals." ;
+  rdfs:label "is NodeKind Literal" ;
+  sh:ask """ASK {
+	FILTER ($nodeKind IN ( sh:Literal, sh:BlankNodeOrLiteral, sh:IRIOrLiteral ))
+}""" ;
+  sh:parameter [
+      sh:predicate dash:nodeKind ;
+      sh:class sh:NodeKind ;
+      sh:description "The sh:NodeKind to check." ;
+      sh:name "node kind" ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+  sh:returnType xsd:boolean ;
+.
+dash:propertySuggestionGenerator
+  rdf:type rdf:Property ;
+  rdfs:comment "Links the constraint component with instances of dash:SuggestionGenerator that may be used to produce suggestions for a given validation result that was produced by a property constraint." ;
+  rdfs:domain sh:ConstraintComponent ;
+  rdfs:label "property suggestion generator" ;
+  rdfs:range dash:SuggestionGenerator ;
+.
+dash:suggestion
+  rdf:type rdf:Property ;
+  rdfs:comment "Can be used to link a validation result with one or more suggestions on how to fix the underlying issue." ;
+  rdfs:domain sh:ValidationResult ;
+  rdfs:label "suggestion" ;
+  rdfs:range dash:Suggestion ;
+.
+dash:suggestionGenerator
+  rdf:type rdf:Property ;
+  rdfs:comment "Links a sh:SPARQLConstraint with instances of dash:SuggestionGenerator that may be used to produce suggestions for a given validation result that was produced by the constraint." ;
+  rdfs:domain sh:SPARQLConstraint ;
+  rdfs:label "suggestion generator" ;
+  rdfs:range dash:SuggestionGenerator ;
 .
 dash:valueCount
   rdf:type sh:SPARQLFunction ;
@@ -472,7 +609,7 @@ dash:valueCount
       sh:order 0 ;
     ] ;
   sh:returnType xsd:integer ;
-  sh:sparql """
+  sh:select """
 		SELECT (COUNT(?object) AS ?result)
 		WHERE {
     		$subject $predicate ?object .
@@ -504,7 +641,7 @@ dash:valuesWithShapeCount
       sh:description "The shapes graph." ;
     ] ;
   sh:returnType xsd:integer ;
-  sh:sparql """
+  sh:select """
 		# The SUM will fail with an error if one of the operands is not a number
 		# (this mechanism is used to propagate errors from sh:hasShape calls)
 		SELECT (SUM(?s) AS ?result)
@@ -526,28 +663,10 @@ owl:Class
   rdf:type rdfs:Class ;
   rdfs:subClassOf rdfs:Class ;
 .
-sh:AllObjectsScope
-  rdf:type sh:SPARQLExecutable ;
-  sh:sparql """
-		SELECT DISTINCT ?this
-		WHERE {
-			?anySubject $anyPredicate ?this .
-		}
-		""" ;
-.
-sh:AllSubjectsScope
-  rdf:type sh:SPARQLExecutable ;
-  sh:sparql """
-		SELECT DISTINCT ?this
-		WHERE {
-			?this $anyPredicate ?anyObject .
-		}
-		""" ;
-.
 sh:AndConstraintComponent
   sh:nodeValidator [
       rdf:type sh:SPARQLSelectValidator ;
-      sh:sparql """
+      sh:select """
 		SELECT $this ?failure
 		WHERE {
 			BIND (dash:countShapesWithMatchResult($this, $and, $shapesGraph, false) AS ?count)
@@ -556,28 +675,36 @@ sh:AndConstraintComponent
 		}
 """ ;
     ] ;
+  sh:propertyValidator [
+      rdf:type sh:SPARQLSelectValidator ;
+      sh:select """
+		SELECT $this ?value ?failure
+		WHERE {
+			$this $PATH ?value .
+			BIND (dash:countShapesWithMatchResult(?value, $and, $shapesGraph, false) AS ?count)
+			BIND (!bound(?count) AS ?failure) .
+			FILTER IF(?failure, true, ?count > 0) .
+		}
+""" ;
+    ] ;
 .
 sh:ClassConstraintComponent
-  sh:inversePropertyValidator dash:hasClass ;
-  sh:nodeValidator dash:hasClass ;
-  sh:propertyValidator dash:hasClass ;
+  sh:validator dash:hasClass ;
 .
 sh:ClassInConstraintComponent
-  sh:inversePropertyValidator dash:hasClassIn ;
-  sh:nodeValidator dash:hasClassIn ;
-  sh:propertyValidator dash:hasClassIn ;
+  sh:validator dash:hasClassIn ;
 .
 sh:ClosedConstraintComponent
   sh:nodeValidator [
       rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Predicate {?predicate} is not allowed (closed shape)" ;
-      sh:sparql """
-		SELECT $this ($this AS ?subject) ?predicate ?object
+      sh:message "Predicate {?path} is not allowed (closed shape)" ;
+      sh:select """
+		SELECT $this (?predicate AS ?path) ?value
 		WHERE {
 			{
 				FILTER ($closed) .
 			}
-			$this ?predicate ?object .
+			$this ?predicate ?value .
 			FILTER (NOT EXISTS {
 				GRAPH $shapesGraph {
 					$currentShape sh:property/sh:predicate ?predicate .
@@ -592,27 +719,20 @@ sh:ClosedConstraintComponent
     ] ;
 .
 sh:DatatypeConstraintComponent
-  sh:nodeValidator dash:hasDatatype ;
-  sh:propertyValidator dash:hasDatatype ;
+  sh:validator dash:hasDatatype ;
 .
 sh:DatatypeInConstraintComponent
-  sh:nodeValidator dash:hasDatatypeIn ;
-  sh:propertyValidator dash:hasDatatypeIn ;
-.
-sh:DirectTypeConstraintComponent
-  sh:inversePropertyValidator dash:hasDirectType ;
-  sh:nodeValidator dash:hasDirectType ;
-  sh:propertyValidator dash:hasDirectType ;
+  sh:validator dash:hasDatatypeIn ;
 .
 sh:DisjointConstraintComponent
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
       sh:message "Property must not share any values with {$disjoint}" ;
-      sh:sparql """
-		SELECT $this ($this AS ?subject) $predicate ?object
+      sh:select """
+		SELECT $this ?value
 		WHERE {
-			$this $predicate ?object .
-			$this $disjoint ?object .
+			$this $PATH ?value .
+			$this $disjoint ?value .
 		}
 		""" ;
     ] ;
@@ -620,21 +740,21 @@ sh:DisjointConstraintComponent
 sh:EqualsConstraintComponent
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Property must have same values as {$equals}" ;
-      sh:sparql """
-		SELECT $this ($this AS ?subject) $predicate ?object
+      sh:message "Must have same values as {$equals}" ;
+      sh:select """
+		SELECT $this ?value
 		WHERE {
 			{
-				$this $predicate ?object .
-				FILTER NOT EXISTS {
-					$this $equals ?object .
+				$this $PATH ?value .
+				MINUS {
+					$this $equals ?value .
 				}
 			}
 			UNION
 			{
-				$this $equals ?object .
-				FILTER NOT EXISTS {
-					$this $predicate ?object .
+				$this $equals ?value .
+				MINUS {
+					$this $PATH ?value .
 				}
 			}
 		}
@@ -651,51 +771,30 @@ sh:Function
     ] ;
 .
 sh:HasValueConstraintComponent
-  sh:inversePropertyValidator [
-      rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Property does not have inverse value {$hasValue}" ;
-      sh:sparql """
-		SELECT $this ($this AS ?object) $predicate
-		WHERE {
-			FILTER NOT EXISTS { $hasValue $predicate $this }
-		}
-		""" ;
-    ] ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Property does not have value {$hasValue}" ;
-      sh:sparql """
-		SELECT $this ($this AS ?subject) $predicate
+      sh:message "Missing expected value {$hasValue}" ;
+      sh:select """
+		SELECT $this
 		WHERE {
-			FILTER NOT EXISTS { $this $predicate $hasValue }
+			FILTER NOT EXISTS { $this $PATH $hasValue }
 		}
 		""" ;
     ] ;
 .
 sh:InConstraintComponent
-  sh:inversePropertyValidator dash:isIn ;
-  sh:nodeValidator dash:isIn ;
-  sh:propertyValidator dash:isIn ;
-.
-sh:InversePropertyScope
-  rdf:type sh:SPARQLExecutable ;
-  sh:sparql """
-		SELECT DISTINCT ?this
-		WHERE {
-			?any $predicate ?this .
-		}
-		""" ;
+  sh:validator dash:isIn ;
 .
 sh:LessThanConstraintComponent
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Property value is not < value of {$lessThan}" ;
-      sh:sparql """
-		SELECT $this ($this AS ?subject) $predicate ?object
+      sh:message "Value is not < value of {$lessThan}" ;
+      sh:select """
+		SELECT $this ?value
 		WHERE {
-			$this $predicate ?object .
-			$this $lessThan ?object2 .
-			FILTER (!(?object < ?object2)) .
+			$this $PATH ?value .
+			$this $lessThan ?otherValue .
+			FILTER (!(?value < ?otherValue)) .
 		}
 		""" ;
     ] ;
@@ -703,104 +802,89 @@ sh:LessThanConstraintComponent
 sh:LessThanOrEqualsConstraintComponent
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Property value is not <= value of {$lessThanOrEquals}" ;
-      sh:sparql """
-		SELECT $this ($this AS ?subject) $predicate ?object
+      sh:message "Value is not <= value of {$lessThanOrEquals}" ;
+      sh:select """
+		SELECT $this ?value
 		WHERE {
-			$this $predicate ?object .
-			$this $lessThanOrEquals ?object2 .
-			FILTER (!(?object <= ?object2)) .
+			$this $PATH ?value .
+			$this $lessThanOrEquals ?otherValue .
+			FILTER (!(?value <= ?otherValue)) .
 		}
 		""" ;
     ] ;
 .
 sh:MaxCountConstraintComponent
-  sh:inversePropertyValidator [
-      rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Inverse property has more than {$maxCount} values ({?count})" ;
-      sh:sparql """
-		SELECT $this ($this AS ?object) $predicate ?count
-		WHERE {
-			BIND (dash:inverseValueCount($this, $predicate) AS ?count) .
-			FILTER (?count > $maxCount) .
-		}
-		""" ;
-    ] ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Property has more than {$maxCount} values ({?count})" ;
-      sh:sparql """
-		SELECT $this ($this AS ?subject) $predicate ?count
+      sh:message "More than {$maxCount} values" ;
+      sh:select """
+		SELECT $this
 		WHERE {
-			BIND (dash:valueCount($this, $predicate) AS ?count) .
-			FILTER (?count > $maxCount) .
+			$this $PATH ?value .
 		}
+		GROUP BY $this
+		HAVING (COUNT(?value) > $maxCount)
 		""" ;
     ] ;
 .
 sh:MaxExclusiveConstraintComponent
-  sh:nodeValidator dash:hasMaxExclusive ;
-  sh:propertyValidator dash:hasMaxExclusive ;
+  sh:validator dash:hasMaxExclusive ;
 .
 sh:MaxInclusiveConstraintComponent
-  sh:nodeValidator dash:hasMaxInclusive ;
-  sh:propertyValidator dash:hasMaxInclusive ;
+  sh:validator dash:hasMaxInclusive ;
 .
 sh:MaxLengthConstraintComponent
-  sh:inversePropertyValidator dash:hasMaxLength ;
-  sh:nodeValidator dash:hasMaxLength ;
-  sh:propertyValidator dash:hasMaxLength ;
+  sh:validator dash:hasMaxLength ;
 .
 sh:MinCountConstraintComponent
-  sh:inversePropertyValidator [
-      rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Inverse property has less than {$minCount} values ({?count})" ;
-      sh:sparql """
-		SELECT $this ($this AS ?object) $predicate ?count
-		WHERE {
-			BIND (dash:inverseValueCount($this, $predicate) AS ?count) .
-			FILTER (?count < $minCount) .
-		}
-		""" ;
-    ] ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Property has less than {$minCount} values ({?count})" ;
-      sh:sparql """
-		SELECT $this ($this AS ?subject) $predicate ?count
+      sh:message "Less than {$minCount} values" ;
+      sh:select """
+		SELECT $this
 		WHERE {
-			BIND (dash:valueCount($this, $predicate) AS ?count) .
-			FILTER (?count < $minCount) .
-		}
+			OPTIONAL {
+				$this $PATH ?value .
+			}
+		} 
+		GROUP BY $this
+		HAVING (COUNT(?value) < $minCount)
 		""" ;
     ] ;
 .
 sh:MinExclusiveConstraintComponent
-  sh:nodeValidator dash:hasMinExclusive ;
-  sh:propertyValidator dash:hasMinExclusive ;
+  sh:validator dash:hasMinExclusive ;
 .
 sh:MinInclusiveConstraintComponent
-  sh:nodeValidator dash:hasMinInclusive ;
-  sh:propertyValidator dash:hasMinInclusive ;
+  sh:validator dash:hasMinInclusive ;
 .
 sh:MinLengthConstraintComponent
-  sh:inversePropertyValidator dash:hasMinLength ;
-  sh:nodeValidator dash:hasMinLength ;
-  sh:propertyValidator dash:hasMinLength ;
+  sh:validator dash:hasMinLength ;
 .
 sh:NodeKindConstraintComponent
-  sh:inversePropertyValidator dash:hasNodeKind ;
-  sh:nodeValidator dash:hasNodeKind ;
-  sh:propertyValidator dash:hasNodeKind ;
+  sh:validator dash:hasNodeKind ;
 .
 sh:NotConstraintComponent
   sh:nodeValidator [
       rdf:type sh:SPARQLSelectValidator ;
       sh:message "Value does have shape {$not}" ;
-      sh:sparql """
-		SELECT $this ?failure
+      sh:select """
+		SELECT $this ($this AS ?value) ?failure
 		WHERE {
 			BIND (sh:hasShape($this, $not, $shapesGraph) AS ?hasShape) .
+			BIND (!bound(?hasShape) AS ?failure) .
+			FILTER (?failure || ?hasShape) .
+		}
+		""" ;
+    ] ;
+  sh:propertyValidator [
+      rdf:type sh:SPARQLSelectValidator ;
+      sh:message "Value does have shape {$not}" ;
+      sh:select """
+		SELECT $this ?value ?failure
+		WHERE {
+			$this $PATH ?value .
+			BIND (sh:hasShape(?value, $not, $shapesGraph) AS ?hasShape) .
 			BIND (!bound(?hasShape) AS ?failure) .
 			FILTER (?failure || ?hasShape) .
 		}
@@ -810,7 +894,7 @@ sh:NotConstraintComponent
 sh:OrConstraintComponent
   sh:nodeValidator [
       rdf:type sh:SPARQLSelectValidator ;
-      sh:sparql """
+      sh:select """
 		SELECT $this ?failure
 		WHERE {
 			BIND (dash:countShapesWithMatchResult($this, $or, $shapesGraph, true) AS ?count)
@@ -819,98 +903,111 @@ sh:OrConstraintComponent
 		}
 """ ;
     ] ;
-.
-sh:PatternConstraintComponent
-  sh:inversePropertyValidator dash:hasPattern ;
-  sh:nodeValidator dash:hasPattern ;
-  sh:propertyValidator dash:hasPattern ;
-.
-sh:PropertyScope
-  rdf:type sh:SPARQLExecutable ;
-  sh:sparql """
-		SELECT DISTINCT ?this
-		WHERE {
-			?this $predicate ?any .
+  sh:propertyValidator [
+      rdf:type sh:SPARQLSelectValidator ;
+      sh:select """
+		SELECT $this ?value ?failure
+		WHERE { 
+			$this $PATH ?value .
+			BIND (dash:countShapesWithMatchResult(?value, $or, $shapesGraph, true) AS ?count)
+			BIND (!bound(?count) AS ?failure) .
+			FILTER IF(?failure, true, ?count = 0) .
 		}
 """ ;
+    ] ;
+.
+sh:PatternConstraintComponent
+  sh:validator dash:hasPattern ;
 .
 sh:QualifiedMaxCountConstraintComponent
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
-      sh:sparql """
-		SELECT $this ($this AS ?subject) $predicate ?count ?failure
-		WHERE {
-			BIND (dash:valuesWithShapeCount($this, $predicate, $qualifiedValueShape, $shapesGraph) AS ?count) .
-			BIND (!bound(?count) AS ?failure) .
-			FILTER IF(?failure, true, ?count > $qualifiedMaxCount) .
+      sh:message "More than {$qualifiedMaxCount} values have shape {$qualifiedValueShape}" ;
+      sh:select """
+	SELECT $this (SUM(?failed)>0 AS ?failure)
+	WHERE {
+		{
+			$this $PATH ?value .
+			BIND  (sh:hasShape(?value, $qualifiedValueShape, $shapesGraph) AS ?hasShape) .
+			FILTER (!bound(?hasShape) || ?hasShape) .
 		}
+		BIND (IF(!bound(?hasShape),1, 0) AS ?failed) .
+	} 
+	GROUP BY $this
+	HAVING ( ( COUNT ( ?value ) > $qualifiedMaxCount ) || ( SUM(?failed) > 0 )) 
 """ ;
     ] ;
 .
 sh:QualifiedMinCountConstraintComponent
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
-      sh:sparql """
-		SELECT $this ($this AS ?subject) $predicate ?count ?failure
-		WHERE {
-			BIND (dash:valuesWithShapeCount($this, $predicate, $qualifiedValueShape, $shapesGraph) AS ?count) .
-			BIND (!bound(?count) AS ?failure) .
-			FILTER IF(?failure, true, ?count < $qualifiedMinCount) .
+      sh:message "Less than {$qualifiedMinCount} values have shape {$qualifiedValueShape}" ;
+      sh:select """
+	SELECT $this (SUM(?failed)>0 AS ?failure)
+	WHERE {
+		{
+			$this $PATH ?value .
+			BIND  (sh:hasShape(?value, $qualifiedValueShape, $shapesGraph) AS ?hasShape) .
+			FILTER (!bound(?hasShape) || ?hasShape) .
 		}
+		BIND (IF(!bound(?hasShape),1, 0) AS ?failed) .
+	} 
+	GROUP BY $this
+	HAVING ( ( COUNT ( ?value ) < $qualifiedMinCount ) || ( SUM(?failed) > 0 )) 
 """ ;
     ] ;
 .
+sh:ShapeConstraintComponent
+  sh:nodeValidator [
+      rdf:type sh:SPARQLSelectValidator ;
+      sh:message "Value does not have shape {$shape}" ;
+      sh:select """
+		SELECT ($value AS $this) $value ?failure
+		WHERE {
+			BIND (sh:hasShape($value, $shape, $shapesGraph) AS ?hasShape) .
+			BIND (!bound(?hasShape) AS ?failure) .
+			FILTER (?failure || !?hasShape) .
+		}
+		""" ;
+    ] ;
+  sh:propertyValidator [
+      rdf:type sh:SPARQLSelectValidator ;
+      sh:message "Value does not have shape {$shape}" ;
+      sh:select """
+		SELECT $this ?value ?failure
+		WHERE {
+			$this $PATH ?value .
+			BIND (sh:hasShape(?value, $shape, $shapesGraph) AS ?hasShape) .
+			BIND (!bound(?hasShape) AS ?failure) .
+			FILTER (?failure || !?hasShape) .
+		}
+		""" ;
+    ] ;
+.
 sh:StemConstraintComponent
-  sh:inversePropertyValidator dash:hasStem ;
-  sh:nodeValidator dash:hasStem ;
-  sh:propertyValidator dash:hasStem ;
+  sh:validator dash:hasStem ;
 .
 sh:UniqueLangConstraintComponent
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Language {?lang} used more than once" ;
-      sh:sparql """
-		SELECT DISTINCT $this ($this AS ?subject) $predicate ?lang
+      sh:message "Language \"{?lang}\" used more than once" ;
+      sh:select """
+		SELECT DISTINCT $this ?lang
 		WHERE {
 			{
 				FILTER ($uniqueLang) .
 			}
-			$this $predicate ?value .
+			$this $PATH ?value .
 			BIND (lang(?value) AS ?lang) .
 			FILTER (bound(?lang) && ?lang != \"\") . 
 			FILTER EXISTS {
-				$this $predicate ?otherValue .
+				$this $PATH ?otherValue .
 				FILTER (?otherValue != ?value && ?lang = lang(?otherValue)) .
 			}
 		}
 		""" ;
     ] ;
 .
-sh:ValueShapeConstraintComponent
-  sh:inversePropertyValidator [
-      rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Value does not have shape {$valueShape}" ;
-      sh:sparql """
-		SELECT $this ($this AS ?object) $predicate ?subject ?failure
-		WHERE {
-			?subject $predicate $this .
-			BIND (sh:hasShape(?subject, $valueShape, $shapesGraph) AS ?hasShape) .
-			BIND (!bound(?hasShape) AS ?failure) .
-			FILTER (?failure || !?hasShape) .
-		}
-		""" ;
-    ] ;
-  sh:propertyValidator [
-      rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Value does not have shape {$valueShape}" ;
-      sh:sparql """
-		SELECT $this ($this AS ?subject) $predicate ?object ?failure
-		WHERE {
-			$this $predicate ?object .
-			BIND (sh:hasShape(?object, $valueShape, $shapesGraph) AS ?hasShape) .
-			BIND (!bound(?hasShape) AS ?failure) .
-			FILTER (?failure || !?hasShape) .
-		}
-		""" ;
-    ] ;
+sh:order
+  rdfs:range xsd:decimal ;
 .

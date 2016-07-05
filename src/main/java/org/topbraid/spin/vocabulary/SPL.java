@@ -42,6 +42,8 @@ public class SPL {
 	public final static Resource primaryKeyURIStart = ResourceFactory.createResource(NS + "primaryKeyURIStart");
     
 	public final static Resource PrimaryKeyPropertyConstraint = ResourceFactory.createResource(NS + "PrimaryKeyPropertyConstraint");
+    
+	public final static Resource PropertyConstraintTemplates = ResourceFactory.createResource(NS + "PropertyConstraintTemplates");
 	
 	public final static Resource RunTestCases = ResourceFactory.createResource(NS + "RunTestCases");
     

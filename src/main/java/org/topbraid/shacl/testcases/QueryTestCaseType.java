@@ -59,7 +59,7 @@ public class QueryTestCaseType implements TestCaseType {
 		@Override
 		public void run(Model results) throws Exception {
 			Resource testCase = getResource();
-			String queryString = JenaUtil.getStringProperty(testCase, SH.sparql);
+			String queryString = JenaUtil.getStringProperty(testCase, SH.select);
 			Model model = testCase.getModel();
 			String actual = createResultSetJSON(queryString, model);
 			JsonObject actualJSON = JSON.parse(actual);

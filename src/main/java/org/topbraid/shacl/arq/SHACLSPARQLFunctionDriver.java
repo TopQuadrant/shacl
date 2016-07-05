@@ -1,6 +1,6 @@
 package org.topbraid.shacl.arq;
 
-import org.topbraid.shacl.model.SHACLFunction;
+import org.topbraid.shacl.model.SHFunction;
 import org.topbraid.spin.arq.SPINFunctionDriver;
 import org.topbraid.spin.arq.SPINFunctionFactory;
 
@@ -19,6 +19,6 @@ public class SHACLSPARQLFunctionDriver implements SPINFunctionDriver {
 
 	@Override
 	public SPINFunctionFactory create(Resource shaclFunction) {
-		return new SHACLARQFunction(shaclFunction.as(SHACLFunction.class));
+		return new SHACLARQFunction(shaclFunction.as(SHFunction.class));
 	}
 }

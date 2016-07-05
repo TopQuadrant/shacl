@@ -25,7 +25,7 @@ ex:APGARObservationShape
       sh:qualifiedValueShape [
           sh:property [
               sh:predicate ex:related_target ;
-              sh:valueShape [
+              sh:shape [
                   sh:property [
                       sh:predicate ex:reference ;
                       sh:hasValue ex:something ;
@@ -40,10 +40,10 @@ ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
-      sh:predicate ex:related ;
       sh:focusNode ex:Observation1 ;
+      sh:path ex:related ;
       sh:severity sh:Violation ;
-      sh:subject ex:Observation1 ;
+      sh:sourceConstraintComponent sh:QualifiedMinCountConstraintComponent ;
     ] ;
 .
 ex:Observation1

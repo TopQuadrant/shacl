@@ -1,5 +1,5 @@
 # W3C Shapes Constraint Language (SHACL) Vocabulary
-# Draft last edited 2016-04-20
+# Draft last edited 2016-07-05
 
 @prefix owl:     <http://www.w3.org/2002/07/owl#> .
 @prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -41,12 +41,11 @@ sh:Shape
 sh:constraint
 	a rdf:Property ;
 	rdfs:comment """
-		This property links a Shape to its (general) constraints.
-		The other properties <code>sh:property</code> and <code>sh:inverseProperty</code> point at more specialized constraint types.
+		This property links a Shape to its node constraints.
 		"""^^rdf:HTML ;
 	rdfs:label "constraint" ;
 	rdfs:domain sh:Shape ;
-	rdfs:range sh:Constraint ;
+	rdfs:range sh:NodeConstraint ;
 	rdfs:isDefinedBy sh: ;
 	sh:defaultValueType sh:NodeConstraint ;
 .
@@ -61,18 +60,6 @@ sh:filterShape
 	rdfs:range sh:Shape ;
 	rdfs:isDefinedBy sh: ;
 	sh:defaultValueType sh:Shape ;
-.
-
-sh:inverseProperty
-	a rdf:Property ;
-	rdfs:comment """
-		This property links a shape to one of its inverse property constraints.
-		"""^^rdf:HTML ;
-	rdfs:label "inverse property" ;
-	rdfs:domain sh:Shape ;
-	rdfs:range sh:InversePropertyConstraint ;
-	rdfs:isDefinedBy sh: ;
-	sh:defaultValueType sh:InversePropertyConstraint ;
 .
 
 sh:property
@@ -121,6 +108,22 @@ sh:scopeNode
 		The shape must be satisfied by resources linked this way.
 		"""^^rdf:HTML ;
 	rdfs:domain sh:Shape ;
+	rdfs:isDefinedBy sh: ;
+.
+
+sh:scopeInverseProperty
+	a rdf:Property ;
+	rdfs:label "scope inverse property" ;
+	rdfs:domain sh:Shape ;
+	rdfs:range rdf:Property ;
+	rdfs:isDefinedBy sh: ;
+.
+
+sh:scopeProperty
+	a rdf:Property ;
+	rdfs:label "scope property" ;
+	rdfs:domain sh:Shape ;
+	rdfs:range rdf:Property ;
 	rdfs:isDefinedBy sh: ;
 .
 
@@ -298,12 +301,10 @@ sh:subject
 sh:predicate
 	a rdf:Property ;
 	rdfs:comment """
-		This property is used to specify a predicate in constraints, scopes and validation results.
-		In constraints, this property defines the predicate for property and inverse property constraints.
-		In validation results, this property defines a predicate associated with the validation result.
+		This property is used to specify the predicate of property constraints.
 		"""^^rdf:HTML ;
 	rdfs:label "predicate" ;
-	# rdfs:domain: sh:AbstractResult or sh:PredicateBasedConstraint or sh:Scope
+	rdfs:domain sh:PropertyConstraint ;
 	rdfs:range rdf:Property ;
 	rdfs:isDefinedBy sh: ;
 .
@@ -364,6 +365,17 @@ sh:sourceConstraintComponent
 	rdfs:isDefinedBy sh: ;
 .
 
+sh:value
+	a rdf:Property ;
+	rdfs:domain sh:AbstractResult ;
+	rdfs:label "value" ;
+	rdfs:comment """
+		This property is a validation result attribute.
+		It links a validation result with an RDF node that is represents the value of the result.
+		"""^^rdf:HTML ;
+	rdfs:isDefinedBy sh: ;
+.
+
 
 # SPARQL execution support ----------------------------------------------------
 
@@ -371,19 +383,70 @@ sh:SPARQLExecutable
 	a rdfs:Class ;
 	rdfs:label "SPARQL executable" ;
 	rdfs:comment """
-		Class of resources that encapsulate a SPARQL query, using <code>sh:sparql</code>.
+		Class of resources that encapsulate a SPARQL query.
 		This class may also be used to declare other properties required by SPARQL engines.
 		"""^^rdf:HTML ;
 	rdfs:subClassOf rdfs:Resource ;
 	rdfs:isDefinedBy sh: ;
 .
 
-sh:sparql
+sh:SPARQLAskExecutable
+	a rdfs:Class ;
+	rdfs:subClassOf sh:SPARQLExecutable ;
+	rdfs:label "SPARQL ASK executable" ;
+.
+
+sh:ask
 	a rdf:Property ;
 	rdfs:range xsd:string ;
-	rdfs:domain sh:SPARQLExecutable ;
-	rdfs:label "SPARQL" ;
-	rdfs:comment "The SPARQL query to execute." ;
+	rdfs:domain sh:SPARQLAskExecutable ;
+	rdfs:label "ask" ;
+	rdfs:comment "The SPARQL ASK query to execute." ;
+	rdfs:isDefinedBy sh: ;
+.
+
+sh:SPARQLConstructExecutable
+	a rdfs:Class ;
+	rdfs:subClassOf sh:SPARQLExecutable ;
+	rdfs:label "SPARQL CONSTRUCT executable" ;
+.
+
+sh:construct
+	a rdf:Property ;
+	rdfs:range xsd:string ;
+	rdfs:domain sh:SPARQLConstructExecutable ;
+	rdfs:label "construct" ;
+	rdfs:comment "The SPARQL CONSTRUCT query to execute." ;
+	rdfs:isDefinedBy sh: ;
+.
+
+sh:SPARQLSelectExecutable
+	a rdfs:Class ;
+	rdfs:subClassOf sh:SPARQLExecutable ;
+	rdfs:label "SPARQL SELECT executable" ;
+.
+
+sh:select
+	a rdf:Property ;
+	rdfs:range xsd:string ;
+	rdfs:domain sh:SPARQLSelectExecutable ;
+	rdfs:label "select" ;
+	rdfs:comment "The SPARQL SELECT query to execute." ;
+	rdfs:isDefinedBy sh: ;
+.
+
+sh:SPARQLUpdateExecutable
+	a rdfs:Class ;
+	rdfs:subClassOf sh:SPARQLExecutable ;
+	rdfs:label "SPARQL UPDATE executable" ;
+.
+
+sh:update
+	a rdf:Property ;
+	rdfs:range xsd:string ;
+	rdfs:domain sh:SPARQLUpdateExecutable ;
+	rdfs:label "update" ;
+	rdfs:comment "The SPARQL UPDATE to execute." ;
 	rdfs:isDefinedBy sh: ;
 .
 
@@ -405,10 +468,10 @@ sh:Scope
 sh:SPARQLScope
 	a rdfs:Class ;
 	rdfs:subClassOf sh:Scope ;
-	rdfs:subClassOf sh:SPARQLExecutable ;
+	rdfs:subClassOf sh:SPARQLSelectExecutable ;
 	rdfs:label "SPARQL scope" ;
 	rdfs:comment """
-		A scope that has a SPARQL body attached to it.
+		A scope that has a SPARQL SELECT query attached to it.
 		"""^^rdf:HTML ;
 	rdfs:isDefinedBy sh: ;
 .
@@ -420,7 +483,7 @@ sh:ScopeType
 	rdfs:label "Scope type" ;
 	rdfs:comment """
 		The (meta) class for parameterizable scopes.
-		Instances of this, including <code>sh:PropertyScope</code>, are instantiated as values of <code>sh:scope</code>.
+		Instances of this are instantiated as values of <code>sh:scope</code>.
 		"""^^rdf:HTML ;
 	rdfs:isDefinedBy sh: ;
 	vs:term_status "unstable" ;
@@ -429,67 +492,11 @@ sh:ScopeType
 sh:SPARQLScopeType
 	a rdfs:Class ;
 	rdfs:subClassOf sh:ScopeType ;
-	rdfs:subClassOf sh:SPARQLExecutable ;
+	rdfs:subClassOf sh:SPARQLSelectExecutable ;
 	rdfs:label "SPARQL scope type" ;
 	rdfs:comment """
 		The (meta) class for parameterizable scopes that are backed by a SPARQL SELECT query.
 		"""^^rdf:HTML ;
-.
-
-sh:AllObjectsScope
-	a sh:ScopeType ;
-	rdfs:subClassOf sh:Scope ;
-	rdfs:label "All objects scope" ;
-	rdfs:comment """
-		The type of scopes that include all object nodes in the data graph.
-		"""^^rdf:HTML ;
-	rdfs:isDefinedBy sh: ;
-.
-
-sh:AllSubjectsScope
-	a sh:ScopeType ;
-	rdfs:subClassOf sh:Scope ;
-	rdfs:label "All subjects scope" ;
-	rdfs:comment """
-		The type of scopes that include all subject nodes in the data graph.
-		"""^^rdf:HTML ;
-	rdfs:isDefinedBy sh: ;
-.
-
-sh:InversePropertyScope
-	a sh:ScopeType ;
-	rdfs:subClassOf sh:Scope ;
-	rdfs:label "Inverse property scope" ;
-	rdfs:comment """
-		The type of scopes that include all values of a specified inverse property.
-		"""^^rdf:HTML ;
-	rdfs:isDefinedBy sh: ;
-	sh:parameter [
-		sh:predicate sh:predicate ;
-		sh:maxCount 1 ;
-		sh:minCount 1 ;
-		sh:name "predicate" ;
-		sh:nodeKind sh:IRI ;
-		sh:description "The property to look for." ;
-	] ;
-.
-
-sh:PropertyScope
-	a sh:ScopeType ;
-	rdfs:subClassOf sh:Scope ;
-	rdfs:label "Property scope" ;
-	rdfs:comment """
-		The type of scopes that include all values of a specified property.
-		"""^^rdf:HTML ;
-	rdfs:isDefinedBy sh: ;
-	sh:parameter [
-		sh:predicate sh:predicate ;
-		sh:maxCount 1 ;
-		sh:minCount 1 ;
-		sh:name "predicate" ;
-		sh:nodeKind sh:IRI ;
-		sh:description "The property to look for." ;
-	] ;
 .
 
 
@@ -515,20 +522,9 @@ sh:NodeConstraint
 	rdfs:isDefinedBy sh: ;
 .
 
-sh:PredicateBasedConstraint
-	a rdfs:Class ;
-	rdfs:subClassOf sh:Constraint ;
-	rdfs:label "Predicate-based constraint" ;
-	rdfs:comment """
-		The shared base class of <code>sh:PropertyConstraint</code> and <code>sh:InversePropertyConstraint</code>,
-		allowing shared properties to be defined for both cases."""^^rdf:HTML ;
-	rdfs:isDefinedBy sh: ;
-	vs:term_status "unstable" ;
-.
-
 sh:PropertyConstraint
 	a rdfs:Class ;
-	rdfs:subClassOf sh:PredicateBasedConstraint ;
+	rdfs:subClassOf sh:Constraint ;
 	rdfs:label "Property constraint" ;
 	rdfs:comment """
 		The class of constraints that are about a given subject/predicate combination.
@@ -536,14 +532,74 @@ sh:PropertyConstraint
 	rdfs:isDefinedBy sh: ;
 .
 
-sh:InversePropertyConstraint
-	a rdfs:Class ;
-	rdfs:subClassOf sh:PredicateBasedConstraint ;
-	rdfs:label "Inverse property constraint" ;
+
+# Path vocabulary -------------------------------------------------------------
+
+sh:path
+	a rdf:Property ;
 	rdfs:comment """
-		The class of constraints that are about a given object/predicate combination.
+		This property is used to specify a path in constraints.
+		The values are either:
+		<ul>
+			<li>nodes that are rdf:Lists (for sequence paths)</li>
+			<li>nodes with exactly one value for either sh:inversePath, sh:alternativePath, sh:zeroOrMorePath, sh:oneOrMorePath or sh:zeroOrOnePath</li>
+			<li>IRIs (for a single predicate path)</li>
+		</ul>
 		"""^^rdf:HTML ;
+	rdfs:label "path" ;
+	rdfs:domain sh:PathConstraint ;
+	rdfs:range rdfs:Resource ;
 	rdfs:isDefinedBy sh: ;
+.
+
+sh:inversePath
+	a rdf:Property ;
+	rdfs:label "inverse path" ;
+	rdfs:comment """
+		Represents a SPARQL 1.1 InversePath.
+		The (single) value of this property represents an inverse path (object to subject).
+		"""^^rdf:HTML ;
+	rdfs:range rdfs:Resource ;
+.
+
+sh:alternativePath
+	a rdf:Property ;
+	rdfs:label "alternative path" ;
+	rdfs:comment """
+		Represents a SPARQL 1.1 AlternativePath.
+		The (single) value of this property must be an rdf:List of path elements.
+		"""^^rdf:HTML ;
+	rdfs:range rdfs:List ;
+.
+
+sh:zeroOrMorePath
+	a rdf:Property ;
+	rdfs:label "zero or more path" ;
+	rdfs:comment """
+		Represents a SPARQL 1.1 ZeroOrMorePath.
+		The (single) value of this property represents a path that is matched zero or more times.
+		"""^^rdf:HTML ;
+	rdfs:range rdfs:Resource ;
+.
+
+sh:oneOrMorePath
+	a rdf:Property ;
+	rdfs:label "one or more path" ;
+	rdfs:comment """
+		Represents a SPARQL 1.1 OneOrMorePath.
+		The (single) value of this property represents a path that is matched one or more times.
+		"""^^rdf:HTML ;
+	rdfs:range rdfs:Resource ;
+.
+
+sh:zeroOrOnePath
+	a rdf:Property ;
+	rdfs:label "zero or one path" ;
+	rdfs:comment """
+		Represents a SPARQL 1.1 ZeroOrOnePath.
+		The (single) value of this property represents a path that is matched zero or one times.
+		"""^^rdf:HTML ;
+	rdfs:range rdfs:Resource ;
 .
 
 
@@ -615,12 +671,7 @@ sh:ConstraintComponent
 		for example <code>sh:pattern</code> and <code>sh:flags</code>.
 		These properties can be linked to the constraint component via <code>sh:parameter</code>.
 		Constraint components can also have links to validators (e.g. in SPARQL) that can be discovered by implementations,
-		using the following properties:
-		<ul>
-			<li><code>sh:propertyValidator</code> points at the validator if used in the context of <code>sh:property</code></li>
-			<li><code>sh:inversePropertyValidator</code> points at the validator if used in the context of <code>sh:inverseProperty</code></li>
-			<li><code>sh:nodeValidator</code> points at the validator if used in the context of <code>sh:constraint</code></li>
-		</ul>.
+		using the properties <code>sh:validator</code>, <code>sh:nodeValidator</code> and <code>sh:propertyValidator</code>.
 		"""^^rdf:HTML ;
 .
 
@@ -629,27 +680,17 @@ sh:context
 	rdfs:label "context" ;
 	rdfs:comment """
 		The context under which a constraint component applies.
-		Values must be either <code>sh:NodeConstraint</code>, <code>sh:PropertyConstraint</code> or <code>sh:InversePropertyConstraint</code>.
+		Values must be either <code>sh:NodeConstraint</code> or <code>sh:PropertyConstraint</code>.
 		"""^^rdf:HTML ;
 	rdfs:domain sh:ConstraintComponent ;
 	rdfs:range rdfs:Class ;
 .
 
-sh:propertyValidator
+sh:validator
 	a rdf:Property ;
-	rdfs:label "property validator" ;
+	rdfs:label "validator" ;
 	rdfs:comment """
-		The validator used to evaluate property constraints.
-		"""^^rdf:HTML ;
-	rdfs:domain sh:ConstraintComponent ;
-	rdfs:range sh:Validator ;
-.
-
-sh:inversePropertyValidator
-	a rdf:Property ;
-	rdfs:label "inverse property validator" ;
-	rdfs:comment """
-		The validator used to evaluate inverse property constraints.
+		The validator(s) used to evaluate either node or property constraints.
 		"""^^rdf:HTML ;
 	rdfs:domain sh:ConstraintComponent ;
 	rdfs:range sh:Validator ;
@@ -659,7 +700,17 @@ sh:nodeValidator
 	a rdf:Property ;
 	rdfs:label "node validator" ;
 	rdfs:comment """
-		The validator used to evaluate node constraints.
+		The validator(s) used to evaluate node constraints.
+		"""^^rdf:HTML ;
+	rdfs:domain sh:ConstraintComponent ;
+	rdfs:range sh:Validator ;
+.
+
+sh:propertyValidator
+	a rdf:Property ;
+	rdfs:label "property validator" ;
+	rdfs:comment """
+		The validator(s) used to evaluate property constraints.
 		"""^^rdf:HTML ;
 	rdfs:domain sh:ConstraintComponent ;
 	rdfs:range sh:Validator ;
@@ -678,10 +729,10 @@ sh:Validator
 sh:SPARQLAskValidator
 	a rdfs:Class ;
 	rdfs:subClassOf sh:Validator ;
-	rdfs:subClassOf sh:SPARQLExecutable ;
+	rdfs:subClassOf sh:SPARQLAskExecutable ;
 	rdfs:label "SPARQL ASK validator" ;
 	rdfs:comment """
-		A sh:Validator based on a SPARQL ASK query, represented using <code>sh:sparql</code>.
+		A sh:Validator based on a SPARQL ASK query, represented using <code>sh:ask</code>.
 		The query is evaluated for each value node and is supposed to return <code>true</code> if
 		the given node is valid.
 		"""^^rdf:HTML ;
@@ -690,24 +741,31 @@ sh:SPARQLAskValidator
 sh:SPARQLSelectValidator
 	a rdfs:Class ;
 	rdfs:subClassOf sh:Validator ;
-	rdfs:subClassOf sh:SPARQLExecutable ;
+	rdfs:subClassOf sh:SPARQLSelectExecutable ;
 	rdfs:label "SPARQL SELECT validator" ;
 	rdfs:comment """
-		A sh:Validator based on a SPARQL SELECT query, represented using <code>sh:sparql</code>.
+		A sh:Validator based on a SPARQL SELECT query, represented using <code>sh:select</code>.
 		"""^^rdf:HTML ;
 .
 
 sh:SPARQLConstraint
 	a rdfs:Class ;
 	rdfs:subClassOf sh:Constraint ;
-	rdfs:subClassOf sh:SPARQLExecutable ;
+	rdfs:subClassOf sh:SPARQLSelectExecutable ;
 	rdfs:label "SPARQL constraint" ;
 	rdfs:comment """
-		A constraint based on a SPARQL query, via <code>sh:sparql</code>.
-		Instances of this class are directly associated with a shape using <code>sh:constraint</code>.
+		A constraint based on a SPARQL query, via <code>sh:select</code>.
+		Instances of this class are directly associated with a shape using <code>sh:sparql</code>.
 		"""^^rdf:HTML ;
 .
 
+sh:sparql
+	a rdf:Property ;
+	rdfs:label "SPARQL constraint" ;
+	rdfs:domain sh:Shape ;
+	rdfs:range sh:SPARQLConstraint ;
+	sh:defaultValueType sh:SPARQLConstraint ;
+.
 
 # Library of Core Constraint Components and their properties ------------------
 
@@ -716,11 +774,10 @@ sh:AndConstraintComponent
 	rdfs:label "And constraint component" ;
 	rdfs:comment """
 		This constraint component can be used to describe the intersection of multiple shapes.
-		This constraint component can be applied to node constraints only.
 		The parameter <code>sh:and</code> points at a list of <code>sh:Shape</code> instances.
 		Valid nodes must validate successfully against all shapes in the list.
 		"""^^rdf:HTML ;
-	sh:context sh:NodeConstraint ;
+	sh:context sh:NodeConstraint, sh:PropertyConstraint ;
 	sh:parameter [
 		sh:predicate sh:and ;
 	] ;
@@ -739,18 +796,7 @@ sh:and
 sh:ClassConstraintComponent 
 	a sh:ConstraintComponent ;
 	rdfs:label "Class constraint component" ;
-	rdfs:comment """
-		This constraint component can be used to specify a class that valid nodes must be instances of.
-		This constraint component can be applied to:
-		<ul>
-			<li><em>node constraints</em> to apply to all nodes in scope</li>
-			<li><em>property constraints</em> to apply to all values of the given property</li>
-			<li><em>inverse property constraints</em> to apply to all inverse property values</li>
-		</ul>
-		The parameter <code>sh:class</code> points at the class.
-		Valid nodes must have an <code>rdf:type</code> triple to that class or a subclass thereof.
-		"""^^rdf:HTML ;
-	sh:context sh:NodeConstraint, sh:PropertyConstraint, sh:InversePropertyConstraint ;
+	sh:context sh:NodeConstraint, sh:PropertyConstraint ;
 	sh:parameter [
 		sh:predicate sh:class ;
 	] ;
@@ -758,13 +804,6 @@ sh:ClassConstraintComponent
 
 sh:class
 	a rdf:Property ;
-	rdfs:comment """
-		This property is a constraint parameter.
-		It specifies an RDF class.
-		The constraint is violated if some context node does not have the specified type.
-		Here a resource is deemed to be an instance of a class if its <code>rdf:type</code> is that class
-		or a subclass of that class via <code>rdfs:subClassOf</code>.
-		"""^^rdf:HTML ;
 	rdfs:label "class" ;
 	rdfs:range rdfs:Class ;
 	rdfs:isDefinedBy sh: ;
@@ -772,7 +811,7 @@ sh:class
 
 sh:ClassInConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:context sh:NodeConstraint, sh:PropertyConstraint, sh:InversePropertyConstraint ;
+	sh:context sh:NodeConstraint, sh:PropertyConstraint ;
 	sh:parameter [
 		sh:predicate sh:classIn ;
 	] ;
@@ -851,28 +890,6 @@ sh:datatypeIn
 	rdfs:isDefinedBy sh: ;
 .
 
-sh:DirectTypeConstraintComponent
-	a sh:ConstraintComponent ;
-	sh:context sh:NodeConstraint, sh:PropertyConstraint, sh:InversePropertyConstraint ;
-	sh:parameter [
-		sh:predicate sh:directType ;
-	] ;
-.
-
-sh:directType
-	a rdf:Property ;
-	rdfs:comment """
-		This property is a constraint parameter.
-		It specifies an RDF class.
-		The constraint is violated if some context node does not have the specified type.
-		A resource is deemed to have a direct type when there is an explicit <code>rdf:type</code> triple
-		linking the resource to the type.
-		"""^^rdf:HTML ;
-	rdfs:label "directType" ;
-	rdfs:range rdfs:Class ;
-	rdfs:isDefinedBy sh: ;
-.
-
 sh:DisjointConstraintComponent
 	a sh:ConstraintComponent ;
 	sh:context sh:PropertyConstraint ;
@@ -905,7 +922,7 @@ sh:equals
 
 sh:HasValueConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:context sh:PropertyConstraint, sh:InversePropertyConstraint ;
+	sh:context sh:PropertyConstraint ;
 	sh:parameter [
 		sh:predicate sh:hasValue ;
 	] ;
@@ -924,7 +941,7 @@ sh:hasValue
 
 sh:InConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:context sh:NodeConstraint, sh:PropertyConstraint, sh:InversePropertyConstraint ;
+	sh:context sh:NodeConstraint, sh:PropertyConstraint ;
 	sh:parameter [
 		sh:predicate sh:in ;
 	] ;
@@ -974,7 +991,7 @@ sh:lessThanOrEquals
 
 sh:MaxCountConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:context sh:PropertyConstraint, sh:InversePropertyConstraint ;
+	sh:context sh:PropertyConstraint ;
 	sh:parameter [
 		sh:predicate sh:maxCount ;
 		sh:datatype xsd:integer ;
@@ -998,6 +1015,7 @@ sh:MaxExclusiveConstraintComponent
 	sh:context sh:NodeConstraint, sh:PropertyConstraint ;
 	sh:parameter [
 		sh:predicate sh:maxExclusive ;
+		sh:nodeKind sh:Literal ;
 	] ;
 .
 
@@ -1009,7 +1027,6 @@ sh:maxExclusive
 		The constraint is violated if the value of any context node is greater than or equal to the <code>maxExclusive</code> value.
 		"""^^rdf:HTML ;
 	rdfs:label "max exclusive" ;
-	rdfs:range xsd:integer ;
 	rdfs:isDefinedBy sh: ;
 .
 
@@ -1018,6 +1035,7 @@ sh:MaxInclusiveConstraintComponent
 	sh:context sh:NodeConstraint, sh:PropertyConstraint ;
 	sh:parameter [
 		sh:predicate sh:maxInclusive ;
+		sh:nodeKind sh:Literal ;
 	] ;
 .
 
@@ -1033,9 +1051,10 @@ sh:maxInclusive
 
 sh:MaxLengthConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:context sh:NodeConstraint, sh:PropertyConstraint, sh:InversePropertyConstraint ;
+	sh:context sh:NodeConstraint, sh:PropertyConstraint ;
 	sh:parameter [
 		sh:predicate sh:maxLength ;
+		sh:datatype xsd:integer ;
 	] ;
 .
 
@@ -1054,7 +1073,7 @@ sh:maxLength
 
 sh:MinCountConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:context sh:PropertyConstraint, sh:InversePropertyConstraint ;
+	sh:context sh:PropertyConstraint ;
 	sh:parameter [
 		sh:predicate sh:minCount ;
 		sh:datatype xsd:integer ;
@@ -1078,6 +1097,7 @@ sh:MinExclusiveConstraintComponent
 	sh:context sh:NodeConstraint, sh:PropertyConstraint ;
 	sh:parameter [
 		sh:predicate sh:minExclusive ;
+		sh:nodeKind sh:Literal ;
 	] ;
 .
 
@@ -1096,6 +1116,7 @@ sh:MinInclusiveConstraintComponent
 	sh:context sh:NodeConstraint, sh:PropertyConstraint ;
 	sh:parameter [
 		sh:predicate sh:minInclusive ;
+		sh:nodeKind sh:Literal ;
 	] ;
 .
 
@@ -1111,9 +1132,10 @@ sh:minInclusive
 
 sh:MinLengthConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:context sh:NodeConstraint, sh:PropertyConstraint, sh:InversePropertyConstraint ;
+	sh:context sh:NodeConstraint, sh:PropertyConstraint ;
 	sh:parameter [
 		sh:predicate sh:minLength ;
+		sh:datatype xsd:integer ;
 	] ;
 .
 
@@ -1132,9 +1154,11 @@ sh:minLength
 
 sh:NodeKindConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:context sh:NodeConstraint, sh:PropertyConstraint, sh:InversePropertyConstraint ;
+	sh:context sh:NodeConstraint, sh:PropertyConstraint ;
 	sh:parameter [
 		sh:predicate sh:nodeKind ;
+		sh:class sh:NodeKind ;
+		sh:in ( sh:BlankNode sh:IRI sh:Literal sh:BlankNodeOrIRI sh:BlankNodeOrLiteral sh:IRIOrLiteral ) ;
 	] ;
 .
 
@@ -1152,7 +1176,7 @@ sh:nodeKind
 
 sh:NotConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:context sh:NodeConstraint ;
+	sh:context sh:NodeConstraint, sh:PropertyConstraint ;
 	sh:parameter [
 		sh:predicate sh:not ;
 	] ;
@@ -1168,7 +1192,7 @@ sh:not
 
 sh:OrConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:context sh:NodeConstraint ;
+	sh:context sh:NodeConstraint, sh:PropertyConstraint ;
 	sh:parameter [
 		sh:predicate sh:or ;
 	] ;
@@ -1183,13 +1207,15 @@ sh:or
 
 sh:PatternConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:context sh:NodeConstraint, sh:PropertyConstraint, sh:InversePropertyConstraint ;
+	sh:context sh:NodeConstraint, sh:PropertyConstraint ;
 	sh:parameter [
 		sh:predicate sh:pattern ;
+		sh:datatype xsd:string ;
 		sh:order 0 ;
 	] ;
 	sh:parameter [
 		sh:predicate sh:flags ;
+		sh:datatype xsd:string ;
 		sh:optional true ;
 		sh:order 1 ;
 	] ;
@@ -1218,13 +1244,13 @@ sh:pattern
 		The constraint is violated if some context node does not match the regular expression.
 		"""^^rdf:HTML ;
 	rdfs:label "pattern" ;
-	rdfs:range rdfs:Class ;
+	rdfs:range xsd:string ;
 	rdfs:isDefinedBy sh: ;
 .
 
 sh:StemConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:context sh:NodeConstraint, sh:PropertyConstraint, sh:InversePropertyConstraint ;
+	sh:context sh:NodeConstraint, sh:PropertyConstraint ;
 	sh:parameter [
 		sh:predicate sh:stem ;
 		sh:datatype xsd:string ;
@@ -1244,10 +1270,10 @@ sh:stem
 
 sh:QualifiedMaxCountConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:context sh:PropertyConstraint, sh:InversePropertyConstraint ;
+	sh:context sh:PropertyConstraint ;
 	sh:parameter [
 		sh:predicate sh:qualifiedMaxCount ;
-		sh:optional true ;
+		sh:datatype xsd:integer ;
 	] ;
 	sh:parameter [
 		sh:predicate sh:qualifiedValueShape ;
@@ -1256,10 +1282,10 @@ sh:QualifiedMaxCountConstraintComponent
 
 sh:QualifiedMinCountConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:context sh:PropertyConstraint, sh:InversePropertyConstraint ;
+	sh:context sh:PropertyConstraint ;
 	sh:parameter [
 		sh:predicate sh:qualifiedMinCount ;
-		sh:optional true ;
+		sh:datatype xsd:integer ;
 	] ;
 	sh:parameter [
 		sh:predicate sh:qualifiedValueShape ;
@@ -1311,11 +1337,28 @@ sh:qualifiedValueShape
 	sh:defaultValueType sh:Shape ;
 .
 
+sh:ShapeConstraintComponent
+	a sh:ConstraintComponent ;
+	sh:context sh:PropertyConstraint ;
+	sh:parameter [
+		sh:predicate sh:shape ;
+	] ;
+.
+
+sh:shape
+	a rdf:Property ;
+	rdfs:label "shape" ;
+	rdfs:range sh:Shape ;
+	rdfs:isDefinedBy sh: ;
+	sh:defaultValueType sh:Shape ;
+.
+
 sh:UniqueLangConstraintComponent
 	a sh:ConstraintComponent ;
 	sh:context sh:PropertyConstraint ;
 	sh:parameter [
 		sh:predicate sh:uniqueLang ;
+		sh:datatype xsd:boolean ;
 	] ;
 .
 
@@ -1325,32 +1368,11 @@ sh:uniqueLang
 		This property is a constraint parameter.
 		It specifies a boolean value.
 		The constraint is violated if the boolean value is <code>true</code>
-		and two or more context nodes have language tags.
+		and two or more value nodes have the same language tags.
 		"""^^rdf:HTML ;
 	rdfs:label "unique lang" ;
 	rdfs:range xsd:boolean ;
 	rdfs:isDefinedBy sh: ;
-.
-
-sh:ValueShapeConstraintComponent
-	a sh:ConstraintComponent ;
-	sh:context sh:PropertyConstraint, sh:InversePropertyConstraint ;
-	sh:parameter [
-		sh:predicate sh:valueShape ;
-	] ;
-.
-
-sh:valueShape
-	a rdf:Property ;
-	rdfs:comment """
-		This property is a constraint parameter.
-		It specifies a shape.
-		The constraint is violated if some context node does not have the specified shape.
-		"""^^rdf:HTML ;
-	rdfs:label "value shape" ;
-	rdfs:range sh:Shape ;
-	rdfs:isDefinedBy sh: ;
-	sh:defaultValueType sh:Shape ;
 .
 
 
@@ -1358,7 +1380,7 @@ sh:valueShape
 
 sh:DerivedValuesConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:context sh:PropertyConstraint, sh:InversePropertyConstraint ;
+	sh:context sh:PropertyConstraint ;
 	sh:parameter [
 		sh:predicate sh:derivedValues ;
 		sh:class sh:ValuesDeriver ;
@@ -1393,18 +1415,19 @@ sh:ValuesDeriver
 sh:SPARQLValuesDeriver
 	a rdfs:Class ;
 	rdfs:subClassOf sh:ValuesDeriver ;
-	rdfs:subClassOf sh:SPARQLExecutable ;
+	rdfs:subClassOf sh:SPARQLSelectExecutable ;
 	rdfs:label "SPARQL values deriver" ;
-	rdfs:comment """
-		The class of objects that can be used to derive values based on a SPARQL query.
-		The values of <code>sh:sparql</code> must be a SELECT query or a fragment that would be a valid
-		WHERE clause, producing bindings for the variable <code>?value</code> based on values of the
-		pre-bound variable <code>$this</code>.
-		"""^^rdf:HTML ;
 .
 
 
 # Non-validating constraint properties ----------------------------------------
+
+sh:defaultValue
+	a rdf:Property ;
+	rdfs:label "default value" ;
+	rdfs:domain sh:PredicateBasedConstraint ;
+	rdfs:isDefinedBy sh: ;
+.
 
 sh:description
 	a rdf:Property ;
@@ -1471,8 +1494,9 @@ sh:returnType
 sh:SPARQLFunction
 	a rdfs:Class ;
 	rdfs:subClassOf sh:Function ;
-	rdfs:subClassOf sh:SPARQLExecutable ;
-	rdfs:comment "A Function backed by a SPARQL query." ;
+	rdfs:subClassOf sh:SPARQLAskExecutable ;
+	rdfs:subClassOf sh:SPARQLSelectExecutable ;
+	rdfs:comment "A Function backed by a SPARQL query - either ASK or SELECT." ;
 .
 
 sh:hasShape
@@ -1558,14 +1582,14 @@ sh:defaultValueType
 .
 
 sh:DefaultValueTypeRule
-	a sh:SPARQLExecutable ;
+	a sh:SPARQLConstructExecutable ;
 	rdfs:label "default value type inference rule" ;
 	rdfs:comment """
 		A resource encapsulating a query that can be used to construct rdf:type triples for certain untyped nodes
 		that are an object in a triple where the predicate has a sh:defaultValueType.
 		This can be used as a pre-processor for shape graphs before they are validated.
 		"""^^rdf:HTML ;
-	sh:sparql """
+	sh:construct """
 		CONSTRUCT {
 			?node a ?defaultValueType .
 		}

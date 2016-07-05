@@ -14,16 +14,16 @@
   rdf:type owl:Ontology ;
   rdfs:label "Test of anon-shape-001" ;
   owl:imports <http://datashapes.org/dash> ;
-  owl:versionInfo "Created with TopBraid Composer"^^xsd:string ;
+  owl:versionInfo "Created with TopBraid Composer" ;
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidNode1 ;
-      sh:predicate ex:property ;
+      sh:path ex:property ;
       sh:severity sh:Violation ;
-      sh:subject ex:InvalidNode1 ;
+      sh:sourceConstraintComponent sh:MinCountConstraintComponent ;
     ] ;
 .
 ex:InvalidNode1
@@ -31,7 +31,7 @@ ex:InvalidNode1
 .
 ex:Person
   rdf:type rdfs:Class ;
-  rdfs:label "Person"^^xsd:string ;
+  rdfs:label "Person" ;
 .
 ex:ValidNode1
   rdf:type ex:Person ;
@@ -39,13 +39,13 @@ ex:ValidNode1
 .
 [
   rdf:type sh:Shape ;
-  rdfs:label "Anon shape"^^xsd:string ;
+  rdfs:label "Anon shape" ;
   sh:property [
+      sh:predicate ex:property ;
       sh:datatype xsd:integer ;
       sh:maxCount 1 ;
       sh:minCount 1 ;
-      sh:name "property"^^xsd:string ;
-      sh:predicate ex:property ;
+      sh:name "property" ;
     ] ;
   sh:scopeClass ex:Person ;
 ].

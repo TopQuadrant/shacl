@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.jena.enhanced.EnhGraph;
@@ -40,6 +41,14 @@ import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.binding.BindingHashMap;
+import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.expr.ExprTransform;
+import org.apache.jena.sparql.expr.ExprTransformer;
+import org.apache.jena.sparql.graph.NodeTransform;
+import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransform;
+import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformSubst;
+import org.apache.jena.sparql.syntax.syntaxtransform.ExprTransformNodeElement;
+import org.apache.jena.sparql.syntax.syntaxtransform.QueryTransformOps;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
@@ -1117,5 +1126,42 @@ public class JenaUtil {
 
 	public static Node invokeFunction3(Resource function, Node argument1, Node argument2, Node argument3, Dataset dataset) {
 		return invokeFunction3(function, toRDFNode(argument1), toRDFNode(argument2), toRDFNode(argument3), dataset);
+	}
+
+
+	/**
+	 * Temp patch for a bug in Jena's syntaxtransform, also applying substitutions on
+	 * HAVING clauses.
+	 * @param query  the Query to transform
+	 * @param substitutions  the variable bindings
+	 * @return a new Query with the bindings applied
+	 */
+	public static Query queryWithSubstitutions(Query query, final Map<Var, Node> substitutions) {
+		Query result = QueryTransformOps.transform(query, substitutions);
+		
+		// TODO: Replace this hack once there is a Jena patch
+		if(result.hasHaving()) {
+			NodeTransform nodeTransform = new NodeTransform() {
+			    @Override
+			    public Node apply(Node node) {
+			        Node n = substitutions.get(node) ;
+			        if ( n == null ) {
+			            return node ;
+			        }
+			        return n ;
+			    }
+			};
+	        ElementTransform eltrans = new ElementTransformSubst(substitutions) ;
+	        ExprTransform exprTrans = new ExprTransformNodeElement(nodeTransform, eltrans) ;
+			List<Expr> havingExprs = result.getHavingExprs();
+			for(int i = 0; i < havingExprs.size(); i++) {
+				Expr old = havingExprs.get(i);
+	            Expr neo = ExprTransformer.transform(exprTrans, old) ;
+	            if ( neo != old ) {
+	            	havingExprs.set(i, neo);
+	            }
+			}
+		}
+		return result;
 	}
 }

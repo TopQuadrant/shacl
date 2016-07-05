@@ -14,30 +14,30 @@
   rdf:type owl:Ontology ;
   rdfs:label "Test of scopeNode-001" ;
   owl:imports <http://datashapes.org/dash> ;
-  owl:versionInfo "Created with TopBraid Composer"^^xsd:string ;
+  owl:versionInfo "Created with TopBraid Composer" ;
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidResource1 ;
-      sh:predicate rdfs:label ;
+      sh:path rdfs:label ;
       sh:severity sh:Violation ;
-      sh:subject ex:InvalidResource1 ;
+      sh:sourceConstraintComponent sh:MaxCountConstraintComponent ;
     ] ;
 .
 ex:InvalidResource1
   rdf:type rdfs:Resource ;
-  rdfs:label "Invalid resource 1"^^xsd:string ;
+  rdfs:label "Invalid resource 1" ;
 .
 ex:TestShape
   rdf:type sh:Shape ;
-  rdfs:label "Test shape"^^xsd:string ;
+  rdfs:label "Test shape" ;
   sh:property [
-      rdfs:label "label"^^xsd:string ;
+      sh:predicate rdfs:label ;
+      rdfs:label "label" ;
       sh:datatype xsd:string ;
       sh:maxCount 0 ;
-      sh:predicate rdfs:label ;
     ] ;
   sh:scopeNode ex:InvalidResource1 ;
   sh:scopeNode ex:ValidResource1 ;

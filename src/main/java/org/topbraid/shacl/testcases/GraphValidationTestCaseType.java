@@ -14,11 +14,15 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
+import org.topbraid.shacl.arq.SHACLPaths;
 import org.topbraid.shacl.constraints.ModelConstraintValidator;
+import org.topbraid.shacl.constraints.SHACLSuggestionGenerator;
+import org.topbraid.shacl.constraints.SHACLSuggestionGeneratorFactory;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.ARQFactory;
+import org.topbraid.spin.util.JenaDatatypes;
 import org.topbraid.spin.util.JenaUtil;
 
 public class GraphValidationTestCaseType implements TestCaseType {
@@ -26,9 +30,29 @@ public class GraphValidationTestCaseType implements TestCaseType {
 	public final static List<Property> IGNORED_PROPERTIES = Arrays.asList(new Property[] {
 		SH.message, 
 		SH.sourceConstraint, 
-		SH.sourceShape, 
-		SH.sourceConstraintComponent
+		SH.sourceShape
 	});
+	
+	
+	public static void addStatements(Model model, Statement s) {
+		if(!IGNORED_PROPERTIES.contains(s.getPredicate())) {
+			model.add(s);
+		}
+		if(s.getObject().isAnon()) {
+			for(Statement t : s.getModel().listStatements(s.getResource(), null, (RDFNode)null).toList()) {
+				addStatements(model, t);
+			}
+		}
+	}
+
+	
+	public static void addSuggestions(Model dataModel, Model shapesModel, Model actualResults) {
+		SHACLSuggestionGenerator generator = SHACLSuggestionGeneratorFactory.get().createSuggestionGenerator(dataModel, shapesModel);
+		if(generator == null) {
+			throw new UnsupportedOperationException("Cannot run test due to no suggestion generator installed");
+		}
+		generator.addSuggestions(actualResults, Integer.MAX_VALUE, null);
+	}
 
 
 	@Override
@@ -50,12 +74,16 @@ public class GraphValidationTestCaseType implements TestCaseType {
 		@Override
 		public void run(Model results) throws Exception {
 			
-			Model model = SHACLUtil.withDefaultValueTypeInferences(getResource().getModel());
+			Model dataModel = SHACLUtil.withDefaultValueTypeInferences(getResource().getModel());
 
-			Dataset dataset = ARQFactory.get().getDataset(model);
+			Dataset dataset = ARQFactory.get().getDataset(dataModel);
 			URI shapesGraphURI = SHACLUtil.withShapesGraph(dataset);
 
-			Model actualResults = ModelConstraintValidator.get().validateModel(dataset, shapesGraphURI, null, true, null);
+			Model actualResults = ModelConstraintValidator.get().validateModel(dataset, shapesGraphURI, null, true, null, null);
+			if(getResource().hasProperty(DASH.includeSuggestions, JenaDatatypes.TRUE)) {
+				Model shapesModel = dataset.getNamedModel(shapesGraphURI.toString());
+				addSuggestions(dataModel, shapesModel, actualResults);
+			}
 			actualResults.setNsPrefix(SH.PREFIX, SH.NS);
 			actualResults.setNsPrefix("rdf", RDF.getURI());
 			actualResults.setNsPrefix("rdfs", RDFS.getURI());
@@ -64,7 +92,18 @@ public class GraphValidationTestCaseType implements TestCaseType {
 			}
 			Model expected = JenaUtil.createDefaultModel();
 			for(Statement s : getResource().listProperties(DASH.expectedResult).toList()) {
-				expected.add(s.getResource().listProperties());
+				for(Statement t : s.getResource().listProperties().toList()) {
+					if(t.getPredicate().equals(DASH.suggestion)) {
+						addStatements(expected, t);
+					}
+					else if(SH.path.equals(t.getPredicate())) {
+						expected.add(t.getSubject(), t.getPredicate(),
+								SHACLPaths.clonePath(t.getResource(), expected));
+					}
+					else {
+						expected.add(t);
+					}
+				}
 			}
 			if(expected.getGraph().isIsomorphicWith(actualResults.getGraph())) {
 				createResult(results, DASH.SuccessTestCaseResult);

@@ -30,15 +30,18 @@ import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.topbraid.shacl.constraints.ExecutionLanguage;
 import org.topbraid.shacl.constraints.ExecutionLanguageSelector;
-import org.topbraid.shacl.model.SHACLFactory;
-import org.topbraid.shacl.model.SHACLParameter;
-import org.topbraid.shacl.model.SHACLParameterizableScope;
-import org.topbraid.shacl.model.SHACLPropertyConstraint;
-import org.topbraid.shacl.model.SHACLResult;
+import org.topbraid.shacl.model.SHConstraintComponent;
+import org.topbraid.shacl.model.SHFactory;
+import org.topbraid.shacl.model.SHParameter;
+import org.topbraid.shacl.model.SHParameterizableScope;
+import org.topbraid.shacl.model.SHPropertyConstraint;
+import org.topbraid.shacl.model.SHResult;
+import org.topbraid.shacl.model.SHShape;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.util.JenaUtil;
+import org.topbraid.spin.util.OptimizedMultiUnion;
 
 /**
  * Various SHACL-related utility methods that didn't fit elsewhere.
@@ -51,19 +54,26 @@ public class SHACLUtil {
 	
 	public final static String SHAPES_FILE_PART = ".shapes.";
 	
+	private static final Set<Property> SPARQL_PROPERTIES = new HashSet<Property>();
+	static {
+		SPARQL_PROPERTIES.add(SH.ask);
+		SPARQL_PROPERTIES.add(SH.construct);
+		SPARQL_PROPERTIES.add(SH.select);
+		SPARQL_PROPERTIES.add(SH.update);
+	}
+
 	private final static Set<Resource> classesWithDefaultType = new HashSet<Resource>();
 	static {
 		classesWithDefaultType.add(SH.NodeConstraint);
 		classesWithDefaultType.add(SH.Parameter);
-		classesWithDefaultType.add(SH.InversePropertyConstraint);
 		classesWithDefaultType.add(SH.PropertyConstraint);
 	}
 	
 	private final static List<Property> constraintProperties = new LinkedList<Property>();
 	static {
 		constraintProperties.add(SH.constraint);
-		constraintProperties.add(SH.inverseProperty);
 		constraintProperties.add(SH.property);
+		constraintProperties.add(SH.sparql);
 	}
 	
 	private final static List<Property> constraintPropertiesIncludingParameter = new LinkedList<Property>();
@@ -140,7 +150,7 @@ public class SHACLUtil {
 	 * @return a new Model containing the inferred triples
 	 */
 	public static Model createDefaultValueTypesModel(Model model) {
-		String sparql = JenaUtil.getStringProperty(SH.DefaultValueTypeRule.inModel(model), SH.sparql);
+		String sparql = JenaUtil.getStringProperty(SH.DefaultValueTypeRule.inModel(model), SH.construct);
 		if(sparql == null) {
 			throw new IllegalArgumentException("Shapes graph does not include " + SH.PREFIX + ":" + SH.DefaultValueTypeRule);
 		}
@@ -188,17 +198,17 @@ public class SHACLUtil {
 	}
 	
 	
-	public static List<SHACLResult> getAllResults(Model model) {
-		List<SHACLResult> results = new LinkedList<SHACLResult>();
+	public static List<SHResult> getAllResults(Model model) {
+		List<SHResult> results = new LinkedList<SHResult>();
 		// TODO: Not pretty code, not generic
 		for(Resource r : model.listResourcesWithProperty(RDF.type, SH.ValidationResult).toList()) {
-			results.add(r.as(SHACLResult.class));
+			results.add(r.as(SHResult.class));
 		}
 		for(Resource r : model.listResourcesWithProperty(RDF.type, DASH.FailureResult).toList()) {
-			results.add(r.as(SHACLResult.class));
+			results.add(r.as(SHResult.class));
 		}
 		for(Resource r : model.listResourcesWithProperty(RDF.type, DASH.SuccessResult).toList()) {
-			results.add(r.as(SHACLResult.class));
+			results.add(r.as(SHResult.class));
 		}
 		return results;
 	}
@@ -244,11 +254,32 @@ public class SHACLUtil {
 	}
 	
 	
-	public static SHACLParameter getParameterAtClass(Resource cls, Property predicate) {
+	public static SHConstraintComponent getConstraintComponentOfValidator(Resource validator) {
+		for(Statement s : validator.getModel().listStatements(null, SH.validator, validator).toList()) {
+			return s.getSubject().as(SHConstraintComponent.class);
+		}
+		return null;
+	}
+	
+	
+	public static Resource getDefaultTypeForConstraintPredicate(Property predicate) {
+		if(SH.property.equals(predicate)) {
+			return SH.PropertyConstraint;
+		}
+		else if(SH.parameter.equals(predicate)) {
+			return SH.Parameter;
+		}
+		else {
+			throw new IllegalArgumentException();
+		}
+	}
+	
+	
+	public static SHParameter getParameterAtClass(Resource cls, Property predicate) {
 		for(Resource c : JenaUtil.getAllSuperClassesStar(cls)) {
 			for(Resource arg : JenaUtil.getResourceProperties(c, SH.parameter)) {
 				if(arg.hasProperty(SH.predicate, predicate)) {
-					return SHACLFactory.asParameter(arg);
+					return SHFactory.asParameter(arg);
 				}
 			}
 		}
@@ -256,9 +287,9 @@ public class SHACLUtil {
 	}
 	
 	
-	public static SHACLParameter getParameterAtInstance(Resource instance, Property predicate) {
+	public static SHParameter getParameterAtInstance(Resource instance, Property predicate) {
 		for(Resource type : JenaUtil.getTypes(instance)) {
-			SHACLParameter argument = getParameterAtClass(type, predicate);
+			SHParameter argument = getParameterAtClass(type, predicate);
 			if(argument != null) {
 				return argument;
 			}
@@ -307,11 +338,11 @@ public class SHACLUtil {
 		return null;
 	}
 	
-	public static SHACLPropertyConstraint getPropertyConstraintAtClass(Resource cls, Property predicate) {
+	public static SHPropertyConstraint getPropertyConstraintAtClass(Resource cls, Property predicate) {
 		for(Resource c : JenaUtil.getAllSuperClassesStar(cls)) {
 			for(Resource arg : JenaUtil.getResourceProperties(c, SH.property)) {
 				if(arg.hasProperty(SH.predicate, predicate)) {
-					return SHACLFactory.asPropertyConstraint(arg);
+					return SHFactory.asPropertyConstraint(arg);
 				}
 			}
 		}
@@ -319,9 +350,9 @@ public class SHACLUtil {
 	}
 	
 	
-	public static SHACLPropertyConstraint getPropertyConstraintAtInstance(Resource instance, Property predicate) {
+	public static SHPropertyConstraint getPropertyConstraintAtInstance(Resource instance, Property predicate) {
 		for(Resource type : JenaUtil.getTypes(instance)) {
-			SHACLPropertyConstraint property = getPropertyConstraintAtClass(type, predicate);
+			SHPropertyConstraint property = getPropertyConstraintAtClass(type, predicate);
 			if(property != null) {
 				return property;
 			}
@@ -336,7 +367,7 @@ public class SHACLUtil {
 	 * @param cls  the class to get the predicates of
 	 * @return the declared predicates
 	 */
-	public static List<Property> getPropertiesOfClass(Resource cls) {
+	public static List<Property> getAllPropertiesOfClass(Resource cls) {
 		List<Property> results = new LinkedList<Property>();
 		for(Resource c : getAllSuperClassesAndShapesStar(cls)) {
 			addDirectPropertiesOfClass(c, results);
@@ -353,16 +384,113 @@ public class SHACLUtil {
 	public static Iterable<RDFNode> getResourcesInScope(Resource scope, Dataset dataset) {
 		Resource type = JenaUtil.getType(scope);
 		Resource executable;
-		SHACLParameterizableScope parameterizableScope = null;
-		if(SHACLFactory.isSPARQLScope(scope)) {
+		SHParameterizableScope parameterizableScope = null;
+		if(SHFactory.isSPARQLScope(scope)) {
 			executable = scope;
 		}
 		else {
 			executable = type;
-			parameterizableScope = SHACLFactory.asParameterizableScope(scope);
+			parameterizableScope = SHFactory.asParameterizableScope(scope);
 		}
 		ExecutionLanguage language = ExecutionLanguageSelector.get().getLanguageForScope(executable);
 		return language.executeScope(dataset, executable, parameterizableScope);
+	}
+	
+	
+	/**
+	 * Gets all shapes associated with a given focus node.
+	 * This looks for all shapes based on class-based scopes.
+	 * Future versions will also look for property-based scopes.
+	 * @param node  the (focus) node
+	 * @return a List of shapes
+	 */
+	public static List<SHShape> getAllShapesAtNode(RDFNode node) {
+		return getAllShapesAtNode(node, node instanceof Resource ? JenaUtil.getTypes((Resource)node) : null);
+	}
+	
+	
+	public static List<SHShape> getAllShapesAtNode(RDFNode node, Iterable<Resource> types) {
+		List<SHShape> results = new LinkedList<SHShape>();
+		if(node instanceof Resource) {
+			Set<Resource> reached = new HashSet<Resource>();
+			for(Resource type : types) {
+				addAllShapesAtClassOrShape(type, results, reached);
+			}
+		}
+		
+		// TODO: support sh:scopeProperty and sh:inverseScopeProperty
+		
+		return results;
+	}
+	
+	
+	/**
+	 * Gets all sh:Shapes that have a given class in their scope, including ConstraintComponents
+	 * and the class or shape itself if it is marked as sh:Shape.
+	 * Also walks up the class hierarchy.
+	 * @param clsOrShape  the class or Shape to get the shapes of
+	 * @return the shapes, ordered by the most specialized (subclass) first
+	 */
+	public static List<SHShape> getAllShapesAtClassOrShape(Resource clsOrShape) {
+		List<SHShape> results = new LinkedList<SHShape>();
+		Set<Resource> reached = new HashSet<Resource>();
+		addAllShapesAtClassOrShape(clsOrShape, results, reached);
+		return results;
+	}
+	
+	
+	private static void addAllShapesAtClassOrShape(Resource clsOrShape, List<SHShape> results, Set<Resource> reached) {
+		addDirectShapesAtClassOrShape(clsOrShape, results);
+		reached.add(clsOrShape);
+		for(Resource superClass : JenaUtil.getSuperClasses(clsOrShape)) {
+			if(!reached.contains(superClass)) {
+				addAllShapesAtClassOrShape(superClass, results, reached);
+			}
+		}
+	}
+	
+	
+	/**
+	 * Gets the directly associated sh:Shapes that have a given class in their scope,
+	 * including ConstraintComponents and the class or shape itself if it is marked as sh:Shape.
+	 * Does not walk up the class hierarchy.
+	 * @param clsOrShape  the class or Shape to get the shapes of
+	 * @return the shapes
+	 */
+	public static Collection<SHShape> getDirectShapesAtClassOrShape(Resource clsOrShape) {
+		List<SHShape> results = new LinkedList<SHShape>();
+		addDirectShapesAtClassOrShape(clsOrShape, results);
+		return results;
+	}
+
+
+	private static void addDirectShapesAtClassOrShape(Resource clsOrShape, List<SHShape> results) {
+		if(JenaUtil.hasIndirectType(clsOrShape, SH.Shape) && !results.contains(clsOrShape)) {
+			results.add(SHFactory.asShape(clsOrShape));
+		}
+		// More correct would be: if(JenaUtil.hasIndirectType(clsOrShape, RDFS.Class)) {
+		{
+			StmtIterator it = clsOrShape.getModel().listStatements(null, SH.scopeClass, clsOrShape);
+			while(it.hasNext()) {
+				Resource subject = it.next().getSubject();
+				if(!results.contains(subject)) {
+					SHShape shape = SHFactory.asShape(subject);
+					if(!shape.isDeactivated()) {
+						results.add(shape);
+					}
+				}
+			}
+		}
+		
+		{
+			StmtIterator it = clsOrShape.getModel().listStatements(null, SH.context, clsOrShape);
+			while(it.hasNext()) {
+				Resource subject = it.next().getSubject();
+				if(!results.contains(subject)) {
+					results.add(SHFactory.asShape(subject));
+				}
+			}
+		}
 	}
 	
 	
@@ -391,6 +519,11 @@ public class SHACLUtil {
 	}
 	
 	
+	public static boolean isClassWithDefaultType(Resource cls) {
+		return classesWithDefaultType.contains(cls);
+	}
+	
+	
 	public static boolean isParameterAtInstance(Resource subject, Property predicate) {
 		for(Resource type : getTypes(subject)) {
 			Resource arg = getParameterAtClass(type, predicate);
@@ -402,8 +535,8 @@ public class SHACLUtil {
 	}
 	
 	
-	public static boolean isClassWithDefaultType(Resource cls) {
-		return classesWithDefaultType.contains(cls);
+	public static boolean isSPARQLProperty(Property property) {
+		return SPARQL_PROPERTIES.contains(property);
 	}
 	
 	
@@ -415,9 +548,19 @@ public class SHACLUtil {
 	 * @return true if SHACL is present
 	 */
 	public static boolean exists(Model model) {
-    	return model != null &&
-        		SH.NS.equals(model.getNsPrefixURI(SH.PREFIX)) && 
-        		model.contains(SH.Shape, RDF.type, (RDFNode)null);
+		return model != null && exists(model.getGraph());
+	}
+	
+	
+	public static boolean exists(Graph graph) {
+		if(graph instanceof OptimizedMultiUnion) {
+			return ((OptimizedMultiUnion)graph).getIncludesSHACL();
+		}
+		else {
+	    	return graph != null &&
+	        		SH.NS.equals(graph.getPrefixMapping().getNsPrefixURI(SH.PREFIX)) && 
+	        		graph.contains(SH.Shape.asNode(), RDF.type.asNode(), Node.ANY);
+		}
 	}
 	
 	

@@ -19,34 +19,34 @@ ex:GraphValidationTestCase
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidRectangle1 ;
-      sh:object 42 ;
-      sh:predicate ex:area ;
+      sh:path ex:area ;
       sh:severity sh:Violation ;
-      sh:subject ex:InvalidRectangle1 ;
+      sh:sourceConstraintComponent sh:DerivedValuesConstraintComponent ;
+      sh:value 42 ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidRectangle2 ;
-      sh:object 41 ;
-      sh:predicate ex:area ;
+      sh:path ex:area ;
       sh:severity sh:Violation ;
-      sh:subject ex:InvalidRectangle2 ;
+      sh:sourceConstraintComponent sh:DerivedValuesConstraintComponent ;
+      sh:value 41 ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidRectangle2 ;
-      sh:object 42 ;
-      sh:predicate ex:area ;
+      sh:path ex:area ;
       sh:severity sh:Violation ;
-      sh:subject ex:InvalidRectangle2 ;
+      sh:sourceConstraintComponent sh:DerivedValuesConstraintComponent ;
+      sh:value 42 ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidRectangle3 ;
-      sh:object 43 ;
-      sh:predicate ex:area ;
+      sh:path ex:area ;
       sh:severity sh:Violation ;
-      sh:subject ex:InvalidRectangle3 ;
+      sh:sourceConstraintComponent sh:DerivedValuesConstraintComponent ;
+      sh:value 43 ;
     ] ;
 .
 ex:InvalidRectangle1
@@ -68,26 +68,30 @@ ex:InvalidRectangle3
   ex:width 6 ;
 .
 ex:Rectangle
-  rdf:type rdfs:Class, sh:Shape ;
+  rdf:type rdfs:Class ;
+  rdf:type sh:Shape ;
   sh:property [
+      sh:predicate ex:area ;
       sh:datatype xsd:integer ;
       sh:derivedValues [
-      	a sh:SPARQLValuesDeriver ;
-          sh:sparql """
-				$this ex:width ?width .
-				$this ex:height ?height .
-				BIND (?width * ?height AS ?value) .
+          rdf:type sh:SPARQLValuesDeriver ;
+          sh:select """
+          		SELECT ?value
+          		WHERE {
+					$this ex:width ?width .
+					$this ex:height ?height .
+					BIND (?width * ?height AS ?value) .
+				}
 				""" ;
         ] ;
-      sh:predicate ex:area ;
     ] ;
   sh:property [
-      sh:datatype xsd:integer ;
       sh:predicate ex:height ;
+      sh:datatype xsd:integer ;
     ] ;
   sh:property [
-      sh:datatype xsd:integer ;
       sh:predicate ex:width ;
+      sh:datatype xsd:integer ;
     ] ;
 .
 ex:ValidRectangle1

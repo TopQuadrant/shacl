@@ -5,9 +5,10 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.function.FunctionFactory;
 import org.apache.jena.sparql.function.FunctionRegistry;
-import org.topbraid.shacl.model.SHACLConstraintComponent;
+import org.topbraid.shacl.model.SHConstraintComponent;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.SPINFunctionDrivers;
+import org.topbraid.spin.arq.SPINFunctionFactory;
 import org.topbraid.spin.util.JenaUtil;
 
 /**
@@ -24,7 +25,10 @@ public class SHACLFunctions {
 	public static void registerFunction(Resource resource) {
 		FunctionFactory arqFunction = SPINFunctionDrivers.get().create(resource);
 		if(arqFunction != null) {
-			FunctionRegistry.get().put(resource.getURI(), arqFunction);
+			FunctionFactory oldFF = FunctionRegistry.get().get(resource.getURI());
+			if(oldFF == null || oldFF instanceof SPINFunctionFactory) {
+				FunctionRegistry.get().put(resource.getURI(), arqFunction);
+			}
 		}
 	}
 
@@ -44,14 +48,12 @@ public class SHACLFunctions {
 		
 		Resource ccClass = SH.ConstraintComponent.inModel(model);
 		for(Resource resource : JenaUtil.getAllInstances(ccClass)) {
-			perhapsRegisterFunction(resource.as(SHACLConstraintComponent.class), SH.nodeValidator);
-			perhapsRegisterFunction(resource.as(SHACLConstraintComponent.class), SH.propertyValidator);
-			perhapsRegisterFunction(resource.as(SHACLConstraintComponent.class), SH.inversePropertyValidator);
+			perhapsRegisterFunction(resource.as(SHConstraintComponent.class), SH.validator);
 		}
 	}
 	
 	
-	private static void perhapsRegisterFunction(SHACLConstraintComponent component, Property predicate) {
+	private static void perhapsRegisterFunction(SHConstraintComponent component, Property predicate) {
 		for(Resource validator : JenaUtil.getResourceProperties(component, predicate)) {
 			if(validator.isURIResource() && 
 					!FunctionRegistry.get().isRegistered(validator.getURI()) &&

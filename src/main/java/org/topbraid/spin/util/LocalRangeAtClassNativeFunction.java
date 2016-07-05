@@ -6,14 +6,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.arq.AbstractFunction2;
-import org.topbraid.spin.vocabulary.SPIN;
-import org.topbraid.spin.vocabulary.SPL;
-
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.function.FunctionEnv;
 import org.apache.jena.util.iterator.ExtendedIterator;
@@ -21,6 +18,12 @@ import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.XSD;
+import org.topbraid.shacl.model.SHShape;
+import org.topbraid.shacl.util.SHACLUtil;
+import org.topbraid.shacl.vocabulary.SH;
+import org.topbraid.spin.arq.AbstractFunction2;
+import org.topbraid.spin.vocabulary.SPIN;
+import org.topbraid.spin.vocabulary.SPL;
 
 /**
  * A native implementation of swa:localRangeAtClass, to optimize performance.
@@ -185,47 +188,18 @@ public class LocalRangeAtClassNativeFunction extends AbstractFunction2 {
 			}
 		}		
 		
-		if(!(graph instanceof OptimizedMultiUnion) || ((OptimizedMultiUnion)graph).getIncludesSHACL()) {
+		if(SHACLUtil.exists(graph)) {
 			
-			{
-				ExtendedIterator<Triple> it = graph.find(type, SH.parameter.asNode(), Node.ANY);
-				while(it.hasNext()) {
-					Node constraint = it.next().getObject();
-					if(constraint.isBlank() || constraint.isURI()) {
-						if(graph.contains(constraint, SH.predicate.asNode(), property)) {
-							Node valueType = getObject(constraint, SH.class_.asNode(), graph);
-							if(valueType != null) {
-								it.close();
-								return valueType;
-							}
-							Node datatype = getObject(constraint, SH.datatype.asNode(), graph);
-							if(datatype != null) {
-								it.close();
-								return datatype;
-							}
-						}
-					}
+			for(SHShape shape : SHACLUtil.getDirectShapesAtClassOrShape((Resource)ModelFactory.createModelForGraph(graph).asRDFNode(type))) {
+				
+				Node paramResult = walkPropertyConstraint(graph, shape.asNode(), property, SH.parameter.asNode());
+				if(paramResult != null) {
+					return paramResult;
 				}
-			}
-
-			{
-				ExtendedIterator<Triple> it = graph.find(type, SH.property.asNode(), Node.ANY);
-				while(it.hasNext()) {
-					Node constraint = it.next().getObject();
-					if(constraint.isBlank() || constraint.isURI()) {
-						if(graph.contains(constraint, SH.predicate.asNode(), property)) {
-							Node valueType = getObject(constraint, SH.class_.asNode(), graph);
-							if(valueType != null) {
-								it.close();
-								return valueType;
-							}
-							Node datatype = getObject(constraint, SH.datatype.asNode(), graph);
-							if(datatype != null) {
-								it.close();
-								return datatype;
-							}
-						}
-					}
+				
+				Node propertyResult = walkPropertyConstraint(graph, shape.asNode(), property, SH.property.asNode());
+				if(propertyResult != null) {
+					return propertyResult;
 				}
 			}
 		}		
@@ -239,6 +213,29 @@ public class LocalRangeAtClassNativeFunction extends AbstractFunction2 {
 			}
 		}
 		
+		return null;
+	}
+	
+	
+	private static Node walkPropertyConstraint(Graph graph, Node shape, Node predicate, Node systemPredicate) {
+		ExtendedIterator<Triple> it = graph.find(shape, systemPredicate, Node.ANY);
+		while(it.hasNext()) {
+			Node constraint = it.next().getObject();
+			if(constraint.isBlank() || constraint.isURI()) {
+				if(graph.contains(constraint, SH.predicate.asNode(), predicate)) {
+					Node valueType = getObject(constraint, SH.class_.asNode(), graph);
+					if(valueType != null) {
+						it.close();
+						return valueType;
+					}
+					Node datatype = getObject(constraint, SH.datatype.asNode(), graph);
+					if(datatype != null) {
+						it.close();
+						return datatype;
+					}
+				}
+			}
+		}
 		return null;
 	}
 }

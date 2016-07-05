@@ -21,218 +21,218 @@ ex:GraphValidationTestCase
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InstanceWithBlankNode ;
-      sh:object _:b55454 ;
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InstanceWithBlankNode ;
+      sh:sourceConstraintComponent sh:NodeKindConstraintComponent ;
+      sh:value _:b55454 ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InstanceWithBlankNode ;
-      sh:object _:b55454 ;
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InstanceWithBlankNode ;
+      sh:sourceConstraintComponent sh:NodeKindConstraintComponent ;
+      sh:value _:b55454 ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InstanceWithBlankNode ;
-      sh:object _:b55454 ;
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InstanceWithBlankNode ;
+      sh:sourceConstraintComponent sh:NodeKindConstraintComponent ;
+      sh:value _:b55454 ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InstanceWithBlankNodeAndIRI ;
-      sh:object rdfs:Class ;
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InstanceWithBlankNodeAndIRI ;
+      sh:sourceConstraintComponent sh:NodeKindConstraintComponent ;
+      sh:value rdfs:Class ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InstanceWithBlankNodeAndIRI ;
-      sh:object rdfs:Class ;
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InstanceWithBlankNodeAndIRI ;
+      sh:sourceConstraintComponent sh:NodeKindConstraintComponent ;
+      sh:value rdfs:Class ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InstanceWithBlankNodeAndIRI ;
-      sh:object rdfs:Class ;
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InstanceWithBlankNodeAndIRI ;
+      sh:sourceConstraintComponent sh:NodeKindConstraintComponent ;
+      sh:value rdfs:Class ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InstanceWithBlankNodeAndIRI ;
-      sh:object _:b67098 ;
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InstanceWithBlankNodeAndIRI ;
+      sh:sourceConstraintComponent sh:NodeKindConstraintComponent ;
+      sh:value _:b67098 ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InstanceWithBlankNodeAndIRI ;
-      sh:object _:b67098 ;
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InstanceWithBlankNodeAndIRI ;
+      sh:sourceConstraintComponent sh:NodeKindConstraintComponent ;
+      sh:value _:b67098 ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InstanceWithBlankNodeAndIRI ;
-      sh:object _:b67098 ;
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InstanceWithBlankNodeAndIRI ;
+      sh:sourceConstraintComponent sh:NodeKindConstraintComponent ;
+      sh:value _:b67098 ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InstanceWithBlankNodeAndLiteral ;
-      sh:object "Literal" ;
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InstanceWithBlankNodeAndLiteral ;
+      sh:sourceConstraintComponent sh:NodeKindConstraintComponent ;
+      sh:value "Literal" ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InstanceWithBlankNodeAndLiteral ;
-      sh:object "Literal" ;
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InstanceWithBlankNodeAndLiteral ;
+      sh:sourceConstraintComponent sh:NodeKindConstraintComponent ;
+      sh:value "Literal" ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InstanceWithBlankNodeAndLiteral ;
-      sh:object "Literal" ;
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InstanceWithBlankNodeAndLiteral ;
+      sh:sourceConstraintComponent sh:NodeKindConstraintComponent ;
+      sh:value "Literal" ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InstanceWithBlankNodeAndLiteral ;
-      sh:object _:b99026 ;
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InstanceWithBlankNodeAndLiteral ;
+      sh:sourceConstraintComponent sh:NodeKindConstraintComponent ;
+      sh:value _:b99026 ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InstanceWithBlankNodeAndLiteral ;
-      sh:object _:b99026 ;
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InstanceWithBlankNodeAndLiteral ;
+      sh:sourceConstraintComponent sh:NodeKindConstraintComponent ;
+      sh:value _:b99026 ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InstanceWithBlankNodeAndLiteral ;
-      sh:object _:b99026 ;
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InstanceWithBlankNodeAndLiteral ;
+      sh:sourceConstraintComponent sh:NodeKindConstraintComponent ;
+      sh:value _:b99026 ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InstanceWithIRI ;
-      sh:object rdfs:Class ;
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InstanceWithIRI ;
+      sh:sourceConstraintComponent sh:NodeKindConstraintComponent ;
+      sh:value rdfs:Class ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InstanceWithIRI ;
-      sh:object rdfs:Class ;
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InstanceWithIRI ;
+      sh:sourceConstraintComponent sh:NodeKindConstraintComponent ;
+      sh:value rdfs:Class ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InstanceWithIRI ;
-      sh:object rdfs:Class ;
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InstanceWithIRI ;
+      sh:sourceConstraintComponent sh:NodeKindConstraintComponent ;
+      sh:value rdfs:Class ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InstanceWithIRIAndLiteral ;
-      sh:object rdfs:Class ;
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InstanceWithIRIAndLiteral ;
+      sh:sourceConstraintComponent sh:NodeKindConstraintComponent ;
+      sh:value rdfs:Class ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InstanceWithIRIAndLiteral ;
-      sh:object rdfs:Class ;
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InstanceWithIRIAndLiteral ;
+      sh:sourceConstraintComponent sh:NodeKindConstraintComponent ;
+      sh:value rdfs:Class ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InstanceWithIRIAndLiteral ;
-      sh:object rdfs:Class ;
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InstanceWithIRIAndLiteral ;
+      sh:sourceConstraintComponent sh:NodeKindConstraintComponent ;
+      sh:value rdfs:Class ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InstanceWithIRIAndLiteral ;
-      sh:object "Literal" ;
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InstanceWithIRIAndLiteral ;
+      sh:sourceConstraintComponent sh:NodeKindConstraintComponent ;
+      sh:value "Literal" ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InstanceWithIRIAndLiteral ;
-      sh:object "Literal" ;
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InstanceWithIRIAndLiteral ;
+      sh:sourceConstraintComponent sh:NodeKindConstraintComponent ;
+      sh:value "Literal" ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InstanceWithIRIAndLiteral ;
-      sh:object "Literal" ;
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InstanceWithIRIAndLiteral ;
+      sh:sourceConstraintComponent sh:NodeKindConstraintComponent ;
+      sh:value "Literal" ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InstanceWithLiteral ;
-      sh:object "Literal" ;
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InstanceWithLiteral ;
+      sh:sourceConstraintComponent sh:NodeKindConstraintComponent ;
+      sh:value "Literal" ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InstanceWithLiteral ;
-      sh:object "Literal" ;
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InstanceWithLiteral ;
+      sh:sourceConstraintComponent sh:NodeKindConstraintComponent ;
+      sh:value "Literal" ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InstanceWithLiteral ;
-      sh:object "Literal" ;
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InstanceWithLiteral ;
+      sh:sourceConstraintComponent sh:NodeKindConstraintComponent ;
+      sh:value "Literal" ;
     ] ;
 .
 ex:InstanceWithBlankNode
@@ -269,48 +269,48 @@ ex:MyClass
 ex:ShapeWithBlankNode
   rdf:type sh:Shape ;
   sh:property [
-      sh:nodeKind sh:BlankNode ;
       sh:predicate ex:myProperty ;
+      sh:nodeKind sh:BlankNode ;
     ] ;
   sh:scopeClass ex:MyClass ;
 .
 ex:ShapeWithBlankNodeOrIRI
   rdf:type sh:Shape ;
   sh:property [
-      sh:nodeKind sh:BlankNodeOrIRI ;
       sh:predicate ex:myProperty ;
+      sh:nodeKind sh:BlankNodeOrIRI ;
     ] ;
   sh:scopeClass ex:MyClass ;
 .
 ex:ShapeWithBlankNodeOrLiteral
   rdf:type sh:Shape ;
   sh:property [
-      sh:nodeKind sh:BlankNodeOrLiteral ;
       sh:predicate ex:myProperty ;
+      sh:nodeKind sh:BlankNodeOrLiteral ;
     ] ;
   sh:scopeClass ex:MyClass ;
 .
 ex:ShapeWithIRI
   rdf:type sh:Shape ;
   sh:property [
-      sh:nodeKind sh:IRI ;
       sh:predicate ex:myProperty ;
+      sh:nodeKind sh:IRI ;
     ] ;
   sh:scopeClass ex:MyClass ;
 .
 ex:ShapeWithIRIOrLiteral
   rdf:type sh:Shape ;
   sh:property [
-      sh:nodeKind sh:IRIOrLiteral ;
       sh:predicate ex:myProperty ;
+      sh:nodeKind sh:IRIOrLiteral ;
     ] ;
   sh:scopeClass ex:MyClass ;
 .
 ex:ShapeWithLiteral
   rdf:type sh:Shape ;
   sh:property [
-      sh:nodeKind sh:Literal ;
       sh:predicate ex:myProperty ;
+      sh:nodeKind sh:Literal ;
     ] ;
   sh:scopeClass ex:MyClass ;
 .

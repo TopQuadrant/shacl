@@ -12,48 +12,49 @@
 
 <http://datashapes.org/sh/tests/core/property/in-001.test>
   rdf:type owl:Ontology ;
-  owl:versionInfo "Created with TopBraid Composer"^^xsd:string ;
   owl:imports <http://datashapes.org/dash> ;
+  owl:versionInfo "Created with TopBraid Composer" ;
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidInstance1 ;
-      sh:object "D"^^xsd:string ;
-      sh:predicate ex:property ;
+      sh:path ex:property ;
       sh:severity sh:Violation ;
-      sh:subject ex:InvalidInstance1 ;
+      sh:sourceConstraintComponent sh:InConstraintComponent ;
+      sh:value "D" ;
     ] ;
 .
 ex:InvalidInstance1
   rdf:type ex:ShapeClass ;
-  ex:property "D"^^xsd:string ;
-  rdfs:label "Invalid instance1"^^xsd:string ;
+  ex:property "D" ;
+  rdfs:label "Invalid instance1" ;
 .
 ex:ShapeClass
-  rdf:type rdfs:Class, sh:Shape ;
-  rdfs:label "Shape class"^^xsd:string ;
+  rdf:type rdfs:Class ;
+  rdf:type sh:Shape ;
+  rdfs:label "Shape class" ;
   sh:property [
-      rdfs:label "property"^^xsd:string ;
+      sh:predicate ex:property ;
+      rdfs:label "property" ;
       sh:datatype xsd:string ;
       sh:in (
-          "A"^^xsd:string
-          "B"^^xsd:string
-          "C"^^xsd:string
+          "A"
+          "B"
+          "C"
         ) ;
-      sh:predicate ex:property ;
     ] ;
 .
 ex:ValidInstance1
   rdf:type ex:ShapeClass ;
-  ex:property "A"^^xsd:string ;
-  rdfs:label "Valid instance1"^^xsd:string ;
+  ex:property "A" ;
+  rdfs:label "Valid instance1" ;
 .
 ex:ValidInstance2
   rdf:type ex:ShapeClass ;
-  ex:property "A"^^xsd:string ;
-  ex:property "B"^^xsd:string ;
-  ex:property "C"^^xsd:string ;
-  rdfs:label "Valid instance2"^^xsd:string ;
+  ex:property "A" ;
+  ex:property "B" ;
+  ex:property "C" ;
+  rdfs:label "Valid instance2" ;
 .

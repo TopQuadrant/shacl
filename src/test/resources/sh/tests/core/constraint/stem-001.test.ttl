@@ -22,11 +22,15 @@ ex:GraphValidationTestCase
       rdf:type sh:ValidationResult ;
       sh:focusNode <http://example.org> ;
       sh:severity sh:Violation ;
+      sh:sourceConstraintComponent sh:StemConstraintComponent ;
+      sh:value <http://example.org> ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode "http://example.org/A" ;
       sh:severity sh:Violation ;
+      sh:sourceConstraintComponent sh:StemConstraintComponent ;
+      sh:value "http://example.org/A" ;
     ] ;
 .
 ex:ShapeWithStem

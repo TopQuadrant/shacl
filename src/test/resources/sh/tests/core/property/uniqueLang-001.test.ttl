@@ -14,36 +14,36 @@
   rdf:type owl:Ontology ;
   rdfs:label "Test of uniqueLang-001" ;
   owl:imports <http://datashapes.org/dash> ;
-  owl:versionInfo "Created with TopBraid Composer"^^xsd:string ;
+  owl:versionInfo "Created with TopBraid Composer" ;
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidInstance1 ;
-      sh:predicate ex:testProperty ;
+      sh:path ex:testProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InvalidInstance1 ;
+      sh:sourceConstraintComponent sh:UniqueLangConstraintComponent ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidInstance2 ;
-      sh:predicate ex:testProperty ;
+      sh:path ex:testProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InvalidInstance2 ;
+      sh:sourceConstraintComponent sh:UniqueLangConstraintComponent ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidInstance2 ;
-      sh:predicate ex:testProperty ;
+      sh:path ex:testProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InvalidInstance2 ;
+      sh:sourceConstraintComponent sh:UniqueLangConstraintComponent ;
     ] ;
 .
 ex:InvalidInstance1
   rdf:type ex:TestShape ;
+  ex:testProperty "Me" ;
   ex:testProperty "Me"@en ;
-  ex:testProperty "Me"^^xsd:string ;
   ex:testProperty "Moi"@fr ;
   ex:testProperty "Myself"@en ;
 .
@@ -56,20 +56,24 @@ ex:InvalidInstance2
   ex:testProperty "Myself"@en ;
 .
 ex:TestShape
-  rdf:type rdfs:Class, sh:Shape ;
-  rdfs:label "Test shape"^^xsd:string ;
+  rdf:type rdfs:Class ;
+  rdf:type sh:Shape ;
+  rdfs:label "Test shape" ;
   sh:property [
-      rdfs:label "test property"^^xsd:string ;
-      sh:datatypeIn ( xsd:string rdf:langString ) ;
       sh:predicate ex:testProperty ;
+      rdfs:label "test property" ;
+      sh:datatypeIn (
+          xsd:string
+          rdf:langString
+        ) ;
       sh:uniqueLang "true"^^xsd:boolean ;
     ] ;
 .
 ex:ValidInstance1
   rdf:type ex:TestShape ;
+  ex:testProperty "Me" ;
   ex:testProperty "Me"@en ;
-  ex:testProperty "Me"^^xsd:string ;
   ex:testProperty "Moi"@fr ;
-  ex:testProperty "Myself"^^xsd:string ;
-  rdfs:label "Valid instance1"^^xsd:string ;
+  ex:testProperty "Myself" ;
+  rdfs:label "Valid instance1" ;
 .

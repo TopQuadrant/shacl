@@ -20,21 +20,20 @@ ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
-      sh:predicate sh:maxCount ;
-      sh:focusNode _:b3633 ;
-      sh:object 1.2 ;
+      sh:focusNode [
+          rdf:type sh:PropertyConstraint ;
+          sh:maxCount 1.2 ;
+          sh:minCount 1 ;
+        ] ;
+      sh:path sh:maxCount ;
       sh:severity sh:Violation ;
-      sh:subject _:b3633 ;
+      sh:sourceConstraintComponent sh:DatatypeConstraintComponent ;
+      sh:value 1.2 ;
     ] ;
 .
 ex:MyClass
   rdf:type rdfs:Class ;
   rdf:type sh:Shape ;
   rdfs:subClassOf rdfs:Class ;
-  sh:property _:b3633 ;
-.
-_:b3633
-  rdf:type sh:PropertyConstraint ;
-  sh:maxCount 1.2 ;
-  sh:minCount 1 ;
+  sh:property [] ;
 .

@@ -14,37 +14,38 @@
   rdf:type owl:Ontology ;
   rdfs:label "Test of minLength-001" ;
   owl:imports <http://datashapes.org/dash> ;
-  owl:versionInfo "Created with TopBraid Composer"^^xsd:string ;
+  owl:versionInfo "Created with TopBraid Composer" ;
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidInstance1 ;
-      sh:object "A"^^xsd:string ;
-      sh:predicate ex:testProperty ;
+      sh:path ex:testProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InvalidInstance1 ;
+      sh:sourceConstraintComponent sh:MinLengthConstraintComponent ;
+      sh:value "A" ;
     ] ;
 .
 ex:InvalidInstance1
   rdf:type ex:TestShape ;
-  ex:testProperty "A"^^xsd:string ;
+  ex:testProperty "A" ;
 .
 ex:TestShape
-  rdf:type rdfs:Class, sh:Shape ;
-  rdfs:label "Test shape"^^xsd:string ;
+  rdf:type rdfs:Class ;
+  rdf:type sh:Shape ;
+  rdfs:label "Test shape" ;
   sh:property [
-      rdfs:label "test property"^^xsd:string ;
+      sh:predicate ex:testProperty ;
+      rdfs:label "test property" ;
       sh:datatype xsd:string ;
       sh:minLength 2 ;
-      sh:predicate ex:testProperty ;
     ] ;
 .
 ex:ValidInstance1
   rdf:type ex:TestShape ;
-  ex:testProperty "AB"^^xsd:string ;
-  ex:testProperty "ABC"^^xsd:string ;
+  ex:testProperty "AB" ;
+  ex:testProperty "ABC" ;
 .
 ex:ValidInstance2
   rdf:type ex:TestShape ;

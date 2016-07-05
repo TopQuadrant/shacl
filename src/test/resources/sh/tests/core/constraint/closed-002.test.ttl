@@ -20,11 +20,11 @@ ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
-      sh:predicate ex:otherProperty ;
       sh:focusNode ex:InvalidInstance1 ;
-      sh:object 4 ;
+      sh:path ex:otherProperty ;
       sh:severity sh:Violation ;
-      sh:subject ex:InvalidInstance1 ;
+      sh:sourceConstraintComponent sh:ClosedConstraintComponent ;
+      sh:value 4 ;
     ] ;
 .
 ex:InvalidInstance1

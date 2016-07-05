@@ -24,11 +24,17 @@ public class DASH {
 
     public final static Resource FunctionTestCase = ResourceFactory.createResource(NS + "FunctionTestCase");
 
+    public final static Resource GraphUpdate = ResourceFactory.createResource(NS + "GraphUpdate");
+
     public final static Resource GraphValidationTestCase = ResourceFactory.createResource(NS + "GraphValidationTestCase");
 
     public final static Resource InferencingTestCase = ResourceFactory.createResource(NS + "InferencingTestCase");
 
+    public final static Resource None = ResourceFactory.createResource(NS + "None");
+
     public final static Resource QueryTestCase = ResourceFactory.createResource(NS + "QueryTestCase");
+
+    public final static Resource SPARQLUpdateSuggestionGenerator = ResourceFactory.createResource(NS + "SPARQLUpdateSuggestionGenerator");
 
     public final static Resource SuccessResult = ResourceFactory.createResource(NS + "SuccessResult");
     
@@ -40,16 +46,30 @@ public class DASH {
 
 
     public final static Property abstract_ = ResourceFactory.createProperty(NS + "abstract");
+    
+    public final static Property addedTriple = ResourceFactory.createProperty(NS + "addedTriple");
 
     public final static Property cachable = ResourceFactory.createProperty(NS + "cachable");
+    
+    public final static Property deletedTriple = ResourceFactory.createProperty(NS + "deletedTriple");
     
     public final static Property expectedResult = ResourceFactory.createProperty(NS + "expectedResult");
 
     public final static Property expression = ResourceFactory.createProperty(NS + "expression");
 
+    public final static Property includeSuggestions = ResourceFactory.createProperty(NS + "includeSuggestions");
+    
     public final static Property node = ResourceFactory.createProperty(NS + "node");
     
     public final static Property private_ = ResourceFactory.createProperty(NS + "private");
+    
+    public final static Property propertySuggestionGenerator = ResourceFactory.createProperty(NS + "propertySuggestionGenerator");
+
+    public final static Property rootClass = ResourceFactory.createProperty(NS + "rootClass");
+    
+    public final static Property suggestion = ResourceFactory.createProperty(NS + "suggestion");
+    
+    public final static Property suggestionGenerator = ResourceFactory.createProperty(NS + "suggestionGenerator");
 
     public final static Property testCase = ResourceFactory.createProperty(NS + "testCase");
 

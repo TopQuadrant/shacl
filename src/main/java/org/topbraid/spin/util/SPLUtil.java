@@ -9,12 +9,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.topbraid.spin.arq.ARQFactory;
-import org.topbraid.spin.model.Argument;
-import org.topbraid.spin.vocabulary.SP;
-import org.topbraid.spin.vocabulary.SPIN;
-import org.topbraid.spin.vocabulary.SPL;
-
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
@@ -24,6 +18,12 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
+import org.topbraid.spin.arq.ARQFactory;
+import org.topbraid.spin.model.Argument;
+import org.topbraid.spin.model.TemplateCall;
+import org.topbraid.spin.vocabulary.SP;
+import org.topbraid.spin.vocabulary.SPIN;
+import org.topbraid.spin.vocabulary.SPL;
 
 
 /**
@@ -288,5 +288,17 @@ public class SPLUtil {
 			}
 			JenaUtil.setGraphReadOptimization(false);
 		}
+	}
+	
+	
+	/**
+	 * Checks if a given template call is about a specific property.
+	 * @param templateCall  the template call to check
+	 * @param onProperty  the property to be used in the constraint
+	 * @return true if the template is about a given 
+	 */
+	public static boolean isOnProperty(TemplateCall templateCall, Property onProperty) {
+		return templateCall.hasProperty(SPL.predicate, onProperty) &&
+				JenaUtil.hasIndirectType(templateCall, SPL.PropertyConstraintTemplates);
 	}
 }
