@@ -1,15 +1,34 @@
 package org.topbraid.shacl.arq;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryParseException;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.sparql.path.P_Alt;
+import org.apache.jena.sparql.path.P_Inverse;
+import org.apache.jena.sparql.path.P_Link;
+import org.apache.jena.sparql.path.P_OneOrMore1;
+import org.apache.jena.sparql.path.P_OneOrMoreN;
+import org.apache.jena.sparql.path.P_Path1;
+import org.apache.jena.sparql.path.P_Seq;
+import org.apache.jena.sparql.path.P_ZeroOrMore1;
+import org.apache.jena.sparql.path.P_ZeroOrMoreN;
+import org.apache.jena.sparql.path.P_ZeroOrOne;
+import org.apache.jena.sparql.path.Path;
+import org.apache.jena.sparql.syntax.Element;
+import org.apache.jena.sparql.syntax.ElementGroup;
+import org.apache.jena.sparql.syntax.ElementPathBlock;
+import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 import org.apache.jena.sparql.util.FmtUtils;
 import org.apache.jena.vocabulary.RDF;
 import org.topbraid.shacl.vocabulary.SH;
+import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.util.JenaUtil;
 
 /**
@@ -45,7 +64,7 @@ public class SHACLPaths {
 			sb.append(FmtUtils.stringForNode(path.asNode(), path.getModel()));
 		}
 		else {
-			appendPathBlankNode(sb, path, SEQUENCE_PATH_SEPARATOR);
+			appendPathBlankNode(sb, path, separator);
 		}
 	}
 	
@@ -79,8 +98,8 @@ public class SHACLPaths {
 			sb.append("+");
 		}
 		else if(path.hasProperty(SH.zeroOrOnePath)) {
-			sb.append("?");
 			appendNestedPath(sb, JenaUtil.getResourceProperty(path, SH.zeroOrOnePath), SEQUENCE_PATH_SEPARATOR);
+			sb.append("?");
 		}
 	}
 	
@@ -99,6 +118,80 @@ public class SHACLPaths {
 		}
 	}
 	
+	
+	/**
+	 * Creates SHACL RDF triples for a given Jena Path (which may have been created using getJenaPath).
+	 * @param path  the Jena Path
+	 * @param model  the Model to create the triples in
+	 * @return the (root) Resource of the SHACL path
+	 */
+	public static Resource createPath(Path path, Model model) {
+		if(path instanceof P_Alt) {
+			Resource result = model.createResource();
+			RDFList list = model.createList(Arrays.asList(new RDFNode[] {
+				createPath(((P_Alt) path).getLeft(), model),
+				createPath(((P_Alt) path).getRight(), model)
+			}).iterator());
+			result.addProperty(SH.alternativePath, list);
+			return result;
+		}
+		else if(path instanceof P_Inverse) {
+			Resource result = model.createResource();
+			result.addProperty(SH.inversePath, createPath(((P_Inverse) path).getSubPath(), model));
+			return result;
+		}
+		else if(path instanceof P_Link) {
+			return (Resource) model.asRDFNode(((P_Link) path).getNode());
+		}
+		else if(path instanceof P_OneOrMore1 || path instanceof P_OneOrMoreN) {
+			Resource result = model.createResource();
+			result.addProperty(SH.oneOrMorePath, createPath(((P_Path1)path).getSubPath(), model));
+			return result;
+		}
+		if(path instanceof P_Seq) {
+			return model.createList(Arrays.asList(new RDFNode[] {
+				createPath(((P_Seq) path).getLeft(), model),
+				createPath(((P_Seq) path).getRight(), model)
+			}).iterator());
+		}
+		else if(path instanceof P_ZeroOrMore1 || path instanceof P_ZeroOrMoreN) {
+			Resource result = model.createResource();
+			result.addProperty(SH.zeroOrMorePath, createPath(((P_Path1)path).getSubPath(), model));
+			return result;
+		}
+		else if(path instanceof P_ZeroOrOne) {
+			Resource result = model.createResource();
+			result.addProperty(SH.zeroOrOnePath, createPath(((P_Path1)path).getSubPath(), model));
+			return result;
+		}
+		else {
+			throw new IllegalArgumentException("Path element not supported by SHACL syntax: " + path);
+		}
+	}
+
+	
+	/**
+	 * Attempts to parse a given string into a Jena Path.
+	 * Throws an Exception if the string cannot be parsed.
+	 * @param string  the string to parse
+	 * @param model  the Model to operate on (for prefixes)
+	 * @return a Path or a Resource if this is a URI
+	 */
+	public static Object getJenaPath(String string, Model model) throws QueryParseException {
+		Query query = ARQFactory.get().createQuery(model, "ASK { ?a \n" + string + "\n ?b }");
+		Element element = query.getQueryPattern();
+		if(element instanceof ElementGroup) {
+			Element e = ((ElementGroup)element).getElements().get(0);
+			if(e instanceof ElementPathBlock) {
+				return ((ElementPathBlock) e).getPattern().get(0).getPath();
+			}
+			else if(e instanceof ElementTriplesBlock) {
+				return model.asRDFNode(((ElementTriplesBlock) e).getPattern().get(0).getPredicate());
+			}
+		}
+		throw new QueryParseException("Not a SPARQL 1.1 Path expression", 2, 1);
+	}
+
 	
 	public static String getPathString(Resource path) {
 		StringBuffer sb = new StringBuffer();
