@@ -40,7 +40,7 @@ public class ComponentConstraintExecutable extends ConstraintExecutable {
 			SHConstraintComponent component, Resource context) {
 		super(constraint);
 		
-		if(!SH.NodeConstraint.equals(context) && !SH.PropertyConstraint.equals(context)) {
+		if(!SH.Shape.equals(context) && !SH.PropertyConstraint.equals(context)) {
 			throw new IllegalArgumentException("Invalid context: " + context);
 		}
 		this.constraint = constraint;
@@ -121,7 +121,7 @@ public class ComponentConstraintExecutable extends ConstraintExecutable {
 
 	public Resource getValidator() {
 		
-		Property predicate = SH.PropertyConstraint.equals(context) ? SH.propertyValidator : SH.nodeValidator;
+		Property predicate = SH.PropertyConstraint.equals(context) ? SH.propertyValidator : SH.shapeValidator;
 		Resource validator = JenaUtil.getResourceProperty(component, predicate);
 		if(validator == null) {
 			validator = JenaUtil.getResourceProperty(component, SH.validator);

@@ -32,12 +32,10 @@ ex:InvalidResource1
 ex:TestShape
   rdf:type sh:Shape ;
   rdfs:label "Test shape" ;
-  sh:constraint [
-      sh:in (
-          ex:ValidResource1
-          ex:ValidResource2
-        ) ;
-    ] ;
+  sh:in (
+      ex:ValidResource1
+      ex:ValidResource2
+    ) ;
   sh:scopeProperty ex:property1 ;
   sh:scopeProperty ex:property2 ;
 .

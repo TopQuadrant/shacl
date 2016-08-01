@@ -295,6 +295,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 						}
 					}
 					
+					RDFNode resultFocusNode = thisValue;
 					if(SHFactory.isPropertyConstraintWithPath(constraint)) {
 						result.addProperty(SH.path, SHACLPaths.clonePath(SHFactory.asPropertyConstraint(constraint).getPath(), result.getModel()));
 					}
@@ -306,6 +307,10 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 						if(pathValue != null && pathValue.isURIResource()) {
 							result.addProperty(SH.path, pathValue);
 						}
+						RDFNode focusNodeValue = sol.get(SH.focusNodeVar.getVarName());
+						if(focusNodeValue != null) {
+							resultFocusNode = focusNodeValue;
+						}
 					}
 					
 					RDFNode selectValue = sol.get(SH.valueVar.getVarName());
@@ -313,7 +318,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 						result.addProperty(SH.value, selectValue);
 					}
 					
-					result.addProperty(SH.focusNode, thisValue);
+					result.addProperty(SH.focusNode, resultFocusNode);
 		
 					violationCount++;
 				}
@@ -405,7 +410,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 			valueVar += "_";
 		}
 		StringBuffer sb = new StringBuffer("SELECT $this ?value");
-		if(SH.NodeConstraint.equals(executable.getContext())) {
+		if(SH.Shape.equals(executable.getContext())) {
 			sb.append("\nWHERE {\n");
 			sb.append("    BIND ($this AS ");
 			sb.append(valueVar);

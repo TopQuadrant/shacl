@@ -42,7 +42,7 @@ ex:InvalidInstance1
 .
 ex:MyShape
   rdf:type sh:Shape ;
-  sh:constraint sh:Closed ;
+  sh:closed "true"^^xsd:boolean ;
   sh:property [
       sh:predicate ex:someProperty ;
     ] ;

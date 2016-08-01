@@ -21,13 +21,11 @@ ex:InvalidInstance1
 .
 ex:NotExampleShape
   rdf:type sh:Shape ;
-  sh:constraint [
-      sh:not [
-          rdf:type sh:Shape ;
-          sh:property [
-              sh:predicate ex:property ;
-              sh:minCount 1 ;
-            ] ;
+  sh:not [
+      rdf:type sh:Shape ;
+      sh:property [
+          sh:predicate ex:property ;
+          sh:minCount 1 ;
         ] ;
     ] ;
   sh:scopeNode ex:InvalidInstance1 ;

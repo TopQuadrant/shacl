@@ -13,12 +13,11 @@ import org.topbraid.shacl.constraints.ConstraintExecutable;
 import org.topbraid.shacl.model.SHConstraintComponent;
 import org.topbraid.shacl.model.SHFactory;
 import org.topbraid.shacl.model.SHParameterizableConstraint;
-import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaUtil;
 
-public class SHParameterizableConstraintImpl extends SHParameterizableInstanceImpl implements SHParameterizableConstraint {
+public abstract class SHParameterizableConstraintImpl extends SHParameterizableInstanceImpl implements SHParameterizableConstraint {
 	
 	public SHParameterizableConstraintImpl(Node node, EnhGraph graph) {
 		super(node, graph);
@@ -28,20 +27,10 @@ public class SHParameterizableConstraintImpl extends SHParameterizableInstanceIm
 	@Override
 	public List<ConstraintExecutable> getExecutables() {
 		List<ConstraintExecutable> results = new LinkedList<ConstraintExecutable>();
-		Resource context = JenaUtil.getType(this);
-		if(context == null) {
-			context = SHACLUtil.getResourceDefaultType(this);
-		}
-		if(SH.Parameter.equals(context)) {
-			context = SH.PropertyConstraint.inModel(context.getModel());
-		}
-		if(context == null) {
-			// TODO: Check if this is correct - defaulting to NodeConstraint (e.g. in sh:or)
-			context = SH.NodeConstraint.inModel(getModel());
-		}
+		Resource context = getContext();
 		
-		for(Statement s : getModel().listStatements(null, SH.context, context).toList()) {
-			SHConstraintComponent component = SHFactory.asConstraintComponent(s.getSubject());
+		for(Resource comp : JenaUtil.getAllInstances(SH.ConstraintComponent.inModel(context.getModel()))) {
+			SHConstraintComponent component = SHFactory.asConstraintComponent(comp);
 			if(component.getParameters().size() == 1) {
 				Property parameter = component.getParameters().get(0).getPredicate();
 				for(Statement parameterValueS : this.listProperties(parameter).toList()) {

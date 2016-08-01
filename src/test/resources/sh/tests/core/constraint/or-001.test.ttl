@@ -42,26 +42,24 @@ ex:RectangleWithArea
   rdf:type rdfs:Class ;
   rdf:type sh:Shape ;
   rdfs:subClassOf rdfs:Resource ;
-  sh:constraint [
-      sh:or (
-          [
-            sh:property [
-                sh:predicate ex:height ;
-                sh:minCount 1 ;
-              ] ;
-            sh:property [
-                sh:predicate ex:width ;
-                sh:minCount 1 ;
-              ] ;
-          ]
-          [
-            sh:property [
-                sh:predicate ex:area ;
-                sh:minCount 1 ;
-              ] ;
-          ]
-        ) ;
-    ] ;
+  sh:or (
+      [
+        sh:property [
+            sh:predicate ex:height ;
+            sh:minCount 1 ;
+          ] ;
+        sh:property [
+            sh:predicate ex:width ;
+            sh:minCount 1 ;
+          ] ;
+      ]
+      [
+        sh:property [
+            sh:predicate ex:area ;
+            sh:minCount 1 ;
+          ] ;
+      ]
+    ) ;
 .
 ex:ValidRectangle1
   rdf:type ex:RectangleWithArea ;

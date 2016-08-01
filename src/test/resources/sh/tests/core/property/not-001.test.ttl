@@ -39,10 +39,7 @@ ex:TestShape
   sh:property [
       sh:predicate ex:property ;
       sh:not [
-          rdf:type sh:Shape ;
-          sh:constraint [
-              sh:datatype xsd:integer ;
-            ] ;
+          sh:datatype xsd:integer ;
         ] ;
     ] ;
   sh:scopeNode ex:InvalidResource1 ;

@@ -12,9 +12,7 @@ import org.topbraid.shacl.arq.functions.HasShapeFunction;
 import org.topbraid.shacl.arq.functions.ScopeContainsPFunction;
 import org.topbraid.shacl.model.impl.SHConstraintComponentImpl;
 import org.topbraid.shacl.model.impl.SHFunctionImpl;
-import org.topbraid.shacl.model.impl.SHNodeConstraintImpl;
 import org.topbraid.shacl.model.impl.SHParameterImpl;
-import org.topbraid.shacl.model.impl.SHParameterizableConstraintImpl;
 import org.topbraid.shacl.model.impl.SHParameterizableImpl;
 import org.topbraid.shacl.model.impl.SHParameterizableInstanceImpl;
 import org.topbraid.shacl.model.impl.SHParameterizableScopeImpl;
@@ -38,11 +36,9 @@ public class SHFactory {
 	private static void init(Personality<RDFNode> p) {
 		p.add(SHConstraintComponent.class, new SimpleImplementation(SH.ConstraintComponent.asNode(), SHConstraintComponentImpl.class));
 		p.add(SHFunction.class, new SimpleImplementation(SH.Function.asNode(), SHFunctionImpl.class));
-    	p.add(SHNodeConstraint.class, new SimpleImplementation(SH.NodeConstraint.asNode(), SHNodeConstraintImpl.class));
     	p.add(SHParameter.class, new SimpleImplementation(SH.Parameter.asNode(), SHParameterImpl.class));
     	p.add(SHParameterizable.class, new SimpleImplementation(SH.Parameterizable.asNode(), SHParameterizableImpl.class));
     	p.add(SHParameterizableInstance.class, new SimpleImplementation(RDFS.Resource.asNode(), SHParameterizableInstanceImpl.class));
-    	p.add(SHParameterizableConstraint.class, new SimpleImplementation(SH.Constraint.asNode(), SHParameterizableConstraintImpl.class));
     	p.add(SHParameterizableScope.class, new SimpleImplementation(SH.Scope.asNode(), SHParameterizableScopeImpl.class));
     	p.add(SHPropertyConstraint.class, new SimpleImplementation(SH.PropertyConstraint.asNode(), SHPropertyConstraintImpl.class));
     	p.add(SHResult.class, new SimpleImplementation(SH.AbstractResult.asNode(), SHResultImpl.class));
@@ -101,18 +97,20 @@ public class SHFactory {
 	
 	
 	public static SHParameterizableConstraint asParameterizableConstraint(RDFNode node) {
-		return node.as(SHParameterizableConstraint.class);
+		if(node instanceof Resource && isPropertyConstraint((Resource)node)) {
+			return asPropertyConstraint(node);
+		}
+		else if(node instanceof Resource && isParameter((Resource)node)) {
+			return asParameter(node);
+		}
+		else {
+			return asShape(node);
+		}
 	}
 	
 	
 	public static SHParameterizableScope asParameterizableScope(RDFNode node) {
 		return node.as(SHParameterizableScope.class);
-	}
-	
-	
-	public static boolean isNodeConstraint(Resource resource) {
-		return resource.hasProperty(RDF.type, SH.NodeConstraint) ||
-				(!resource.hasProperty(RDF.type) && resource.getModel().contains(null, SH.constraint, resource));
 	}
 
 	
@@ -156,10 +154,9 @@ public class SHFactory {
 			Resource r = (Resource) node;
 			if(!r.hasProperty(RDF.type)) {
 				return  node.getModel().contains(null, SH.property, node) ||
-						node.getModel().contains(null, SH.parameter, node) ||
-						node.getModel().contains(null, SH.constraint, node);
+						node.getModel().contains(null, SH.parameter, node);
 			}
-			else if(r.hasProperty(RDF.type, SH.NodeConstraint) ||
+			else if(r.hasProperty(RDF.type, SH.Shape) ||
 					r.hasProperty(RDF.type, SH.PropertyConstraint) ||
 					r.hasProperty(RDF.type, SH.Parameter)) {
 				return true;

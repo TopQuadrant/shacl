@@ -29,27 +29,27 @@ public class SHPropertyConstraintImpl extends SHParameterizableConstraintImpl im
 				return datatype;
 			}
 			else {
-				Resource directType = JenaUtil.getResourceProperty(this, SH.directType);
-				if(directType != null) {
-					return directType;
+				Resource kind = JenaUtil.getResourceProperty(this, SH.nodeKind);
+				if(SH.IRI.equals(kind) || SH.BlankNode.equals(kind)) {
+					return RDFS.Resource.inModel(getModel());
+				}
+				else if(SH.Literal.equals(kind)) {
+					return RDFS.Literal.inModel(getModel());
 				}
 				else {
-					Resource kind = JenaUtil.getResourceProperty(this, SH.nodeKind);
-					if(SH.IRI.equals(kind) || SH.BlankNode.equals(kind)) {
-						return RDFS.Resource.inModel(getModel());
-					}
-					else if(SH.Literal.equals(kind)) {
-						return RDFS.Literal.inModel(getModel());
-					}
-					else {
-						return null;
-					}
+					return null;
 				}
 			}
 		}
 	}
 	
 	
+	@Override
+	public Resource getContext() {
+		return SH.PropertyConstraint.inModel(getModel());
+	}
+
+
 	@Override
 	public String getCountDisplayString() {
 		Integer minCount = getMinCount();

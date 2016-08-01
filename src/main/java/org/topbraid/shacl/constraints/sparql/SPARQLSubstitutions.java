@@ -227,11 +227,6 @@ public class SPARQLSubstitutions {
 			scopes.add("        ?ANY_VALUE_" + index++ + "  <" + property + "> ?this .\n");
 		}
 		
-		for(Resource cls : JenaUtil.getResourceProperties(shape, SH.context)) {
-			String varName = "?CONTEXT_VAR";
-			scopes.add("        " + varName + " <" + RDFS.subClassOf + ">* <" + cls + "> .\n            ?this a " + varName + " .\n");
-		}
-		
 		if(shape.hasProperty(SH.scope)) {
 			scopes.add(createScopes(shape));
 		}

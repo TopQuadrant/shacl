@@ -43,8 +43,6 @@ public class SH {
     public final static Resource Literal = ResourceFactory.createResource(NS + "Literal");
 
     public final static Resource MaxCountConstraintComponent = ResourceFactory.createResource(NS + "MaxCountConstraintComponent");
-
-    public final static Resource NodeConstraint = ResourceFactory.createResource(NS + "NodeConstraint");
     
     public final static Resource Parameter = ResourceFactory.createResource(NS + "Parameter");
 
@@ -87,17 +85,9 @@ public class SH {
 
     public final static Property class_ = ResourceFactory.createProperty(NS + "class");
 
-    public final static Property classIn = ResourceFactory.createProperty(NS + "classIn");
-
-    public final static Property constraint = ResourceFactory.createProperty(NS + "constraint");
-
     public final static Property construct = ResourceFactory.createProperty(NS + "construct");
 
-    public final static Property context = ResourceFactory.createProperty(NS + "context");
-
     public final static Property datatype = ResourceFactory.createProperty(NS + "datatype");
-
-    public final static Property datatypeIn = ResourceFactory.createProperty(NS + "datatypeIn");
 
     public final static Property defaultValue = ResourceFactory.createProperty(NS + "defaultValue");
 
@@ -106,8 +96,6 @@ public class SH {
     public final static Property derivedValues = ResourceFactory.createProperty(NS + "derivedValues");
 
     public final static Property description = ResourceFactory.createProperty(NS + "description");
-
-    public final static Property directType = ResourceFactory.createProperty(NS + "directType");
 
     public final static Property entailment = ResourceFactory.createProperty(NS + "entailment");
     
@@ -144,8 +132,6 @@ public class SH {
     public final static Property name = ResourceFactory.createProperty(NS + "name");
 
     public final static Property nodeKind = ResourceFactory.createProperty(NS + "nodeKind");
-
-    public final static Property nodeValidator = ResourceFactory.createProperty(NS + "nodeValidator");
     
     public final static Property not = ResourceFactory.createProperty(NS + "not");
 
@@ -187,6 +173,8 @@ public class SH {
 
     public final static Property shapesGraph = ResourceFactory.createProperty(NS + "shapesGraph");
 
+    public final static Property shapeValidator = ResourceFactory.createProperty(NS + "shapeValidator");
+
     public final static Property sourceConstraint = ResourceFactory.createProperty(NS + "sourceConstraint");
     
     public final static Property sourceConstraintComponent = ResourceFactory.createProperty(NS + "sourceConstraintComponent");
@@ -209,6 +197,8 @@ public class SH {
 	public static final Var currentShapeVar = Var.alloc("currentShape");
 
 	public static final Var failureVar = Var.alloc("failure");
+
+	public static final Var focusNodeVar = Var.alloc(focusNode.getLocalName());
 
 	public static final Var PATHVar = Var.alloc("PATH");
 

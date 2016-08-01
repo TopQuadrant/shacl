@@ -34,13 +34,11 @@ ex:TestShape
   rdf:type sh:Shape ;
   rdfs:label "Test shape" ;
   rdfs:subClassOf rdfs:Resource ;
-  sh:constraint [
-      sh:not [
-          rdf:type sh:Shape ;
-          sh:property [
-              sh:predicate ex:property ;
-              sh:minCount 1 ;
-            ] ;
+  sh:not [
+      rdf:type sh:Shape ;
+      sh:property [
+          sh:predicate ex:property ;
+          sh:minCount 1 ;
         ] ;
     ] ;
   sh:scopeNode ex:InvalidResource1 ;

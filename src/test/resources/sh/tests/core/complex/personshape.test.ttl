@@ -65,12 +65,10 @@ ex:Person
 ex:PersonShape
   rdf:type sh:Shape ;
   rdfs:label "Person shape" ;
-  sh:constraint [
-      sh:closed "true"^^xsd:boolean ;
-      sh:ignoredProperties (
-          rdf:type
-        ) ;
-    ] ;
+  sh:closed "true"^^xsd:boolean ;
+  sh:ignoredProperties (
+      rdf:type
+    ) ;
   sh:property [
       sh:predicate ex:child ;
       sh:class ex:Person ;

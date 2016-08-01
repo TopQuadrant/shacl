@@ -28,14 +28,10 @@ ex:AddressShape
       sh:predicate ex:address ;
       sh:or (
           [
-            sh:constraint [
-                sh:datatype xsd:string ;
-              ] ;
+            sh:datatype xsd:string ;
           ]
           [
-            sh:constraint [
-                sh:class ex:Address ;
-              ] ;
+            sh:class ex:Address ;
           ]
         ) ;
     ] ;

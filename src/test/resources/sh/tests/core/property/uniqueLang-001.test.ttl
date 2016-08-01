@@ -62,10 +62,6 @@ ex:TestShape
   sh:property [
       sh:predicate ex:testProperty ;
       rdfs:label "test property" ;
-      sh:datatypeIn (
-          xsd:string
-          rdf:langString
-        ) ;
       sh:uniqueLang "true"^^xsd:boolean ;
     ] ;
 .

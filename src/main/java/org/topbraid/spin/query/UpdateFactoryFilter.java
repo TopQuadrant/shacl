@@ -1,5 +1,6 @@
 package org.topbraid.spin.query;
 
+import org.apache.jena.query.Syntax ;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateRequest;
 import org.apache.log4j.Logger;
@@ -23,7 +24,7 @@ public class UpdateFactoryFilter {
 
 	public UpdateRequest create(String str) {
 		analyzeRequest(str);
-		return UpdateFactory.create(str);
+		return UpdateFactory.create(str, Syntax.syntaxARQ);
 	}
 	
 	private void analyzeRequest(String update) {

@@ -36,11 +36,9 @@ ex:GraphValidationTestCase
 ex:ShapeWithStem
   rdf:type sh:Shape ;
   rdfs:label "Shape with stem" ;
-  sh:constraint [
-      sh:stem "http://example.org/" ;
-    ] ;
   sh:scopeNode <http://example.org> ;
   sh:scopeNode <http://example.org/> ;
   sh:scopeNode <http://example.org/A> ;
   sh:scopeNode "http://example.org/A" ;
+  sh:stem "http://example.org/" ;
 .

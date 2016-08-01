@@ -14,13 +14,19 @@ import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaUtil;
 
-public class SHShapeImpl extends SHResourceImpl implements SHShape {
+public class SHShapeImpl extends SHParameterizableConstraintImpl implements SHShape {
 
 	public SHShapeImpl(Node node, EnhGraph graph) {
 		super(node, graph);
 	}
 
 	
+	@Override
+	public Resource getContext() {
+		return SH.Shape.inModel(getModel());
+	}
+
+
 	@Override
 	public List<SHPropertyConstraint> getPropertyConstraints(RDFNode predicate) {
 		List<SHPropertyConstraint> results = new LinkedList<SHPropertyConstraint>();

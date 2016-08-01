@@ -42,14 +42,11 @@ ex:TestShape
   rdf:type rdfs:Class ;
   rdf:type sh:Shape ;
   rdfs:label "Test shape" ;
-  sh:constraint [
-      rdf:type sh:NodeConstraint ;
-      sh:in (
-          ex:Green
-          ex:Red
-          ex:Yellow
-        ) ;
-    ] ;
+  sh:in (
+      ex:Green
+      ex:Red
+      ex:Yellow
+    ) ;
 .
 ex:Yellow
   rdf:type ex:TestShape ;

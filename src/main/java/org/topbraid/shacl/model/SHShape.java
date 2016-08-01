@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.apache.jena.rdf.model.RDFNode;
 
-public interface SHShape extends SHResource {
+public interface SHShape extends SHParameterizableConstraint {
 
 	/**
 	 * Gets all sh:PropertyConstraints including sh:Parameter declarations

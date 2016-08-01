@@ -784,13 +784,17 @@ public class JenaUtil {
 	
 	
 	private static boolean hasSuperClass(Resource subClass, Resource superClass, Set<Resource> reached) {
-		for(Statement s : subClass.listProperties(RDFS.subClassOf).toList()) {
+		StmtIterator it = subClass.listProperties(RDFS.subClassOf);
+		while(it.hasNext()) {
+			Statement s = it.next();
 			if(superClass.equals(s.getObject())) {
+				it.close();
 				return true;
 			}
 			else if(!reached.contains(s.getResource())) {
 				reached.add(s.getResource());
 				if(hasSuperClass(s.getResource(), superClass, reached)) {
+					it.close();
 					return true;
 				}
 			}

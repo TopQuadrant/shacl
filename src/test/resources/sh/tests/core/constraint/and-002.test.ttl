@@ -18,17 +18,15 @@
 .
 ex:AndShape
   rdf:type sh:Shape ;
-  sh:constraint [
-      sh:and (
-          ex:SuperShape
-          [
-            sh:property [
-                sh:predicate ex:property ;
-                sh:maxCount 1 ;
-              ] ;
-          ]
-        ) ;
-    ] ;
+  sh:and (
+      ex:SuperShape
+      [
+        sh:property [
+            sh:predicate ex:property ;
+            sh:maxCount 1 ;
+          ] ;
+      ]
+    ) ;
   sh:scopeNode ex:InvalidInstance1 ;
   sh:scopeNode ex:InvalidInstance2 ;
   sh:scopeNode ex:ValidInstance1 ;

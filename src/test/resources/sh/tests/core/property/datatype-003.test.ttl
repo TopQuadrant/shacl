@@ -23,7 +23,7 @@ ex:GraphValidationTestCase
       sh:focusNode ex:InvalidInstance1 ;
       sh:path ex:value ;
       sh:severity sh:Violation ;
-      sh:sourceConstraintComponent sh:DatatypeInConstraintComponent ;
+      sh:sourceConstraintComponent sh:OrConstraintComponent ;
       sh:value 42 ;
     ] ;
 .
@@ -34,9 +34,13 @@ ex:MyShape
   rdf:type sh:Shape ;
   sh:property [
       sh:predicate ex:value ;
-      sh:datatypeIn (
-          xsd:string
-          rdf:langString
+      sh:or (
+          [
+            sh:datatype xsd:string ;
+          ]
+          [
+            sh:datatype rdf:langString ;
+          ]
         ) ;
     ] ;
   sh:scopeNode ex:InvalidInstance1 ;

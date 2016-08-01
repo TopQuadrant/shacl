@@ -20,9 +20,7 @@ ex:ExampleClass
   rdf:type rdfs:Class ;
   rdf:type sh:Shape ;
   rdfs:subClassOf rdfs:Resource ;
-  sh:constraint [
-      sh:not ex:FilteredExampleShape ;
-    ] ;
+  sh:not ex:FilteredExampleShape ;
 .
 ex:FilteredExampleShape
   rdf:type sh:Shape ;

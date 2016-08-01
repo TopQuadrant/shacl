@@ -2,9 +2,11 @@ package org.topbraid.shacl.constraints;
 
 import java.net.URI;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 import org.apache.jena.query.Dataset;
@@ -51,7 +53,7 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 	 * @param dataset  the Dataset to validate
 	 * @param shapesGraphURI  the URI of the shapes graph in the dataset
 	 * @param minSeverity  the minimum severity, e.g. sh:Error or null for all
-	 * @param validateShapes  true to also check schema-level resources (sh:parameter, sh:context etc)
+	 * @param validateShapes  true to also check schema-level resources (sh:parameter etc)
 	 * @param monitor  an optional ProgressMonitor
 	 * @return a Model containing violation results - empty if OK
 	 */
@@ -97,6 +99,25 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 	
 	private Map<Resource,List<SHConstraint>> buildShape2ConstraintsMap(Model shapesModel, Model dataModel, List<Property> constraintProperties, boolean validateShapes) {
 		Map<Resource,List<SHConstraint>> map = new HashMap<Resource,List<SHConstraint>>();
+		
+		// Collect all shapes, as identified by scope and/or type
+		Set<Resource> shapes = new HashSet<Resource>();
+		collectShapes(shapes, shapesModel, SH.scope);
+		collectShapes(shapes, shapesModel, SH.scopeClass);
+		collectShapes(shapes, shapesModel, SH.scopeNode);
+		collectShapes(shapes, shapesModel, SH.scopeInverseProperty);
+		collectShapes(shapes, shapesModel, SH.scopeProperty);
+		for(Resource shape : JenaUtil.getAllInstances(shapesModel.getResource(SH.Shape.getURI()))) {
+			if(JenaUtil.hasIndirectType(shape, RDFS.Class)) {
+				shapes.add(shape);
+			}
+		}
+		for(Resource shape : shapes) {
+			List<SHConstraint> list = new LinkedList<SHConstraint>();
+			list.add(SHFactory.asShape(shape));
+			map.put(shape, list);
+		}
+		
 		for(Property constraintProperty : constraintProperties) {
 			for(Statement s : shapesModel.listStatements(null, constraintProperty, (RDFNode)null).toList()) {
 				if(s.getObject().isResource()) {
@@ -118,7 +139,7 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 							}
 							else if(JenaUtil.hasSuperClass(type, SH.Constraint)) {
 								// Only execute property constraints if sh:predicate is present
-								if(SH.constraint.equals(constraintProperty) || c.hasProperty(SH.predicate) || c.hasProperty(SH.path)) {
+								if(c.hasProperty(SH.predicate) || c.hasProperty(SH.path)) {
 									list.add(SHFactory.asParameterizableConstraint(c));
 								}
 							}
@@ -131,6 +152,11 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 	}
 	
 	
+	private void collectShapes(Set<Resource> shapes, Model shapesModel, Property predicate) {
+		shapes.addAll(shapesModel.listSubjectsWithProperty(predicate).toList());
+	}
+	
+	
 	// Used to filter out scopeless shapes that are only used as part of other shapes
 	private boolean hasScope(Resource shape, Model dataModel, boolean validateShapes) {
 		if(JenaUtil.hasIndirectType(shape, RDFS.Class)) {
@@ -140,7 +166,12 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 			return true;
 		}
 		else if(shape.hasProperty(SH.scopeClass)) {
-			return true;
+			if(validateShapes) {
+				return true;
+			}
+			else {
+				return !JenaUtil.hasIndirectType(shape, SH.ConstraintComponent);
+			}
 		}
 		else if(shape.hasProperty(SH.scopeProperty)) {
 			return true;
@@ -149,9 +180,6 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 			return true;
 		}
 		else if(shape.hasProperty(SH.scopeNode)) {
-			return true;
-		}
-		else if(validateShapes && shape.hasProperty(SH.context)) {
 			return true;
 		}
 		else {

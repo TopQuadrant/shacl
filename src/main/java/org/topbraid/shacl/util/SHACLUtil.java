@@ -64,14 +64,14 @@ public class SHACLUtil {
 
 	private final static Set<Resource> classesWithDefaultType = new HashSet<Resource>();
 	static {
-		classesWithDefaultType.add(SH.NodeConstraint);
+		classesWithDefaultType.add(SH.Shape);
 		classesWithDefaultType.add(SH.Parameter);
 		classesWithDefaultType.add(SH.PropertyConstraint);
+		classesWithDefaultType.add(SH.SPARQLConstraint);
 	}
 	
 	private final static List<Property> constraintProperties = new LinkedList<Property>();
 	static {
-		constraintProperties.add(SH.constraint);
 		constraintProperties.add(SH.property);
 		constraintProperties.add(SH.sparql);
 	}
@@ -244,19 +244,15 @@ public class SHACLUtil {
 					getAllSuperClassesAndShapesStarHelper(it.next().getSubject(), results);
 				}
 			}
-			{
-				StmtIterator it = node.getModel().listStatements(null, SH.context, node);
-				while(it.hasNext()) {
-					getAllSuperClassesAndShapesStarHelper(it.next().getSubject(), results);
-				}
-			}
 		}
 	}
 	
 	
 	public static SHConstraintComponent getConstraintComponentOfValidator(Resource validator) {
-		for(Statement s : validator.getModel().listStatements(null, SH.validator, validator).toList()) {
-			return s.getSubject().as(SHConstraintComponent.class);
+		for(Statement s : validator.getModel().listStatements(null, null, validator).toList()) {
+			if(SH.validator.equals(s.getPredicate()) || SH.shapeValidator.equals(s.getPredicate()) || SH.propertyValidator.equals(s.getPredicate())) {
+				return s.getSubject().as(SHConstraintComponent.class);
+			}
 		}
 		return null;
 	}
@@ -478,16 +474,6 @@ public class SHACLUtil {
 					if(!shape.isDeactivated()) {
 						results.add(shape);
 					}
-				}
-			}
-		}
-		
-		{
-			StmtIterator it = clsOrShape.getModel().listStatements(null, SH.context, clsOrShape);
-			while(it.hasNext()) {
-				Resource subject = it.next().getSubject();
-				if(!results.contains(subject)) {
-					results.add(SHFactory.asShape(subject));
 				}
 			}
 		}

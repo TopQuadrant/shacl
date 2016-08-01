@@ -178,7 +178,8 @@ public class LocalRangeAtClassNativeFunction extends AbstractFunction2 {
 			while(it.hasNext()) {
 				Node constraint = it.next().getObject();
 				if(graph.contains(constraint, SPL.predicate.asNode(), property) &&
-						graph.contains(constraint, RDF.type.asNode(), SPL.Argument.asNode())) {
+						(graph.contains(constraint, RDF.type.asNode(), SPL.Argument.asNode()) ||
+						 graph.contains(constraint, RDF.type.asNode(), SPL.Attribute.asNode()))) {
 					Node valueType = getObject(constraint, SPL.valueType.asNode(), graph);
 					if(valueType != null) {
 						it.close();

@@ -18,6 +18,7 @@ import org.apache.jena.vocabulary.RDF;
 import org.topbraid.shacl.model.SHConstraint;
 import org.topbraid.shacl.model.SHFactory;
 import org.topbraid.shacl.model.SHParameterizableScope;
+import org.topbraid.shacl.model.SHShape;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.progress.ProgressMonitor;
@@ -67,15 +68,12 @@ public class ResourceConstraintValidator extends AbstractConstraintValidator {
 			}
 		}
 		
-		// rdf:type / sh:scopeClass|sh:context
+		// rdf:type / sh:scopeClass
 		for(Resource type : JenaUtil.getAllTypes(resource)) {
 			if(JenaUtil.hasIndirectType(type.inModel(shapesModel), SH.Shape)) {
 				shapes.add(type);
 			}
 			for(Statement s : shapesModel.listStatements(null, SH.scopeClass, type).toList()) {
-				shapes.add(s.getSubject());
-			}
-			for(Statement s : shapesModel.listStatements(null, SH.context, type).toList()) {
 				shapes.add(s.getSubject());
 			}
 		}
@@ -174,7 +172,12 @@ public class ResourceConstraintValidator extends AbstractConstraintValidator {
 		
 		RDFNode resource = dataset.getDefaultModel().asRDFNode(resourceNode);
 		Model shapesModel = dataset.getNamedModel(shapesGraphURI.toString());
-		Resource shape = (Resource) shapesModel.asRDFNode(shapeNode);
+		SHShape shape = SHFactory.asShape(shapesModel.asRDFNode(shapeNode));
+		
+		if(constraintFilter == null || constraintFilter.test(shape)) {
+			addQueryResults(results, shape, shape, resource, dataset, shapesGraphURI, minSeverity, labelFunction, monitor);
+		}
+		
 		for(Property constraintProperty : constraintProperties) {
 			for(Resource c : JenaUtil.getResourceProperties(shape, constraintProperty)) {
 				if(c.hasProperty(RDF.type, SH.SPARQLConstraint)) {

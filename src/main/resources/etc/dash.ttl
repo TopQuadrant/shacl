@@ -12,7 +12,7 @@
 
 <http://datashapes.org/dash>
   rdf:type owl:Ontology ;
-  rdfs:comment """DASH implements a standard SPARQL implementation of SHACL and is utilized by TopBraid and its API.
+  rdfs:comment """DASH defines a standard SPARQL implementation of SHACL which is (among others) utilized by TopBraid and its API.
 
 DASH is also a SHACL library for frequently needed features and design patterns. All features in this library are 100% standards compliant and will work on any engine that fully supports SHACL.""" ;
   rdfs:label "DASH Data Shapes Library" ;
@@ -114,7 +114,6 @@ dash:MemberShapeConstraintComponent
   rdf:type sh:ConstraintComponent ;
   rdfs:comment "Can be used to specify constraints on the members of a given list, assuming that the given sh:property has rdf:Lists as values. A violation is reported for each member of the list that does not comply with the constraints specified by the given shape." ;
   rdfs:label "Member shape constraint component" ;
-  sh:context sh:PropertyConstraint ;
   sh:parameter [
       sh:predicate dash:memberShape ;
       sh:class sh:Shape ;
@@ -135,20 +134,45 @@ dash:MemberShapeConstraintComponent
 		}
 """ ;
     ] ;
+  sh:scopeClass sh:PropertyConstraint ;
+.
+dash:NonRecursiveConstraintComponent
+  rdf:type sh:ConstraintComponent ;
+  dash:propertySuggestionGenerator <http://topbraid.org/tosh#DeleteTripleSuggestionGenerator> ;
+  rdfs:comment """Used to state that a property or path must not point back to itself.
+
+For example, \"a person cannot have itself as parent\" can be expressed by setting dash:nonRecursive=true for a given sh:predicate.
+
+To express that a person cannot have itself among any of its (recursive) parents, use a sh:path with the + operator such as ex:parent+.""" ;
+  rdfs:label "Non-recursive constraint component" ;
+  sh:parameter [
+      sh:predicate dash:nonRecursive ;
+      sh:datatype xsd:boolean ;
+      sh:name "non-recursive" ;
+    ] ;
+  sh:propertyValidator [
+      rdf:type sh:SPARQLSelectValidator ;
+      sh:message "Points back at itself (recursively)" ;
+      sh:select """SELECT $this ($this AS ?value)
+WHERE {
+	{
+		FILTER (?nonRecursive)
+	}
+    $this $PATH $this .
+}""" ;
+    ] ;
+  sh:scopeClass sh:PropertyConstraint ;
 .
 dash:None
   rdf:type sh:Shape ;
   rdfs:comment "A Shape that is violated for every possible focus node. This can be used in sh:filterShape statements to essentially deactivate other shapes or constraints." ;
   rdfs:label "None" ;
-  sh:constraint [
-      sh:in () ;
-    ] ;
+  sh:in () ;
 .
 dash:PrimaryKeyConstraintComponent
   rdf:type sh:ConstraintComponent ;
   rdfs:comment "Enforces a constraint that the given property (sh:predicate) serves as primary key for all resources in the scope of the shape. If a property has been declared to be the primary key then each resource must have exactly one value for that property. Furthermore, the URIs of those resources must start with a given string (dash:uriStart), followed by the URL-encoded primary key value. For example if dash:uriStart is \"http://example.org/country-\" and the primary key for an instance is \"de\" then the URI must be \"http://example.org/country-de\". Finally, as a result of the URI policy, there can not be any other resource with the same value under the same primary key policy." ;
   rdfs:label "Primary key constraint component" ;
-  sh:context sh:PropertyConstraint ;
   sh:labelTemplate "The property {?predicate} is the primary key and URIs start with {?uriStart}" ;
   sh:parameter [
       sh:predicate dash:uriStart ;
@@ -187,6 +211,7 @@ WHERE {
     } .
 }""" ;
     ] ;
+  sh:scopeClass sh:PropertyConstraint ;
 .
 dash:QueryTestCase
   rdf:type rdfs:Class ;
@@ -215,8 +240,6 @@ dash:RootClassConstraintComponent
   rdf:type sh:ConstraintComponent ;
   rdfs:comment "A constraint component defining the parameter dash:rootClass, which restricts the values to be either the root class itself or one of its subclasses. This is typically used in conjunction with properties that have rdfs:Class as their type." ;
   rdfs:label "Root class constraint component" ;
-  sh:context sh:NodeConstraint ;
-  sh:context sh:PropertyConstraint ;
   sh:labelTemplate "Root class {$rootClass}" ;
   sh:parameter [
       sh:predicate dash:rootClass ;
@@ -225,6 +248,8 @@ dash:RootClassConstraintComponent
       sh:name "root class" ;
       sh:nodeKind sh:IRI ;
     ] ;
+  sh:scopeClass sh:PropertyConstraint ;
+  sh:scopeClass sh:Shape ;
   sh:validator dash:hasRootClass ;
 .
 dash:SPARQLUpdateSuggestionGenerator
@@ -236,6 +261,13 @@ In many cases, there may be multiple possible suggestions to fix a problem. For 
   rdfs:subClassOf dash:SuggestionGenerator ;
   rdfs:subClassOf sh:SPARQLSelectExecutable ;
   rdfs:subClassOf sh:SPARQLUpdateExecutable ;
+.
+dash:ShapeClass
+  rdf:type rdfs:Class ;
+  rdfs:comment "Metaclass of classes that are also SHACL shapes. Instances of this metaclass (i.e. the classes themselves) can have constraints attached to them. No other type arc is needed." ;
+  rdfs:label "Shape class" ;
+  rdfs:subClassOf rdfs:Class ;
+  rdfs:subClassOf sh:Shape ;
 .
 dash:SuccessResult
   rdf:type rdfs:Class ;
@@ -664,17 +696,6 @@ owl:Class
   rdfs:subClassOf rdfs:Class ;
 .
 sh:AndConstraintComponent
-  sh:nodeValidator [
-      rdf:type sh:SPARQLSelectValidator ;
-      sh:select """
-		SELECT $this ?failure
-		WHERE {
-			BIND (dash:countShapesWithMatchResult($this, $and, $shapesGraph, false) AS ?count)
-			BIND (!bound(?count) AS ?failure) .
-			FILTER IF(?failure, true, ?count > 0) .
-		}
-""" ;
-    ] ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
       sh:select """
@@ -687,15 +708,28 @@ sh:AndConstraintComponent
 		}
 """ ;
     ] ;
+  sh:scopeClass sh:PropertyConstraint ;
+  sh:scopeClass sh:Shape ;
+  sh:shapeValidator [
+      rdf:type sh:SPARQLSelectValidator ;
+      sh:select """
+		SELECT $this ?failure
+		WHERE {
+			BIND (dash:countShapesWithMatchResult($this, $and, $shapesGraph, false) AS ?count)
+			BIND (!bound(?count) AS ?failure) .
+			FILTER IF(?failure, true, ?count > 0) .
+		}
+""" ;
+    ] ;
 .
 sh:ClassConstraintComponent
+  sh:scopeClass sh:PropertyConstraint ;
+  sh:scopeClass sh:Shape ;
   sh:validator dash:hasClass ;
 .
-sh:ClassInConstraintComponent
-  sh:validator dash:hasClassIn ;
-.
 sh:ClosedConstraintComponent
-  sh:nodeValidator [
+  sh:scopeClass sh:Shape ;
+  sh:shapeValidator [
       rdf:type sh:SPARQLSelectValidator ;
       sh:message "Predicate {?path} is not allowed (closed shape)" ;
       sh:select """
@@ -719,10 +753,12 @@ sh:ClosedConstraintComponent
     ] ;
 .
 sh:DatatypeConstraintComponent
+  sh:scopeClass sh:PropertyConstraint ;
+  sh:scopeClass sh:Shape ;
   sh:validator dash:hasDatatype ;
 .
-sh:DatatypeInConstraintComponent
-  sh:validator dash:hasDatatypeIn ;
+sh:DerivedValuesConstraintComponent
+  sh:scopeClass sh:PropertyConstraint ;
 .
 sh:DisjointConstraintComponent
   sh:propertyValidator [
@@ -736,6 +772,7 @@ sh:DisjointConstraintComponent
 		}
 		""" ;
     ] ;
+  sh:scopeClass sh:PropertyConstraint ;
 .
 sh:EqualsConstraintComponent
   sh:propertyValidator [
@@ -760,6 +797,7 @@ sh:EqualsConstraintComponent
 		}
 		""" ;
     ] ;
+  sh:scopeClass sh:PropertyConstraint ;
 .
 sh:Function
   sh:property [
@@ -781,8 +819,11 @@ sh:HasValueConstraintComponent
 		}
 		""" ;
     ] ;
+  sh:scopeClass sh:PropertyConstraint ;
 .
 sh:InConstraintComponent
+  sh:scopeClass sh:PropertyConstraint ;
+  sh:scopeClass sh:Shape ;
   sh:validator dash:isIn ;
 .
 sh:LessThanConstraintComponent
@@ -798,6 +839,7 @@ sh:LessThanConstraintComponent
 		}
 		""" ;
     ] ;
+  sh:scopeClass sh:PropertyConstraint ;
 .
 sh:LessThanOrEqualsConstraintComponent
   sh:propertyValidator [
@@ -812,6 +854,7 @@ sh:LessThanOrEqualsConstraintComponent
 		}
 		""" ;
     ] ;
+  sh:scopeClass sh:PropertyConstraint ;
 .
 sh:MaxCountConstraintComponent
   sh:propertyValidator [
@@ -826,14 +869,21 @@ sh:MaxCountConstraintComponent
 		HAVING (COUNT(?value) > $maxCount)
 		""" ;
     ] ;
+  sh:scopeClass sh:PropertyConstraint ;
 .
 sh:MaxExclusiveConstraintComponent
+  sh:scopeClass sh:PropertyConstraint ;
+  sh:scopeClass sh:Shape ;
   sh:validator dash:hasMaxExclusive ;
 .
 sh:MaxInclusiveConstraintComponent
+  sh:scopeClass sh:PropertyConstraint ;
+  sh:scopeClass sh:Shape ;
   sh:validator dash:hasMaxInclusive ;
 .
 sh:MaxLengthConstraintComponent
+  sh:scopeClass sh:PropertyConstraint ;
+  sh:scopeClass sh:Shape ;
   sh:validator dash:hasMaxLength ;
 .
 sh:MinCountConstraintComponent
@@ -851,32 +901,29 @@ sh:MinCountConstraintComponent
 		HAVING (COUNT(?value) < $minCount)
 		""" ;
     ] ;
+  sh:scopeClass sh:PropertyConstraint ;
 .
 sh:MinExclusiveConstraintComponent
+  sh:scopeClass sh:PropertyConstraint ;
+  sh:scopeClass sh:Shape ;
   sh:validator dash:hasMinExclusive ;
 .
 sh:MinInclusiveConstraintComponent
+  sh:scopeClass sh:PropertyConstraint ;
+  sh:scopeClass sh:Shape ;
   sh:validator dash:hasMinInclusive ;
 .
 sh:MinLengthConstraintComponent
+  sh:scopeClass sh:PropertyConstraint ;
+  sh:scopeClass sh:Shape ;
   sh:validator dash:hasMinLength ;
 .
 sh:NodeKindConstraintComponent
+  sh:scopeClass sh:PropertyConstraint ;
+  sh:scopeClass sh:Shape ;
   sh:validator dash:hasNodeKind ;
 .
 sh:NotConstraintComponent
-  sh:nodeValidator [
-      rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Value does have shape {$not}" ;
-      sh:select """
-		SELECT $this ($this AS ?value) ?failure
-		WHERE {
-			BIND (sh:hasShape($this, $not, $shapesGraph) AS ?hasShape) .
-			BIND (!bound(?hasShape) AS ?failure) .
-			FILTER (?failure || ?hasShape) .
-		}
-		""" ;
-    ] ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
       sh:message "Value does have shape {$not}" ;
@@ -890,19 +937,22 @@ sh:NotConstraintComponent
 		}
 		""" ;
     ] ;
+  sh:scopeClass sh:PropertyConstraint ;
+  sh:scopeClass sh:Shape ;
+  sh:shapeValidator [
+      rdf:type sh:SPARQLSelectValidator ;
+      sh:message "Value does have shape {$not}" ;
+      sh:select """
+		SELECT $this ($this AS ?value) ?failure
+		WHERE {
+			BIND (sh:hasShape($this, $not, $shapesGraph) AS ?hasShape) .
+			BIND (!bound(?hasShape) AS ?failure) .
+			FILTER (?failure || ?hasShape) .
+		}
+		""" ;
+    ] ;
 .
 sh:OrConstraintComponent
-  sh:nodeValidator [
-      rdf:type sh:SPARQLSelectValidator ;
-      sh:select """
-		SELECT $this ?failure
-		WHERE {
-			BIND (dash:countShapesWithMatchResult($this, $or, $shapesGraph, true) AS ?count)
-			BIND (!bound(?count) AS ?failure) .
-			FILTER IF(?failure, true, ?count = 0) .
-		}
-""" ;
-    ] ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
       sh:select """
@@ -915,8 +965,23 @@ sh:OrConstraintComponent
 		}
 """ ;
     ] ;
+  sh:scopeClass sh:PropertyConstraint ;
+  sh:scopeClass sh:Shape ;
+  sh:shapeValidator [
+      rdf:type sh:SPARQLSelectValidator ;
+      sh:select """
+		SELECT $this ?failure
+		WHERE {
+			BIND (dash:countShapesWithMatchResult($this, $or, $shapesGraph, true) AS ?count)
+			BIND (!bound(?count) AS ?failure) .
+			FILTER IF(?failure, true, ?count = 0) .
+		}
+""" ;
+    ] ;
 .
 sh:PatternConstraintComponent
+  sh:scopeClass sh:PropertyConstraint ;
+  sh:scopeClass sh:Shape ;
   sh:validator dash:hasPattern ;
 .
 sh:QualifiedMaxCountConstraintComponent
@@ -937,6 +1002,7 @@ sh:QualifiedMaxCountConstraintComponent
 	HAVING ( ( COUNT ( ?value ) > $qualifiedMaxCount ) || ( SUM(?failed) > 0 )) 
 """ ;
     ] ;
+  sh:scopeClass sh:PropertyConstraint ;
 .
 sh:QualifiedMinCountConstraintComponent
   sh:propertyValidator [
@@ -956,20 +1022,9 @@ sh:QualifiedMinCountConstraintComponent
 	HAVING ( ( COUNT ( ?value ) < $qualifiedMinCount ) || ( SUM(?failed) > 0 )) 
 """ ;
     ] ;
+  sh:scopeClass sh:PropertyConstraint ;
 .
 sh:ShapeConstraintComponent
-  sh:nodeValidator [
-      rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Value does not have shape {$shape}" ;
-      sh:select """
-		SELECT ($value AS $this) $value ?failure
-		WHERE {
-			BIND (sh:hasShape($value, $shape, $shapesGraph) AS ?hasShape) .
-			BIND (!bound(?hasShape) AS ?failure) .
-			FILTER (?failure || !?hasShape) .
-		}
-		""" ;
-    ] ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
       sh:message "Value does not have shape {$shape}" ;
@@ -983,8 +1038,23 @@ sh:ShapeConstraintComponent
 		}
 		""" ;
     ] ;
+  sh:scopeClass sh:PropertyConstraint ;
+  sh:shapeValidator [
+      rdf:type sh:SPARQLSelectValidator ;
+      sh:message "Value does not have shape {$shape}" ;
+      sh:select """
+		SELECT ($value AS $this) $value ?failure
+		WHERE {
+			BIND (sh:hasShape($value, $shape, $shapesGraph) AS ?hasShape) .
+			BIND (!bound(?hasShape) AS ?failure) .
+			FILTER (?failure || !?hasShape) .
+		}
+		""" ;
+    ] ;
 .
 sh:StemConstraintComponent
+  sh:scopeClass sh:PropertyConstraint ;
+  sh:scopeClass sh:Shape ;
   sh:validator dash:hasStem ;
 .
 sh:UniqueLangConstraintComponent
@@ -1007,6 +1077,7 @@ sh:UniqueLangConstraintComponent
 		}
 		""" ;
     ] ;
+  sh:scopeClass sh:PropertyConstraint ;
 .
 sh:order
   rdfs:range xsd:decimal ;
