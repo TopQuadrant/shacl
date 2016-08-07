@@ -10,7 +10,6 @@ import org.apache.jena.rdf.model.Resource;
 import org.topbraid.shacl.model.SHFactory;
 import org.topbraid.shacl.model.SHPropertyConstraint;
 import org.topbraid.shacl.model.SHShape;
-import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaUtil;
 
@@ -41,11 +40,5 @@ public class SHShapeImpl extends SHParameterizableConstraintImpl implements SHSh
 			}
 		}
 		return results;
-	}
-
-
-	@Override
-	public boolean isDeactivated() {
-		return hasProperty(SH.filterShape, DASH.None);
 	}
 }

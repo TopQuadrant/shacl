@@ -42,9 +42,9 @@ ex:TestShape
           sh:datatype xsd:integer ;
         ] ;
     ] ;
-  sh:scopeNode ex:InvalidResource1 ;
-  sh:scopeNode ex:ValidResource1 ;
-  sh:scopeNode ex:ValidResource2 ;
+  sh:targetNode ex:InvalidResource1 ;
+  sh:targetNode ex:ValidResource1 ;
+  sh:targetNode ex:ValidResource2 ;
 .
 ex:ValidResource1
   rdf:type rdfs:Resource ;

@@ -28,6 +28,6 @@ ex:NotExampleShape
           sh:minCount 1 ;
         ] ;
     ] ;
-  sh:scopeNode ex:InvalidInstance1 ;
-  sh:scopeNode ex:ValidInstance1 ;
+  sh:targetNode ex:InvalidInstance1 ;
+  sh:targetNode ex:ValidInstance1 ;
 .

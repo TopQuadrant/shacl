@@ -21,17 +21,17 @@ import org.apache.jena.sparql.pfunction.PropFuncArg;
 import org.apache.jena.sparql.pfunction.PropertyFunctionBase;
 
 /**
- * The property function http://topbraid.org/shacl/tbsh#scopeContains.
+ * The property function http://topbraid.org/shacl/tbsh#targetContains.
  * Binds the variable on the right hand side with all focus nodes produced by the
- * SHACL scope on the left hand side.
+ * SHACL target on the left hand side.
  * 
- * 		(?myScope ?shapesGraph) tbsh:scopeContains ?focusNode .
+ * 		(?myTarget ?shapesGraph) tbsh:targetContains ?focusNode .
  * 
  * @author Holger Knublauch
  */
-public class ScopeContainsPFunction extends PropertyFunctionBase {
+public class TargetContainsPFunction extends PropertyFunctionBase {
 	
-	public final static String URI = "http://topbraid.org/shacl/tbsh#scopeContains";
+	public final static String URI = "http://topbraid.org/shacl/tbsh#targetContains";
 
 	
 	@Override
@@ -45,16 +45,16 @@ public class ScopeContainsPFunction extends PropertyFunctionBase {
 			throw new ExprEvalException("Right hand side " + URI + " must be a variable");
 		}
 		
-		Node scopeNode = argSubject.getArgList().get(0);
+		Node targetNode = argSubject.getArgList().get(0);
 		Node shapesGraphNode = argSubject.getArgList().get(1);
 		
 		Dataset dataset = DatasetImpl.wrap(execCxt.getDataset());
 
 		Model model = dataset.getNamedModel(shapesGraphNode.getURI());
-		Resource scope = (Resource) model.asRDFNode(scopeNode);
+		Resource target = (Resource) model.asRDFNode(targetNode);
 
 		Set<Node> focusNodes = new HashSet<Node>();
-		SHACLUtil.addNodesInScope(scope, dataset, focusNodes);
+		SHACLUtil.addNodesInTarget(target, dataset, focusNodes);
 		return new QueryIterExtendByVar(binding, (Var) argObject.getArg(), focusNodes.iterator(), execCxt);
 	}
 }

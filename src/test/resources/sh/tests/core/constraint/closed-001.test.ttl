@@ -46,8 +46,8 @@ ex:MyShape
   sh:property [
       sh:predicate ex:someProperty ;
     ] ;
-  sh:scopeNode ex:InvalidInstance1 ;
-  sh:scopeNode ex:ValidInstance1 ;
+  sh:targetNode ex:InvalidInstance1 ;
+  sh:targetNode ex:ValidInstance1 ;
 .
 ex:ValidInstance1
   ex:someProperty 3 ;

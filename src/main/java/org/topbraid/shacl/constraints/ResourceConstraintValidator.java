@@ -17,7 +17,7 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDF;
 import org.topbraid.shacl.model.SHConstraint;
 import org.topbraid.shacl.model.SHFactory;
-import org.topbraid.shacl.model.SHParameterizableScope;
+import org.topbraid.shacl.model.SHParameterizableTarget;
 import org.topbraid.shacl.model.SHShape;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.vocabulary.SH;
@@ -53,34 +53,34 @@ public class ResourceConstraintValidator extends AbstractConstraintValidator {
 	public Set<Resource> getShapesForResource(Resource resource, Dataset dataset, Model shapesModel) {
 		Set<Resource> shapes = new HashSet<Resource>();
 
-		// sh:scopeNode
-		shapes.addAll(shapesModel.listSubjectsWithProperty(SH.scopeNode, resource).toList());
+		// sh:targetNode
+		shapes.addAll(shapesModel.listSubjectsWithProperty(SH.targetNode, resource).toList());
 		
-		// property scopes
-		for(Statement s : shapesModel.listStatements(null, SH.scopeProperty, (RDFNode)null).toList()) {
+		// property targets
+		for(Statement s : shapesModel.listStatements(null, SH.targetSubjectsOf, (RDFNode)null).toList()) {
 			if(resource.hasProperty(JenaUtil.asProperty(s.getResource()))) {
 				shapes.add(s.getSubject());
 			}
 		}
-		for(Statement s : shapesModel.listStatements(null, SH.scopeInverseProperty, (RDFNode)null).toList()) {
+		for(Statement s : shapesModel.listStatements(null, SH.targetObjectsOf, (RDFNode)null).toList()) {
 			if(resource.getModel().contains(null, JenaUtil.asProperty(s.getResource()), resource)) {
 				shapes.add(s.getSubject());
 			}
 		}
 		
-		// rdf:type / sh:scopeClass
+		// rdf:type / sh:targetClass
 		for(Resource type : JenaUtil.getAllTypes(resource)) {
 			if(JenaUtil.hasIndirectType(type.inModel(shapesModel), SH.Shape)) {
 				shapes.add(type);
 			}
-			for(Statement s : shapesModel.listStatements(null, SH.scopeClass, type).toList()) {
+			for(Statement s : shapesModel.listStatements(null, SH.targetClass, type).toList()) {
 				shapes.add(s.getSubject());
 			}
 		}
 		
-		// sh:scope
-		for(Statement s : shapesModel.listStatements(null, SH.scope, (RDFNode)null).toList()) {
-			if(isInScope(resource, dataset, s.getResource())) {
+		// sh:target
+		for(Statement s : shapesModel.listStatements(null, SH.target, (RDFNode)null).toList()) {
+			if(isInTarget(resource, dataset, s.getResource())) {
 				shapes.add(s.getSubject());
 			}
 		}
@@ -202,14 +202,14 @@ public class ResourceConstraintValidator extends AbstractConstraintValidator {
 	}
 	
 	
-	private boolean isInScope(Resource focusNode, Dataset dataset, Resource scope) {
-		SHParameterizableScope parameterizableScope = null;
-		Resource executable = scope;
-		if(SHFactory.isParameterizableInstance(scope)) {
-			parameterizableScope = SHFactory.asParameterizableScope(scope);
-			executable = parameterizableScope.getParameterizable();
+	private boolean isInTarget(Resource focusNode, Dataset dataset, Resource target) {
+		SHParameterizableTarget parameterizableTarget = null;
+		Resource executable = target;
+		if(SHFactory.isParameterizableInstance(target)) {
+			parameterizableTarget = SHFactory.asParameterizableTarget(target);
+			executable = parameterizableTarget.getParameterizable();
 		}
-		ExecutionLanguage lang = ExecutionLanguageSelector.get().getLanguageForScope(executable);
-		return lang.isNodeInScope(focusNode, dataset, executable, parameterizableScope);
+		ExecutionLanguage lang = ExecutionLanguageSelector.get().getLanguageForTarget(executable);
+		return lang.isNodeInTarget(focusNode, dataset, executable, parameterizableTarget);
 	}
 }

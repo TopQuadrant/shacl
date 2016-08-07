@@ -33,7 +33,7 @@ import org.topbraid.shacl.constraints.ExecutionLanguageSelector;
 import org.topbraid.shacl.model.SHConstraintComponent;
 import org.topbraid.shacl.model.SHFactory;
 import org.topbraid.shacl.model.SHParameter;
-import org.topbraid.shacl.model.SHParameterizableScope;
+import org.topbraid.shacl.model.SHParameterizableTarget;
 import org.topbraid.shacl.model.SHPropertyConstraint;
 import org.topbraid.shacl.model.SHResult;
 import org.topbraid.shacl.model.SHShape;
@@ -89,7 +89,7 @@ public class SHACLUtil {
 			"WHERE {\n" +
 			"    ?arg2 a ?type .\n" +
 			"    ?type rdfs:subClassOf* ?class .\n" +
-			"    ?shape <" + SH.scopeClass + ">* ?class .\n" +
+			"    ?shape <" + SH.targetClass + ">* ?class .\n" +
 			"    ?shape <" + SH.property + ">|<" + SH.parameter + "> ?p .\n" +
 			"    ?p <" + SH.predicate + "> ?arg1 .\n" +
 			"    ?p rdfs:label ?label .\n" +
@@ -132,38 +132,14 @@ public class SHACLUtil {
 
 
 	/**
-	 * Adds all resources from a given sh:scope to a given results Set of Nodes.
-	 * @param scope  the value of sh:scope (template call or native scope)
+	 * Adds all resources from a given sh:target to a given results Set of Nodes.
+	 * @param target  the value of sh:target (parameterized or SPARQL target)
 	 * @param dataset  the dataset to operate on
 	 * @param results  the Set to add the resulting Nodes to
 	 */
-	public static void addNodesInScope(Resource scope, Dataset dataset, Set<Node> results) {
-		for(RDFNode focusNode : getResourcesInScope(scope, dataset)) {
+	public static void addNodesInTarget(Resource target, Dataset dataset, Set<Node> results) {
+		for(RDFNode focusNode : getResourcesInTarget(target, dataset)) {
 			results.add(focusNode.asNode());
-		}
-	}
-	
-	
-	/**
-	 * Runs the rule to infer missing rdf:type triples for certain blank nodes.
-	 * @param model  the input Model
-	 * @return a new Model containing the inferred triples
-	 */
-	public static Model createDefaultValueTypesModel(Model model) {
-		String sparql = JenaUtil.getStringProperty(SH.DefaultValueTypeRule.inModel(model), SH.construct);
-		if(sparql == null) {
-			throw new IllegalArgumentException("Shapes graph does not include " + SH.PREFIX + ":" + SH.DefaultValueTypeRule);
-		}
-		Model resultModel = JenaUtil.createMemoryModel();
-		MultiUnion multiUnion = new MultiUnion(new Graph[] {
-			model.getGraph(),
-			resultModel.getGraph()
-		});
-		Model unionModel = ModelFactory.createModelForGraph(multiUnion);
-		Query query = ARQFactory.get().createQuery(model, sparql);
-		try(QueryExecution qexec = ARQFactory.get().createQueryExecution(query, unionModel)) {
-		    qexec.execConstruct(resultModel);
-		    return resultModel;    
 		}
 	}
 	
@@ -215,7 +191,7 @@ public class SHACLUtil {
 	
 	
 	/**
-	 * Gets all (transitive) superclasses including shapes that reference a class via sh:scopeClass.
+	 * Gets all (transitive) superclasses including shapes that reference a class via sh:targetClass.
 	 * @param cls  the class to start at
 	 * @return a Set of classes and shapes
 	 */
@@ -239,7 +215,7 @@ public class SHACLUtil {
 				}
 			}
 			{
-				StmtIterator it = node.getModel().listStatements(null, SH.scopeClass, node);
+				StmtIterator it = node.getModel().listStatements(null, SH.targetClass, node);
 				while(it.hasNext()) {
 					getAllSuperClassesAndShapesStarHelper(it.next().getSubject(), results);
 				}
@@ -299,7 +275,7 @@ public class SHACLUtil {
 		try {
 			while(it.hasNext()) {
 				Statement s = it.next();
-				Resource defaultValueType = JenaUtil.getResourceProperty(s.getPredicate(), SH.defaultValueType);
+				Resource defaultValueType = JenaUtil.getResourceProperty(s.getPredicate(), DASH.defaultValueType);
 				if(defaultValueType != null) {
 					return defaultValueType;
 				}
@@ -373,30 +349,30 @@ public class SHACLUtil {
 
 
 	/**
-	 * Gets all nodes from a given sh:scope.
-	 * @param scope  the value of sh:scope (template call or native scope)
+	 * Gets all nodes from a given sh:target.
+	 * @param target  the value of sh:target (parameterizable or SPARQL target)
 	 * @param dataset  the dataset to operate on
 	 */
-	public static Iterable<RDFNode> getResourcesInScope(Resource scope, Dataset dataset) {
-		Resource type = JenaUtil.getType(scope);
+	public static Iterable<RDFNode> getResourcesInTarget(Resource target, Dataset dataset) {
+		Resource type = JenaUtil.getType(target);
 		Resource executable;
-		SHParameterizableScope parameterizableScope = null;
-		if(SHFactory.isSPARQLScope(scope)) {
-			executable = scope;
+		SHParameterizableTarget parameterizableTarget = null;
+		if(SHFactory.isSPARQLTarget(target)) {
+			executable = target;
 		}
 		else {
 			executable = type;
-			parameterizableScope = SHFactory.asParameterizableScope(scope);
+			parameterizableTarget = SHFactory.asParameterizableTarget(target);
 		}
-		ExecutionLanguage language = ExecutionLanguageSelector.get().getLanguageForScope(executable);
-		return language.executeScope(dataset, executable, parameterizableScope);
+		ExecutionLanguage language = ExecutionLanguageSelector.get().getLanguageForTarget(executable);
+		return language.executeTarget(dataset, executable, parameterizableTarget);
 	}
 	
 	
 	/**
 	 * Gets all shapes associated with a given focus node.
-	 * This looks for all shapes based on class-based scopes.
-	 * Future versions will also look for property-based scopes.
+	 * This looks for all shapes based on class-based targets.
+	 * Future versions will also look for property-based targets.
 	 * @param node  the (focus) node
 	 * @return a List of shapes
 	 */
@@ -414,14 +390,14 @@ public class SHACLUtil {
 			}
 		}
 		
-		// TODO: support sh:scopeProperty and sh:inverseScopeProperty
+		// TODO: support sh:targetObjectsOf and sh:targetSubjectsOf
 		
 		return results;
 	}
 	
 	
 	/**
-	 * Gets all sh:Shapes that have a given class in their scope, including ConstraintComponents
+	 * Gets all sh:Shapes that have a given class in their target, including ConstraintComponents
 	 * and the class or shape itself if it is marked as sh:Shape.
 	 * Also walks up the class hierarchy.
 	 * @param clsOrShape  the class or Shape to get the shapes of
@@ -447,7 +423,7 @@ public class SHACLUtil {
 	
 	
 	/**
-	 * Gets the directly associated sh:Shapes that have a given class in their scope,
+	 * Gets the directly associated sh:Shapes that have a given class in their target,
 	 * including ConstraintComponents and the class or shape itself if it is marked as sh:Shape.
 	 * Does not walk up the class hierarchy.
 	 * @param clsOrShape  the class or Shape to get the shapes of
@@ -466,7 +442,7 @@ public class SHACLUtil {
 		}
 		// More correct would be: if(JenaUtil.hasIndirectType(clsOrShape, RDFS.Class)) {
 		{
-			StmtIterator it = clsOrShape.getModel().listStatements(null, SH.scopeClass, clsOrShape);
+			StmtIterator it = clsOrShape.getModel().listStatements(null, SH.targetClass, clsOrShape);
 			while(it.hasNext()) {
 				Resource subject = it.next().getSubject();
 				if(!results.contains(subject)) {
@@ -553,7 +529,7 @@ public class SHACLUtil {
 	public static Model withDefaultValueTypeInferences(Model model) {
 		return ModelFactory.createModelForGraph(new MultiUnion(new Graph[] {
 				model.getGraph(),
-				SHACLUtil.createDefaultValueTypesModel(model).getGraph()
+				DASH.createDefaultValueTypesModel(model).getGraph()
 		}));
 	}
 

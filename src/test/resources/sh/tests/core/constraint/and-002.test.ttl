@@ -27,9 +27,9 @@ ex:AndShape
           ] ;
       ]
     ) ;
-  sh:scopeNode ex:InvalidInstance1 ;
-  sh:scopeNode ex:InvalidInstance2 ;
-  sh:scopeNode ex:ValidInstance1 ;
+  sh:targetNode ex:InvalidInstance1 ;
+  sh:targetNode ex:InvalidInstance2 ;
+  sh:targetNode ex:ValidInstance1 ;
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;

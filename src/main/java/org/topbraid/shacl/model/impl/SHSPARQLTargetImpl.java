@@ -3,13 +3,13 @@ package org.topbraid.shacl.model.impl;
 import org.apache.jena.enhanced.EnhGraph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.vocabulary.RDFS;
-import org.topbraid.shacl.model.SHSPARQLScope;
+import org.topbraid.shacl.model.SHSPARQLTarget;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaUtil;
 
-public class SHSPARQLScopeImpl extends SHResourceImpl implements SHSPARQLScope {
+public class SHSPARQLTargetImpl extends SHResourceImpl implements SHSPARQLTarget {
 	
-	public SHSPARQLScopeImpl(Node node, EnhGraph graph) {
+	public SHSPARQLTargetImpl(Node node, EnhGraph graph) {
 		super(node, graph);
 	}
 
@@ -38,6 +38,6 @@ public class SHSPARQLScopeImpl extends SHResourceImpl implements SHSPARQLScope {
 			return sparql;
 		}
 		
-		return "(Incomplete SPARQL Scope)";
+		return "(Incomplete SPARQL Target)";
 	}
 }

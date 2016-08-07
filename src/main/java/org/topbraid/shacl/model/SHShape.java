@@ -13,11 +13,4 @@ public interface SHShape extends SHParameterizableConstraint {
 	 * @return a possibly empty list
 	 */
 	List<SHPropertyConstraint> getPropertyConstraints(RDFNode predicate);
-	
-	
-	/**
-	 * Checks if this shape has been deactivated by having sh:filterShape dash:None.
-	 * @return true if deactivated
-	 */
-	boolean isDeactivated();
 }

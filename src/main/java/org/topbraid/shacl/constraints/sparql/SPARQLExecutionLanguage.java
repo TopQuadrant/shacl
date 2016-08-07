@@ -32,7 +32,7 @@ import org.topbraid.shacl.constraints.ModelConstraintValidator;
 import org.topbraid.shacl.constraints.SHACLException;
 import org.topbraid.shacl.model.SHConstraint;
 import org.topbraid.shacl.model.SHFactory;
-import org.topbraid.shacl.model.SHParameterizableScope;
+import org.topbraid.shacl.model.SHParameterizableTarget;
 import org.topbraid.shacl.model.SHShape;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
@@ -81,8 +81,8 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 
 	
 	@Override
-	public boolean canExecuteScope(Resource scope) {
-		return scope.hasProperty(SH.select);
+	public boolean canExecuteTarget(Resource target) {
+		return target.hasProperty(SH.select);
 	}
 	
 	
@@ -160,7 +160,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 			filters.add(SHFactory.asShape(filter));
 		}
 		if(focusNode == null) {
-			query = SPARQLSubstitutions.insertScopeAndFilterClauses(query, filters.size(), shape, dataset, bindings);
+			query = SPARQLSubstitutions.insertTargetAndFilterClauses(query, filters.size(), shape, dataset, bindings);
 		}
 		else if(!filters.isEmpty()) {
 			query = SPARQLSubstitutions.insertFilterClause(query, filters.size());
@@ -333,22 +333,22 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 
 	
 	@Override
-	public Iterable<RDFNode> executeScope(Dataset dataset, Resource scope, SHParameterizableScope parameterizableScope) {
+	public Iterable<RDFNode> executeTarget(Dataset dataset, Resource target, SHParameterizableTarget parameterizableTarget) {
 
-		String sparql = JenaUtil.getStringProperty(scope, SH.select);
-		String queryString = ARQFactory.get().createPrefixDeclarations(scope.getModel()) + sparql;
+		String sparql = JenaUtil.getStringProperty(target, SH.select);
+		String queryString = ARQFactory.get().createPrefixDeclarations(target.getModel()) + sparql;
 		Query query;
 		try {
-			query = getSPARQLWithSelect(scope);
+			query = getSPARQLWithSelect(target);
 		}
 		catch(QueryParseException ex) {
-			throw new SHACLException("Invalid SPARQL scope (" + ex.getLocalizedMessage() + "):\n" + queryString);
+			throw new SHACLException("Invalid SPARQL target (" + ex.getLocalizedMessage() + "):\n" + queryString);
 		}
 		
 		QuerySolutionMap bindings = null;
-		if(parameterizableScope != null) {
+		if(parameterizableTarget != null) {
 			bindings = new QuerySolutionMap();
-			parameterizableScope.addBindings(bindings);
+			parameterizableTarget.addBindings(bindings);
 		}
 		try(QueryExecution qexec = SPARQLSubstitutions.createQueryExecution(query, dataset, bindings)) {
 		    Set<RDFNode> results = new HashSet<RDFNode>();
@@ -369,7 +369,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 
 	
 	@Override
-	public boolean isNodeInScope(RDFNode focusNode, Dataset dataset, Resource executable, SHParameterizableScope parameterizableScope) {
+	public boolean isNodeInTarget(RDFNode focusNode, Dataset dataset, Resource executable, SHParameterizableTarget parameterizableTarget) {
 
 		// If sh:sparql exists only, then we expect run the query with ?this pre-bound
 		String sparql = JenaUtil.getStringProperty(executable, SH.select);
@@ -379,13 +379,13 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 			query = ARQFactory.get().createQuery(queryString);
 		}
 		catch(QueryParseException ex) {
-			throw new SHACLException("Invalid SPARQL scope (" + ex.getLocalizedMessage() + "):\n" + queryString);
+			throw new SHACLException("Invalid SPARQL target (" + ex.getLocalizedMessage() + "):\n" + queryString);
 		}
 
 		QuerySolutionMap bindings = new QuerySolutionMap();
 		bindings.add(SH.thisVar.getVarName(), focusNode);
-		if(parameterizableScope != null) {
-			parameterizableScope.addBindings(bindings);
+		if(parameterizableTarget != null) {
+			parameterizableTarget.addBindings(bindings);
 		}
 		try(QueryExecution qexec = SPARQLSubstitutions.createQueryExecution(query, dataset, bindings)) {
 		    ResultSet rs = qexec.execSelect();
@@ -394,7 +394,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		}
 
 		/* Alternative: a stupid brute-force algorithm
-		Iterator<Resource> it = getResourcesInScope(dataset, executable, templateCall).iterator();
+		Iterator<Resource> it = getResourcesInTarget(dataset, executable, templateCall).iterator();
 		while(it.hasNext()) {
 			if(focusNode.equals(it.next())) {
 				return true;

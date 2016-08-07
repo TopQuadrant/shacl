@@ -47,10 +47,10 @@ ex:MyShape
       sh:predicate ex:value ;
       sh:datatype xsd:string ;
     ] ;
-  sh:scopeNode ex:InvalidInstance1 ;
-  sh:scopeNode ex:InvalidInstance2 ;
-  sh:scopeNode ex:ValidInstance1 ;
-  sh:scopeNode ex:ValidInstance2 ;
+  sh:targetNode ex:InvalidInstance1 ;
+  sh:targetNode ex:InvalidInstance2 ;
+  sh:targetNode ex:ValidInstance1 ;
+  sh:targetNode ex:ValidInstance2 ;
 .
 ex:ValidInstance1
   ex:value "A" ;

@@ -23,7 +23,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.vocabulary.RDFS;
-import org.topbraid.shacl.arq.functions.ScopeContainsPFunction;
+import org.topbraid.shacl.arq.functions.TargetContainsPFunction;
 import org.topbraid.shacl.constraints.ModelConstraintValidator;
 import org.topbraid.shacl.constraints.SHACLException;
 import org.topbraid.shacl.vocabulary.SH;
@@ -109,7 +109,7 @@ public class SPARQLSubstitutions {
 
 	
 	// TODO: Algorithm incorrect, e.g. if { is included as a comment
-	static Query insertScopeAndFilterClauses(Query query, int filterCount, Resource shape, Dataset dataset, QuerySolution binding) {
+	static Query insertTargetAndFilterClauses(Query query, int filterCount, Resource shape, Dataset dataset, QuerySolution binding) {
 		String str = query.toString();
 		Pattern pattern = Pattern.compile("(?i)WHERE\\s*\\{");
 		Matcher matcher = pattern.matcher(str);
@@ -128,7 +128,7 @@ public class SPARQLSubstitutions {
 			}
 			
 			s.append("\nWHERE {\n");
-			appendScopes(s, shape, dataset);
+			appendTargets(s, shape, dataset);
 			s.append("        }    }\n");
 			for(int i = 0; i < filterCount; i++) {
 				s.append("    FILTER <");
@@ -201,48 +201,48 @@ public class SPARQLSubstitutions {
 	}
 	
 	
-	private static void appendScopes(StringBuffer sb, Resource shape, Dataset dataset) {
+	private static void appendTargets(StringBuffer sb, Resource shape, Dataset dataset) {
 		
-		List<String> scopes = new LinkedList<String>();
+		List<String> targets = new LinkedList<String>();
 		
-		if(shape.getModel().contains(shape, SH.scopeNode, (RDFNode)null)) {
-			scopes.add("        GRAPH $shapesGraph { $" + SH.currentShapeVar.getName() + " <" + SH.scopeNode + "> ?this } .\n");
+		if(shape.getModel().contains(shape, SH.targetNode, (RDFNode)null)) {
+			targets.add("        GRAPH $shapesGraph { $" + SH.currentShapeVar.getName() + " <" + SH.targetNode + "> ?this } .\n");
 		}
 		
 		if(JenaUtil.hasIndirectType(shape, RDFS.Class)) {
 			String varName = "?CLASS_VAR";
-			scopes.add("        " + varName + " <" + RDFS.subClassOf + ">* $" + SH.currentShapeVar.getName() + " .\n            ?this a " + varName + " .\n");
+			targets.add("        " + varName + " <" + RDFS.subClassOf + ">* $" + SH.currentShapeVar.getName() + " .\n            ?this a " + varName + " .\n");
 		}
 		
-		for(Resource cls : JenaUtil.getResourceProperties(shape, SH.scopeClass)) {
+		for(Resource cls : JenaUtil.getResourceProperties(shape, SH.targetClass)) {
 			String varName = "?SHAPE_CLASS_VAR";
-			scopes.add("        " + varName + " <" + RDFS.subClassOf + ">* <" + cls + "> .\n            ?this a " + varName + " .\n");
+			targets.add("        " + varName + " <" + RDFS.subClassOf + ">* <" + cls + "> .\n            ?this a " + varName + " .\n");
 		}
 
 		int index = 0;
-		for(Resource property : JenaUtil.getResourceProperties(shape, SH.scopeProperty)) {
-			scopes.add("        ?this <" + property + "> ?ANY_VALUE_" + index++ + " .\n");
+		for(Resource property : JenaUtil.getResourceProperties(shape, SH.targetSubjectsOf)) {
+			targets.add("        ?this <" + property + "> ?ANY_VALUE_" + index++ + " .\n");
 		}
-		for(Resource property : JenaUtil.getResourceProperties(shape, SH.scopeInverseProperty)) {
-			scopes.add("        ?ANY_VALUE_" + index++ + "  <" + property + "> ?this .\n");
-		}
-		
-		if(shape.hasProperty(SH.scope)) {
-			scopes.add(createScopes(shape));
+		for(Resource property : JenaUtil.getResourceProperties(shape, SH.targetObjectsOf)) {
+			targets.add("        ?ANY_VALUE_" + index++ + "  <" + property + "> ?this .\n");
 		}
 		
-		if(scopes.isEmpty()) {
-			throw new SHACLException("Unscoped shape " + shape);
+		if(shape.hasProperty(SH.target)) {
+			targets.add(createTargets(shape));
 		}
-		else if(scopes.size() == 1) {
-			sb.append(scopes.get(0));
+		
+		if(targets.isEmpty()) {
+			throw new SHACLException("Shape witout target " + shape);
+		}
+		else if(targets.size() == 1) {
+			sb.append(targets.get(0));
 		}
 		else {
-			for(int i = 0; i < scopes.size(); i++) {
+			for(int i = 0; i < targets.size(); i++) {
 				sb.append("        {");
-				sb.append(scopes.get(i));
+				sb.append(targets.get(i));
 				sb.append("        }");
-				if(i < scopes.size() - 1) {
+				if(i < targets.size() - 1) {
 					sb.append("        UNION\n");
 				}
 			}
@@ -250,9 +250,9 @@ public class SPARQLSubstitutions {
 	}
 	
 	
-	private static String createScopes(Resource shape) {
-		String scopeVar = "?scpe_" + (int)(Math.random() * 10000);
-		return  "        GRAPH $" + SH.shapesGraphVar.getName() + " { $" + SH.currentShapeVar.getName() + " <" + SH.scope + "> " + scopeVar + "} .\n" +
-				"        (" + scopeVar + " $" + SH.shapesGraphVar.getName() + ") <" + ScopeContainsPFunction.URI + "> ?this .\n";
+	private static String createTargets(Resource shape) {
+		String targetVar = "?trgt_" + (int)(Math.random() * 10000);
+		return  "        GRAPH $" + SH.shapesGraphVar.getName() + " { $" + SH.currentShapeVar.getName() + " <" + SH.target + "> " + targetVar + "} .\n" +
+				"        (" + targetVar + " $" + SH.shapesGraphVar.getName() + ") <" + TargetContainsPFunction.URI + "> ?this .\n";
 	}
  }

@@ -1,20 +1,19 @@
-# baseURI: http://datashapes.org/sh/tests/core/scope/scopeProperty-002.test
+# baseURI: http://datashapes.org/sh/tests/core/target/targetSubjectsOf-002.test
 # imports: http://datashapes.org/dash
 # prefix: ex
 
 @prefix dash: <http://datashapes.org/dash#> .
-@prefix ex: <http://datashapes.org/sh/tests/core/scope/scopeProperty-002.test#> .
+@prefix ex: <http://datashapes.org/sh/tests/core/target/targetSubjectsOf-002.test#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://datashapes.org/sh/tests/core/scope/scopeProperty-002.test>
+<http://datashapes.org/sh/tests/core/target/targetSubjectsOf-002.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of scopeProperty-002" ;
+  rdfs:label "Test of targetObjectsOf 002" ;
   owl:imports <http://datashapes.org/dash> ;
-  owl:versionInfo "Created with TopBraid Composer" ;
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
@@ -51,8 +50,8 @@ ex:MyShape
       sh:predicate ex:myProperty ;
       sh:maxCount 1 ;
     ] ;
-  sh:scopeClass ex:MyClass ;
-  sh:scopeProperty ex:myProperty ;
+  sh:targetClass ex:MyClass ;
+  sh:targetSubjectsOf ex:myProperty ;
 .
 ex:ValidInstance1
   rdf:type ex:MyClass ;

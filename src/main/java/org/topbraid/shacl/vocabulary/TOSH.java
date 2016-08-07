@@ -16,7 +16,7 @@ public class TOSH {
 
     public final static String PREFIX = "tosh";
 
-
+    
     public final static Property useDeclaredDatatype = ResourceFactory.createProperty(NS + "useDeclaredDatatype");
 
 

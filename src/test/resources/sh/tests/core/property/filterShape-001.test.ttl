@@ -60,7 +60,7 @@ ex:PersonShape
           "female"
         ) ;
     ] ;
-  sh:scopeClass ex:Person ;
+  sh:targetClass ex:Person ;
 .
 ex:ValidInstance1
   rdf:type ex:Person ;

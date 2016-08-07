@@ -92,5 +92,5 @@ ex:PersonShape
           sh:inversePath ex:child ;
         ] ;
     ] ;
-  sh:scopeClass ex:Person ;
+  sh:targetClass ex:Person ;
 .

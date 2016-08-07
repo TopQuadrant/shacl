@@ -100,13 +100,13 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 	private Map<Resource,List<SHConstraint>> buildShape2ConstraintsMap(Model shapesModel, Model dataModel, List<Property> constraintProperties, boolean validateShapes) {
 		Map<Resource,List<SHConstraint>> map = new HashMap<Resource,List<SHConstraint>>();
 		
-		// Collect all shapes, as identified by scope and/or type
+		// Collect all shapes, as identified by target and/or type
 		Set<Resource> shapes = new HashSet<Resource>();
-		collectShapes(shapes, shapesModel, SH.scope);
-		collectShapes(shapes, shapesModel, SH.scopeClass);
-		collectShapes(shapes, shapesModel, SH.scopeNode);
-		collectShapes(shapes, shapesModel, SH.scopeInverseProperty);
-		collectShapes(shapes, shapesModel, SH.scopeProperty);
+		collectShapes(shapes, shapesModel, SH.target);
+		collectShapes(shapes, shapesModel, SH.targetClass);
+		collectShapes(shapes, shapesModel, SH.targetNode);
+		collectShapes(shapes, shapesModel, SH.targetObjectsOf);
+		collectShapes(shapes, shapesModel, SH.targetSubjectsOf);
 		for(Resource shape : JenaUtil.getAllInstances(shapesModel.getResource(SH.Shape.getURI()))) {
 			if(JenaUtil.hasIndirectType(shape, RDFS.Class)) {
 				shapes.add(shape);
@@ -122,7 +122,7 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 			for(Statement s : shapesModel.listStatements(null, constraintProperty, (RDFNode)null).toList()) {
 				if(s.getObject().isResource()) {
 					Resource shape = s.getSubject();
-					if(hasScope(shape, dataModel, validateShapes)) {
+					if(hasTarget(shape, dataModel, validateShapes)) {
 						List<SHConstraint> list = map.get(shape);
 						if(list == null) {
 							list = new LinkedList<SHConstraint>();
@@ -157,15 +157,15 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 	}
 	
 	
-	// Used to filter out scopeless shapes that are only used as part of other shapes
-	private boolean hasScope(Resource shape, Model dataModel, boolean validateShapes) {
+	// Used to filter out targetless shapes that are only used as part of other shapes
+	private boolean hasTarget(Resource shape, Model dataModel, boolean validateShapes) {
 		if(JenaUtil.hasIndirectType(shape, RDFS.Class)) {
 			return true;
 		}
-		else if(shape.hasProperty(SH.scope)) {
+		else if(shape.hasProperty(SH.target)) {
 			return true;
 		}
-		else if(shape.hasProperty(SH.scopeClass)) {
+		else if(shape.hasProperty(SH.targetClass)) {
 			if(validateShapes) {
 				return true;
 			}
@@ -173,13 +173,13 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 				return !JenaUtil.hasIndirectType(shape, SH.ConstraintComponent);
 			}
 		}
-		else if(shape.hasProperty(SH.scopeProperty)) {
+		else if(shape.hasProperty(SH.targetSubjectsOf)) {
 			return true;
 		}
-		else if(shape.hasProperty(SH.scopeInverseProperty)) {
+		else if(shape.hasProperty(SH.targetObjectsOf)) {
 			return true;
 		}
-		else if(shape.hasProperty(SH.scopeNode)) {
+		else if(shape.hasProperty(SH.targetNode)) {
 			return true;
 		}
 		else {

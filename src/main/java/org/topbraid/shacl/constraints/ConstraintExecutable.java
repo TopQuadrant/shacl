@@ -32,8 +32,8 @@ public abstract class ConstraintExecutable {
 	 */
     public List<SHShape> getFilterShapes() {
 		List<SHShape> results = new LinkedList<SHShape>();
-		for(Resource scope : JenaUtil.getResourceProperties(constraint, SH.filterShape)) {
-			results.add(SHFactory.asShape(scope));
+		for(Resource shape : JenaUtil.getResourceProperties(constraint, SH.filterShape)) {
+			results.add(SHFactory.asShape(shape));
 		}
 		return results;
 	}

@@ -9,17 +9,17 @@ import org.apache.jena.sparql.pfunction.PropertyFunctionRegistry;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.topbraid.shacl.arq.functions.HasShapeFunction;
-import org.topbraid.shacl.arq.functions.ScopeContainsPFunction;
+import org.topbraid.shacl.arq.functions.TargetContainsPFunction;
 import org.topbraid.shacl.model.impl.SHConstraintComponentImpl;
 import org.topbraid.shacl.model.impl.SHFunctionImpl;
 import org.topbraid.shacl.model.impl.SHParameterImpl;
 import org.topbraid.shacl.model.impl.SHParameterizableImpl;
 import org.topbraid.shacl.model.impl.SHParameterizableInstanceImpl;
-import org.topbraid.shacl.model.impl.SHParameterizableScopeImpl;
+import org.topbraid.shacl.model.impl.SHParameterizableTargetImpl;
 import org.topbraid.shacl.model.impl.SHPropertyConstraintImpl;
 import org.topbraid.shacl.model.impl.SHResultImpl;
 import org.topbraid.shacl.model.impl.SHSPARQLConstraintImpl;
-import org.topbraid.shacl.model.impl.SHSPARQLScopeImpl;
+import org.topbraid.shacl.model.impl.SHSPARQLTargetImpl;
 import org.topbraid.shacl.model.impl.SHShapeImpl;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.vocabulary.SH;
@@ -39,15 +39,15 @@ public class SHFactory {
     	p.add(SHParameter.class, new SimpleImplementation(SH.Parameter.asNode(), SHParameterImpl.class));
     	p.add(SHParameterizable.class, new SimpleImplementation(SH.Parameterizable.asNode(), SHParameterizableImpl.class));
     	p.add(SHParameterizableInstance.class, new SimpleImplementation(RDFS.Resource.asNode(), SHParameterizableInstanceImpl.class));
-    	p.add(SHParameterizableScope.class, new SimpleImplementation(SH.Scope.asNode(), SHParameterizableScopeImpl.class));
+    	p.add(SHParameterizableTarget.class, new SimpleImplementation(SH.Target.asNode(), SHParameterizableTargetImpl.class));
     	p.add(SHPropertyConstraint.class, new SimpleImplementation(SH.PropertyConstraint.asNode(), SHPropertyConstraintImpl.class));
     	p.add(SHResult.class, new SimpleImplementation(SH.AbstractResult.asNode(), SHResultImpl.class));
     	p.add(SHShape.class, new SimpleImplementation(SH.Shape.asNode(), SHShapeImpl.class));
 		p.add(SHSPARQLConstraint.class, new SimpleImplementation(SH.SPARQLConstraint.asNode(), SHSPARQLConstraintImpl.class));
-		p.add(SHSPARQLScope.class, new SimpleImplementation(SH.SPARQLScope.asNode(), SHSPARQLScopeImpl.class));
+		p.add(SHSPARQLTarget.class, new SimpleImplementation(SH.SPARQLTarget.asNode(), SHSPARQLTargetImpl.class));
     	
 		FunctionRegistry.get().put(SH.hasShape.getURI(), HasShapeFunction.class);
-		PropertyFunctionRegistry.get().put(ScopeContainsPFunction.URI, ScopeContainsPFunction.class);
+		PropertyFunctionRegistry.get().put(TargetContainsPFunction.URI, TargetContainsPFunction.class);
     }
 	
 	
@@ -86,8 +86,8 @@ public class SHFactory {
 	}
 	
 	
-	public static SHSPARQLScope asSPARQLScope(RDFNode node) {
-		return node.as(SHSPARQLScope.class);
+	public static SHSPARQLTarget asSPARQLTarget(RDFNode node) {
+		return node.as(SHSPARQLTarget.class);
 	}
 	
 	
@@ -109,8 +109,8 @@ public class SHFactory {
 	}
 	
 	
-	public static SHParameterizableScope asParameterizableScope(RDFNode node) {
-		return node.as(SHParameterizableScope.class);
+	public static SHParameterizableTarget asParameterizableTarget(RDFNode node) {
+		return node.as(SHParameterizableTarget.class);
 	}
 
 	
@@ -121,8 +121,8 @@ public class SHFactory {
 	}
 	
 	
-	public static boolean isSPARQLScope(RDFNode node) {
-		return node instanceof Resource && JenaUtil.hasIndirectType((Resource)node, SH.SPARQLScope);
+	public static boolean isSPARQLTarget(RDFNode node) {
+		return node instanceof Resource && JenaUtil.hasIndirectType((Resource)node, SH.SPARQLTarget);
 	}
 	
 	

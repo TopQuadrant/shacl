@@ -8,7 +8,7 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.topbraid.shacl.model.SHParameterizableScope;
+import org.topbraid.shacl.model.SHParameterizableTarget;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 
@@ -29,7 +29,7 @@ public class FallbackExecutionLanguage implements ExecutionLanguage {
 
 	
 	@Override
-	public boolean canExecuteScope(Resource executable) {
+	public boolean canExecuteTarget(Resource executable) {
 		return true;
 	}
 
@@ -52,15 +52,15 @@ public class FallbackExecutionLanguage implements ExecutionLanguage {
 
 
 	@Override
-	public Iterable<RDFNode> executeScope(Dataset dataset,
-			Resource executable, SHParameterizableScope parameterizableScope) {
+	public Iterable<RDFNode> executeTarget(Dataset dataset,
+			Resource executable, SHParameterizableTarget parameterizableTarget) {
 		return Collections.emptyList();
 	}
 
 
 	@Override
-	public boolean isNodeInScope(RDFNode focusNode, Dataset dataset,
-			Resource executable, SHParameterizableScope parameterizableScope) {
+	public boolean isNodeInTarget(RDFNode focusNode, Dataset dataset,
+			Resource executable, SHParameterizableTarget parameterizableTarget) {
 		return false;
 	}
 }

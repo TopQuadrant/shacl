@@ -34,7 +34,7 @@ ex:APGARObservationShape
             ] ;
         ] ;
     ] ;
-  sh:scopeNode ex:Observation1 ;
+  sh:targetNode ex:Observation1 ;
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;

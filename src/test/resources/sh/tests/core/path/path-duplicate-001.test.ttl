@@ -69,5 +69,5 @@ ex:S
           ex:p2
         ) ;
     ] ;
-  sh:scopeNode ex:A ;
+  sh:targetNode ex:A ;
 .

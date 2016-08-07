@@ -42,6 +42,6 @@ ex:ValidNode1
       sh:minCount 1 ;
       sh:name "property" ;
     ] ;
-  sh:scopeNode ex:InvalidNode1 ;
-  sh:scopeNode ex:ValidNode1 ;
+  sh:targetNode ex:InvalidNode1 ;
+  sh:targetNode ex:ValidNode1 ;
 ].

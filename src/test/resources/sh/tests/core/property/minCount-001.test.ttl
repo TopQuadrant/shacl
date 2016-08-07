@@ -41,8 +41,8 @@ ex:PersonShape
       sh:datatype xsd:string ;
       sh:minCount 1 ;
     ] ;
-  sh:scopeClass ex:Person ;
-  sh:scopeNode ex:ValidResource ;
+  sh:targetClass ex:Person ;
+  sh:targetNode ex:ValidResource ;
 .
 ex:ValidResource
   rdf:type ex:Person ;

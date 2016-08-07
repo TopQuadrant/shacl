@@ -272,7 +272,7 @@ ex:ShapeWithBlankNode
       sh:predicate ex:myProperty ;
       sh:nodeKind sh:BlankNode ;
     ] ;
-  sh:scopeClass ex:MyClass ;
+  sh:targetClass ex:MyClass ;
 .
 ex:ShapeWithBlankNodeOrIRI
   rdf:type sh:Shape ;
@@ -280,7 +280,7 @@ ex:ShapeWithBlankNodeOrIRI
       sh:predicate ex:myProperty ;
       sh:nodeKind sh:BlankNodeOrIRI ;
     ] ;
-  sh:scopeClass ex:MyClass ;
+  sh:targetClass ex:MyClass ;
 .
 ex:ShapeWithBlankNodeOrLiteral
   rdf:type sh:Shape ;
@@ -288,7 +288,7 @@ ex:ShapeWithBlankNodeOrLiteral
       sh:predicate ex:myProperty ;
       sh:nodeKind sh:BlankNodeOrLiteral ;
     ] ;
-  sh:scopeClass ex:MyClass ;
+  sh:targetClass ex:MyClass ;
 .
 ex:ShapeWithIRI
   rdf:type sh:Shape ;
@@ -296,7 +296,7 @@ ex:ShapeWithIRI
       sh:predicate ex:myProperty ;
       sh:nodeKind sh:IRI ;
     ] ;
-  sh:scopeClass ex:MyClass ;
+  sh:targetClass ex:MyClass ;
 .
 ex:ShapeWithIRIOrLiteral
   rdf:type sh:Shape ;
@@ -304,7 +304,7 @@ ex:ShapeWithIRIOrLiteral
       sh:predicate ex:myProperty ;
       sh:nodeKind sh:IRIOrLiteral ;
     ] ;
-  sh:scopeClass ex:MyClass ;
+  sh:targetClass ex:MyClass ;
 .
 ex:ShapeWithLiteral
   rdf:type sh:Shape ;
@@ -312,7 +312,7 @@ ex:ShapeWithLiteral
       sh:predicate ex:myProperty ;
       sh:nodeKind sh:Literal ;
     ] ;
-  sh:scopeClass ex:MyClass ;
+  sh:targetClass ex:MyClass ;
 .
 ex:myProperty
   rdf:type rdf:Property ;

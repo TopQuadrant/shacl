@@ -49,9 +49,9 @@ public class ExecutionLanguageSelector {
 	}
 	
 	
-	public ExecutionLanguage getLanguageForScope(Resource executable) {
+	public ExecutionLanguage getLanguageForTarget(Resource executable) {
 		for(ExecutionLanguage lang : languages) {
-			if(lang.canExecuteScope(executable)) {
+			if(lang.canExecuteTarget(executable)) {
 				return lang;
 			}
 		}

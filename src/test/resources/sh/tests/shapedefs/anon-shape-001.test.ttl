@@ -47,5 +47,5 @@ ex:ValidNode1
       sh:minCount 1 ;
       sh:name "property" ;
     ] ;
-  sh:scopeClass ex:Person ;
+  sh:targetClass ex:Person ;
 ].

@@ -47,10 +47,10 @@ ex:MyShape
       sh:predicate ex:property ;
       sh:maxInclusive 1 ;
     ] ;
-  sh:scopeNode ex:InvalidResource1 ;
-  sh:scopeNode ex:InvalidResource2 ;
-  sh:scopeNode ex:ValidResource1 ;
-  sh:scopeNode ex:ValidResource2 ;
+  sh:targetNode ex:InvalidResource1 ;
+  sh:targetNode ex:InvalidResource2 ;
+  sh:targetNode ex:ValidResource1 ;
+  sh:targetNode ex:ValidResource2 ;
 .
 ex:ValidResource1
   ex:property 0 ;

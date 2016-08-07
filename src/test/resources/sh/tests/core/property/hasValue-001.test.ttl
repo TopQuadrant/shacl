@@ -44,7 +44,7 @@ ex:PersonShape
       sh:datatype xsd:string ;
       sh:hasValue "male" ;
     ] ;
-  sh:scopeClass ex:MalePerson ;
+  sh:targetClass ex:MalePerson ;
 .
 ex:ValidMalePerson1
   rdf:type ex:MalePerson ;

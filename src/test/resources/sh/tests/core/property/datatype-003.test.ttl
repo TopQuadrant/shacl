@@ -43,10 +43,10 @@ ex:MyShape
           ]
         ) ;
     ] ;
-  sh:scopeNode ex:InvalidInstance1 ;
-  sh:scopeNode ex:ValidInstance1 ;
-  sh:scopeNode ex:ValidInstance2 ;
-  sh:scopeNode ex:ValidInstance3 ;
+  sh:targetNode ex:InvalidInstance1 ;
+  sh:targetNode ex:ValidInstance1 ;
+  sh:targetNode ex:ValidInstance2 ;
+  sh:targetNode ex:ValidInstance3 ;
 .
 ex:ValidInstance1
   ex:value "A" ;

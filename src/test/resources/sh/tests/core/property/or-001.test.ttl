@@ -35,9 +35,9 @@ ex:AddressShape
           ]
         ) ;
     ] ;
-  sh:scopeNode ex:InvalidResource1 ;
-  sh:scopeNode ex:ValidResource1 ;
-  sh:scopeNode ex:ValidResource2 ;
+  sh:targetNode ex:InvalidResource1 ;
+  sh:targetNode ex:ValidResource1 ;
+  sh:targetNode ex:ValidResource2 ;
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;

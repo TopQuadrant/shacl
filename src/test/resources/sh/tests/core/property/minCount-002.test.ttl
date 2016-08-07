@@ -26,7 +26,7 @@ ex:TestShape
       sh:minCount 0 ;
       sh:name "property" ;
     ] ;
-  sh:scopeNode ex:ValidResource1 ;
+  sh:targetNode ex:ValidResource1 ;
 .
 ex:ValidResource1
   rdf:type rdfs:Resource ;

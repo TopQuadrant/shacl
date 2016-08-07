@@ -1,4 +1,3 @@
-# baseURI: http://datashapes.org/dash
 # imports: http://topbraid.org/tosh
 # imports: http://www.w3.org/ns/shacl#
 # prefix: dash
@@ -20,15 +19,15 @@ DASH is also a SHACL library for frequently needed features and design patterns.
   owl:imports sh: ;
 .
 dash:AllObjects
-  rdf:type dash:AllObjectsScope ;
-  rdfs:comment "A reusable instance of dash:AllObjectsScope." ;
+  rdf:type dash:AllObjectsTarget ;
+  rdfs:comment "A reusable instance of dash:AllObjectsTarget." ;
   rdfs:label "All objects" ;
 .
-dash:AllObjectsScope
-  rdf:type sh:SPARQLScopeType ;
-  rdfs:comment "A scope containing all objects in the data graph as focus nodes." ;
-  rdfs:label "All objects scope" ;
-  rdfs:subClassOf sh:Scope ;
+dash:AllObjectsTarget
+  rdf:type sh:SPARQLTargetType ;
+  rdfs:comment "A target containing all objects in the data graph as focus nodes." ;
+  rdfs:label "All objects target" ;
+  rdfs:subClassOf sh:Target ;
   sh:labelTemplate "All objects" ;
   sh:select """SELECT DISTINCT ?this
 WHERE {
@@ -36,20 +35,39 @@ WHERE {
 }""" ;
 .
 dash:AllSubjects
-  rdf:type dash:AllSubjectsScope ;
-  rdfs:comment "A reusable instance of dash:AllSubjectsScope." ;
+  rdf:type dash:AllSubjectsTarget ;
+  rdfs:comment "A reusable instance of dash:AllSubjectsTarget." ;
   rdfs:label "All subjects" ;
 .
-dash:AllSubjectsScope
-  rdf:type sh:SPARQLScopeType ;
-  rdfs:comment "A scope containing all subjects in the data graph as focus nodes." ;
-  rdfs:label "All subjects scope" ;
-  rdfs:subClassOf sh:Scope ;
+dash:AllSubjectsTarget
+  rdf:type sh:SPARQLTargetType ;
+  rdfs:comment "A target containing all subjects in the data graph as focus nodes." ;
+  rdfs:label "All subjects target" ;
+  rdfs:subClassOf sh:Target ;
   sh:labelTemplate "All subjects" ;
   sh:select """SELECT DISTINCT ?this
 WHERE {
     ?this ?anyP ?anyO .
 }""" ;
+.
+dash:DefaultValueTypeRule
+  rdf:type sh:SPARQLConstructExecutable ;
+  rdfs:comment """
+		A resource encapsulating a query that can be used to construct rdf:type triples for certain untyped nodes
+		that are an object in a triple where the predicate has a sh:defaultValueType.
+		This can be used as a pre-processor for shape graphs before they are validated.
+		"""^^rdf:HTML ;
+  rdfs:label "default value type inference rule" ;
+  sh:construct """
+		CONSTRUCT {
+			?node a ?defaultValueType .
+		}
+		WHERE {
+			?predicate sh:defaultValueType ?defaultValueType .
+			?anySubject ?predicate ?node .
+			FILTER (NOT EXISTS { ?node a ?anyType }) .
+		}
+		""" ;
 .
 dash:FailureResult
   rdf:type rdfs:Class ;
@@ -134,7 +152,7 @@ dash:MemberShapeConstraintComponent
 		}
 """ ;
     ] ;
-  sh:scopeClass sh:PropertyConstraint ;
+  sh:targetClass sh:PropertyConstraint ;
 .
 dash:NonRecursiveConstraintComponent
   rdf:type sh:ConstraintComponent ;
@@ -161,7 +179,7 @@ WHERE {
     $this $PATH $this .
 }""" ;
     ] ;
-  sh:scopeClass sh:PropertyConstraint ;
+  sh:targetClass sh:PropertyConstraint ;
 .
 dash:None
   rdf:type sh:Shape ;
@@ -171,7 +189,7 @@ dash:None
 .
 dash:PrimaryKeyConstraintComponent
   rdf:type sh:ConstraintComponent ;
-  rdfs:comment "Enforces a constraint that the given property (sh:predicate) serves as primary key for all resources in the scope of the shape. If a property has been declared to be the primary key then each resource must have exactly one value for that property. Furthermore, the URIs of those resources must start with a given string (dash:uriStart), followed by the URL-encoded primary key value. For example if dash:uriStart is \"http://example.org/country-\" and the primary key for an instance is \"de\" then the URI must be \"http://example.org/country-de\". Finally, as a result of the URI policy, there can not be any other resource with the same value under the same primary key policy." ;
+  rdfs:comment "Enforces a constraint that the given property (sh:predicate) serves as primary key for all resources in the target of the shape. If a property has been declared to be the primary key then each resource must have exactly one value for that property. Furthermore, the URIs of those resources must start with a given string (dash:uriStart), followed by the URL-encoded primary key value. For example if dash:uriStart is \"http://example.org/country-\" and the primary key for an instance is \"de\" then the URI must be \"http://example.org/country-de\". Finally, as a result of the URI policy, there can not be any other resource with the same value under the same primary key policy." ;
   rdfs:label "Primary key constraint component" ;
   sh:labelTemplate "The property {?predicate} is the primary key and URIs start with {?uriStart}" ;
   sh:parameter [
@@ -211,7 +229,7 @@ WHERE {
     } .
 }""" ;
     ] ;
-  sh:scopeClass sh:PropertyConstraint ;
+  sh:targetClass sh:PropertyConstraint ;
 .
 dash:QueryTestCase
   rdf:type rdfs:Class ;
@@ -248,8 +266,8 @@ dash:RootClassConstraintComponent
       sh:name "root class" ;
       sh:nodeKind sh:IRI ;
     ] ;
-  sh:scopeClass sh:PropertyConstraint ;
-  sh:scopeClass sh:Shape ;
+  sh:targetClass sh:PropertyConstraint ;
+  sh:targetClass sh:Shape ;
   sh:validator dash:hasRootClass ;
 .
 dash:SPARQLUpdateSuggestionGenerator
@@ -386,6 +404,21 @@ dash:countShapesWithMatchResult
 		}
 		""" ;
 .
+dash:defaultValueType
+  rdf:type rdf:Property ;
+  rdfs:comment """
+		Links a property with a default value type.
+		The default value type is assumed to be the <code>rdf:type</code> of values of the property
+		that declare no type on their own.
+		An example use of <code>sh:defaultValueType</code> is <code>sh:property</code>,
+		the values of which are assumed to be instances of <code>sh:PropertyConstraint</code>
+		even if they are untyped (blank) nodes.
+		"""^^rdf:HTML ;
+  rdfs:domain rdf:Property ;
+  rdfs:label "default value type" ;
+  rdfs:range rdfs:Class ;
+  owl:versionInfo "Note this property may get removed in future versions. It is a left-over from a previous design in SHACL." ;
+.
 dash:deletedTriple
   rdf:type rdf:Property ;
   rdfs:comment "May link a dash:GraphUpdate result with one or more triples (represented as instances of rdf:Statement) that should be deleted to fix the source of the result." ;
@@ -403,20 +436,6 @@ dash:hasClass
 		""" ;
   sh:message "Value does not have class {$class}" ;
 .
-dash:hasClassIn
-  rdf:type sh:SPARQLAskValidator ;
-  rdfs:comment "Checks whether a given node ($value) is an instance of a class from a given list ($classIn). Uses the same logic as sh:hasClass for each list member." ;
-  rdfs:label "has class in" ;
-  sh:ask """
-		ASK {
-			GRAPH $shapesGraph {
-				$classIn (rdf:rest*)/rdf:first ?class .
-			}
-			$value rdf:type/rdfs:subClassOf* ?class .
-		}
-		""" ;
-  sh:message "Value does not have one of the classes {$classIn}" ;
-.
 dash:hasDatatype
   rdf:type sh:SPARQLAskValidator ;
   rdfs:comment "Checks whether a given node ($value) is a literal with a given datatype ($datatype)." ;
@@ -427,20 +446,6 @@ dash:hasDatatype
 		}
 		""" ;
   sh:message "Value does not have datatype {$datatype}" ;
-.
-dash:hasDatatypeIn
-  rdf:type sh:SPARQLAskValidator ;
-  rdfs:comment "Checks whether a given node ($value) is a literal with a datatype from a given list ($datatypeIn). Uses the same logic as sh:hasDatatype for each list member." ;
-  rdfs:label "has datatype in" ;
-  sh:ask """
-		ASK {
-			GRAPH $shapesGraph {
-				$datatypeIn (rdf:rest*)/rdf:first ?datatype .
-			}
-			FILTER (datatype($value)  = ?datatype) .
-		}
-		""" ;
-  sh:message "Value does not have one of the datatypes {$datatypeIn}" ;
 .
 dash:hasMaxExclusive
   rdf:type sh:SPARQLAskValidator ;
@@ -708,8 +713,6 @@ sh:AndConstraintComponent
 		}
 """ ;
     ] ;
-  sh:scopeClass sh:PropertyConstraint ;
-  sh:scopeClass sh:Shape ;
   sh:shapeValidator [
       rdf:type sh:SPARQLSelectValidator ;
       sh:select """
@@ -721,14 +724,15 @@ sh:AndConstraintComponent
 		}
 """ ;
     ] ;
+  sh:targetClass sh:PropertyConstraint ;
+  sh:targetClass sh:Shape ;
 .
 sh:ClassConstraintComponent
-  sh:scopeClass sh:PropertyConstraint ;
-  sh:scopeClass sh:Shape ;
+  sh:targetClass sh:PropertyConstraint ;
+  sh:targetClass sh:Shape ;
   sh:validator dash:hasClass ;
 .
 sh:ClosedConstraintComponent
-  sh:scopeClass sh:Shape ;
   sh:shapeValidator [
       rdf:type sh:SPARQLSelectValidator ;
       sh:message "Predicate {?path} is not allowed (closed shape)" ;
@@ -751,14 +755,15 @@ sh:ClosedConstraintComponent
 		}
 """ ;
     ] ;
+  sh:targetClass sh:Shape ;
 .
 sh:DatatypeConstraintComponent
-  sh:scopeClass sh:PropertyConstraint ;
-  sh:scopeClass sh:Shape ;
+  sh:targetClass sh:PropertyConstraint ;
+  sh:targetClass sh:Shape ;
   sh:validator dash:hasDatatype ;
 .
 sh:DerivedValuesConstraintComponent
-  sh:scopeClass sh:PropertyConstraint ;
+  sh:targetClass sh:PropertyConstraint ;
 .
 sh:DisjointConstraintComponent
   sh:propertyValidator [
@@ -772,7 +777,7 @@ sh:DisjointConstraintComponent
 		}
 		""" ;
     ] ;
-  sh:scopeClass sh:PropertyConstraint ;
+  sh:targetClass sh:PropertyConstraint ;
 .
 sh:EqualsConstraintComponent
   sh:propertyValidator [
@@ -797,7 +802,7 @@ sh:EqualsConstraintComponent
 		}
 		""" ;
     ] ;
-  sh:scopeClass sh:PropertyConstraint ;
+  sh:targetClass sh:PropertyConstraint ;
 .
 sh:Function
   sh:property [
@@ -819,11 +824,11 @@ sh:HasValueConstraintComponent
 		}
 		""" ;
     ] ;
-  sh:scopeClass sh:PropertyConstraint ;
+  sh:targetClass sh:PropertyConstraint ;
 .
 sh:InConstraintComponent
-  sh:scopeClass sh:PropertyConstraint ;
-  sh:scopeClass sh:Shape ;
+  sh:targetClass sh:PropertyConstraint ;
+  sh:targetClass sh:Shape ;
   sh:validator dash:isIn ;
 .
 sh:LessThanConstraintComponent
@@ -839,7 +844,7 @@ sh:LessThanConstraintComponent
 		}
 		""" ;
     ] ;
-  sh:scopeClass sh:PropertyConstraint ;
+  sh:targetClass sh:PropertyConstraint ;
 .
 sh:LessThanOrEqualsConstraintComponent
   sh:propertyValidator [
@@ -854,7 +859,7 @@ sh:LessThanOrEqualsConstraintComponent
 		}
 		""" ;
     ] ;
-  sh:scopeClass sh:PropertyConstraint ;
+  sh:targetClass sh:PropertyConstraint ;
 .
 sh:MaxCountConstraintComponent
   sh:propertyValidator [
@@ -869,21 +874,21 @@ sh:MaxCountConstraintComponent
 		HAVING (COUNT(?value) > $maxCount)
 		""" ;
     ] ;
-  sh:scopeClass sh:PropertyConstraint ;
+  sh:targetClass sh:PropertyConstraint ;
 .
 sh:MaxExclusiveConstraintComponent
-  sh:scopeClass sh:PropertyConstraint ;
-  sh:scopeClass sh:Shape ;
+  sh:targetClass sh:PropertyConstraint ;
+  sh:targetClass sh:Shape ;
   sh:validator dash:hasMaxExclusive ;
 .
 sh:MaxInclusiveConstraintComponent
-  sh:scopeClass sh:PropertyConstraint ;
-  sh:scopeClass sh:Shape ;
+  sh:targetClass sh:PropertyConstraint ;
+  sh:targetClass sh:Shape ;
   sh:validator dash:hasMaxInclusive ;
 .
 sh:MaxLengthConstraintComponent
-  sh:scopeClass sh:PropertyConstraint ;
-  sh:scopeClass sh:Shape ;
+  sh:targetClass sh:PropertyConstraint ;
+  sh:targetClass sh:Shape ;
   sh:validator dash:hasMaxLength ;
 .
 sh:MinCountConstraintComponent
@@ -901,26 +906,26 @@ sh:MinCountConstraintComponent
 		HAVING (COUNT(?value) < $minCount)
 		""" ;
     ] ;
-  sh:scopeClass sh:PropertyConstraint ;
+  sh:targetClass sh:PropertyConstraint ;
 .
 sh:MinExclusiveConstraintComponent
-  sh:scopeClass sh:PropertyConstraint ;
-  sh:scopeClass sh:Shape ;
+  sh:targetClass sh:PropertyConstraint ;
+  sh:targetClass sh:Shape ;
   sh:validator dash:hasMinExclusive ;
 .
 sh:MinInclusiveConstraintComponent
-  sh:scopeClass sh:PropertyConstraint ;
-  sh:scopeClass sh:Shape ;
+  sh:targetClass sh:PropertyConstraint ;
+  sh:targetClass sh:Shape ;
   sh:validator dash:hasMinInclusive ;
 .
 sh:MinLengthConstraintComponent
-  sh:scopeClass sh:PropertyConstraint ;
-  sh:scopeClass sh:Shape ;
+  sh:targetClass sh:PropertyConstraint ;
+  sh:targetClass sh:Shape ;
   sh:validator dash:hasMinLength ;
 .
 sh:NodeKindConstraintComponent
-  sh:scopeClass sh:PropertyConstraint ;
-  sh:scopeClass sh:Shape ;
+  sh:targetClass sh:PropertyConstraint ;
+  sh:targetClass sh:Shape ;
   sh:validator dash:hasNodeKind ;
 .
 sh:NotConstraintComponent
@@ -937,8 +942,6 @@ sh:NotConstraintComponent
 		}
 		""" ;
     ] ;
-  sh:scopeClass sh:PropertyConstraint ;
-  sh:scopeClass sh:Shape ;
   sh:shapeValidator [
       rdf:type sh:SPARQLSelectValidator ;
       sh:message "Value does have shape {$not}" ;
@@ -951,6 +954,8 @@ sh:NotConstraintComponent
 		}
 		""" ;
     ] ;
+  sh:targetClass sh:PropertyConstraint ;
+  sh:targetClass sh:Shape ;
 .
 sh:OrConstraintComponent
   sh:propertyValidator [
@@ -965,8 +970,6 @@ sh:OrConstraintComponent
 		}
 """ ;
     ] ;
-  sh:scopeClass sh:PropertyConstraint ;
-  sh:scopeClass sh:Shape ;
   sh:shapeValidator [
       rdf:type sh:SPARQLSelectValidator ;
       sh:select """
@@ -978,10 +981,12 @@ sh:OrConstraintComponent
 		}
 """ ;
     ] ;
+  sh:targetClass sh:PropertyConstraint ;
+  sh:targetClass sh:Shape ;
 .
 sh:PatternConstraintComponent
-  sh:scopeClass sh:PropertyConstraint ;
-  sh:scopeClass sh:Shape ;
+  sh:targetClass sh:PropertyConstraint ;
+  sh:targetClass sh:Shape ;
   sh:validator dash:hasPattern ;
 .
 sh:QualifiedMaxCountConstraintComponent
@@ -1002,7 +1007,7 @@ sh:QualifiedMaxCountConstraintComponent
 	HAVING ( ( COUNT ( ?value ) > $qualifiedMaxCount ) || ( SUM(?failed) > 0 )) 
 """ ;
     ] ;
-  sh:scopeClass sh:PropertyConstraint ;
+  sh:targetClass sh:PropertyConstraint ;
 .
 sh:QualifiedMinCountConstraintComponent
   sh:propertyValidator [
@@ -1022,7 +1027,7 @@ sh:QualifiedMinCountConstraintComponent
 	HAVING ( ( COUNT ( ?value ) < $qualifiedMinCount ) || ( SUM(?failed) > 0 )) 
 """ ;
     ] ;
-  sh:scopeClass sh:PropertyConstraint ;
+  sh:targetClass sh:PropertyConstraint ;
 .
 sh:ShapeConstraintComponent
   sh:propertyValidator [
@@ -1038,7 +1043,6 @@ sh:ShapeConstraintComponent
 		}
 		""" ;
     ] ;
-  sh:scopeClass sh:PropertyConstraint ;
   sh:shapeValidator [
       rdf:type sh:SPARQLSelectValidator ;
       sh:message "Value does not have shape {$shape}" ;
@@ -1051,10 +1055,11 @@ sh:ShapeConstraintComponent
 		}
 		""" ;
     ] ;
+  sh:targetClass sh:PropertyConstraint ;
 .
 sh:StemConstraintComponent
-  sh:scopeClass sh:PropertyConstraint ;
-  sh:scopeClass sh:Shape ;
+  sh:targetClass sh:PropertyConstraint ;
+  sh:targetClass sh:Shape ;
   sh:validator dash:hasStem ;
 .
 sh:UniqueLangConstraintComponent
@@ -1077,8 +1082,32 @@ sh:UniqueLangConstraintComponent
 		}
 		""" ;
     ] ;
-  sh:scopeClass sh:PropertyConstraint ;
+  sh:targetClass sh:PropertyConstraint ;
+.
+sh:derivedValues
+  dash:defaultValueType sh:SPARQLValuesDeriver ;
+.
+sh:filterShape
+  dash:defaultValueType sh:Shape ;
+.
+sh:not
+  dash:defaultValueType sh:Shape ;
 .
 sh:order
   rdfs:range xsd:decimal ;
+.
+sh:parameter
+  dash:defaultValueType sh:Parameter ;
+.
+sh:property
+  dash:defaultValueType sh:PropertyConstraint ;
+.
+sh:qualifiedValueShape
+  dash:defaultValueType sh:Shape ;
+.
+sh:shape
+  dash:defaultValueType sh:Shape ;
+.
+sh:sparql
+  dash:defaultValueType sh:SPARQLConstraint ;
 .

@@ -30,8 +30,6 @@ public class SH {
 
     public final static Resource ConstraintComponent = ResourceFactory.createResource(NS + "ConstraintComponent");
 
-    public final static Resource DefaultValueTypeRule = ResourceFactory.createResource(NS + "DefaultValueTypeRule");
-
     public final static Resource DerivedValuesConstraintComponent = ResourceFactory.createResource(NS + "DerivedValuesConstraintComponent");
 
     public final static Resource Function = ResourceFactory.createResource(NS + "Function");
@@ -52,8 +50,6 @@ public class SH {
 
     public final static Resource ResultAnnotation = ResourceFactory.createResource(NS + "ResultAnnotation");
 
-    public final static Resource Scope = ResourceFactory.createResource(NS + "Scope");
-
     public final static Resource Shape = ResourceFactory.createResource(NS + "Shape");
     
     public final static Resource SPARQLAskValidator = ResourceFactory.createResource(NS + "SPARQLAskValidator");
@@ -64,9 +60,11 @@ public class SH {
     
     public final static Resource SPARQLSelectValidator = ResourceFactory.createResource(NS + "SPARQLSelectValidator");
     
-    public final static Resource SPARQLScope = ResourceFactory.createResource(NS + "SPARQLScope");
+    public final static Resource SPARQLTarget = ResourceFactory.createResource(NS + "SPARQLTarget");
     
     public final static Resource SPARQLValuesDeriver = ResourceFactory.createResource(NS + "SPARQLValuesDeriver");
+    
+    public final static Resource Target = ResourceFactory.createResource(NS + "Target");
     
     public final static Resource ValidationResult = ResourceFactory.createResource(NS + "ValidationResult");
     
@@ -90,8 +88,6 @@ public class SH {
     public final static Property datatype = ResourceFactory.createProperty(NS + "datatype");
 
     public final static Property defaultValue = ResourceFactory.createProperty(NS + "defaultValue");
-
-    public final static Property defaultValueType = ResourceFactory.createProperty(NS + "defaultValueType");
 
     public final static Property derivedValues = ResourceFactory.createProperty(NS + "derivedValues");
 
@@ -154,16 +150,6 @@ public class SH {
     public final static Property propertyValidator = ResourceFactory.createProperty(NS + "propertyValidator");
 
     public final static Property returnType = ResourceFactory.createProperty(NS + "returnType");
-    
-    public final static Property scope = ResourceFactory.createProperty(NS + "scope");
-    
-    public final static Property scopeClass = ResourceFactory.createProperty(NS + "scopeClass");
-    
-    public final static Property scopeInverseProperty = ResourceFactory.createProperty(NS + "scopeInverseProperty");
-
-    public final static Property scopeNode = ResourceFactory.createProperty(NS + "scopeNode");
-    
-    public final static Property scopeProperty = ResourceFactory.createProperty(NS + "scopeProperty");
 
     public final static Property select = ResourceFactory.createProperty(NS + "select");
 
@@ -182,6 +168,16 @@ public class SH {
     public final static Property sourceShape = ResourceFactory.createProperty(NS + "sourceShape");
 
     public final static Property sparql = ResourceFactory.createProperty(NS + "sparql");
+    
+    public final static Property target = ResourceFactory.createProperty(NS + "target");
+    
+    public final static Property targetClass = ResourceFactory.createProperty(NS + "targetClass");
+
+    public final static Property targetNode = ResourceFactory.createProperty(NS + "targetNode");
+    
+    public final static Property targetObjectsOf = ResourceFactory.createProperty(NS + "targetObjectsOf");
+    
+    public final static Property targetSubjectsOf = ResourceFactory.createProperty(NS + "targetSubjectsOf");
 
     public final static Property update = ResourceFactory.createProperty(NS + "update");
 
