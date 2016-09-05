@@ -83,6 +83,6 @@ public class HasShapeFunction extends AbstractFunction4 {
 	protected Model doRun(RDFNode resource, Resource shape, Dataset dataset,
 			Node shapesGraphNode) {
 		return ResourceConstraintValidator.get().validateNodeAgainstShape(
-				dataset, URI.create(shapesGraphNode.getURI()), resource.asNode(), shape.asNode(), SH.Violation, null, null, null);
+				dataset, URI.create(shapesGraphNode.getURI()), resource.asNode(), shape.asNode(), null, null, null, null);
 	}
 }

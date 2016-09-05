@@ -1,5 +1,5 @@
 # W3C Shapes Constraint Language (SHACL) Vocabulary
-# Draft last edited 2016-08-05
+# Draft last edited 2016-08-25
 
 @prefix owl:     <http://www.w3.org/2002/07/owl#> .
 @prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -75,7 +75,7 @@ sh:targetClass
 	a rdf:Property ;
 	rdfs:label "target class" ;
 	rdfs:comment """
-		This property links a shape to a class.
+		Links a shape to a class.
 		The shape must be satisfied by all the instances of the class.
 		"""^^rdf:HTML ;
 	rdfs:domain sh:Shape ;
@@ -87,7 +87,7 @@ sh:targetNode
 	a rdf:Property ;
 	rdfs:label "target node" ;
 	rdfs:comment """
-		This property links a shape to individual nodes.
+		Links a shape to individual nodes.
 		The shape must be satisfied by all nodes linked this way.
 		"""^^rdf:HTML ;
 	rdfs:domain sh:Shape ;
@@ -97,6 +97,10 @@ sh:targetNode
 sh:targetObjectsOf
 	a rdf:Property ;
 	rdfs:label "target objects of" ;
+	rdfs:comment """
+		Links a shape to a property.
+		The shape must be satisfied by all objects of triples that have the given property as its predicate.
+		"""^^rdf:HTML ;
 	rdfs:domain sh:Shape ;
 	rdfs:range rdf:Property ;
 	rdfs:isDefinedBy sh: ;
@@ -105,6 +109,10 @@ sh:targetObjectsOf
 sh:targetSubjectsOf
 	a rdf:Property ;
 	rdfs:label "target subjects of" ;
+	rdfs:comment """
+		Links a shape to a property.
+		The shape must be satisfied by all subjects of triples that have the given property as its predicate.
+		"""^^rdf:HTML ;
 	rdfs:domain sh:Shape ;
 	rdfs:range rdf:Property ;
 	rdfs:isDefinedBy sh: ;
@@ -113,7 +121,7 @@ sh:targetSubjectsOf
 sh:property
 	a rdf:Property ;
 	rdfs:comment """
-		This property links a shape to one of its property constraints.
+		Links a shape to its property constraints.
 		"""^^rdf:HTML ;
 	rdfs:isDefinedBy sh: ;
 	rdfs:label "property" ;
@@ -717,9 +725,12 @@ sh:AndConstraintComponent
 		The parameter <code>sh:and</code> points at a list of <code>sh:Shape</code> instances.
 		Valid nodes must validate successfully against all shapes in the list.
 		"""^^rdf:HTML ;
-	sh:parameter [
-		sh:predicate sh:and ;
-	] ;
+	sh:parameter sh:AndConstraintComponent-and ;
+.
+
+sh:AndConstraintComponent-and
+	a sh:Parameter ;
+	sh:predicate sh:and ;
 .
 
 sh:and
@@ -732,12 +743,16 @@ sh:and
 	rdfs:isDefinedBy sh: ;
 .
 
+
 sh:ClassConstraintComponent 
 	a sh:ConstraintComponent ;
 	rdfs:label "Class constraint component" ;
-	sh:parameter [
-		sh:predicate sh:class ;
-	] ;
+	sh:parameter sh:ClassConstraintComponent-class ;
+.
+
+sh:ClassConstraintComponent-class
+	a sh:Parameter ;
+	sh:predicate sh:class ;
 .
 
 sh:class
@@ -747,15 +762,22 @@ sh:class
 	rdfs:isDefinedBy sh: ;
 .
 
+
 sh:ClosedConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:parameter [
-		sh:predicate sh:closed ;
-	] ;
-	sh:parameter [
-		sh:predicate sh:ignoredProperties ;
-		sh:optional true ;
-	] ;
+	sh:parameter sh:ClosedConstraintComponent-closed ;
+	sh:parameter sh:ClosedConstraintComponent-ignoredProperties ;
+.
+
+sh:ClosedConstraintComponent-closed
+	a sh:Parameter ; 
+	sh:predicate sh:closed ;
+.
+
+sh:ClosedConstraintComponent-ignoredProperties
+	a sh:Parameter ;
+	sh:predicate sh:ignoredProperties ;
+	sh:optional true ;
 .
 
 sh:closed
@@ -772,11 +794,15 @@ sh:ignoredProperties
 	rdfs:isDefinedBy sh: ;
 .
 
+
 sh:DatatypeConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:parameter [
-		sh:predicate sh:datatype ;
-	] ;
+	sh:parameter sh:DatatypeConstraintComponent-datatype ;
+.
+
+sh:DatatypeConstraintComponent-datatype
+	a sh:Parameter ;
+	sh:predicate sh:datatype ;
 .
 
 sh:datatype
@@ -789,11 +815,15 @@ sh:datatype
 	rdfs:isDefinedBy sh: ;
 .
 
+
 sh:DisjointConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:parameter [
-		sh:predicate sh:disjoint ;
-	] ;
+	sh:parameter sh:DisjointConstraintComponent-disjoint ;
+.
+
+sh:DisjointConstraintComponent-disjoint
+	a sh:Parameter ;
+	sh:predicate sh:disjoint ;
 .
 
 sh:disjoint
@@ -803,11 +833,15 @@ sh:disjoint
 	rdfs:isDefinedBy sh: ;
 .
 
+
 sh:EqualsConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:parameter [
-		sh:predicate sh:equals ;
-	] ;
+	sh:parameter sh:EqualsConstraintComponent-equals ;
+.
+
+sh:EqualsConstraintComponent-equals
+	a sh:Parameter ;
+	sh:predicate sh:equals ;
 .
 
 sh:equals
@@ -817,11 +851,15 @@ sh:equals
 	rdfs:isDefinedBy sh: ;
 .
 
+
 sh:HasValueConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:parameter [
-		sh:predicate sh:hasValue ;
-	] ;
+	sh:parameter sh:HasValueConstraintComponent-hasValue ;
+.
+
+sh:HasValueConstraintComponent-hasValue
+	a sh:Parameter ;
+	sh:predicate sh:hasValue ;
 .
 
 sh:hasValue
@@ -833,11 +871,15 @@ sh:hasValue
 	rdfs:label "hasValue" ;
 .
 
+
 sh:InConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:parameter [
-		sh:predicate sh:in ;
-	] ;
+	sh:parameter sh:InConstraintComponent-in ;
+.
+
+sh:InConstraintComponent-in
+	a sh:Parameter ;
+	sh:predicate sh:in ;
 .
 
 sh:in
@@ -851,11 +893,15 @@ sh:in
 	rdfs:range rdf:List ;
 .
 
+
 sh:LessThanConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:parameter [
-		sh:predicate sh:lessThan ;
-	] ;
+	sh:parameter sh:LessThanConstraintComponent-lessThan ;
+.
+
+sh:LessThanConstraintComponent-lessThan
+	a sh:Parameter ;
+	sh:predicate sh:lessThan ;
 .
 
 sh:lessThan
@@ -865,11 +911,15 @@ sh:lessThan
 	rdfs:isDefinedBy sh: ;
 .
 
+
 sh:LessThanOrEqualsConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:parameter [
-		sh:predicate sh:lessThanOrEquals ;
-	] ;
+	sh:parameter sh:LessThanOrEqualsConstraintComponent-lessThanOrEquals ;
+.
+
+sh:LessThanOrEqualsConstraintComponent-lessThanOrEquals
+	a sh:Parameter ;
+	sh:predicate sh:lessThanOrEquals ;
 .
 
 sh:lessThanOrEquals
@@ -879,12 +929,16 @@ sh:lessThanOrEquals
 	rdfs:isDefinedBy sh: ;
 .
 
+
 sh:MaxCountConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:parameter [
-		sh:predicate sh:maxCount ;
-		sh:datatype xsd:integer ;
-	] ;
+	sh:parameter sh:MaxCountConstraintComponent-maxCount ;
+.
+
+sh:MaxCountConstraintComponent-maxCount
+	a sh:Parameter ;
+	sh:predicate sh:maxCount ;
+	sh:datatype xsd:integer ;
 .
 
 sh:maxCount
@@ -897,12 +951,16 @@ sh:maxCount
 	rdfs:isDefinedBy sh: ;
 .
 
+
 sh:MaxExclusiveConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:parameter [
-		sh:predicate sh:maxExclusive ;
-		sh:nodeKind sh:Literal ;
-	] ;
+	sh:parameter sh:MaxExclusiveConstraintComponent-maxExclusive ;
+.
+
+sh:MaxExclusiveConstraintComponent-maxExclusive
+	a sh:Parameter ;
+	sh:predicate sh:maxExclusive ;
+	sh:nodeKind sh:Literal ;
 .
 
 sh:maxExclusive
@@ -914,12 +972,16 @@ sh:maxExclusive
 	rdfs:isDefinedBy sh: ;
 .
 
+
 sh:MaxInclusiveConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:parameter [
-		sh:predicate sh:maxInclusive ;
-		sh:nodeKind sh:Literal ;
-	] ;
+	sh:parameter sh:MaxInclusiveConstraintComponent-maxInclusive ;
+.
+
+sh:MaxInclusiveConstraintComponent-maxInclusive
+	a sh:Parameter ;
+	sh:predicate sh:maxInclusive ;
+	sh:nodeKind sh:Literal ;
 .
 
 sh:maxInclusive
@@ -931,12 +993,16 @@ sh:maxInclusive
 	rdfs:isDefinedBy sh: ;
 .
 
+
 sh:MaxLengthConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:parameter [
-		sh:predicate sh:maxLength ;
-		sh:datatype xsd:integer ;
-	] ;
+	sh:parameter sh:MaxLengthConstraintComponent-maxLength ;
+.
+
+sh:MaxLengthConstraintComponent-maxLength
+	a sh:Parameter ;
+	sh:predicate sh:maxLength ;
+	sh:datatype xsd:integer ;
 .
 
 sh:maxLength
@@ -949,12 +1015,16 @@ sh:maxLength
 	rdfs:isDefinedBy sh: ;
 .
 
+
 sh:MinCountConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:parameter [
-		sh:predicate sh:minCount ;
-		sh:datatype xsd:integer ;
-	] ;
+	sh:parameter sh:MinCountConstraintComponent-minCount ;
+.
+
+sh:MinCountConstraintComponent-minCount
+	a sh:Parameter ;
+	sh:predicate sh:minCount ;
+	sh:datatype xsd:integer ;
 .
 
 sh:minCount
@@ -967,12 +1037,16 @@ sh:minCount
 	rdfs:isDefinedBy sh: ;
 .
 
+
 sh:MinExclusiveConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:parameter [
-		sh:predicate sh:minExclusive ;
-		sh:nodeKind sh:Literal ;
-	] ;
+	sh:parameter sh:MinExclusiveConstraintComponent-minExclusive ;
+.
+
+sh:MinExclusiveConstraintComponent-minExclusive
+	a sh:Parameter ;
+	sh:predicate sh:minExclusive ;
+	sh:nodeKind sh:Literal ;
 .
 
 sh:minExclusive
@@ -984,12 +1058,16 @@ sh:minExclusive
 	rdfs:isDefinedBy sh: ;
 .
 
+
 sh:MinInclusiveConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:parameter [
-		sh:predicate sh:minInclusive ;
-		sh:nodeKind sh:Literal ;
-	] ;
+	sh:parameter sh:MinInclusiveConstraintComponent-minInclusive ;
+.
+
+sh:MinInclusiveConstraintComponent-minInclusive
+	a sh:Parameter ;
+	sh:predicate sh:minInclusive ;
+	sh:nodeKind sh:Literal ;
 .
 
 sh:minInclusive
@@ -1001,12 +1079,16 @@ sh:minInclusive
 	rdfs:isDefinedBy sh: ;
 .
 
+
 sh:MinLengthConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:parameter [
-		sh:predicate sh:minLength ;
-		sh:datatype xsd:integer ;
-	] ;
+	sh:parameter sh:MinLengthConstraintComponent-minLength ;
+.
+
+sh:MinLengthConstraintComponent-minLength
+	a sh:Parameter ;
+	sh:predicate sh:minLength ;
+	sh:datatype xsd:integer ;
 .
 
 sh:minLength
@@ -1019,13 +1101,17 @@ sh:minLength
 	rdfs:isDefinedBy sh: ;
 .
 
+
 sh:NodeKindConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:parameter [
-		sh:predicate sh:nodeKind ;
-		sh:class sh:NodeKind ;
-		sh:in ( sh:BlankNode sh:IRI sh:Literal sh:BlankNodeOrIRI sh:BlankNodeOrLiteral sh:IRIOrLiteral ) ;
-	] ;
+	sh:parameter sh:NodeKindConstraintComponent-nodeKind ;
+.
+
+sh:NodeKindConstraintComponent-nodeKind
+	a sh:Parameter ;
+	sh:predicate sh:nodeKind ;
+	sh:class sh:NodeKind ;
+	sh:in ( sh:BlankNode sh:IRI sh:Literal sh:BlankNodeOrIRI sh:BlankNodeOrLiteral sh:IRIOrLiteral ) ;
 .
 
 sh:nodeKind
@@ -1038,11 +1124,15 @@ sh:nodeKind
 	rdfs:isDefinedBy sh: ;
 .
 
+
 sh:NotConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:parameter [
-		sh:predicate sh:not ;
-	] ;
+	sh:parameter sh:NotConstraintComponent-not ;
+.
+
+sh:NotConstraintComponent-not
+	a sh:Parameter ;
+	sh:predicate sh:not ;
 .
 
 sh:not
@@ -1052,11 +1142,15 @@ sh:not
 	rdfs:isDefinedBy sh: ;
 .
 
+
 sh:OrConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:parameter [
-		sh:predicate sh:or ;
-	] ;
+	sh:parameter sh:OrConstraintComponent-or ;
+.
+
+sh:OrConstraintComponent-or
+	a sh:Parameter ;
+	sh:predicate sh:or ;
 .
 
 sh:or
@@ -1066,19 +1160,26 @@ sh:or
 	rdfs:isDefinedBy sh: ;
 .
 
+
 sh:PatternConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:parameter [
-		sh:predicate sh:pattern ;
-		sh:datatype xsd:string ;
-		sh:order 0 ;
-	] ;
-	sh:parameter [
-		sh:predicate sh:flags ;
-		sh:datatype xsd:string ;
-		sh:optional true ;
-		sh:order 1 ;
-	] ;
+	sh:parameter sh:PatternConstraintComponent-pattern ;
+	sh:parameter sh:PatternConstraintComponent-flags ;
+.
+
+sh:PatternConstraintComponent-pattern
+	a sh:Parameter ;
+	sh:predicate sh:pattern ;
+	sh:datatype xsd:string ;
+	sh:order 0 ;
+.
+
+sh:PatternConstraintComponent-flags
+	a sh:Parameter ;
+	sh:predicate sh:flags ;
+	sh:datatype xsd:string ;
+	sh:optional true ;
+	sh:order 1 ;
 .
 
 sh:flags
@@ -1107,12 +1208,16 @@ sh:pattern
 	rdfs:isDefinedBy sh: ;
 .
 
+
 sh:StemConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:parameter [
-		sh:predicate sh:stem ;
-		sh:datatype xsd:string ;
-	] ;
+	sh:parameter sh:StemConstraintComponent-stem ;
+.
+
+sh:StemConstraintComponent-stem
+	a sh:Parameter ;
+	sh:predicate sh:stem ;
+	sh:datatype xsd:string ;
 .
 
 sh:stem
@@ -1125,26 +1230,40 @@ sh:stem
 	rdfs:isDefinedBy sh: ;
 .
 
+
 sh:QualifiedMaxCountConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:parameter [
-		sh:predicate sh:qualifiedMaxCount ;
-		sh:datatype xsd:integer ;
-	] ;
-	sh:parameter [
-		sh:predicate sh:qualifiedValueShape ;
-	] ;
+	sh:parameter sh:QualifiedMaxCountConstraintComponent-qualifiedMaxCount ;
+	sh:parameter sh:QualifiedMaxCountConstraintComponent-qualifiedValueShape ;
 .
+
+sh:QualifiedMaxCountConstraintComponent-qualifiedMaxCount
+	a sh:Parameter ;
+	sh:predicate sh:qualifiedMaxCount ;
+	sh:datatype xsd:integer ;
+.
+
+sh:QualifiedMaxCountConstraintComponent-qualifiedValueShape
+	a sh:Parameter ;
+	sh:predicate sh:qualifiedValueShape ;
+.
+
 
 sh:QualifiedMinCountConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:parameter [
-		sh:predicate sh:qualifiedMinCount ;
-		sh:datatype xsd:integer ;
-	] ;
-	sh:parameter [
-		sh:predicate sh:qualifiedValueShape ;
-	] ;
+	sh:parameter sh:QualifiedMinCountConstraintComponent-qualifiedMinCount ;
+	sh:parameter sh:QualifiedMinCountConstraintComponent-qualifiedValueShape ;
+.
+
+sh:QualifiedMinCountConstraintComponent-qualifiedMinCount
+	a sh:Parameter ;
+	sh:predicate sh:qualifiedMinCount ;
+	sh:datatype xsd:integer ;
+.
+
+sh:QualifiedMinCountConstraintComponent-qualifiedValueShape
+	a sh:Parameter ;
+	sh:predicate sh:qualifiedValueShape ;
 .
 
 sh:qualifiedMaxCount
@@ -1174,11 +1293,15 @@ sh:qualifiedValueShape
 	rdfs:isDefinedBy sh: ;
 .
 
+
 sh:ShapeConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:parameter [
-		sh:predicate sh:shape ;
-	] ;
+	sh:parameter sh:ShapeConstraintComponent-shape ;
+.
+
+sh:ShapeConstraintComponent-shape
+	a sh:Parameter ;
+	sh:predicate sh:shape ;
 .
 
 sh:shape
@@ -1188,12 +1311,16 @@ sh:shape
 	rdfs:isDefinedBy sh: ;
 .
 
+
 sh:UniqueLangConstraintComponent
 	a sh:ConstraintComponent ;
-	sh:parameter [
-		sh:predicate sh:uniqueLang ;
-		sh:datatype xsd:boolean ;
-	] ;
+	sh:parameter sh:UniqueLangConstraintComponent-uniqueLang ;
+.
+
+sh:UniqueLangConstraintComponent-uniqueLang
+	a sh:Parameter ;
+	sh:predicate sh:uniqueLang ;
+	sh:datatype xsd:boolean ;
 .
 
 sh:uniqueLang

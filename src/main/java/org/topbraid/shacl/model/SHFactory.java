@@ -133,12 +133,13 @@ public class SHFactory {
 	 * @return true if node is a Shape
 	 */
 	public static boolean isShape(RDFNode node) {
-		// TODO: Make it rely on sh:defaultValueType
 		if(node instanceof Resource) {
 			if(JenaUtil.hasIndirectType((Resource)node, SH.Shape)) {
 				return true;
 			}
 			else if(node.isAnon() && !((Resource)node).hasProperty(RDF.type)) {
+				// TODO: This logic is not really correct - it should also test that if
+				//       other rdf:type triples are present
 				if(node.getModel().contains(null, SH.shape, node) ||
 						node.getModel().contains(null, SH.filterShape, node)) {
 					return true;

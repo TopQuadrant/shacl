@@ -1,3 +1,4 @@
+# baseURI: http://datashapes.org/dash
 # imports: http://topbraid.org/tosh
 # imports: http://www.w3.org/ns/shacl#
 # prefix: dash
@@ -49,6 +50,15 @@ dash:AllSubjectsTarget
 WHERE {
     ?this ?anyP ?anyO .
 }""" ;
+.
+dash:DateOrDateTime
+  rdf:type rdf:List ;
+  rdf:first xsd:date ;
+  rdf:rest (
+      xsd:dateTime
+    ) ;
+  rdfs:comment "An rdf:List that can be used in property constraints as value for sh:or to indicate that all values of a property must be either xsd:date or xsd:dateTime." ;
+  rdfs:label "Date or date time" ;
 .
 dash:DefaultValueTypeRule
   rdf:type sh:SPARQLConstructExecutable ;
@@ -132,12 +142,7 @@ dash:MemberShapeConstraintComponent
   rdf:type sh:ConstraintComponent ;
   rdfs:comment "Can be used to specify constraints on the members of a given list, assuming that the given sh:property has rdf:Lists as values. A violation is reported for each member of the list that does not comply with the constraints specified by the given shape." ;
   rdfs:label "Member shape constraint component" ;
-  sh:parameter [
-      sh:predicate dash:memberShape ;
-      sh:class sh:Shape ;
-      sh:description "The shape that the list members must have." ;
-      sh:name "member shape" ;
-    ] ;
+  sh:parameter dash:MemberShapeConstraintComponent-memberShape ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
       sh:message "List member {?member} does not have the shape {$memberShape}" ;
@@ -154,20 +159,22 @@ dash:MemberShapeConstraintComponent
     ] ;
   sh:targetClass sh:PropertyConstraint ;
 .
+dash:MemberShapeConstraintComponent-memberShape
+  rdf:type sh:Parameter ;
+  sh:predicate dash:memberShape ;
+  sh:class sh:Shape ;
+  sh:description "The shape that the list members must have." ;
+  sh:name "member shape" ;
+.
 dash:NonRecursiveConstraintComponent
   rdf:type sh:ConstraintComponent ;
-  dash:propertySuggestionGenerator <http://topbraid.org/tosh#DeleteTripleSuggestionGenerator> ;
   rdfs:comment """Used to state that a property or path must not point back to itself.
 
 For example, \"a person cannot have itself as parent\" can be expressed by setting dash:nonRecursive=true for a given sh:predicate.
 
 To express that a person cannot have itself among any of its (recursive) parents, use a sh:path with the + operator such as ex:parent+.""" ;
   rdfs:label "Non-recursive constraint component" ;
-  sh:parameter [
-      sh:predicate dash:nonRecursive ;
-      sh:datatype xsd:boolean ;
-      sh:name "non-recursive" ;
-    ] ;
+  sh:parameter dash:NonRecursiveConstraintComponent-nonRecursive ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
       sh:message "Points back at itself (recursively)" ;
@@ -181,6 +188,13 @@ WHERE {
     ] ;
   sh:targetClass sh:PropertyConstraint ;
 .
+dash:NonRecursiveConstraintComponent-nonRecursive
+  rdf:type sh:Parameter ;
+  sh:predicate dash:nonRecursive ;
+  sh:datatype xsd:boolean ;
+  sh:maxCount 1 ;
+  sh:name "non-recursive" ;
+.
 dash:None
   rdf:type sh:Shape ;
   rdfs:comment "A Shape that is violated for every possible focus node. This can be used in sh:filterShape statements to essentially deactivate other shapes or constraints." ;
@@ -192,12 +206,7 @@ dash:PrimaryKeyConstraintComponent
   rdfs:comment "Enforces a constraint that the given property (sh:predicate) serves as primary key for all resources in the target of the shape. If a property has been declared to be the primary key then each resource must have exactly one value for that property. Furthermore, the URIs of those resources must start with a given string (dash:uriStart), followed by the URL-encoded primary key value. For example if dash:uriStart is \"http://example.org/country-\" and the primary key for an instance is \"de\" then the URI must be \"http://example.org/country-de\". Finally, as a result of the URI policy, there can not be any other resource with the same value under the same primary key policy." ;
   rdfs:label "Primary key constraint component" ;
   sh:labelTemplate "The property {?predicate} is the primary key and URIs start with {?uriStart}" ;
-  sh:parameter [
-      sh:predicate dash:uriStart ;
-      sh:datatype xsd:string ;
-      sh:description "The start of the URIs of well-formed resources." ;
-      sh:name "URI start" ;
-    ] ;
+  sh:parameter dash:PrimaryKeyConstraintComponent-uriStart ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
       sh:select """SELECT $this ?value ?message
@@ -231,6 +240,13 @@ WHERE {
     ] ;
   sh:targetClass sh:PropertyConstraint ;
 .
+dash:PrimaryKeyConstraintComponent-uriStart
+  rdf:type sh:Parameter ;
+  sh:predicate dash:uriStart ;
+  sh:datatype xsd:string ;
+  sh:description "The start of the URIs of well-formed resources." ;
+  sh:name "URI start" ;
+.
 dash:QueryTestCase
   rdf:type rdfs:Class ;
   rdf:type sh:Shape ;
@@ -259,16 +275,17 @@ dash:RootClassConstraintComponent
   rdfs:comment "A constraint component defining the parameter dash:rootClass, which restricts the values to be either the root class itself or one of its subclasses. This is typically used in conjunction with properties that have rdfs:Class as their type." ;
   rdfs:label "Root class constraint component" ;
   sh:labelTemplate "Root class {$rootClass}" ;
-  sh:parameter [
-      sh:predicate dash:rootClass ;
-      sh:class rdfs:Class ;
-      sh:description "The root class." ;
-      sh:name "root class" ;
-      sh:nodeKind sh:IRI ;
-    ] ;
+  sh:parameter dash:RootClassConstraintComponent-rootClass ;
   sh:targetClass sh:PropertyConstraint ;
-  sh:targetClass sh:Shape ;
   sh:validator dash:hasRootClass ;
+.
+dash:RootClassConstraintComponent-rootClass
+  rdf:type sh:Parameter ;
+  sh:predicate dash:rootClass ;
+  sh:class rdfs:Class ;
+  sh:description "The root class." ;
+  sh:name "root class" ;
+  sh:nodeKind sh:IRI ;
 .
 dash:SPARQLUpdateSuggestionGenerator
   rdf:type rdfs:Class ;
@@ -280,12 +297,14 @@ In many cases, there may be multiple possible suggestions to fix a problem. For 
   rdfs:subClassOf sh:SPARQLSelectExecutable ;
   rdfs:subClassOf sh:SPARQLUpdateExecutable ;
 .
-dash:ShapeClass
-  rdf:type rdfs:Class ;
-  rdfs:comment "Metaclass of classes that are also SHACL shapes. Instances of this metaclass (i.e. the classes themselves) can have constraints attached to them. No other type arc is needed." ;
-  rdfs:label "Shape class" ;
-  rdfs:subClassOf rdfs:Class ;
-  rdfs:subClassOf sh:Shape ;
+dash:StringOrLangString
+  rdf:type rdf:List ;
+  rdf:first xsd:string ;
+  rdf:rest (
+      rdf:langString
+    ) ;
+  rdfs:comment "An rdf:List that can be used in property constraints as value for sh:or to indicate that all values of a property must be either xsd:string or rdf:langString." ;
+  rdfs:label "String or langString" ;
 .
 dash:SuccessResult
   rdf:type rdfs:Class ;
@@ -313,10 +332,10 @@ dash:SuggestionGenerator
 .
 dash:TestCase
   rdf:type rdfs:Class ;
+  dash:abstract "true"^^xsd:boolean ;
   rdfs:comment "A test case to verify that a (SHACL-based) feature works as expected." ;
   rdfs:label "Test case" ;
   rdfs:subClassOf rdfs:Resource ;
-  sh:abstract "true"^^xsd:boolean ;
 .
 dash:TestCaseResult
   rdf:type rdfs:Class ;
@@ -345,15 +364,23 @@ dash:TestCaseResult
 dash:ValidationTestCase
   rdf:type rdfs:Class ;
   rdf:type sh:Shape ;
+  dash:abstract "true"^^xsd:boolean ;
   rdfs:comment "Abstract superclass for test cases concerning SHACL constraint validation. Future versions may add new kinds of validatin test cases, e.g. to validate a single resource only." ;
   rdfs:label "Validation test case" ;
   rdfs:subClassOf dash:TestCase ;
   sh:property [
       sh:predicate dash:expectedResult ;
       sh:class sh:AbstractResult ;
-      sh:description "The expected result of a function call." ;
+      sh:description "The expected validation results." ;
       sh:name "expected result" ;
     ] ;
+.
+dash:abstract
+  rdf:type rdf:Property ;
+  rdfs:comment "Indicates that a class is \"abstract\" and cannot be used in asserted rdf:type triples. Only non-abstract subclasses of abstract classes should be instantiated directly." ;
+  rdfs:domain rdfs:Class ;
+  rdfs:label "abstract" ;
+  rdfs:range xsd:boolean ;
 .
 dash:addedTriple
   rdf:type rdf:Property ;
@@ -613,6 +640,10 @@ dash:propertySuggestionGenerator
   rdfs:label "property suggestion generator" ;
   rdfs:range dash:SuggestionGenerator ;
 .
+dash:rootClass
+  rdf:type rdf:Property ;
+  rdfs:label "root class" ;
+.
 dash:suggestion
   rdf:type rdf:Property ;
   rdfs:comment "Can be used to link a validation result with one or more suggestions on how to fix the underlying issue." ;
@@ -729,7 +760,6 @@ sh:AndConstraintComponent
 .
 sh:ClassConstraintComponent
   sh:targetClass sh:PropertyConstraint ;
-  sh:targetClass sh:Shape ;
   sh:validator dash:hasClass ;
 .
 sh:ClosedConstraintComponent
@@ -759,7 +789,6 @@ sh:ClosedConstraintComponent
 .
 sh:DatatypeConstraintComponent
   sh:targetClass sh:PropertyConstraint ;
-  sh:targetClass sh:Shape ;
   sh:validator dash:hasDatatype ;
 .
 sh:DerivedValuesConstraintComponent
@@ -878,17 +907,14 @@ sh:MaxCountConstraintComponent
 .
 sh:MaxExclusiveConstraintComponent
   sh:targetClass sh:PropertyConstraint ;
-  sh:targetClass sh:Shape ;
   sh:validator dash:hasMaxExclusive ;
 .
 sh:MaxInclusiveConstraintComponent
   sh:targetClass sh:PropertyConstraint ;
-  sh:targetClass sh:Shape ;
   sh:validator dash:hasMaxInclusive ;
 .
 sh:MaxLengthConstraintComponent
   sh:targetClass sh:PropertyConstraint ;
-  sh:targetClass sh:Shape ;
   sh:validator dash:hasMaxLength ;
 .
 sh:MinCountConstraintComponent
@@ -910,22 +936,18 @@ sh:MinCountConstraintComponent
 .
 sh:MinExclusiveConstraintComponent
   sh:targetClass sh:PropertyConstraint ;
-  sh:targetClass sh:Shape ;
   sh:validator dash:hasMinExclusive ;
 .
 sh:MinInclusiveConstraintComponent
   sh:targetClass sh:PropertyConstraint ;
-  sh:targetClass sh:Shape ;
   sh:validator dash:hasMinInclusive ;
 .
 sh:MinLengthConstraintComponent
   sh:targetClass sh:PropertyConstraint ;
-  sh:targetClass sh:Shape ;
   sh:validator dash:hasMinLength ;
 .
 sh:NodeKindConstraintComponent
   sh:targetClass sh:PropertyConstraint ;
-  sh:targetClass sh:Shape ;
   sh:validator dash:hasNodeKind ;
 .
 sh:NotConstraintComponent
@@ -986,7 +1008,6 @@ sh:OrConstraintComponent
 .
 sh:PatternConstraintComponent
   sh:targetClass sh:PropertyConstraint ;
-  sh:targetClass sh:Shape ;
   sh:validator dash:hasPattern ;
 .
 sh:QualifiedMaxCountConstraintComponent

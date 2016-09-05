@@ -25,6 +25,10 @@ public class SH {
     public final static Resource AbstractResult = ResourceFactory.createResource(NS + "AbstractResult");
 
     public final static Resource BlankNode = ResourceFactory.createResource(NS + "BlankNode");
+
+    public final static Resource BlankNodeOrIRI = ResourceFactory.createResource(NS + "BlankNodeOrIRI");
+
+    public final static Resource BlankNodeOrLiteral = ResourceFactory.createResource(NS + "BlankNodeOrLiteral");
     
     public final static Resource Constraint = ResourceFactory.createResource(NS + "Constraint");
 
@@ -37,6 +41,8 @@ public class SH {
     public final static Resource Info = ResourceFactory.createResource(NS + "Info");
 
     public final static Resource IRI = ResourceFactory.createResource(NS + "IRI");
+
+    public final static Resource IRIOrLiteral = ResourceFactory.createResource(NS + "IRIOrLiteral");
 
     public final static Resource Literal = ResourceFactory.createResource(NS + "Literal");
 

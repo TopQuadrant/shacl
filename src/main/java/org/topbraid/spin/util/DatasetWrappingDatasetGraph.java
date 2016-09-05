@@ -100,12 +100,17 @@ public class DatasetWrappingDatasetGraph extends DatasetGraphBase {
 
 	@Override
 	public Graph getGraph(Node graphNode) {
-		Model model = dataset.getNamedModel(graphNode.getURI());
-		if(model != null) {
-			return model.getGraph();
+		try {
+			Model model = dataset.getNamedModel(graphNode.getURI());
+			if(model != null) {
+				return model.getGraph();
+			}
+			else {
+				return null;
+			}
 		}
-		else {
-			return null;
+		catch(Exception ex) {
+			throw new IllegalArgumentException("Exception accessing named graph " + graphNode, ex);
 		}
 	}
 

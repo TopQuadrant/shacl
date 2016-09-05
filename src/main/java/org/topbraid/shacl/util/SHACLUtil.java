@@ -49,10 +49,12 @@ import org.topbraid.spin.util.OptimizedMultiUnion;
  * @author Holger Knublauch
  */
 public class SHACLUtil {
-	
+
 	public final static String MACROS_FILE_PART = ".macros.";
 	
 	public final static String SHAPES_FILE_PART = ".shapes.";
+	
+	public static final String URN_X_SHACL = "urn:x-shacl:";
 	
 	private static final Set<Property> SPARQL_PROPERTIES = new HashSet<Property>();
 	static {
@@ -535,7 +537,7 @@ public class SHACLUtil {
 
 
 	public static URI withShapesGraph(Dataset dataset) {
-		URI shapesGraphURI = URI.create("urn:x-shacl:" + UUID.randomUUID());
+		URI shapesGraphURI = URI.create(URN_X_SHACL + UUID.randomUUID());
 		Model shapesModel = createShapesModel(dataset);
 		dataset.addNamedModel(shapesGraphURI.toString(), shapesModel);
 		return shapesGraphURI;
