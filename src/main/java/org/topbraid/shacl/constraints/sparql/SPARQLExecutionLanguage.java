@@ -59,7 +59,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 	
 	@Override
 	public boolean canExecuteConstraint(ConstraintExecutable executable) {
-		if(JenaUtil.hasIndirectType(executable.getConstraint(), SH.SPARQLConstraint) &&
+		if(SHFactory.isSPARQLConstraint(executable.getConstraint()) &&
 				executable.getConstraint().hasProperty(SH.select)) {
 			return true;
 		}
@@ -207,7 +207,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 
 	private String getSPARQL(ConstraintExecutable executable) {
 		SHConstraint constraint = executable.getConstraint();
-		if(JenaUtil.hasIndirectType(constraint, SH.SPARQLConstraint)) {
+		if(SHFactory.isSPARQLConstraint(constraint)) {
 			return JenaUtil.getStringProperty(constraint, SH.select);
 		}
 		else if(executable instanceof ComponentConstraintExecutable) {

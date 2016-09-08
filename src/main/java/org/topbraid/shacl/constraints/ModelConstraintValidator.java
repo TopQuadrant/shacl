@@ -134,7 +134,7 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 							type = SHACLUtil.getResourceDefaultType(c);
 						}
 						if(type != null) {
-							if(JenaUtil.hasIndirectType(c, SH.SPARQLConstraint)) {
+							if(SH.SPARQLConstraint.equals(type)) {
 								list.add(SHFactory.asSPARQLConstraint(c));
 							}
 							else if(JenaUtil.hasSuperClass(type, SH.Constraint)) {
