@@ -1,5 +1,5 @@
 # W3C Shapes Constraint Language (SHACL) Vocabulary
-# Draft last edited 2016-08-25
+# Draft last edited 2016-09-15
 
 @prefix owl:     <http://www.w3.org/2002/07/owl#> .
 @prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -891,6 +891,26 @@ sh:in
 	rdfs:isDefinedBy sh: ;
 	rdfs:label "in" ;
 	rdfs:range rdf:List ;
+.
+
+
+sh:LanguageInConstraintComponent
+	a sh:ConstraintComponent ;
+	sh:parameter sh:LanguageInConstraintComponent-languageIn ;
+.
+
+sh:LanguageInConstraintComponent-languageIn
+	a sh:Parameter ;
+	sh:predicate sh:languageIn ;
+.
+
+sh:languageIn
+	a rdf:Property ;
+	rdfs:label "language in" ;
+	rdfs:comment """
+		Specifies a list of language tags that all value nodes must have.
+		"""^^rdf:HTML ;
+	rdfs:range rdf:List ;   # members: xsd:string
 .
 
 

@@ -582,6 +582,21 @@ dash:isIn
 		""" ;
   sh:message "Value is not in {$in}" ;
 .
+dash:isLanguageIn
+  rdf:type sh:SPARQLAskValidator ;
+  rdfs:label "is language in" ;
+  sh:ask """
+		ASK {
+			BIND (lang($value) AS ?valueLang) .
+			FILTER (bound(?valueLang) && EXISTS {
+				GRAPH $shapesGraph {
+					$languageIn (rdf:rest*)/rdf:first ?lang .
+				    FILTER (langMatches(?valueLang, ?lang))
+				} } )
+		}
+		""" ;
+  sh:message "Language does not match any of {$languageIn}" ;
+.
 dash:isNodeKindBlankNode
   rdf:type sh:SPARQLFunction ;
   dash:cachable "true"^^xsd:boolean ;
@@ -859,6 +874,11 @@ sh:InConstraintComponent
   sh:targetClass sh:PropertyConstraint ;
   sh:targetClass sh:Shape ;
   sh:validator dash:isIn ;
+.
+sh:LanguageInConstraintComponent
+  sh:targetClass sh:PropertyConstraint ;
+  sh:targetClass sh:Shape ;
+  sh:validator dash:isLanguageIn ;
 .
 sh:LessThanConstraintComponent
   sh:propertyValidator [
