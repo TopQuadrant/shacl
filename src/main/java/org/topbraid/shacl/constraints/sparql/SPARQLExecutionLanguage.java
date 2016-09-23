@@ -22,6 +22,9 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.shared.PrefixMapping;
+import org.apache.jena.shared.impl.PrefixMappingImpl;
+import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.topbraid.shacl.arq.SHACLPaths;
 import org.topbraid.shacl.constraints.ComponentConstraintExecutable;
@@ -49,6 +52,10 @@ import org.topbraid.spin.util.JenaUtil;
  * @author Holger Knublauch
  */
 public class SPARQLExecutionLanguage implements ExecutionLanguage {
+	
+	// Flag to bypass sh:prefixes and instead use all prefixes in the Jena object of the shapes graph.
+	// Note that this flag will be switched to false in a future release.
+	public static boolean useGraphPrefixes = true;
 	
 	private static SPARQLExecutionLanguage singleton = new SPARQLExecutionLanguage();
 	
@@ -110,7 +117,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		sb.append("        BIND (\"Derived value is not among existing values\" AS ?message) .\n");
 		sb.append("    }\n");
 		sb.append("}");
-		return sb.toString();
+		return withPrefixes(sb.toString(), valuesDeriver);
 	}
 
 
@@ -123,9 +130,9 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 			return;
 		}
 		
-		String sparql = getSPARQL(executable);
+		String queryString = getSPARQL(executable);
 		SHConstraint constraint = executable.getConstraint();
-		if(sparql == null) {
+		if(queryString == null) {
 			String message = "Missing " + SH.PREFIX + ":" + SH.select.getLocalName() + " of " + SPINLabels.get().getLabel(constraint);
 			if(constraint.isAnon()) {
 				StmtIterator it = constraint.getModel().listStatements(null, null, constraint);
@@ -139,7 +146,6 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 			throw new SHACLException(message);
 		}
 
-		String queryString = ARQFactory.get().createPrefixDeclarations(constraint.getModel()) + sparql;
 		Query query;
 		try {
 			query = ARQFactory.get().createQuery(queryString);
@@ -192,13 +198,13 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 			String label = executable + " (" + violationCount + " violations)";
 			Iterator<String> varNames = bindings.varNames();
 			if(varNames.hasNext()) {
-				sparql += "\nBindings:";
+				queryString += "\nBindings:";
 				while(varNames.hasNext()) {
 					String varName = varNames.next();
-					sparql += "\n- ?" + varName + ": " + bindings.get(varName);
+					queryString += "\n- ?" + varName + ": " + bindings.get(varName);
 				}
 			}
-			SPINStatistics stats = new SPINStatistics(label, sparql, duration, startTime, 
+			SPINStatistics stats = new SPINStatistics(label, queryString, duration, startTime, 
 					focusNode != null ? focusNode.asNode() : constraint.asNode());
 			SPINStatisticsManager.get().add(Collections.singletonList(stats));
 		}
@@ -208,7 +214,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 	private String getSPARQL(ConstraintExecutable executable) {
 		SHConstraint constraint = executable.getConstraint();
 		if(SHFactory.isSPARQLConstraint(constraint)) {
-			return JenaUtil.getStringProperty(constraint, SH.select);
+			return withPrefixes(JenaUtil.getStringProperty(constraint, SH.select), SHFactory.asSPARQLConstraint(constraint));
 		}
 		else if(executable instanceof ComponentConstraintExecutable) {
 			ComponentConstraintExecutable cce = (ComponentConstraintExecutable) executable;
@@ -218,7 +224,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 					return createSPARQLFromAskValidator(cce, validator);
 				}
 				else if(JenaUtil.hasIndirectType(validator, SH.SPARQLSelectValidator)) {
-					return JenaUtil.getStringProperty(validator, SH.select);
+					return withPrefixes(JenaUtil.getStringProperty(validator, SH.select), validator);
 				}
 			}
 			else if (SH.DerivedValuesConstraintComponent.equals(cce.getComponent())) {
@@ -336,7 +342,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 	public Iterable<RDFNode> executeTarget(Dataset dataset, Resource target, SHParameterizableTarget parameterizableTarget) {
 
 		String sparql = JenaUtil.getStringProperty(target, SH.select);
-		String queryString = ARQFactory.get().createPrefixDeclarations(target.getModel()) + sparql;
+		String queryString = withPrefixes(sparql, target);
 		Query query;
 		try {
 			query = getSPARQLWithSelect(target);
@@ -373,7 +379,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 
 		// If sh:sparql exists only, then we expect run the query with ?this pre-bound
 		String sparql = JenaUtil.getStringProperty(executable, SH.select);
-		String queryString = ARQFactory.get().createPrefixDeclarations(executable.getModel()) + sparql;
+		String queryString = withPrefixes(sparql, executable);
 		Query query;
 		try {
 			query = ARQFactory.get().createQuery(queryString);
@@ -442,7 +448,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		String body = "{ BIND(true AS ?qyueyru). " + sparql.substring(firstIndex + 1, lastIndex + 1);
 		sb.append("    FILTER NOT EXISTS " + body + "\n}");
 		
-		return sb.toString();
+		return withPrefixes(sb.toString(), validator);
 	}
 	
 	
@@ -452,10 +458,75 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 			throw new SHACLException("Missing sh:sparql at " + host);
 		}
 		try {
-			return ARQFactory.get().createQuery(host.getModel(), sparql);
+			return ARQFactory.get().createQuery(withPrefixes(sparql, host));
 		}
 		catch(Exception ex) {
-			return ARQFactory.get().createQuery(host.getModel(), "SELECT ?this WHERE {" + sparql + "}");
+			return ARQFactory.get().createQuery(withPrefixes("SELECT ?this WHERE {" + sparql + "}", host));
 		}
+	}
+	
+	
+	/**
+	 * Gets a parsable SPARQL string based on a fragment and prefix declarations.
+	 * Depending on the setting of the flag useGraphPrefixes, this either uses the
+	 * prefixes from the Jena graph of the given executable, or strictly uses sh:prefixes.
+	 * @param str  the query fragment (e.g. starting with SELECT)
+	 * @param executable  the sh:SPARQLExecutable potentially holding the sh:prefixes
+	 * @return the parsable SPARQL string
+	 */
+	public static String withPrefixes(String str, Resource executable) {
+		if(useGraphPrefixes) {
+			return ARQFactory.get().createPrefixDeclarations(executable.getModel()) + str;
+		}
+		else {
+			StringBuffer sb = new StringBuffer();
+			PrefixMapping pm = new PrefixMappingImpl();
+			Set<Resource> reached = new HashSet<Resource>();
+			for(Resource ontology : JenaUtil.getResourceProperties(executable, SH.prefixes)) {
+				String duplicate = collectPrefixes(ontology, pm, reached);
+				if(duplicate != null) {
+					throw new SHACLException("Duplicate prefix declaration for prefix " + duplicate);
+				}
+			}
+			for(String prefix : pm.getNsPrefixMap().keySet()) {
+				sb.append("PREFIX ");
+				sb.append(prefix);
+				sb.append(": <");
+				sb.append(pm.getNsPrefixURI(prefix));
+				sb.append(">\n");
+			}
+			sb.append(str);
+			return sb.toString();
+		}
+	}
+	
+	
+	// Returns the duplicate prefix, if any
+	private static String collectPrefixes(Resource ontology, PrefixMapping pm, Set<Resource> reached) {
+		
+		reached.add(ontology);
+		
+		for(Resource decl : JenaUtil.getResourceProperties(ontology, SH.declare)) {
+			String prefix = JenaUtil.getStringProperty(decl, SH.prefix);
+			String ns = JenaUtil.getStringProperty(decl, SH.namespace);
+			if(prefix != null && ns != null) {
+				String oldNS = pm.getNsPrefixURI(prefix);
+				if(oldNS != null && !oldNS.equals(ns)) {
+					return prefix;
+				}
+				pm.setNsPrefix(prefix, ns);
+			}
+		}
+		
+		for(Resource imp : JenaUtil.getResourceProperties(ontology, OWL.imports)) {
+			if(!reached.contains(imp)) {
+				String duplicate = collectPrefixes(imp, pm, reached);
+				if(duplicate != null) {
+					return duplicate;
+				}
+			}
+		}
+		
+		return null;
 	}
 }

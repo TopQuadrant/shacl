@@ -54,6 +54,7 @@ ex:TestShape
   rdfs:label "Test shape" ;
   sh:sparql [
       sh:message "Cannot have a label" ;
+      sh:prefixes <http://datashapes.org/sh/tests/sparql/constraint/sparql-001.test> ;
       sh:select """SELECT $this ?path ?value
 WHERE {
     $this ?path ?value .

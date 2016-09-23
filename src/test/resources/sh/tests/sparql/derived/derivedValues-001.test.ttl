@@ -13,6 +13,11 @@
 <http://datashapes.org/sh/tests/sparql/derived/derivedValues-001.test>
   rdf:type owl:Ontology ;
   owl:imports <http://datashapes.org/dash> ;
+  sh:declare [
+      rdf:type sh:PrefixDeclaration ;
+      sh:namespace "http://datashapes.org/sh/tests/sparql/derived/derivedValues-001.test#"^^xsd:anyURI ;
+      sh:prefix "ex" ;
+    ] ;
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
@@ -75,6 +80,7 @@ ex:Rectangle
       sh:datatype xsd:integer ;
       sh:derivedValues [
           rdf:type sh:SPARQLValuesDeriver ;
+          sh:prefixes <http://datashapes.org/sh/tests/sparql/derived/derivedValues-001.test> ;
           sh:select """
           		SELECT ?value
           		WHERE {

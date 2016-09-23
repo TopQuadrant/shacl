@@ -93,12 +93,18 @@ public class ComponentConstraintExecutable extends ConstraintExecutable {
 	
 	@Override
 	public List<Literal> getMessages() {
-		Resource validator = getValidator();
-		if(validator != null) {
-			return JenaUtil.getLiteralProperties(validator, SH.message);
+		List<Literal> constraintMessages = JenaUtil.getLiteralProperties(constraint, SH.message);
+		if(!constraintMessages.isEmpty()) {
+			return constraintMessages;
 		}
 		else {
-			return Collections.emptyList();
+			Resource validator = getValidator();
+			if(validator != null) {
+				return JenaUtil.getLiteralProperties(validator, SH.message);
+			}
+			else {
+				return Collections.emptyList();
+			}
 		}
 	}
 	

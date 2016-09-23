@@ -34,6 +34,7 @@ import org.apache.jena.sparql.serializer.SerializationContext;
 import org.apache.jena.sparql.sse.SSE;
 import org.apache.jena.sparql.util.ExprUtils;
 import org.apache.jena.sparql.util.FmtUtils;
+import org.topbraid.shacl.constraints.sparql.SPARQLExecutionLanguage;
 import org.topbraid.shacl.model.SHConstraintComponent;
 import org.topbraid.shacl.model.SHFunction;
 import org.topbraid.shacl.model.SHParameter;
@@ -84,7 +85,7 @@ public class SHACLARQFunction implements org.apache.jena.sparql.function.Functio
 		
 		try {
 			queryString = JenaUtil.getStringProperty(askValidator, SH.ask);
-			arqQuery = ARQFactory.get().createQuery(askValidator.getModel(), queryString);
+			arqQuery = ARQFactory.get().createQuery(SPARQLExecutionLanguage.withPrefixes(queryString, askValidator));
 		}
 		catch(Exception ex) {
 			throw new IllegalArgumentException("Validator " + askValidator + " does not define a valid body", ex);

@@ -1,4 +1,3 @@
-
 package org.topbraid.shacl.vocabulary;
 
 import org.apache.jena.rdf.model.Property;
@@ -93,6 +92,8 @@ public class SH {
 
     public final static Property datatype = ResourceFactory.createProperty(NS + "datatype");
 
+    public final static Property declare = ResourceFactory.createProperty(NS + "declare");
+
     public final static Property defaultValue = ResourceFactory.createProperty(NS + "defaultValue");
 
     public final static Property derivedValues = ResourceFactory.createProperty(NS + "derivedValues");
@@ -133,6 +134,8 @@ public class SH {
 
     public final static Property name = ResourceFactory.createProperty(NS + "name");
 
+    public final static Property namespace = ResourceFactory.createProperty(NS + "namespace");
+
     public final static Property nodeKind = ResourceFactory.createProperty(NS + "nodeKind");
     
     public final static Property not = ResourceFactory.createProperty(NS + "not");
@@ -150,6 +153,10 @@ public class SH {
     public final static Property path = ResourceFactory.createProperty(NS + "path");
 
     public final static Property predicate = ResourceFactory.createProperty(NS + "predicate");
+
+    public final static Property prefix = ResourceFactory.createProperty(NS + "prefix");
+
+    public final static Property prefixes = ResourceFactory.createProperty(NS + "prefixes");
 
     public final static Property property = ResourceFactory.createProperty(NS + "property");
 

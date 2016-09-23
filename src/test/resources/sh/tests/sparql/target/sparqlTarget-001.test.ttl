@@ -42,6 +42,7 @@ ex:TestShape
     ] ;
   sh:target [
       rdf:type sh:SPARQLTarget ;
+      sh:prefixes <http://datashapes.org/sh/tests/sparql/target/sparqlTarget-001.test> ;
       sh:select """SELECT ?this
 WHERE {
     ?this a owl:Thing .
