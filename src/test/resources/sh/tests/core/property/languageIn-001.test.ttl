@@ -26,24 +26,24 @@ ex:GraphValidationTestCase
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:Berg ;
-      sh:path ex:prefLabel ;
-      sh:severity sh:Violation ;
+      sh:resultPath ex:prefLabel ;
+      sh:resultSeverity sh:Violation ;
       sh:sourceConstraintComponent sh:LanguageInConstraintComponent ;
       sh:value ex:BergLabel ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:Berg ;
-      sh:path ex:prefLabel ;
-      sh:severity sh:Violation ;
+      sh:resultPath ex:prefLabel ;
+      sh:resultSeverity sh:Violation ;
       sh:sourceConstraintComponent sh:LanguageInConstraintComponent ;
       sh:value "Berg" ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:Berg ;
-      sh:path ex:prefLabel ;
-      sh:severity sh:Violation ;
+      sh:resultPath ex:prefLabel ;
+      sh:resultSeverity sh:Violation ;
       sh:sourceConstraintComponent sh:LanguageInConstraintComponent ;
       sh:value "Berg"@de ;
     ] ;

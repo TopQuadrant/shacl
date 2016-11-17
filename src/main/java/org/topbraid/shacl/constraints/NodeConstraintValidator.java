@@ -2,6 +2,7 @@ package org.topbraid.shacl.constraints;
 
 import java.net.URI;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
@@ -15,72 +16,76 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDF;
+import org.topbraid.shacl.constraints.sparql.SPARQLExecutionLanguage;
 import org.topbraid.shacl.model.SHConstraint;
 import org.topbraid.shacl.model.SHFactory;
 import org.topbraid.shacl.model.SHParameterizableTarget;
 import org.topbraid.shacl.model.SHShape;
 import org.topbraid.shacl.util.SHACLUtil;
+import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.progress.ProgressMonitor;
 import org.topbraid.spin.util.JenaUtil;
 
 /**
- * A SHACL constraint validator for individual resources - either against all shapes
+ * A SHACL constraint validator for individual nodes - either against all shapes
  * derived from its Model, or against a specified Shape.
  * 
  * @author Holger Knublauch
  */
-public class ResourceConstraintValidator extends AbstractConstraintValidator {
+public class NodeConstraintValidator extends AbstractConstraintValidator {
 	
-	private static ResourceConstraintValidator singleton = new ResourceConstraintValidator();
-	
-	public static ResourceConstraintValidator get() {
-		return singleton;
+	public NodeConstraintValidator() {
+		this(JenaUtil.createMemoryModel());
 	}
 	
-	public static void set(ResourceConstraintValidator value) {
-		singleton = value;
+	public NodeConstraintValidator(Model resultsModel) {
+		super(resultsModel);
 	}
 
 
 	/**
 	 * Gets a Set of all Shapes that should be evaluated for a given resource.
-	 * @param resource  the resource to get the shapes for
+	 * @param focusNode  the resource to get the shapes for
 	 * @param dataset  the Dataset containing the resource
 	 * @param shapesModel  the shapes Model
 	 * @return a Set of shape resources
 	 */
-	public Set<Resource> getShapesForResource(Resource resource, Dataset dataset, Model shapesModel) {
+	public Set<Resource> getShapesForNode(RDFNode focusNode, Dataset dataset, Model shapesModel) {
 		Set<Resource> shapes = new HashSet<Resource>();
 
 		// sh:targetNode
-		shapes.addAll(shapesModel.listSubjectsWithProperty(SH.targetNode, resource).toList());
+		shapes.addAll(shapesModel.listSubjectsWithProperty(SH.targetNode, focusNode).toList());
 		
 		// property targets
-		for(Statement s : shapesModel.listStatements(null, SH.targetSubjectsOf, (RDFNode)null).toList()) {
-			if(resource.hasProperty(JenaUtil.asProperty(s.getResource()))) {
-				shapes.add(s.getSubject());
+		if(focusNode instanceof Resource) {
+			for(Statement s : shapesModel.listStatements(null, SH.targetSubjectsOf, (RDFNode)null).toList()) {
+				if(((Resource)focusNode).hasProperty(JenaUtil.asProperty(s.getResource()))) {
+					shapes.add(s.getSubject());
+				}
 			}
 		}
 		for(Statement s : shapesModel.listStatements(null, SH.targetObjectsOf, (RDFNode)null).toList()) {
-			if(resource.getModel().contains(null, JenaUtil.asProperty(s.getResource()), resource)) {
+			if(focusNode.getModel().contains(null, JenaUtil.asProperty(s.getResource()), focusNode)) {
 				shapes.add(s.getSubject());
 			}
 		}
 		
 		// rdf:type / sh:targetClass
-		for(Resource type : JenaUtil.getAllTypes(resource)) {
-			if(JenaUtil.hasIndirectType(type.inModel(shapesModel), SH.Shape)) {
-				shapes.add(type);
-			}
-			for(Statement s : shapesModel.listStatements(null, SH.targetClass, type).toList()) {
-				shapes.add(s.getSubject());
+		if(focusNode instanceof Resource) {
+			for(Resource type : JenaUtil.getAllTypes((Resource)focusNode)) {
+				if(JenaUtil.hasIndirectType(type.inModel(shapesModel), SH.Shape)) {
+					shapes.add(type);
+				}
+				for(Statement s : shapesModel.listStatements(null, SH.targetClass, type).toList()) {
+					shapes.add(s.getSubject());
+				}
 			}
 		}
 		
 		// sh:target
 		for(Statement s : shapesModel.listStatements(null, SH.target, (RDFNode)null).toList()) {
-			if(isInTarget(resource, dataset, s.getResource())) {
+			if(isInTarget(focusNode, dataset, s.getResource())) {
 				shapes.add(s.getSubject());
 			}
 		}
@@ -90,34 +95,32 @@ public class ResourceConstraintValidator extends AbstractConstraintValidator {
 
 	
 	/**
-	 * Validates all SHACL constraints for a given resource.
+	 * Validates all SHACL constraints for a given node.
 	 * This always includes shapesGraph validation (sh:parameter etc).
 	 * @param dataset  the Dataset to operate on
 	 * @param shapesGraphURI  the URI of the shapes graph (must be in the dataset)
-	 * @param focusNode  the resource to validate
+	 * @param focusNode  the node to validate
 	 * @param minSeverity  the minimum severity level or null for all constraints
 	 * @param constraintFilter  a filter that all SHACLConstraints must pass, or null for all constraints
 	 * @param monitor  an optional progress monitor
 	 * @return a Model with constraint violations
 	 */
-	public Model validateNode(Dataset dataset, URI shapesGraphURI, Node focusNode, Resource minSeverity, Predicate<SHConstraint> constraintFilter, Function<RDFNode,String> labelFunction, ProgressMonitor monitor) throws InterruptedException {
-		
-		Model results = JenaUtil.createMemoryModel();
+	public Model validateNode(Dataset dataset, URI shapesGraphURI, Node focusNode, Resource minSeverity, Predicate<SHConstraint> constraintFilter, Function<RDFNode,String> labelFunction, boolean validateShapes, ProgressMonitor monitor) throws InterruptedException {
 		
 		Model shapesModel = dataset.getNamedModel(shapesGraphURI.toString());
 		
-		List<Property> properties = SHACLUtil.getAllConstraintProperties(true);
+		List<Property> properties = SHACLUtil.getAllConstraintProperties(validateShapes);
 		
-		Resource resource = (Resource) dataset.getDefaultModel().asRDFNode(focusNode);
-		Set<Resource> shapes = getShapesForResource(resource, dataset, shapesModel);
+		RDFNode focusRDFNode = (Resource) dataset.getDefaultModel().asRDFNode(focusNode);
+		Set<Resource> shapes = getShapesForNode(focusRDFNode, dataset, shapesModel);
 		for(Resource shape : shapes) {
 			if(monitor != null && monitor.isCanceled()) {
 				throw new InterruptedException();
 			}
-			addResourceViolations(dataset, shapesGraphURI, focusNode, shape.asNode(), properties, minSeverity, constraintFilter, results, labelFunction, monitor);
+			addResourceViolations(dataset, shapesGraphURI, focusNode, shape.asNode(), properties, minSeverity, constraintFilter, labelFunction, monitor);
 		}
 		
-		return results;
+		return resultsModel;
 	}
 
 	
@@ -134,16 +137,12 @@ public class ResourceConstraintValidator extends AbstractConstraintValidator {
 	 * @return a Model with constraint violations
 	 */
 	public Model validateNodeAgainstShape(Dataset dataset, URI shapesGraphURI, Node focusNode, Node shape, Resource minSeverity, Predicate<SHConstraint> constraintFilter, Function<RDFNode,String> labelFunction, ProgressMonitor monitor) {
-		Model results = JenaUtil.createMemoryModel();
-		Model oldResults = getCurrentResultsModel();
-		setCurrentResultsModel(results);
-		addResourceViolations(dataset, shapesGraphURI, focusNode, shape, SHACLUtil.getAllConstraintProperties(true), minSeverity, constraintFilter, results, labelFunction, monitor);
-		setCurrentResultsModel(oldResults);
-		return results;
+		addResourceViolations(dataset, shapesGraphURI, focusNode, shape, SHACLUtil.getAllConstraintProperties(true), minSeverity, constraintFilter, labelFunction, monitor);
+		return resultsModel;
 	}
 
 
-	private void addQueryResults(Model results, 
+	private boolean addQueryResults( 
 			SHConstraint constraint,
 			Resource shape,
 			RDFNode focusNode,
@@ -151,31 +150,38 @@ public class ResourceConstraintValidator extends AbstractConstraintValidator {
 			URI shapesGraphURI,
 			Resource minSeverity,
 			Function<RDFNode,String> labelFunction,
+			List<Resource> resultsList,
 			ProgressMonitor monitor) {
 		
+		boolean violations = false;
 		for(ConstraintExecutable executable : constraint.getExecutables()) {
-			
 			Resource severity = executable.getSeverity();
 			if(SHACLUtil.hasMinSeverity(severity, minSeverity)) {
 				ExecutionLanguage lang = ExecutionLanguageSelector.get().getLanguageForConstraint(executable);
-				notifyValidationStarting(shape, executable, focusNode, lang, results);
-				lang.executeConstraint(dataset, shape, shapesGraphURI, executable, focusNode, results, labelFunction);
-				notifyValidationFinished(shape, executable, focusNode, lang, results);
+				violations |= lang.executeConstraint(dataset, shape, shapesGraphURI, executable, focusNode, resultsModel, labelFunction, resultsList);
 			}
 		}
+		return violations;
 	}
 
 
-	private void addResourceViolations(Dataset dataset, URI shapesGraphURI, Node resourceNode, Node shapeNode,
-			List<Property> constraintProperties, Resource minSeverity, Predicate<SHConstraint> constraintFilter, Model results,
+	private void addResourceViolations(Dataset dataset, URI shapesGraphURI, Node focusNode, Node shapeNode,
+			List<Property> constraintProperties, Resource minSeverity, Predicate<SHConstraint> constraintFilter,
 			Function<RDFNode,String> labelFunction, ProgressMonitor monitor) {
 		
-		RDFNode resource = dataset.getDefaultModel().asRDFNode(resourceNode);
+		if(shapesGraphURI == null) {
+			shapesGraphURI = DefaultShapesGraphProvider.get().getDefaultShapesGraphURI(dataset);
+		}
+		
+		RDFNode focusRDFNode = dataset.getDefaultModel().asRDFNode(focusNode);
 		Model shapesModel = dataset.getNamedModel(shapesGraphURI.toString());
 		SHShape shape = SHFactory.asShape(shapesModel.asRDFNode(shapeNode));
 		
+		List<Resource> resultsList = new LinkedList<Resource>();
+		
+		boolean violations = false;
 		if(constraintFilter == null || constraintFilter.test(shape)) {
-			addQueryResults(results, shape, shape, resource, dataset, shapesGraphURI, minSeverity, labelFunction, monitor);
+			violations |= addQueryResults(shape, shape, focusRDFNode, dataset, shapesGraphURI, minSeverity, labelFunction, resultsList, monitor);
 		}
 		
 		for(Property constraintProperty : constraintProperties) {
@@ -183,26 +189,39 @@ public class ResourceConstraintValidator extends AbstractConstraintValidator {
 				if(c.hasProperty(RDF.type, SH.SPARQLConstraint)) {
 					SHConstraint constraint = SHFactory.asSPARQLConstraint(c);
 					if(constraintFilter == null || constraintFilter.test(constraint)) {
-						addQueryResults(results, constraint, shape, resource, dataset, shapesGraphURI, minSeverity, labelFunction, monitor);
+						violations |= addQueryResults(constraint, shape, focusRDFNode, dataset, shapesGraphURI, minSeverity, labelFunction, resultsList, monitor);
 					}
 				}
 				else if(SHFactory.isParameterizableConstraint(c)) {
 					SHConstraint constraint = SHFactory.asParameterizableConstraint(c);
 					if(constraintFilter == null || constraintFilter.test(constraint)) {
-						addQueryResults(results, constraint, shape, resource, dataset, shapesGraphURI, minSeverity, labelFunction, monitor);
+						violations |= addQueryResults(constraint, shape, focusRDFNode, dataset, shapesGraphURI, minSeverity, labelFunction, resultsList, monitor);
 					}
 				}
 			}
 		}
-		// This would be active if argument may be sh:NodeConstraints
-		/*if(!shape.hasProperty(RDF.type)) {
-			SHACLConstraint constraint = shape.as(SHACLNodeConstraint.class);
-			addQueryResults(results, constraint, shape, resource, dataset, shapesGraphURI, minSeverity, monitor);
-		}*/
+		
+		if(SPARQLExecutionLanguage.createDetails) {
+			Resource result = resultsModel.createResource(violations ? SH.ValidationResult : DASH.SuccessResult);
+			result.addProperty(SH.focusNode, focusRDFNode);
+			result.addProperty(SH.sourceShape, shape);
+			result.addProperty(SH.sourceConstraint, shape);
+			result.addProperty(SH.resultMessage, "Does " + (violations ? "not " : "") + "have shape");
+			for(Resource r : resultsList) {
+				result.addProperty(SH.detail, r);
+			}
+			if(violations) {
+				Resource severity = JenaUtil.getResourceProperty(shape, SH.severity);
+				if(severity == null) {
+					severity = SH.Violation;
+				}
+				result.addProperty(SH.severity, severity);
+			}
+		}
 	}
 	
 	
-	private boolean isInTarget(Resource focusNode, Dataset dataset, Resource target) {
+	private boolean isInTarget(RDFNode focusNode, Dataset dataset, Resource target) {
 		SHParameterizableTarget parameterizableTarget = null;
 		Resource executable = target;
 		if(SHFactory.isParameterizableInstance(target)) {

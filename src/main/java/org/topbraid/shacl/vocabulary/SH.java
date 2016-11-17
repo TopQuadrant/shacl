@@ -50,6 +50,8 @@ public class SH {
     public final static Resource Parameter = ResourceFactory.createResource(NS + "Parameter");
 
     public final static Resource Parameterizable = ResourceFactory.createResource(NS + "Parameterizable");
+    
+    public final static Resource PrefixDeclaration = ResourceFactory.createResource(NS + "PrefixDeclaration");
 
     public final static Resource PropertyConstraint = ResourceFactory.createResource(NS + "PropertyConstraint");
 
@@ -60,6 +62,8 @@ public class SH {
     public final static Resource SPARQLAskValidator = ResourceFactory.createResource(NS + "SPARQLAskValidator");
     
     public final static Resource SPARQLConstraint = ResourceFactory.createResource(NS + "SPARQLConstraint");
+
+    public final static Resource SPARQLExecutable = ResourceFactory.createResource(NS + "SPARQLExecutable");
 
     public final static Resource SPARQLFunction = ResourceFactory.createResource(NS + "SPARQLFunction");
     
@@ -91,22 +95,22 @@ public class SH {
     public final static Property construct = ResourceFactory.createProperty(NS + "construct");
 
     public final static Property datatype = ResourceFactory.createProperty(NS + "datatype");
+    
+    public final static Property deactivated = ResourceFactory.createProperty(NS + "deactivated");
 
     public final static Property declare = ResourceFactory.createProperty(NS + "declare");
 
     public final static Property defaultValue = ResourceFactory.createProperty(NS + "defaultValue");
+
+    public final static Property detail = ResourceFactory.createProperty(NS + "detail");
 
     public final static Property derivedValues = ResourceFactory.createProperty(NS + "derivedValues");
 
     public final static Property description = ResourceFactory.createProperty(NS + "description");
 
     public final static Property entailment = ResourceFactory.createProperty(NS + "entailment");
-    
-    public final static Property filterShape = ResourceFactory.createProperty(NS + "filterShape");
 
     public final static Property focusNode = ResourceFactory.createProperty(NS + "focusNode");
-
-    public final static Resource hasShape = ResourceFactory.createResource(NS + "hasShape");
 
     public final static Property hasValue = ResourceFactory.createProperty(NS + "hasValue");
     
@@ -161,6 +165,12 @@ public class SH {
     public final static Property property = ResourceFactory.createProperty(NS + "property");
 
     public final static Property propertyValidator = ResourceFactory.createProperty(NS + "propertyValidator");
+
+    public final static Property resultMessage = ResourceFactory.createProperty(NS + "resultMessage");
+
+    public final static Property resultPath = ResourceFactory.createProperty(NS + "resultPath");
+
+    public final static Property resultSeverity = ResourceFactory.createProperty(NS + "resultSeverity");
 
     public final static Property returnType = ResourceFactory.createProperty(NS + "returnType");
 

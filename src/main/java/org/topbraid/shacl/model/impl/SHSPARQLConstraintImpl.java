@@ -9,8 +9,8 @@ import org.apache.jena.vocabulary.RDFS;
 import org.topbraid.shacl.constraints.ConstraintExecutable;
 import org.topbraid.shacl.constraints.SPARQLConstraintExecutable;
 import org.topbraid.shacl.model.SHSPARQLConstraint;
-import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
+import org.topbraid.spin.util.JenaDatatypes;
 import org.topbraid.spin.util.JenaUtil;
 
 public class SHSPARQLConstraintImpl extends SHResourceImpl implements SHSPARQLConstraint {
@@ -36,7 +36,7 @@ public class SHSPARQLConstraintImpl extends SHResourceImpl implements SHSPARQLCo
 
 	@Override
 	public boolean isDeactivated() {
-		return hasProperty(SH.filterShape, DASH.None);
+		return hasProperty(SH.deactivated, JenaDatatypes.TRUE);
 	}
 
 

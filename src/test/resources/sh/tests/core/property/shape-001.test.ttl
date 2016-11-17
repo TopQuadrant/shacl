@@ -25,8 +25,8 @@ ex:GraphValidationTestCase
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:Issue_1 ;
-      sh:path ex:assignedTo ;
-      sh:severity sh:Violation ;
+      sh:resultPath ex:assignedTo ;
+      sh:resultSeverity sh:Violation ;
       sh:sourceConstraintComponent sh:ShapeConstraintComponent ;
       sh:value ex:Anon ;
     ] ;

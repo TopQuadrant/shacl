@@ -81,9 +81,9 @@ public class TestDASHTestCases {
 			ex.printStackTrace();
 		}
 		for(Statement s : results.listStatements(null, RDF.type, DASH.FailureTestCaseResult).toList()) {
-			String message = JenaUtil.getStringProperty(s.getSubject(), SH.message);
+			String message = JenaUtil.getStringProperty(s.getSubject(), SH.resultMessage);
 			if(message == null) {
-				message = "(No " + SH.PREFIX + ":" + SH.message.getLocalName() + " found in failure)";
+				message = "(No " + SH.PREFIX + ":" + SH.resultMessage.getLocalName() + " found in failure)";
 			}
 			Assert.fail(message);
 		}

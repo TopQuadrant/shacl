@@ -23,13 +23,13 @@ public class SHResultImpl extends SHResourceImpl implements SHResult {
 	
 	@Override
 	public String getMessage() {
-		return JenaUtil.getStringProperty(this, SH.message);
+		return JenaUtil.getStringProperty(this, SH.resultMessage);
 	}
 
 	
 	@Override
 	public Resource getPath() {
-		return JenaUtil.getPropertyResourceValue(this, SH.path);
+		return JenaUtil.getPropertyResourceValue(this, SH.resultPath);
 	}
 
 	

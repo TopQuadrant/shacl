@@ -28,7 +28,8 @@ import org.topbraid.spin.util.JenaUtil;
 public class GraphValidationTestCaseType implements TestCaseType {
 
 	public final static List<Property> IGNORED_PROPERTIES = Arrays.asList(new Property[] {
-		SH.message, 
+		SH.message, // For TopBraid's suggestions
+		SH.resultMessage, 
 		SH.sourceConstraint, 
 		SH.sourceShape
 	});
@@ -79,7 +80,7 @@ public class GraphValidationTestCaseType implements TestCaseType {
 			Dataset dataset = ARQFactory.get().getDataset(dataModel);
 			URI shapesGraphURI = SHACLUtil.withShapesGraph(dataset);
 
-			Model actualResults = ModelConstraintValidator.get().validateModel(dataset, shapesGraphURI, null, true, null, null);
+			Model actualResults = new ModelConstraintValidator().validateModel(dataset, shapesGraphURI, null, true, null, null);
 			if(getResource().hasProperty(DASH.includeSuggestions, JenaDatatypes.TRUE)) {
 				Model shapesModel = dataset.getNamedModel(shapesGraphURI.toString());
 				addSuggestions(dataModel, shapesModel, actualResults);
@@ -96,7 +97,7 @@ public class GraphValidationTestCaseType implements TestCaseType {
 					if(t.getPredicate().equals(DASH.suggestion)) {
 						addStatements(expected, t);
 					}
-					else if(SH.path.equals(t.getPredicate())) {
+					else if(SH.resultPath.equals(t.getPredicate())) {
 						expected.add(t.getSubject(), t.getPredicate(),
 								SHACLPaths.clonePath(t.getResource(), expected));
 					}

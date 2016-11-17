@@ -24,7 +24,6 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.vocabulary.RDFS;
 import org.topbraid.shacl.arq.functions.TargetContainsPFunction;
-import org.topbraid.shacl.constraints.ModelConstraintValidator;
 import org.topbraid.shacl.constraints.SHACLException;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.ARQFactory;
@@ -80,36 +79,9 @@ public class SPARQLSubstitutions {
 		}
 	}
 
-
-	// TODO: Algorithm incorrect, e.g. if { is included as a comment
-	static Query insertFilterClause(Query query, int filterCount) {
-		String str = query.toString();
-		Pattern pattern = Pattern.compile("(?i)WHERE\\s*\\{");
-		Matcher matcher = pattern.matcher(str);
-		if(matcher.find()) {
-			int index = matcher.end();
-			StringBuilder sb = new StringBuilder(str);
-			
-			StringBuffer s = new StringBuffer();
-			for(int i = 0; i < filterCount; i++) {
-				s.append("{ FILTER <");
-				s.append(SH.hasShape.getURI());
-				s.append(">(?this, ?");
-				s.append(ModelConstraintValidator.FILTER_VAR_NAME + i);
-				s.append(", ?" + SH.shapesGraphVar.getVarName() + ") }");
-			}
-			
-			sb.insert(index, s.toString());
-			return ARQFactory.get().createQuery(sb.toString());
-		}
-		else {
-			throw new IllegalArgumentException("Cannot find first '{' in query string: " + str);
-		}
-	}
-
 	
 	// TODO: Algorithm incorrect, e.g. if { is included as a comment
-	static Query insertTargetAndFilterClauses(Query query, int filterCount, Resource shape, Dataset dataset, QuerySolution binding) {
+	static Query insertTargetClauses(Query query, Resource shape, Dataset dataset, QuerySolution binding) {
 		String str = query.toString();
 		Pattern pattern = Pattern.compile("(?i)WHERE\\s*\\{");
 		Matcher matcher = pattern.matcher(str);
@@ -130,13 +102,6 @@ public class SPARQLSubstitutions {
 			s.append("\nWHERE {\n");
 			appendTargets(s, shape, dataset);
 			s.append("        }    }\n");
-			for(int i = 0; i < filterCount; i++) {
-				s.append("    FILTER <");
-				s.append(SH.hasShape.getURI());
-				s.append(">(?this, ?");
-				s.append(ModelConstraintValidator.FILTER_VAR_NAME + i);
-				s.append(", ?" + SH.shapesGraphVar.getVarName() + ") .");
-			}
 			s.append("}");
 			
 			sb.insert(index, s.toString());
@@ -232,7 +197,7 @@ public class SPARQLSubstitutions {
 		}
 		
 		if(targets.isEmpty()) {
-			throw new SHACLException("Shape witout target " + shape);
+			throw new SHACLException("Shape without target " + shape);
 		}
 		else if(targets.size() == 1) {
 			sb.append(targets.get(0));

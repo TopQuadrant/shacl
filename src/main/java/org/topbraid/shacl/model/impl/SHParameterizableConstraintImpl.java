@@ -13,8 +13,8 @@ import org.topbraid.shacl.constraints.ConstraintExecutable;
 import org.topbraid.shacl.model.SHConstraintComponent;
 import org.topbraid.shacl.model.SHFactory;
 import org.topbraid.shacl.model.SHParameterizableConstraint;
-import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
+import org.topbraid.spin.util.JenaDatatypes;
 import org.topbraid.spin.util.JenaUtil;
 
 public abstract class SHParameterizableConstraintImpl extends SHParameterizableInstanceImpl implements SHParameterizableConstraint {
@@ -34,7 +34,10 @@ public abstract class SHParameterizableConstraintImpl extends SHParameterizableI
 			if(component.getParameters().size() == 1) {
 				Property parameter = component.getParameters().get(0).getPredicate();
 				for(Statement parameterValueS : this.listProperties(parameter).toList()) {
-					results.add(new ComponentConstraintExecutable(this, component, context, parameterValueS.getObject()));
+					ComponentConstraintExecutable executable = new ComponentConstraintExecutable(this, component, context, parameterValueS.getObject());
+					if(executable.isComplete()) {
+						results.add(executable);
+					}
 				}
 			}
 			else {
@@ -50,6 +53,6 @@ public abstract class SHParameterizableConstraintImpl extends SHParameterizableI
 
 	@Override
 	public boolean isDeactivated() {
-		return hasProperty(SH.filterShape, DASH.None);
+		return hasProperty(SH.deactivated, JenaDatatypes.TRUE);
 	}
 }

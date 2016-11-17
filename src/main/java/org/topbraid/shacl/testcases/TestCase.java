@@ -21,7 +21,7 @@ public abstract class TestCase {
 	
 	public Resource createFailure(Model results, String message) {
 		Resource failure = createResult(results, DASH.FailureTestCaseResult);
-		failure.addProperty(SH.message, message);
+		failure.addProperty(SH.resultMessage, message);
 		return failure;
 	}
 	

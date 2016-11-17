@@ -24,32 +24,32 @@ ex:GraphValidationTestCase
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidRectangle1 ;
-      sh:path ex:area ;
-      sh:severity sh:Violation ;
+      sh:resultPath ex:area ;
+      sh:resultSeverity sh:Violation ;
       sh:sourceConstraintComponent sh:DerivedValuesConstraintComponent ;
       sh:value 42 ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidRectangle2 ;
-      sh:path ex:area ;
-      sh:severity sh:Violation ;
+      sh:resultPath ex:area ;
+      sh:resultSeverity sh:Violation ;
       sh:sourceConstraintComponent sh:DerivedValuesConstraintComponent ;
       sh:value 41 ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidRectangle2 ;
-      sh:path ex:area ;
-      sh:severity sh:Violation ;
+      sh:resultPath ex:area ;
+      sh:resultSeverity sh:Violation ;
       sh:sourceConstraintComponent sh:DerivedValuesConstraintComponent ;
       sh:value 42 ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidRectangle3 ;
-      sh:path ex:area ;
-      sh:severity sh:Violation ;
+      sh:resultPath ex:area ;
+      sh:resultSeverity sh:Violation ;
       sh:sourceConstraintComponent sh:DerivedValuesConstraintComponent ;
       sh:value 43 ;
     ] ;

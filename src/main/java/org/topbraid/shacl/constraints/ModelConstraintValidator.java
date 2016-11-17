@@ -36,16 +36,10 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 	
 	public static final String FILTER_VAR_NAME = "FILTER_SHAPE";
 
-	private static ModelConstraintValidator singleton = new ModelConstraintValidator();
-	
-	public static ModelConstraintValidator get() {
-		return singleton;
+	public ModelConstraintValidator() {
+		super(JenaUtil.createMemoryModel());
 	}
 	
-	public static void set(ModelConstraintValidator value) {
-		singleton = value;
-	}
-
 	
 	/**
 	 * Validates all resources in a given Model, which is expected to be the default
@@ -79,11 +73,10 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 			monitor.beginTask("Validating constraints for " + map.size() + " shapes...", map.size());
 		}
 		
-		Model results = JenaUtil.createMemoryModel();
-		results.setNsPrefixes(dataset.getDefaultModel());
+		resultsModel.setNsPrefixes(dataset.getDefaultModel());
 		for(Resource shape : map.keySet()) {
 			for(SHConstraint constraint : map.get(shape)) {
-				validateConstraintForShape(dataset, shapesGraphURI, minSeverity, constraint, shape, results, labelFunction, monitor);
+				validateConstraintForShape(dataset, shapesGraphURI, minSeverity, constraint, shape, labelFunction, monitor);
 				if(monitor != null) {
 					monitor.worked(1);
 					if(monitor.isCanceled()) {
@@ -93,7 +86,7 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 			}
 		}
 		
-		return results;
+		return resultsModel;
 	}
 	
 	
@@ -188,7 +181,7 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 	}
 	
 	
-	private void validateConstraintForShape(Dataset dataset, URI shapesGraphURI, Resource minSeverity, SHConstraint constraint, Resource shape, Model results, Function<RDFNode,String> labelFunction, ProgressMonitor monitor) {
+	private void validateConstraintForShape(Dataset dataset, URI shapesGraphURI, Resource minSeverity, SHConstraint constraint, Resource shape, Function<RDFNode,String> labelFunction, ProgressMonitor monitor) {
 		for(ConstraintExecutable executable : constraint.getExecutables()) {
 			Resource severity = executable.getSeverity();
 			if(SHACLUtil.hasMinSeverity(severity, minSeverity)) {
@@ -196,9 +189,7 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 					monitor.subTask("Validating Shape " + SPINLabels.get().getLabel(shape));
 				}
 				ExecutionLanguage lang = ExecutionLanguageSelector.get().getLanguageForConstraint(executable);
-				notifyValidationStarting(shape, executable, null, lang, results);
-				lang.executeConstraint(dataset, shape, shapesGraphURI, executable, null, results, labelFunction);
-				notifyValidationFinished(shape, executable, null, lang, results);
+				lang.executeConstraint(dataset, shape, shapesGraphURI, executable, null, resultsModel, labelFunction, new LinkedList<Resource>());
 			}
 		}
 	}

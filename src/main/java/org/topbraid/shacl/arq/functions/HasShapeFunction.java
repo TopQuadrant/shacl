@@ -13,46 +13,66 @@ import org.apache.jena.sparql.expr.ExprEvalException;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.function.FunctionEnv;
 import org.apache.jena.vocabulary.RDF;
-import org.topbraid.shacl.constraints.AbstractConstraintValidator;
 import org.topbraid.shacl.constraints.FailureLog;
-import org.topbraid.shacl.constraints.ResourceConstraintValidator;
+import org.topbraid.shacl.constraints.NodeConstraintValidator;
+import org.topbraid.shacl.constraints.sparql.SPARQLExecutionLanguage;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.arq.AbstractFunction4;
+import org.topbraid.spin.arq.AbstractFunction3;
 import org.topbraid.spin.util.JenaDatatypes;
+import org.topbraid.spin.util.JenaUtil;
 
 /**
- * The native implementation of the sh:hasShape function.
+ * The implementation of the tosh:hasShape function.
  * 
  * @author Holger Knublauch
  */
-public class HasShapeFunction extends AbstractFunction4 {
+public class HasShapeFunction extends AbstractFunction3 {
 	
 	private static ThreadLocal<Boolean> recursionIsErrorFlag = new ThreadLocal<Boolean>();
+	
+	private static ThreadLocal<Model> resultsModelTL = new ThreadLocal<>();
+	
+	private static ThreadLocal<URI> shapesGraph = new ThreadLocal<URI>();
+	
+	public static Model getResultsModel() {
+		return resultsModelTL.get();
+	}
+	
+	public static URI getShapesGraph() {
+		return shapesGraph.get();
+	}
+	
+	public static void setResultsModel(Model value) {
+		resultsModelTL.set(value);
+	}
+	
+	public static void setShapesGraph(URI uri) {
+		shapesGraph.set(uri);
+	}
 
 	
 	@Override
-	protected NodeValue exec(Node resourceNode, Node shapeNode, Node shapesGraphNode, Node recursionIsError, FunctionEnv env) {
+	protected NodeValue exec(Node focusNode, Node shapeNode, Node recursionIsError, FunctionEnv env) {
+
 		Boolean oldFlag = recursionIsErrorFlag.get();
 		if(JenaDatatypes.TRUE.asNode().equals(recursionIsError)) {
 			recursionIsErrorFlag.set(true);
 		}
 		try {
-			if(SHACLRecursionGuard.start(resourceNode, shapeNode)) {
+			if(SHACLRecursionGuard.start(focusNode, shapeNode)) {
 				if(JenaDatatypes.TRUE.asNode().equals(recursionIsError) || (oldFlag != null && oldFlag)) {
 					String message = "Unsupported recursion";
-					Model resultsModel = AbstractConstraintValidator.getCurrentResultsModel();
-					if(resultsModel != null) {
-						Resource failure = resultsModel.createResource(DASH.FailureResult);
-						failure.addProperty(SH.message, message);
-						failure.addProperty(SH.focusNode, resultsModel.asRDFNode(resourceNode));
-						failure.addProperty(SH.sourceShape, resultsModel.asRDFNode(shapeNode));
-					}
+					Model resultsModel = resultsModelTL.get();
+					Resource failure = resultsModel.createResource(DASH.FailureResult);
+					failure.addProperty(SH.resultMessage, message);
+					failure.addProperty(SH.focusNode, resultsModel.asRDFNode(focusNode));
+					failure.addProperty(SH.sourceShape, resultsModel.asRDFNode(shapeNode));
 					FailureLog.get().logFailure(message);
 					throw new ExprEvalException("Unsupported recursion");
 				}
 				else {
-					SHACLRecursionGuard.end(resourceNode, shapeNode);
+					SHACLRecursionGuard.end(focusNode, shapeNode);
 					return NodeValue.TRUE;
 				}
 			}
@@ -60,17 +80,34 @@ public class HasShapeFunction extends AbstractFunction4 {
 				
 				try {
 					Model model = ModelFactory.createModelForGraph(env.getActiveGraph());
-					RDFNode resource = model.asRDFNode(resourceNode);
+					RDFNode resource = model.asRDFNode(focusNode);
 					Dataset dataset = DatasetImpl.wrap(env.getDataset());
 					Resource shape = (Resource) dataset.getDefaultModel().asRDFNode(shapeNode);
-					Model results = doRun(resource, shape, dataset,	shapesGraphNode);
+					Model results = doRun(resource, shape, dataset);
+					if(resultsModelTL.get() != null) {
+						resultsModelTL.get().add(results);
+					}
 					if(results.contains(null, RDF.type, DASH.FailureResult)) {
 						throw new ExprEvalException("Propagating failure from nested shapes");
 					}
-					return NodeValue.makeBoolean(results.isEmpty());
+
+					if(SPARQLExecutionLanguage.createDetails) {
+						boolean result = true;
+						for(Resource r : results.listSubjectsWithProperty(RDF.type, SH.ValidationResult).toList()) {
+							if(!results.contains(null, SH.detail, r)) {
+								result = false;
+								break;
+							}
+						}
+						return NodeValue.makeBoolean(result);
+					}
+					else {
+						boolean result = !results.contains(null, RDF.type, SH.ValidationResult);
+						return NodeValue.makeBoolean(result);
+					}
 				}
 				finally {
-					SHACLRecursionGuard.end(resourceNode, shapeNode);
+					SHACLRecursionGuard.end(focusNode, shapeNode);
 				}
 			}
 		}
@@ -80,9 +117,9 @@ public class HasShapeFunction extends AbstractFunction4 {
 	}
 
 
-	protected Model doRun(RDFNode resource, Resource shape, Dataset dataset,
-			Node shapesGraphNode) {
-		return ResourceConstraintValidator.get().validateNodeAgainstShape(
-				dataset, URI.create(shapesGraphNode.getURI()), resource.asNode(), shape.asNode(), null, null, null, null);
+	private Model doRun(RDFNode resource, Resource shape, Dataset dataset) {
+		Model local = JenaUtil.createMemoryModel();
+		return new NodeConstraintValidator(local).validateNodeAgainstShape(
+				dataset, shapesGraph.get(), resource.asNode(), shape.asNode(), null, null, null, null);
 	}
 }

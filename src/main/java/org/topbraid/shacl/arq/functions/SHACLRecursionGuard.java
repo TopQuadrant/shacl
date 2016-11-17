@@ -6,7 +6,7 @@ import java.util.Set;
 import org.apache.jena.graph.Node;
 
 /**
- * A ThreadLocal structure to prevent infinite loops of sh:hasShape calls.
+ * A ThreadLocal structure to prevent infinite loops of tosh:hasShape calls.
  * 
  * @author Holger Knublauch
  */

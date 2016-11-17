@@ -15,7 +15,7 @@ public interface SHConstraint extends SHResource {
 	
 	
 	/**
-	 * Checks if this constraint has been deactivated by having sh:filterShape dash:None.
+	 * Checks if this constraint has been deactivated.
 	 * @return true if deactivated
 	 */
 	boolean isDeactivated();

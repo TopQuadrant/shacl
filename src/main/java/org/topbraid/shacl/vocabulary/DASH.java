@@ -61,6 +61,8 @@ public class DASH {
 
     public final static Property cachable = ResourceFactory.createProperty(NS + "cachable");
 
+    public final static Property composite = ResourceFactory.createProperty(NS + "composite");
+
 	public final static Property defaultValueType = ResourceFactory.createProperty(NS + "defaultValueType");
     
     public final static Property deletedTriple = ResourceFactory.createProperty(NS + "deletedTriple");

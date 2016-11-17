@@ -27,16 +27,16 @@ import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.topbraid.shacl.arq.SHACLPaths;
+import org.topbraid.shacl.arq.functions.HasShapeFunction;
 import org.topbraid.shacl.constraints.ComponentConstraintExecutable;
 import org.topbraid.shacl.constraints.ConstraintExecutable;
 import org.topbraid.shacl.constraints.ExecutionLanguage;
 import org.topbraid.shacl.constraints.FailureLog;
-import org.topbraid.shacl.constraints.ModelConstraintValidator;
 import org.topbraid.shacl.constraints.SHACLException;
 import org.topbraid.shacl.model.SHConstraint;
 import org.topbraid.shacl.model.SHFactory;
 import org.topbraid.shacl.model.SHParameterizableTarget;
-import org.topbraid.shacl.model.SHShape;
+import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.ARQFactory;
@@ -53,9 +53,11 @@ import org.topbraid.spin.util.JenaUtil;
  */
 public class SPARQLExecutionLanguage implements ExecutionLanguage {
 	
+	// Flag to generate sh:details for all violations.
+	public static boolean createDetails = false;
+	
 	// Flag to bypass sh:prefixes and instead use all prefixes in the Jena object of the shapes graph.
-	// Note that this flag will be switched to false in a future release.
-	public static boolean useGraphPrefixes = true;
+	public static boolean useGraphPrefixes = false;
 	
 	private static SPARQLExecutionLanguage singleton = new SPARQLExecutionLanguage();
 	
@@ -98,8 +100,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		int startIndex = sparql.indexOf('{');
 		int endIndex = sparql.lastIndexOf('}');
 		sparql = sparql.substring(startIndex + 1, endIndex - 1);
-		StringBuffer sb = new StringBuffer("SELECT ?this ");
-		sb.append("?value ?message");
+		StringBuffer sb = new StringBuffer("SELECT ?this ?value ?message");
 		sb.append("\nWHERE {\n");
 		sb.append("    {\n");
 		sb.append("        $this $" + SH.PATHVar.getVarName() + " ?value .\n");
@@ -122,14 +123,14 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 
 
 	@Override
-	public void executeConstraint(Dataset dataset, Resource shape, URI shapesGraphURI,
-			ConstraintExecutable executable, RDFNode focusNode, Model results, Function<RDFNode,String> labelFunction) {
-
-		List<SHShape> filters = executable.getFilterShapes();
-		if(filters.contains(DASH.None)) {
-			return;
-		}
+	public boolean executeConstraint(Dataset dataset, Resource shape, URI shapesGraphURI,
+			ConstraintExecutable executable, RDFNode focusNode, Model results,
+			Function<RDFNode,String> labelFunction, List<Resource> resultsList) {
 		
+		if(executable.getConstraint().isDeactivated()) {
+			return false;
+		}
+
 		String queryString = getSPARQL(executable);
 		SHConstraint constraint = executable.getConstraint();
 		if(queryString == null) {
@@ -162,14 +163,8 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		if(executable instanceof ComponentConstraintExecutable) {
 			((ComponentConstraintExecutable)executable).addBindings(bindings);
 		}
-		for(Resource filter : JenaUtil.getResourceProperties(shape, SH.filterShape)) {
-			filters.add(SHFactory.asShape(filter));
-		}
 		if(focusNode == null) {
-			query = SPARQLSubstitutions.insertTargetAndFilterClauses(query, filters.size(), shape, dataset, bindings);
-		}
-		else if(!filters.isEmpty()) {
-			query = SPARQLSubstitutions.insertFilterClause(query, filters.size());
+			query = SPARQLSubstitutions.insertTargetClauses(query, shape, dataset, bindings);
 		}
 		
 		if(SHFactory.isPropertyConstraint(executable.getConstraint()) || SHFactory.isParameter(executable.getConstraint())) {
@@ -184,14 +179,26 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		}
 		bindings.add(SH.currentShapeVar.getVarName(), shape);
 		bindings.add(SH.shapesGraphVar.getVarName(), ResourceFactory.createResource(shapesGraphURI.toString()));
-		for(int i = 0; i < filters.size(); i++) {
-			bindings.add(ModelConstraintValidator.FILTER_VAR_NAME + i, filters.get(i));
-		}
 		
 		QueryExecution qexec = SPARQLSubstitutions.createQueryExecution(query, dataset, bindings);
 
 		long startTime = System.currentTimeMillis();
-		int violationCount = executeSelectQuery(results, constraint, shape, focusNode, executable, qexec, labelFunction);
+		
+		URI oldShapesGraphURI = HasShapeFunction.getShapesGraph();
+		HasShapeFunction.setShapesGraph(shapesGraphURI);
+		
+		Model oldNestedResults = HasShapeFunction.getResultsModel();
+		Model nestedResults = JenaUtil.createMemoryModel();
+		HasShapeFunction.setResultsModel(nestedResults);
+		
+		int violationCount;
+		try {
+			violationCount = executeSelectQuery(results, nestedResults, constraint, shape, focusNode, executable, qexec, labelFunction, resultsList);
+		}
+		finally {
+			HasShapeFunction.setShapesGraph(oldShapesGraphURI);
+			HasShapeFunction.setResultsModel(oldNestedResults);
+		}
 		if(SPINStatisticsManager.get().isRecording()) {
 			long endTime = System.currentTimeMillis();
 			long duration = endTime - startTime;
@@ -208,6 +215,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 					focusNode != null ? focusNode.asNode() : constraint.asNode());
 			SPINStatisticsManager.get().add(Collections.singletonList(stats));
 		}
+		return violationCount > 0;
 	}
 
 
@@ -235,99 +243,118 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 	}
 	
 
-	private static int executeSelectQuery(Model results, SHConstraint constraint, Resource shape,
+	private static int executeSelectQuery(Model results, Model nestedResults, SHConstraint constraint, Resource shape,
 			RDFNode focusNode, ConstraintExecutable executable,
-			QueryExecution qexec, Function<RDFNode,String> labelFunction) {
+			QueryExecution qexec, Function<RDFNode,String> labelFunction, List<Resource> resultsList) {
 	
 		ResultSet rs = qexec.execSelect();
 		int violationCount = 0;
 		try {
 			List<Literal> defaultMessages = executable.getMessages();
-			while(rs.hasNext()) {
-				QuerySolution sol = rs.next();
-				RDFNode thisValue = sol.get(SH.thisVar.getVarName());
-				if(thisValue != null) {
-					
-					Resource resultType = SH.ValidationResult;
-					Resource severity = executable.getSeverity();
-					RDFNode selectMessage = sol.get(SH.message.getLocalName());
-					if(JenaDatatypes.TRUE.equals(sol.get(SH.failureVar.getName()))) {
-						resultType = DASH.FailureResult;
-						String message = "Constraint " + SPINLabels.get().getLabel(executable.getConstraint());
-						if(executable instanceof ComponentConstraintExecutable) {
-							message += " at component " + SPINLabels.get().getLabel(((ComponentConstraintExecutable)executable).getComponent());
-						}
-						message += " has produced ?" + SH.failureVar.getName();
-						if(focusNode != null) {
-							message += " for focus node ";
-							if(focusNode.isLiteral()) {
-								message += focusNode;
-							}
-							else {
-								message += SPINLabels.get().getLabel((Resource)focusNode);
-							}
-						}
-						FailureLog.get().logFailure(message);
-						selectMessage = ResourceFactory.createTypedLiteral("Validation Failure: Could not validate shape");
-					}
-					
-					Resource result = results.createResource(resultType);
-					result.addProperty(SH.severity, severity);
-					result.addProperty(SH.sourceConstraint, constraint);
-					result.addProperty(SH.sourceShape, shape);
-					if(executable instanceof ComponentConstraintExecutable) {
-						result.addProperty(SH.sourceConstraintComponent, ((ComponentConstraintExecutable)executable).getComponent());
-					}
-					
-					if(selectMessage != null) {
-						result.addProperty(SH.message, selectMessage);
-					}
-					else {
-						for(Literal defaultMessage : defaultMessages) {
+			if(rs.hasNext()) {
+				while(rs.hasNext()) {
+					QuerySolution sol = rs.next();
+					RDFNode thisValue = sol.get(SH.thisVar.getVarName());
+					if(thisValue != null) {
+						Resource resultType = SH.ValidationResult;
+						Resource severity = executable.getSeverity();
+						RDFNode selectMessage = sol.get(SH.message.getLocalName());
+						if(JenaDatatypes.TRUE.equals(sol.get(SH.failureVar.getName()))) {
+							resultType = DASH.FailureResult;
+							String message = "Constraint " + SPINLabels.get().getLabel(executable.getConstraint());
 							if(executable instanceof ComponentConstraintExecutable) {
-								QuerySolutionMap map = new QuerySolutionMap();
-								Iterator<String> varNames = sol.varNames();
-								while(varNames.hasNext()) {
-									String varName = varNames.next();
-									RDFNode value = sol.get(varName);
-									if(value != null) {
-										map.add(varName, value);
-									}
-								}
-								((ComponentConstraintExecutable)executable).addBindings(map);
-								sol = map;
+								message += " at component " + SPINLabels.get().getLabel(((ComponentConstraintExecutable)executable).getComponent());
 							}
-							result.addProperty(SH.message, SPARQLSubstitutions.withSubstitutions(defaultMessage, sol, labelFunction));
+							message += " has produced ?" + SH.failureVar.getName();
+							if(focusNode != null) {
+								message += " for focus node ";
+								if(focusNode.isLiteral()) {
+									message += focusNode;
+								}
+								else {
+									message += SPINLabels.get().getLabel((Resource)focusNode);
+								}
+							}
+							FailureLog.get().logFailure(message);
+							selectMessage = ResourceFactory.createTypedLiteral("Validation Failure: Could not validate shape");
 						}
-					}
-					
-					RDFNode resultFocusNode = thisValue;
-					if(SHFactory.isPropertyConstraintWithPath(constraint)) {
-						result.addProperty(SH.path, SHACLPaths.clonePath(SHFactory.asPropertyConstraint(constraint).getPath(), result.getModel()));
-					}
-					else if(SHFactory.isPropertyConstraint(constraint) || SHFactory.isParameter(constraint)) {
-						result.addProperty(SH.path, SHFactory.asPropertyConstraint(constraint).getPredicate());
-					}
-					else {
-						RDFNode pathValue = sol.get(SH.pathVar.getVarName());
-						if(pathValue != null && pathValue.isURIResource()) {
-							result.addProperty(SH.path, pathValue);
+						
+						Resource result = results.createResource(resultType);
+						result.addProperty(SH.resultSeverity, severity);
+						result.addProperty(SH.sourceConstraint, constraint);
+						result.addProperty(SH.sourceShape, shape);
+						if(executable instanceof ComponentConstraintExecutable) {
+							result.addProperty(SH.sourceConstraintComponent, ((ComponentConstraintExecutable)executable).getComponent());
 						}
-						RDFNode focusNodeValue = sol.get(SH.focusNodeVar.getVarName());
-						if(focusNodeValue != null) {
-							resultFocusNode = focusNodeValue;
+						
+						if(selectMessage != null) {
+							result.addProperty(SH.resultMessage, selectMessage);
 						}
+						else {
+							for(Literal defaultMessage : defaultMessages) {
+								if(executable instanceof ComponentConstraintExecutable) {
+									QuerySolutionMap map = new QuerySolutionMap();
+									Iterator<String> varNames = sol.varNames();
+									while(varNames.hasNext()) {
+										String varName = varNames.next();
+										RDFNode value = sol.get(varName);
+										if(value != null) {
+											map.add(varName, value);
+										}
+									}
+									((ComponentConstraintExecutable)executable).addBindings(map);
+									sol = map;
+								}
+								result.addProperty(SH.resultMessage, SPARQLSubstitutions.withSubstitutions(defaultMessage, sol, labelFunction));
+							}
+						}
+						
+						RDFNode resultFocusNode = thisValue;
+						if(SHFactory.isPropertyConstraintWithPath(constraint)) {
+							result.addProperty(SH.resultPath, SHACLPaths.clonePath(SHFactory.asPropertyConstraint(constraint).getPath(), result.getModel()));
+						}
+						else if(SHFactory.isPropertyConstraint(constraint) || SHFactory.isParameter(constraint)) {
+							result.addProperty(SH.resultPath, SHFactory.asPropertyConstraint(constraint).getPredicate());
+						}
+						else {
+							RDFNode pathValue = sol.get(SH.pathVar.getVarName());
+							if(pathValue != null && pathValue.isURIResource()) {
+								result.addProperty(SH.resultPath, pathValue);
+							}
+							RDFNode focusNodeValue = sol.get(SH.focusNodeVar.getVarName());
+							if(focusNodeValue != null) {
+								resultFocusNode = focusNodeValue;
+							}
+						}
+						
+						RDFNode selectValue = sol.get(SH.valueVar.getVarName());
+						if(selectValue != null) {
+							result.addProperty(SH.value, selectValue);
+						}
+						
+						result.addProperty(SH.focusNode, resultFocusNode);
+						
+						if(createDetails) {
+							addDetails(result, nestedResults);
+						}
+			
+						resultsList.add(result);
+						violationCount++;
 					}
-					
-					RDFNode selectValue = sol.get(SH.valueVar.getVarName());
-					if(selectValue != null) {
-						result.addProperty(SH.value, selectValue);
-					}
-					
-					result.addProperty(SH.focusNode, resultFocusNode);
-		
-					violationCount++;
 				}
+			}
+			else if(createDetails) {
+				Resource success = results.createResource(DASH.SuccessResult);
+				success.addProperty(SH.sourceShape, shape);
+				success.addProperty(SH.sourceConstraint, executable.getConstraint());
+				if(executable instanceof ComponentConstraintExecutable) {
+					success.addProperty(SH.sourceConstraintComponent, ((ComponentConstraintExecutable)executable).getComponent());
+				}
+				if(focusNode != null) {
+					success.addProperty(SH.focusNode, focusNode);
+				}
+				addDetails(success, nestedResults);
+				resultsList.add(success);
 			}
 		}
 		finally {
@@ -335,6 +362,20 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		}
 		
 		return violationCount;
+	}
+	
+	
+	public static void addDetails(Resource parentResult, Model nestedResults) {
+		if(!nestedResults.isEmpty()) {
+			parentResult.getModel().add(nestedResults);
+			for(Resource type : SHACLUtil.RESULT_TYPES) {
+				for(Resource nestedResult : nestedResults.listSubjectsWithProperty(RDF.type, type).toList()) {
+					if(!parentResult.getModel().contains(null, SH.detail, nestedResult)) {
+						parentResult.addProperty(SH.detail, nestedResult);
+					}
+				}
+			}
+		}
 	}
 
 	
@@ -415,9 +456,9 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		while(executable.getComponent().getParametersMap().containsKey(valueVar)) {
 			valueVar += "_";
 		}
-		StringBuffer sb = new StringBuffer("SELECT $this ?value");
+		StringBuffer sb = new StringBuffer();
 		if(SH.Shape.equals(executable.getContext())) {
-			sb.append("\nWHERE {\n");
+			sb.append("SELECT $this ?value\nWHERE {\n");
 			sb.append("    BIND ($this AS ");
 			sb.append(valueVar);
 			sb.append(") .\n");
@@ -436,7 +477,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 			}
 			
 			// Create body
-			sb.append("\nWHERE {\n");
+			sb.append("SELECT DISTINCT $this ?value\nWHERE {\n");
 			sb.append("    $this $" + SH.PATHVar.getVarName() + " " + valueVar + " .\n");
 		}
 

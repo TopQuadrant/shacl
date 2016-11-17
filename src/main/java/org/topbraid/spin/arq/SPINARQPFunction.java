@@ -10,13 +10,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.topbraid.spin.model.Argument;
-import org.topbraid.spin.model.Function;
-import org.topbraid.spin.model.Select;
-import org.topbraid.spin.system.MagicPropertyPolicy;
-import org.topbraid.spin.util.JenaUtil;
-import org.topbraid.spin.vocabulary.SPIN;
-
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
@@ -43,6 +36,12 @@ import org.apache.jena.sparql.pfunction.PropertyFunction;
 import org.apache.jena.sparql.pfunction.PropertyFunctionBase;
 import org.apache.jena.sparql.pfunction.PropertyFunctionFactory;
 import org.apache.jena.sparql.util.IterLib;
+import org.topbraid.spin.model.Argument;
+import org.topbraid.spin.model.Function;
+import org.topbraid.spin.model.Select;
+import org.topbraid.spin.system.MagicPropertyPolicy;
+import org.topbraid.spin.util.JenaUtil;
+import org.topbraid.spin.vocabulary.SPIN;
 
 /**
  * An ARQ PropertyFunction based on a spin:MagicProperty.
@@ -207,8 +206,14 @@ public class SPINARQPFunction extends PropertyFunctionBase implements PropertyFu
 			}
 			
 			// Execute SELECT query and wrap it with a custom iterator
-			Dataset newDataset = new DatasetWithDifferentDefaultModel(model, DatasetImpl.wrap(context.getDataset()));
-			QueryExecution qexec = ARQFactory.get().createQueryExecution(arqQuery, newDataset, bindings);
+			QueryExecution qexec;
+			if(context.getDataset() != null) {
+				Dataset newDataset = new DatasetWithDifferentDefaultModel(model, DatasetImpl.wrap(context.getDataset()));
+				qexec = ARQFactory.get().createQueryExecution(arqQuery, newDataset, bindings);
+			}
+			else {
+				qexec = ARQFactory.get().createQueryExecution(arqQuery, model);
+			}
 			ResultSet rs = qexec.execSelect();
 			QueryIterator it = new PFunctionQueryIterator(rs, qexec, vars, binding);
 			if(existingValues != null) {

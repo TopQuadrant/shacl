@@ -46,24 +46,24 @@ ex:GraphValidationTestCase
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidResource1 ;
-      sh:path ex:address ;
-      sh:severity sh:Violation ;
+      sh:resultPath ex:address ;
+      sh:resultSeverity sh:Violation ;
       sh:sourceConstraintComponent sh:AndConstraintComponent ;
       sh:value _:b61065 ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidResource2 ;
-      sh:path ex:address ;
-      sh:severity sh:Violation ;
+      sh:resultPath ex:address ;
+      sh:resultSeverity sh:Violation ;
       sh:sourceConstraintComponent sh:AndConstraintComponent ;
       sh:value _:b31477 ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidResource3 ;
-      sh:path ex:address ;
-      sh:severity sh:Violation ;
+      sh:resultPath ex:address ;
+      sh:resultSeverity sh:Violation ;
       sh:sourceConstraintComponent sh:AndConstraintComponent ;
       sh:value _:b94057 ;
     ] ;

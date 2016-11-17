@@ -26,11 +26,11 @@ public class SHACL2SPINBridge {
 
 	
 	public static ConstraintViolation createConstraintViolation(Resource shResult) {
-		String message = JenaUtil.getStringProperty(shResult, SH.message);
+		String message = JenaUtil.getStringProperty(shResult, SH.resultMessage);
 		Resource root = JenaUtil.getResourceProperty(shResult, SH.focusNode);
 		List<SimplePropertyPath> paths = new LinkedList<SimplePropertyPath>();
 		if(root != null) {
-			Resource path = JenaUtil.getResourceProperty(shResult, SH.path);
+			Resource path = JenaUtil.getResourceProperty(shResult, SH.resultPath);
 			if(path != null) {
 				if(path.isURIResource()) {
 					paths.add(new ObjectPropertyPath(root, JenaUtil.asProperty(path)));
@@ -44,13 +44,13 @@ public class SHACL2SPINBridge {
 			}
 		}
 		ConstraintViolation cv = new ConstraintViolation(root, paths, null, message, null);
-		if(shResult.hasProperty(SH.severity, SH.Violation)) {
+		if(shResult.hasProperty(SH.resultSeverity, SH.Violation)) {
 			cv.setLevel(SPIN.Error);
 		}
-		else if(shResult.hasProperty(SH.severity, SH.Warning)) {
+		else if(shResult.hasProperty(SH.resultSeverity, SH.Warning)) {
 			cv.setLevel(SPIN.Warning);
 		}
-		else if(shResult.hasProperty(SH.severity, SH.Info)) {
+		else if(shResult.hasProperty(SH.resultSeverity, SH.Info)) {
 			cv.setLevel(SPIN.Info);
 		}
 		return cv;
@@ -69,10 +69,10 @@ public class SHACL2SPINBridge {
 	public static Resource createValidationResult(ConstraintViolation cv, Model results) {
 		Resource result = results.createResource(SPIN.Fatal.equals(cv.getLevel()) ? DASH.FailureResult : SH.ValidationResult);
 		if(SPIN.Info.equals(cv.getLevel())) {
-			result.addProperty(SH.severity, SH.Info);
+			result.addProperty(SH.resultSeverity, SH.Info);
 		}
 		else if(SPIN.Warning.equals(cv.getLevel())) {
-			result.addProperty(SH.severity, SH.Warning);
+			result.addProperty(SH.resultSeverity, SH.Warning);
 		}
 		Resource root = cv.getRoot();
 		if(root != null) {
@@ -83,12 +83,12 @@ public class SHACL2SPINBridge {
 			SimplePropertyPath path = paths.iterator().next();
 			result.addProperty(SH.focusNode, root);
 			if(path instanceof ObjectPropertyPath) {
-				result.addProperty(SH.path, path.getPredicate());
+				result.addProperty(SH.resultPath, path.getPredicate());
 			}
 			else {
 				Resource inverse = result.getModel().createResource();
 				inverse.addProperty(SH.inversePath, path.getPredicate());
-				result.addProperty(SH.path, inverse);
+				result.addProperty(SH.resultPath, inverse);
 			}
 			if(cv.getValue() != null) {
 				result.addProperty(SH.value, cv.getValue());
@@ -96,7 +96,7 @@ public class SHACL2SPINBridge {
 		}
 		String message = cv.getMessage();
 		if(message != null) {
-			result.addProperty(SH.message, message);
+			result.addProperty(SH.resultMessage, message);
 		}
 		return result;
 	}

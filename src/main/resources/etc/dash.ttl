@@ -8,11 +8,14 @@
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix swa: <http://topbraid.org/swa#> .
+@prefix tosh: <http://topbraid.org/tosh#> .
+@prefix vs: <http://www.w3.org/2003/06/sw-vocab-status/ns#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 <http://datashapes.org/dash>
   rdf:type owl:Ontology ;
-  rdfs:comment """DASH defines a standard SPARQL implementation of SHACL which is (among others) utilized by TopBraid and its API.
+  rdfs:comment """DASH defines SPARQL-based validators for all SHACL Core constraint component. These are (among others) utilized by TopBraid and its API. Note that constraint components that require validation of nested shapes (such as sh:shape) are not implementable without a function such as tosh:hasShape.
 
 DASH is also a SHACL library for frequently needed features and design patterns. All features in this library are 100% standards compliant and will work on any engine that fully supports SHACL.""" ;
   rdfs:label "DASH Data Shapes Library" ;
@@ -168,34 +171,68 @@ dash:InferencingTestCase
       sh:name "expected result" ;
     ] ;
 .
-dash:MemberShapeConstraintComponent
-  rdf:type sh:ConstraintComponent ;
-  rdfs:comment "Can be used to specify constraints on the members of a given list, assuming that the given sh:property has rdf:Lists as values. A violation is reported for each member of the list that does not comply with the constraints specified by the given shape." ;
-  rdfs:label "Member shape constraint component" ;
-  sh:parameter dash:MemberShapeConstraintComponent-memberShape ;
-  sh:propertyValidator [
-      rdf:type sh:SPARQLSelectValidator ;
-      sh:message "List member {?member} does not have the shape {$memberShape}" ;
-      sh:prefixes <http://datashapes.org/dash> ;
-      sh:select """
-		SELECT $this ?value ?failure ?member
-		WHERE {
-			$this $PATH ?value .
-			?value rdf:rest*/rdf:first ?member .
-			BIND (sh:hasShape(?member, $memberShape, $shapesGraph) AS ?hasShape) .
-			BIND (!bound(?hasShape) AS ?failure) .
-			FILTER (?failure || !?hasShape) .
-		}
-""" ;
-    ] ;
-  sh:targetClass sh:PropertyConstraint ;
+dash:ListNodeShape
+  rdf:type sh:Shape ;
+  rdfs:comment "Defines constraints on what it means for a node to be a node within a well-formed RDF list. Note that this does not check whether the rdf:rest items are also well-formed lists as this would lead to unsupported recursion." ;
+  rdfs:label "List node shape" ;
+  sh:or (
+      [
+        sh:hasValue () ;
+        sh:property [
+            sh:predicate rdf:first ;
+            sh:maxCount 0 ;
+          ] ;
+        sh:property [
+            sh:predicate rdf:rest ;
+            sh:maxCount 0 ;
+          ] ;
+      ]
+      [
+        sh:not [
+            sh:hasValue () ;
+          ] ;
+        sh:property [
+            sh:predicate rdf:first ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+          ] ;
+        sh:property [
+            sh:predicate rdf:rest ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+          ] ;
+      ]
+    ) ;
 .
-dash:MemberShapeConstraintComponent-memberShape
-  rdf:type sh:Parameter ;
-  sh:predicate dash:memberShape ;
-  sh:class sh:Shape ;
-  sh:description "The shape that the list members must have." ;
-  sh:name "member shape" ;
+dash:ListShape
+  rdf:type sh:Shape ;
+  rdfs:comment """Defines constraints on what it means for a node to be a well-formed RDF list.
+
+The focus node must either be rdf:nil or not recursive. Furthermore, this shape uses dash:ListNodeShape as a \"helper\" to walk through all members of the whole list (including itself).""" ;
+  rdfs:label "List shape" ;
+  sh:or (
+      [
+        sh:hasValue () ;
+      ]
+      [
+        sh:not [
+            sh:hasValue () ;
+          ] ;
+        sh:property [
+            dash:nonRecursive "true"^^xsd:boolean ;
+            sh:path [
+                sh:oneOrMorePath rdf:rest ;
+              ] ;
+          ] ;
+      ]
+    ) ;
+  sh:property [
+      rdfs:comment "Each list member (including this node) must be have the shape dash:ListNodeShape." ;
+      sh:path [
+          sh:zeroOrMorePath rdf:rest ;
+        ] ;
+      sh:shape dash:ListNodeShape ;
+    ] ;
 .
 dash:NonRecursiveConstraintComponent
   rdf:type sh:ConstraintComponent ;
@@ -210,7 +247,7 @@ To express that a person cannot have itself among any of its (recursive) parents
       rdf:type sh:SPARQLSelectValidator ;
       sh:message "Points back at itself (recursively)" ;
       sh:prefixes <http://datashapes.org/dash> ;
-      sh:select """SELECT $this ($this AS ?value)
+      sh:select """SELECT DISTINCT $this ($this AS ?value)
 WHERE {
 	{
 		FILTER (?nonRecursive)
@@ -229,7 +266,7 @@ dash:NonRecursiveConstraintComponent-nonRecursive
 .
 dash:None
   rdf:type sh:Shape ;
-  rdfs:comment "A Shape that is violated for every possible focus node. This can be used in sh:filterShape statements to essentially deactivate other shapes or constraints." ;
+  rdfs:comment "A Shape that is violated for every possible focus node." ;
   rdfs:label "None" ;
   sh:in () ;
 .
@@ -242,7 +279,7 @@ dash:PrimaryKeyConstraintComponent
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
       sh:prefixes <http://datashapes.org/dash> ;
-      sh:select """SELECT $this ?value ?message
+      sh:select """SELECT DISTINCT $this ?value ?message
 WHERE {
     {
         FILTER NOT EXISTS {
@@ -339,6 +376,26 @@ dash:StringOrLangString
   rdfs:comment "An rdf:List that can be used in property constraints as value for sh:or to indicate that all values of a property must be either xsd:string or rdf:langString." ;
   rdfs:label "String or langString" ;
 .
+dash:SubSetOfConstraintComponent
+  rdf:type sh:ConstraintComponent ;
+  rdfs:label "Sub set of constraint component" ;
+  sh:parameter dash:SubSetOfConstraintComponent-subSetOf ;
+  sh:propertyValidator [
+      rdf:type sh:SPARQLAskValidator ;
+      sh:ask """ASK {
+    $this $subSetOf ?value .
+}""" ;
+      sh:message "Must be one of the values of {$subSetOf}" ;
+      sh:prefixes <http://datashapes.org/dash> ;
+    ] ;
+  sh:targetClass sh:PropertyConstraint ;
+.
+dash:SubSetOfConstraintComponent-subSetOf
+  rdf:type sh:Parameter ;
+  sh:predicate dash:subSetOf ;
+  sh:class rdf:Property ;
+  sh:description "A property (of the focus node) that must (at least) have all values from the set of value nodes." ;
+.
 dash:SuccessResult
   rdf:type rdfs:Class ;
   rdfs:comment "A result representing a successfully validated constraint." ;
@@ -422,48 +479,12 @@ dash:addedTriple
   rdfs:label "added triple" ;
   rdfs:range rdf:Statement ;
 .
-dash:countShapesWithMatchResult
-  rdf:type sh:SPARQLFunction ;
-  rdfs:comment "Counts the number of shapes from a given rdf:List (?arg2) defined in a given shapes graph (?arg3) where sh:hasShape returns the provided match value (true or false, ?arg4) for a given focus node (?arg1). The function produces a failure if one of the shapes validated to a failure." ;
-  rdfs:label "count shapes with match result" ;
-  sh:parameter [
-      sh:predicate sh:expectedValue ;
-      sh:datatype xsd:boolean ;
-      sh:description "The expected value of sh:hasShape to count." ;
-      sh:order 3 ;
-    ] ;
-  sh:parameter [
-      sh:predicate sh:focusNode ;
-      sh:class rdfs:Resource ;
-      sh:description "The focus node." ;
-      sh:order 0 ;
-    ] ;
-  sh:parameter [
-      sh:predicate sh:shapes ;
-      sh:class rdf:List ;
-      sh:description "The list of shapes to walk through." ;
-      sh:order 1 ;
-    ] ;
-  sh:parameter [
-      sh:predicate sh:shapesGraph ;
-      sh:class rdfs:Resource ;
-      sh:description "The shapes graph." ;
-      sh:order 2 ;
-    ] ;
-  sh:prefixes <http://datashapes.org/dash> ;
-  sh:returnType xsd:integer ;
-  sh:select """
-		# The SUM will fail with an error if one of the operands is not a number
-		# (this mechanism is used to propagate errors from sh:hasShape calls)
-		SELECT (SUM(?s) AS ?result)
-		WHERE {
-			GRAPH $shapesGraph {
-				$shapes rdf:rest*/rdf:first ?shape .
-			}
-			BIND (sh:hasShape($focusNode, ?shape, $shapesGraph, true) AS ?hasShape) .
-			BIND (IF(bound(?hasShape), IF(?hasShape = $expectedValue, 1, 0), 'error') AS ?s) .
-		}
-		""" ;
+dash:composite
+  rdf:type rdf:Property ;
+  rdfs:comment "Can be used to indicate that a property/path represented by a property constraint represents a composite relationship. In a composite relationship, the life cycle of a \"child\" object (value of the property/path) depends on the \"parent\" object (focus node). If the parent gets deleted, then the child objects should be deleted, too. Tools may use dash:composite (if set to true) to implement cascading delete operations." ;
+  rdfs:domain sh:PropertyConstraint ;
+  rdfs:label "composite" ;
+  rdfs:range xsd:boolean ;
 .
 dash:defaultValueType
   rdf:type rdf:Property ;
@@ -496,18 +517,6 @@ dash:hasClass
 		}
 		""" ;
   sh:message "Value does not have class {$class}" ;
-  sh:prefixes <http://datashapes.org/dash> ;
-.
-dash:hasDatatype
-  rdf:type sh:SPARQLAskValidator ;
-  rdfs:comment "Checks whether a given node ($value) is a literal with a given datatype ($datatype)." ;
-  rdfs:label "has datatype" ;
-  sh:ask """
-		ASK {
-			FILTER (datatype($value) = $datatype) .
-		}
-		""" ;
-  sh:message "Value does not have datatype {$datatype}" ;
   sh:prefixes <http://datashapes.org/dash> ;
 .
 dash:hasMaxExclusive
@@ -606,9 +615,9 @@ dash:hasStem
 .
 dash:isDeactivated
   rdf:type sh:SPARQLFunction ;
-  rdfs:comment "Checks whether a given shape or constraint has been marked as \"deactivated\". This relies on the coding convention to have sh:filterShape dash:None." ;
+  rdfs:comment "Checks whether a given shape or constraint has been marked as \"deactivated\" using sh:deactivated." ;
   sh:ask """ASK {
-    ?constraintOrShape sh:filterShape dash:None .
+    ?constraintOrShape sh:deactivated true .
 }""" ;
   sh:parameter [
       sh:predicate dash:constraintOrShape ;
@@ -636,11 +645,11 @@ dash:isLanguageIn
   sh:ask """
 		ASK {
 			BIND (lang($value) AS ?valueLang) .
-			FILTER (bound(?valueLang) && EXISTS {
+			FILTER EXISTS {
 				GRAPH $shapesGraph {
 					$languageIn (rdf:rest*)/rdf:first ?lang .
 				    FILTER (langMatches(?valueLang, ?lang))
-				} } )
+				} }
 		}
 		""" ;
   sh:message "Language does not match any of {$languageIn}" ;
@@ -711,6 +720,10 @@ dash:rootClass
   rdf:type rdf:Property ;
   rdfs:label "root class" ;
 .
+dash:subSetOf
+  rdf:type rdf:Property ;
+  rdfs:label "sub set of" ;
+.
 dash:suggestion
   rdf:type rdf:Property ;
   rdfs:comment "Can be used to link a validation result with one or more suggestions on how to fix the underlying issue." ;
@@ -752,80 +765,11 @@ dash:valueCount
 		}
 """ ;
 .
-dash:valuesWithShapeCount
-  rdf:type sh:SPARQLFunction ;
-  rdfs:comment "Counts the number of values from a given subject (?arg1) / predicate (?arg2) combination that do not produce any error-level constraint violations for a given shape (?arg3) in a given shapes graph (?arg4). The function produces an error if one of the shapes validated to a fatal error." ;
-  rdfs:label "values with shape count" ;
-  sh:parameter [
-      sh:predicate sh:arg1 ;
-      sh:class rdfs:Resource ;
-      sh:description "The subject to count the values of." ;
-    ] ;
-  sh:parameter [
-      sh:predicate sh:arg2 ;
-      sh:class rdf:Property ;
-      sh:description "The property to count the values of." ;
-    ] ;
-  sh:parameter [
-      sh:predicate sh:arg3 ;
-      sh:class sh:Shape ;
-      sh:description "The shape to validate." ;
-    ] ;
-  sh:parameter [
-      sh:predicate sh:arg4 ;
-      sh:class rdfs:Resource ;
-      sh:description "The shapes graph." ;
-    ] ;
-  sh:prefixes <http://datashapes.org/dash> ;
-  sh:returnType xsd:integer ;
-  sh:select """
-		# The SUM will fail with an error if one of the operands is not a number
-		# (this mechanism is used to propagate errors from sh:hasShape calls)
-		SELECT (SUM(?s) AS ?result)
-		WHERE {
-			{
-				FILTER NOT EXISTS { $arg1 $arg2 ?value }
-				BIND (0 AS ?s)
-			}
-			UNION {
-				FILTER EXISTS { $arg1 $arg2 ?value }
-				$arg1 $arg2 ?value .
-				BIND (sh:hasShape(?value, $arg3, $arg4, true) AS ?hasShape) .
-				BIND (IF(bound(?hasShape), IF(?hasShape, 1, 0), 'error') AS ?s) .
-			}
-		}
-		""" ;
-.
 owl:Class
   rdf:type rdfs:Class ;
   rdfs:subClassOf rdfs:Class ;
 .
 sh:AndConstraintComponent
-  sh:propertyValidator [
-      rdf:type sh:SPARQLSelectValidator ;
-      sh:prefixes <http://datashapes.org/dash> ;
-      sh:select """
-		SELECT $this ?value ?failure
-		WHERE {
-			$this $PATH ?value .
-			BIND (dash:countShapesWithMatchResult(?value, $and, $shapesGraph, false) AS ?count)
-			BIND (!bound(?count) AS ?failure) .
-			FILTER IF(?failure, true, ?count > 0) .
-		}
-""" ;
-    ] ;
-  sh:shapeValidator [
-      rdf:type sh:SPARQLSelectValidator ;
-      sh:prefixes <http://datashapes.org/dash> ;
-      sh:select """
-		SELECT $this ?failure
-		WHERE {
-			BIND (dash:countShapesWithMatchResult($this, $and, $shapesGraph, false) AS ?count)
-			BIND (!bound(?count) AS ?failure) .
-			FILTER IF(?failure, true, ?count > 0) .
-		}
-""" ;
-    ] ;
   sh:targetClass sh:PropertyConstraint ;
   sh:targetClass sh:Shape ;
 .
@@ -861,7 +805,6 @@ sh:ClosedConstraintComponent
 .
 sh:DatatypeConstraintComponent
   sh:targetClass sh:PropertyConstraint ;
-  sh:validator dash:hasDatatype ;
 .
 sh:DerivedValuesConstraintComponent
   sh:targetClass sh:PropertyConstraint ;
@@ -872,7 +815,7 @@ sh:DisjointConstraintComponent
       sh:message "Property must not share any values with {$disjoint}" ;
       sh:prefixes <http://datashapes.org/dash> ;
       sh:select """
-		SELECT $this ?value
+		SELECT DISTINCT $this ?value
 		WHERE {
 			$this $PATH ?value .
 			$this $disjoint ?value .
@@ -887,7 +830,7 @@ sh:EqualsConstraintComponent
       sh:message "Must have same values as {$equals}" ;
       sh:prefixes <http://datashapes.org/dash> ;
       sh:select """
-		SELECT $this ?value
+		SELECT DISTINCT $this ?value
 		WHERE {
 			{
 				$this $PATH ?value .
@@ -928,6 +871,14 @@ sh:HasValueConstraintComponent
 		}
 		""" ;
     ] ;
+  sh:shapeValidator [
+      rdf:type sh:SPARQLAskValidator ;
+      sh:ask """ASK {
+    FILTER ($value = $hasValue)
+}""" ;
+      sh:message "Value must be {$hasValue}" ;
+      sh:prefixes <http://datashapes.org/dash> ;
+    ] ;
   sh:targetClass sh:PropertyConstraint ;
 .
 sh:InConstraintComponent
@@ -946,7 +897,7 @@ sh:LessThanConstraintComponent
       sh:message "Value is not < value of {$lessThan}" ;
       sh:prefixes <http://datashapes.org/dash> ;
       sh:select """
-		SELECT $this ?value
+		SELECT DISTINCT $this ?value
 		WHERE {
 			$this $PATH ?value .
 			$this $lessThan ?otherValue .
@@ -962,7 +913,7 @@ sh:LessThanOrEqualsConstraintComponent
       sh:message "Value is not <= value of {$lessThanOrEquals}" ;
       sh:prefixes <http://datashapes.org/dash> ;
       sh:select """
-		SELECT $this ?value
+		SELECT DISTINCT $this ?value
 		WHERE {
 			$this $PATH ?value .
 			$this $lessThanOrEquals ?otherValue .
@@ -983,7 +934,7 @@ sh:MaxCountConstraintComponent
 			$this $PATH ?value .
 		}
 		GROUP BY $this
-		HAVING (COUNT(?value) > $maxCount)
+		HAVING (COUNT(DISTINCT ?value) > $maxCount)
 		""" ;
     ] ;
   sh:targetClass sh:PropertyConstraint ;
@@ -1013,7 +964,7 @@ sh:MinCountConstraintComponent
 			}
 		} 
 		GROUP BY $this
-		HAVING (COUNT(?value) < $minCount)
+		HAVING (COUNT(DISTINCT ?value) < $minCount)
 		""" ;
     ] ;
   sh:targetClass sh:PropertyConstraint ;
@@ -1035,62 +986,10 @@ sh:NodeKindConstraintComponent
   sh:validator dash:hasNodeKind ;
 .
 sh:NotConstraintComponent
-  sh:propertyValidator [
-      rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Value does have shape {$not}" ;
-      sh:prefixes <http://datashapes.org/dash> ;
-      sh:select """
-		SELECT $this ?value ?failure
-		WHERE {
-			$this $PATH ?value .
-			BIND (sh:hasShape(?value, $not, $shapesGraph) AS ?hasShape) .
-			BIND (!bound(?hasShape) AS ?failure) .
-			FILTER (?failure || ?hasShape) .
-		}
-		""" ;
-    ] ;
-  sh:shapeValidator [
-      rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Value does have shape {$not}" ;
-      sh:prefixes <http://datashapes.org/dash> ;
-      sh:select """
-		SELECT $this ($this AS ?value) ?failure
-		WHERE {
-			BIND (sh:hasShape($this, $not, $shapesGraph) AS ?hasShape) .
-			BIND (!bound(?hasShape) AS ?failure) .
-			FILTER (?failure || ?hasShape) .
-		}
-		""" ;
-    ] ;
   sh:targetClass sh:PropertyConstraint ;
   sh:targetClass sh:Shape ;
 .
 sh:OrConstraintComponent
-  sh:propertyValidator [
-      rdf:type sh:SPARQLSelectValidator ;
-      sh:prefixes <http://datashapes.org/dash> ;
-      sh:select """
-		SELECT $this ?value ?failure
-		WHERE { 
-			$this $PATH ?value .
-			BIND (dash:countShapesWithMatchResult(?value, $or, $shapesGraph, true) AS ?count)
-			BIND (!bound(?count) AS ?failure) .
-			FILTER IF(?failure, true, ?count = 0) .
-		}
-""" ;
-    ] ;
-  sh:shapeValidator [
-      rdf:type sh:SPARQLSelectValidator ;
-      sh:prefixes <http://datashapes.org/dash> ;
-      sh:select """
-		SELECT $this ?failure
-		WHERE {
-			BIND (dash:countShapesWithMatchResult($this, $or, $shapesGraph, true) AS ?count)
-			BIND (!bound(?count) AS ?failure) .
-			FILTER IF(?failure, true, ?count = 0) .
-		}
-""" ;
-    ] ;
   sh:targetClass sh:PropertyConstraint ;
   sh:targetClass sh:Shape ;
 .
@@ -1099,75 +998,12 @@ sh:PatternConstraintComponent
   sh:validator dash:hasPattern ;
 .
 sh:QualifiedMaxCountConstraintComponent
-  sh:propertyValidator [
-      rdf:type sh:SPARQLSelectValidator ;
-      sh:message "More than {$qualifiedMaxCount} values have shape {$qualifiedValueShape}" ;
-      sh:prefixes <http://datashapes.org/dash> ;
-      sh:select """
-	SELECT $this (SUM(?failed)>0 AS ?failure)
-	WHERE {
-		{
-			$this $PATH ?value .
-			BIND  (sh:hasShape(?value, $qualifiedValueShape, $shapesGraph) AS ?hasShape) .
-			FILTER (!bound(?hasShape) || ?hasShape) .
-		}
-		BIND (IF(!bound(?hasShape),1, 0) AS ?failed) .
-	} 
-	GROUP BY $this
-	HAVING ( ( COUNT ( ?value ) > $qualifiedMaxCount ) || ( SUM(?failed) > 0 )) 
-""" ;
-    ] ;
   sh:targetClass sh:PropertyConstraint ;
 .
 sh:QualifiedMinCountConstraintComponent
-  sh:propertyValidator [
-      rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Less than {$qualifiedMinCount} values have shape {$qualifiedValueShape}" ;
-      sh:prefixes <http://datashapes.org/dash> ;
-      sh:select """
-	SELECT $this (SUM(?failed)>0 AS ?failure)
-	WHERE {
-		{
-			$this $PATH ?value .
-			BIND  (sh:hasShape(?value, $qualifiedValueShape, $shapesGraph) AS ?hasShape) .
-			FILTER (!bound(?hasShape) || ?hasShape) .
-		}
-		BIND (IF(!bound(?hasShape),1, 0) AS ?failed) .
-	} 
-	GROUP BY $this
-	HAVING ( ( COUNT ( ?value ) < $qualifiedMinCount ) || ( SUM(?failed) > 0 )) 
-""" ;
-    ] ;
   sh:targetClass sh:PropertyConstraint ;
 .
 sh:ShapeConstraintComponent
-  sh:propertyValidator [
-      rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Value does not have shape {$shape}" ;
-      sh:prefixes <http://datashapes.org/dash> ;
-      sh:select """
-		SELECT $this ?value ?failure
-		WHERE {
-			$this $PATH ?value .
-			BIND (sh:hasShape(?value, $shape, $shapesGraph) AS ?hasShape) .
-			BIND (!bound(?hasShape) AS ?failure) .
-			FILTER (?failure || !?hasShape) .
-		}
-		""" ;
-    ] ;
-  sh:shapeValidator [
-      rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Value does not have shape {$shape}" ;
-      sh:prefixes <http://datashapes.org/dash> ;
-      sh:select """
-		SELECT ($value AS $this) $value ?failure
-		WHERE {
-			BIND (sh:hasShape($value, $shape, $shapesGraph) AS ?hasShape) .
-			BIND (!bound(?hasShape) AS ?failure) .
-			FILTER (?failure || !?hasShape) .
-		}
-		""" ;
-    ] ;
   sh:targetClass sh:PropertyConstraint ;
 .
 sh:StemConstraintComponent
@@ -1200,9 +1036,6 @@ sh:UniqueLangConstraintComponent
 .
 sh:derivedValues
   dash:defaultValueType sh:SPARQLValuesDeriver ;
-.
-sh:filterShape
-  dash:defaultValueType sh:Shape ;
 .
 sh:not
   dash:defaultValueType sh:Shape ;

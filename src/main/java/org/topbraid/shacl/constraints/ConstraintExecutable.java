@@ -1,13 +1,10 @@
 package org.topbraid.shacl.constraints;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Resource;
 import org.topbraid.shacl.model.SHConstraint;
-import org.topbraid.shacl.model.SHFactory;
-import org.topbraid.shacl.model.SHShape;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaUtil;
 
@@ -23,19 +20,6 @@ public abstract class ConstraintExecutable {
 	
 	public ConstraintExecutable(SHConstraint constraint) {
 		this.constraint = constraint;
-	}
-	
-	
-	/**
-	 * Gets the specified sh:filterShapes, to be used as pre-conditions.
-	 * @return the filter shapes
-	 */
-    public List<SHShape> getFilterShapes() {
-		List<SHShape> results = new LinkedList<SHShape>();
-		for(Resource shape : JenaUtil.getResourceProperties(constraint, SH.filterShape)) {
-			results.add(SHFactory.asShape(shape));
-		}
-		return results;
 	}
 	
 	

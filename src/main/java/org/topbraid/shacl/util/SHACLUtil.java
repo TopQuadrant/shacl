@@ -49,6 +49,12 @@ import org.topbraid.spin.util.OptimizedMultiUnion;
  * @author Holger Knublauch
  */
 public class SHACLUtil {
+	
+	public final static Resource[] RESULT_TYPES = {
+		DASH.FailureResult,
+		DASH.SuccessResult,
+		SH.ValidationResult
+	};
 
 	public final static String MACROS_FILE_PART = ".macros.";
 	
@@ -176,17 +182,88 @@ public class SHACLUtil {
 	}
 	
 	
-	public static List<SHResult> getAllResults(Model model) {
+	/**
+	 * Gets all focus nodes from the default Model of a given dataset.
+	 * This includes all targets of all defined targets as well as all instances of classes that
+	 * are also shapes.
+	 * @param dataset  the Dataset
+	 * @param validateShapes  true to include the validation of constraint components
+	 * @return a Set of focus Nodes
+	 */
+	public static Set<Node> getAllFocusNodes(Dataset dataset, boolean validateShapes) {
+
+		Set<Node> results = new HashSet<Node>();
+		
+		// Add all instances of classes that are also shapes
+		Model model = dataset.getDefaultModel();
+		for(Resource shape : JenaUtil.getAllInstances(SH.Shape.inModel(model))) {
+			if(JenaUtil.hasIndirectType(shape, RDFS.Class)) {
+				for(Resource instance : JenaUtil.getAllInstances(shape)) {
+					results.add(instance.asNode());
+				}
+			}
+		}
+		
+		// Add all instances of classes mentioned in sh:targetClass triples
+		for(Statement s : model.listStatements(null, SH.targetClass, (RDFNode)null).toList()) {
+			if(s.getObject().isResource()) {
+				if(validateShapes || (!JenaUtil.hasIndirectType(s.getSubject(), SH.ConstraintComponent) &&
+						!SH.PropertyConstraint.equals(s.getObject())) &&
+						!SH.Constraint.equals(s.getObject())) {
+					for(Resource instance : JenaUtil.getAllInstances(s.getResource())) {
+						results.add(instance.asNode());
+					}
+				}
+			}
+		}
+		
+		// Add all objects of sh:targetNode triples
+		for(Statement s : model.listStatements(null, SH.targetNode, (RDFNode)null).toList()) {
+			results.add(s.getObject().asNode());
+		}
+		
+		// Add all target nodes of sh:target triples
+		for(Statement s : model.listStatements(null, SH.target, (RDFNode)null).toList()) {
+			if(s.getObject().isResource()) {
+				Resource target = s.getResource();
+				for(RDFNode focusNode : SHACLUtil.getResourcesInTarget(target, dataset)) {
+					results.add(focusNode.asNode());
+				}
+			}
+		}
+		
+		// Add all objects of the predicate used as sh:targetObjectsOf
+		for(RDFNode property : model.listObjectsOfProperty(SH.targetObjectsOf).toList()) {
+			if(property.isURIResource()) {
+				Property predicate = JenaUtil.asProperty((Resource)property);
+				for(RDFNode focusNode : model.listObjectsOfProperty(predicate).toList()) {
+					results.add(focusNode.asNode());
+				}
+			}
+		}
+		
+		// Add all subjects of the predicate used as sh:targetSubjectsOf
+		for(RDFNode property : model.listObjectsOfProperty(SH.targetSubjectsOf).toList()) {
+			if(property.isURIResource()) {
+				Property predicate = JenaUtil.asProperty((Resource)property);
+				for(RDFNode focusNode : model.listSubjectsWithProperty(predicate).toList()) {
+					results.add(focusNode.asNode());
+				}
+			}
+		}
+		
+		return results;
+	}
+	
+	
+	public static List<SHResult> getAllTopLevelResults(Model model) {
 		List<SHResult> results = new LinkedList<SHResult>();
-		// TODO: Not pretty code, not generic
-		for(Resource r : model.listResourcesWithProperty(RDF.type, SH.ValidationResult).toList()) {
-			results.add(r.as(SHResult.class));
-		}
-		for(Resource r : model.listResourcesWithProperty(RDF.type, DASH.FailureResult).toList()) {
-			results.add(r.as(SHResult.class));
-		}
-		for(Resource r : model.listResourcesWithProperty(RDF.type, DASH.SuccessResult).toList()) {
-			results.add(r.as(SHResult.class));
+		for(Resource type : RESULT_TYPES) {
+			for(Resource r : model.listResourcesWithProperty(RDF.type, type).toList()) {
+				if(!model.contains(null, SH.detail, r)) {
+					results.add(r.as(SHResult.class));
+				}
+			}
 		}
 		return results;
 	}

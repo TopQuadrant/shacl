@@ -1,18 +1,18 @@
-# baseURI: http://datashapes.org/sh/tests/core/constraint/in-001.test
+# baseURI: http://datashapes.org/sh/tests/core/constraint/shape-001.test
 # imports: http://datashapes.org/dash
 # prefix: ex
 
 @prefix dash: <http://datashapes.org/dash#> .
-@prefix ex: <http://datashapes.org/sh/tests/core/constraint/in-001.test#> .
+@prefix ex: <http://datashapes.org/sh/tests/core/constraint/shape-001.test#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://datashapes.org/sh/tests/core/constraint/in-001.test>
+<http://datashapes.org/sh/tests/core/constraint/shape-001.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of in-001" ;
+  rdfs:label "Test of shape-001" ;
   owl:imports <http://datashapes.org/dash> ;
   owl:versionInfo "Created with TopBraid Composer" ;
 .
@@ -22,33 +22,24 @@ ex:GraphValidationTestCase
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidInstance ;
       sh:resultSeverity sh:Violation ;
-      sh:sourceConstraintComponent sh:InConstraintComponent ;
-      sh:value ex:InvalidInstance ;
+      sh:sourceConstraintComponent sh:ShapeConstraintComponent ;
     ] ;
 .
-ex:Green
-  rdf:type ex:TestShape ;
-  rdfs:label "Green" ;
-.
 ex:InvalidInstance
-  rdf:type ex:TestShape ;
+  rdf:type ex:TestClass ;
   rdfs:label "Invalid instance" ;
 .
-ex:Red
-  rdf:type ex:TestShape ;
-  rdfs:label "Red" ;
-.
-ex:TestShape
+ex:TestClass
   rdf:type rdfs:Class ;
   rdf:type sh:Shape ;
-  rdfs:label "Test shape" ;
-  sh:in (
-      ex:Green
-      ex:Red
-      ex:Yellow
-    ) ;
+  rdfs:label "Test class" ;
+  rdfs:subClassOf rdfs:Resource ;
+  sh:shape [
+      sh:class ex:OtherClass ;
+    ] ;
 .
-ex:Yellow
-  rdf:type ex:TestShape ;
-  rdfs:label "Yellow" ;
+ex:ValidInstance
+  rdf:type ex:OtherClass ;
+  rdf:type ex:TestClass ;
+  rdfs:label "Valid instance" ;
 .

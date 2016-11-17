@@ -21,40 +21,40 @@ ex:GraphValidationTestCase
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidResource1 ;
-      sh:path ex:property1 ;
-      sh:severity sh:Violation ;
+      sh:resultPath ex:property1 ;
+      sh:resultSeverity sh:Violation ;
       sh:sourceConstraintComponent sh:EqualsConstraintComponent ;
       sh:value "A" ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidResource1 ;
-      sh:path ex:property1 ;
-      sh:severity sh:Violation ;
+      sh:resultPath ex:property1 ;
+      sh:resultSeverity sh:Violation ;
       sh:sourceConstraintComponent sh:EqualsConstraintComponent ;
       sh:value "B" ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidResource2 ;
-      sh:path ex:property1 ;
-      sh:severity sh:Violation ;
+      sh:resultPath ex:property1 ;
+      sh:resultSeverity sh:Violation ;
       sh:sourceConstraintComponent sh:EqualsConstraintComponent ;
       sh:value "A" ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidResource3 ;
-      sh:path ex:property1 ;
-      sh:severity sh:Violation ;
+      sh:resultPath ex:property1 ;
+      sh:resultSeverity sh:Violation ;
       sh:sourceConstraintComponent sh:EqualsConstraintComponent ;
       sh:value "A" ;
     ] ;
   dash:expectedResult [
       rdf:type sh:ValidationResult ;
       sh:focusNode ex:InvalidResource4 ;
-      sh:path ex:property1 ;
-      sh:severity sh:Violation ;
+      sh:resultPath ex:property1 ;
+      sh:resultSeverity sh:Violation ;
       sh:sourceConstraintComponent sh:EqualsConstraintComponent ;
       sh:value "B" ;
     ] ;

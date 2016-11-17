@@ -1,6 +1,7 @@
 package org.topbraid.shacl.vocabulary;
 
 import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 
 /**
@@ -15,6 +16,9 @@ public class TOSH {
     public final static String NS = BASE_URI + "#";
 
     public final static String PREFIX = "tosh";
+
+    
+    public final static Resource hasShape = ResourceFactory.createResource(NS + "hasShape");
 
     
     public final static Property useDeclaredDatatype = ResourceFactory.createProperty(NS + "useDeclaredDatatype");

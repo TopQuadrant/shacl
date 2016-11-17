@@ -9,6 +9,7 @@ import org.apache.jena.sparql.pfunction.PropertyFunctionRegistry;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.topbraid.shacl.arq.functions.HasShapeFunction;
+import org.topbraid.shacl.arq.functions.IsValidForDatatypeFunction;
 import org.topbraid.shacl.arq.functions.TargetContainsPFunction;
 import org.topbraid.shacl.model.impl.SHConstraintComponentImpl;
 import org.topbraid.shacl.model.impl.SHFunctionImpl;
@@ -23,6 +24,7 @@ import org.topbraid.shacl.model.impl.SHSPARQLTargetImpl;
 import org.topbraid.shacl.model.impl.SHShapeImpl;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.vocabulary.SH;
+import org.topbraid.shacl.vocabulary.TOSH;
 import org.topbraid.spin.util.JenaUtil;
 import org.topbraid.spin.util.SimpleImplementation;
 
@@ -46,7 +48,8 @@ public class SHFactory {
 		p.add(SHSPARQLConstraint.class, new SimpleImplementation(SH.SPARQLConstraint.asNode(), SHSPARQLConstraintImpl.class));
 		p.add(SHSPARQLTarget.class, new SimpleImplementation(SH.SPARQLTarget.asNode(), SHSPARQLTargetImpl.class));
     	
-		FunctionRegistry.get().put(SH.hasShape.getURI(), HasShapeFunction.class);
+		FunctionRegistry.get().put(TOSH.hasShape.getURI(), HasShapeFunction.class);
+		FunctionRegistry.get().put("http://spinrdf.org/spif#isValidForDatatype", IsValidForDatatypeFunction.class);
 		PropertyFunctionRegistry.get().put(TargetContainsPFunction.URI, TargetContainsPFunction.class);
     }
 	
@@ -140,8 +143,7 @@ public class SHFactory {
 			else if(node.isAnon() && !((Resource)node).hasProperty(RDF.type)) {
 				// TODO: This logic is not really correct - it should also test that if
 				//       other rdf:type triples are present
-				if(node.getModel().contains(null, SH.shape, node) ||
-						node.getModel().contains(null, SH.filterShape, node)) {
+				if(node.getModel().contains(null, SH.shape, node)) {
 					return true;
 				}
 			}
