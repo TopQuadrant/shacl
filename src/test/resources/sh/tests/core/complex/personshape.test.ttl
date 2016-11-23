@@ -34,27 +34,31 @@ ex:Calvin
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
   dash:expectedResult [
-      rdf:type sh:ValidationResult ;
-      sh:focusNode ex:Alice ;
-      sh:resultPath ex:ssn ;
-      sh:resultSeverity sh:Violation ;
-      sh:sourceConstraintComponent sh:PatternConstraintComponent ;
-      sh:value "987-65-432A" ;
-    ] ;
-  dash:expectedResult [
-      rdf:type sh:ValidationResult ;
-      sh:focusNode ex:Bob ;
-      sh:resultPath ex:ssn ;
-      sh:resultSeverity sh:Violation ;
-      sh:sourceConstraintComponent sh:MaxCountConstraintComponent ;
-    ] ;
-  dash:expectedResult [
-      rdf:type sh:ValidationResult ;
-      sh:focusNode ex:Calvin ;
-      sh:resultPath ex:school ;
-      sh:resultSeverity sh:Violation ;
-      sh:sourceConstraintComponent sh:ClosedConstraintComponent ;
-      sh:value ex:TrinityAnglicanSchool ;
+      rdf:type sh:ValidationReport ;
+      sh:conforms "false"^^xsd:boolean ;
+      sh:result [
+          rdf:type sh:ValidationResult ;
+          sh:focusNode ex:Alice ;
+          sh:resultPath ex:ssn ;
+          sh:resultSeverity sh:Violation ;
+          sh:sourceConstraintComponent sh:PatternConstraintComponent ;
+          sh:value "987-65-432A" ;
+        ] ;
+      sh:result [
+          rdf:type sh:ValidationResult ;
+          sh:focusNode ex:Bob ;
+          sh:resultPath ex:ssn ;
+          sh:resultSeverity sh:Violation ;
+          sh:sourceConstraintComponent sh:MaxCountConstraintComponent ;
+        ] ;
+      sh:result [
+          rdf:type sh:ValidationResult ;
+          sh:focusNode ex:Calvin ;
+          sh:resultPath ex:school ;
+          sh:resultSeverity sh:Violation ;
+          sh:sourceConstraintComponent sh:ClosedConstraintComponent ;
+          sh:value ex:TrinityAnglicanSchool ;
+        ] ;
     ] ;
 .
 ex:Person

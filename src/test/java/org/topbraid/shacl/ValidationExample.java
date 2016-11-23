@@ -45,7 +45,7 @@ public class ValidationExample {
 		dataset.addNamedModel(shapesGraphURI.toString(), shapesModel);
 		
 		// Run the validator
-		Model results = new ModelConstraintValidator().validateModel(dataset, shapesGraphURI, null, true, null, null);
+		Model results = new ModelConstraintValidator().validateModel(dataset, shapesGraphURI, null, true, null, null).getModel();
 		
 		// Print violations
 		System.out.println(ModelPrinter.get().print(results));

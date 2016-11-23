@@ -118,8 +118,8 @@ public class HasShapeFunction extends AbstractFunction3 {
 
 
 	private Model doRun(RDFNode resource, Resource shape, Dataset dataset) {
-		Model local = JenaUtil.createMemoryModel();
+		Resource local = JenaUtil.createMemoryModel().createResource(SH.ValidationReport);
 		return new NodeConstraintValidator(local).validateNodeAgainstShape(
-				dataset, shapesGraph.get(), resource.asNode(), shape.asNode(), null, null, null, null);
+				dataset, shapesGraph.get(), resource.asNode(), shape.asNode(), null, null, null, null).getModel();
 	}
 }

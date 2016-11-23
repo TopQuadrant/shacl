@@ -18,6 +18,10 @@
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
+  dash:expectedResult [
+      rdf:type sh:ValidationReport ;
+      sh:conforms "true"^^xsd:boolean ;
+    ] ;
 .
 ex:TestShape
   rdf:type sh:Shape ;

@@ -18,11 +18,15 @@
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
   dash:expectedResult [
-      rdf:type sh:ValidationResult ;
-      sh:focusNode ex:InvalidMalePerson ;
-      sh:resultPath ex:gender ;
-      sh:resultSeverity sh:Violation ;
-      sh:sourceConstraintComponent sh:HasValueConstraintComponent ;
+      rdf:type sh:ValidationReport ;
+      sh:conforms "false"^^xsd:boolean ;
+      sh:result [
+          rdf:type sh:ValidationResult ;
+          sh:focusNode ex:InvalidMalePerson ;
+          sh:resultPath ex:gender ;
+          sh:resultSeverity sh:Violation ;
+          sh:sourceConstraintComponent sh:HasValueConstraintComponent ;
+        ] ;
     ] ;
 .
 ex:InvalidMalePerson

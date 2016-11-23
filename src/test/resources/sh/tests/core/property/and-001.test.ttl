@@ -44,28 +44,32 @@ ex:AddressShape
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
   dash:expectedResult [
-      rdf:type sh:ValidationResult ;
-      sh:focusNode ex:InvalidResource1 ;
-      sh:resultPath ex:address ;
-      sh:resultSeverity sh:Violation ;
-      sh:sourceConstraintComponent sh:AndConstraintComponent ;
-      sh:value _:b61065 ;
-    ] ;
-  dash:expectedResult [
-      rdf:type sh:ValidationResult ;
-      sh:focusNode ex:InvalidResource2 ;
-      sh:resultPath ex:address ;
-      sh:resultSeverity sh:Violation ;
-      sh:sourceConstraintComponent sh:AndConstraintComponent ;
-      sh:value _:b31477 ;
-    ] ;
-  dash:expectedResult [
-      rdf:type sh:ValidationResult ;
-      sh:focusNode ex:InvalidResource3 ;
-      sh:resultPath ex:address ;
-      sh:resultSeverity sh:Violation ;
-      sh:sourceConstraintComponent sh:AndConstraintComponent ;
-      sh:value _:b94057 ;
+      rdf:type sh:ValidationReport ;
+      sh:conforms "false"^^xsd:boolean ;
+      sh:result [
+          rdf:type sh:ValidationResult ;
+          sh:focusNode ex:InvalidResource1 ;
+          sh:resultPath ex:address ;
+          sh:resultSeverity sh:Violation ;
+          sh:sourceConstraintComponent sh:AndConstraintComponent ;
+          sh:value _:b61065 ;
+        ] ;
+      sh:result [
+          rdf:type sh:ValidationResult ;
+          sh:focusNode ex:InvalidResource2 ;
+          sh:resultPath ex:address ;
+          sh:resultSeverity sh:Violation ;
+          sh:sourceConstraintComponent sh:AndConstraintComponent ;
+          sh:value _:b31477 ;
+        ] ;
+      sh:result [
+          rdf:type sh:ValidationResult ;
+          sh:focusNode ex:InvalidResource3 ;
+          sh:resultPath ex:address ;
+          sh:resultSeverity sh:Violation ;
+          sh:sourceConstraintComponent sh:AndConstraintComponent ;
+          sh:value _:b94057 ;
+        ] ;
     ] ;
 .
 ex:InvalidResource1

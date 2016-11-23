@@ -1,6 +1,6 @@
 package org.topbraid.shacl.constraints;
 
-import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
 
 /**
  * Base class for ResourceConstraintValidator and ModelConstraintValidator.
@@ -9,10 +9,10 @@ import org.apache.jena.rdf.model.Model;
  */
 public class AbstractConstraintValidator {
 	
-	protected Model resultsModel;
+	protected Resource report;
 	
 	
-	protected AbstractConstraintValidator(Model resultsModel) {
-		this.resultsModel = resultsModel;
+	protected AbstractConstraintValidator(Resource report) {
+		this.report = report;
 	}
 }

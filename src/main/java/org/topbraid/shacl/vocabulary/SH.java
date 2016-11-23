@@ -75,6 +75,8 @@ public class SH {
     
     public final static Resource Target = ResourceFactory.createResource(NS + "Target");
     
+    public final static Resource ValidationReport = ResourceFactory.createResource(NS + "ValidationReport");
+    
     public final static Resource ValidationResult = ResourceFactory.createResource(NS + "ValidationResult");
     
     public final static Resource Validator = ResourceFactory.createResource(NS + "Validator");
@@ -91,6 +93,8 @@ public class SH {
     public final static Property ask = ResourceFactory.createProperty(NS + "ask");
 
     public final static Property class_ = ResourceFactory.createProperty(NS + "class");
+
+    public final static Property conforms = ResourceFactory.createProperty(NS + "conforms");
 
     public final static Property construct = ResourceFactory.createProperty(NS + "construct");
 
@@ -165,6 +169,8 @@ public class SH {
     public final static Property property = ResourceFactory.createProperty(NS + "property");
 
     public final static Property propertyValidator = ResourceFactory.createProperty(NS + "propertyValidator");
+
+    public final static Property result = ResourceFactory.createProperty(NS + "result");
 
     public final static Property resultMessage = ResourceFactory.createProperty(NS + "resultMessage");
 

@@ -19,18 +19,22 @@
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
   dash:expectedResult [
-      rdf:type sh:ValidationResult ;
-      sh:focusNode rdfs:Resource ;
-      sh:resultSeverity sh:Violation ;
-      sh:sourceConstraintComponent sh:DatatypeConstraintComponent ;
-      sh:value rdfs:Resource ;
-    ] ;
-  dash:expectedResult [
-      rdf:type sh:ValidationResult ;
-      sh:focusNode "String" ;
-      sh:resultSeverity sh:Violation ;
-      sh:sourceConstraintComponent sh:DatatypeConstraintComponent ;
-      sh:value "String" ;
+      rdf:type sh:ValidationReport ;
+      sh:conforms "false"^^xsd:boolean ;
+      sh:result [
+          rdf:type sh:ValidationResult ;
+          sh:focusNode rdfs:Resource ;
+          sh:resultSeverity sh:Violation ;
+          sh:sourceConstraintComponent sh:DatatypeConstraintComponent ;
+          sh:value rdfs:Resource ;
+        ] ;
+      sh:result [
+          rdf:type sh:ValidationResult ;
+          sh:focusNode "String" ;
+          sh:resultSeverity sh:Violation ;
+          sh:sourceConstraintComponent sh:DatatypeConstraintComponent ;
+          sh:value "String" ;
+        ] ;
     ] ;
 .
 ex:InvalidResource1

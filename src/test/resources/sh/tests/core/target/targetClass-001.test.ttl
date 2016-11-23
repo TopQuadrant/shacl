@@ -19,11 +19,15 @@
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
   dash:expectedResult [
-      rdf:type sh:ValidationResult ;
-      sh:focusNode ex:InvalidInstance1 ;
-      sh:resultPath ex:myProperty ;
-      sh:resultSeverity sh:Violation ;
-      sh:sourceConstraintComponent sh:MaxCountConstraintComponent ;
+      rdf:type sh:ValidationReport ;
+      sh:conforms "false"^^xsd:boolean ;
+      sh:result [
+          rdf:type sh:ValidationResult ;
+          sh:focusNode ex:InvalidInstance1 ;
+          sh:resultPath ex:myProperty ;
+          sh:resultSeverity sh:Violation ;
+          sh:sourceConstraintComponent sh:MaxCountConstraintComponent ;
+        ] ;
     ] ;
 .
 ex:InvalidInstance1

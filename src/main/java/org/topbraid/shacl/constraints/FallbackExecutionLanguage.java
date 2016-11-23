@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.topbraid.shacl.model.SHParameterizableTarget;
@@ -38,8 +37,9 @@ public class FallbackExecutionLanguage implements ExecutionLanguage {
 	@Override
 	public boolean executeConstraint(Dataset dataset, Resource shape,
 			URI shapesGraphURI, ConstraintExecutable executable,
-			RDFNode focusNode, Model results, Function<RDFNode,String> labelFunction, List<Resource> resultsList) {
-		Resource result = results.createResource(DASH.FailureResult);
+			RDFNode focusNode, Resource report, Function<RDFNode,String> labelFunction, List<Resource> resultsList) {
+		Resource result = report.getModel().createResource(DASH.FailureResult);
+		report.addProperty(SH.result, result);
 		result.addProperty(SH.resultMessage, "No suitable validator found for constraint");
 		result.addProperty(SH.sourceConstraint, executable.getConstraint());
 		result.addProperty(SH.sourceShape, shape);

@@ -124,7 +124,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 
 	@Override
 	public boolean executeConstraint(Dataset dataset, Resource shape, URI shapesGraphURI,
-			ConstraintExecutable executable, RDFNode focusNode, Model results,
+			ConstraintExecutable executable, RDFNode focusNode, Resource report,
 			Function<RDFNode,String> labelFunction, List<Resource> resultsList) {
 		
 		if(executable.getConstraint().isDeactivated()) {
@@ -193,7 +193,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		
 		int violationCount;
 		try {
-			violationCount = executeSelectQuery(results, nestedResults, constraint, shape, focusNode, executable, qexec, labelFunction, resultsList);
+			violationCount = executeSelectQuery(report, nestedResults, constraint, shape, focusNode, executable, qexec, labelFunction, resultsList);
 		}
 		finally {
 			HasShapeFunction.setShapesGraph(oldShapesGraphURI);
@@ -243,11 +243,19 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 	}
 	
 
-	private static int executeSelectQuery(Model results, Model nestedResults, SHConstraint constraint, Resource shape,
+	private static int executeSelectQuery(Resource report, Model nestedResults, SHConstraint constraint, Resource shape,
 			RDFNode focusNode, ConstraintExecutable executable,
 			QueryExecution qexec, Function<RDFNode,String> labelFunction, List<Resource> resultsList) {
+		
+		Model results = report.getModel();
 	
 		ResultSet rs = qexec.execSelect();
+		
+		if(!rs.getResultVars().contains("this")) {
+			qexec.close();
+			throw new IllegalArgumentException("SELECT constraints must return $this");
+		}
+		
 		int violationCount = 0;
 		try {
 			List<Literal> defaultMessages = executable.getMessages();
@@ -280,6 +288,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 						}
 						
 						Resource result = results.createResource(resultType);
+						report.addProperty(SH.result, result);
 						result.addProperty(SH.resultSeverity, severity);
 						result.addProperty(SH.sourceConstraint, constraint);
 						result.addProperty(SH.sourceShape, shape);

@@ -114,18 +114,6 @@ public class ComponentConstraintExecutable extends ConstraintExecutable {
 	}
 
 
-	@Override
-	public Resource getSeverity() {
-		Resource override = JenaUtil.getResourceProperty(constraint, SH.severity);
-		if(override != null) {
-			return override;
-		}
-		else {
-			return super.getSeverity();
-		}
-	}
-
-
 	public Resource getValidator() {
 		
 		Property predicate = SH.PropertyConstraint.equals(context) ? SH.propertyValidator : SH.shapeValidator;

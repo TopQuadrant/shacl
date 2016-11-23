@@ -19,20 +19,24 @@
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
   dash:expectedResult [
-      rdf:type sh:ValidationResult ;
-      sh:focusNode ex:InvalidResource1 ;
-      sh:resultPath ex:property ;
-      sh:resultSeverity sh:Violation ;
-      sh:sourceConstraintComponent sh:MaxInclusiveConstraintComponent ;
-      sh:value 2 ;
-    ] ;
-  dash:expectedResult [
-      rdf:type sh:ValidationResult ;
-      sh:focusNode ex:InvalidResource2 ;
-      sh:resultPath ex:property ;
-      sh:resultSeverity sh:Violation ;
-      sh:sourceConstraintComponent sh:MaxInclusiveConstraintComponent ;
-      sh:value "a" ;
+      rdf:type sh:ValidationReport ;
+      sh:conforms "false"^^xsd:boolean ;
+      sh:result [
+          rdf:type sh:ValidationResult ;
+          sh:focusNode ex:InvalidResource1 ;
+          sh:resultPath ex:property ;
+          sh:resultSeverity sh:Violation ;
+          sh:sourceConstraintComponent sh:MaxInclusiveConstraintComponent ;
+          sh:value 2 ;
+        ] ;
+      sh:result [
+          rdf:type sh:ValidationResult ;
+          sh:focusNode ex:InvalidResource2 ;
+          sh:resultPath ex:property ;
+          sh:resultSeverity sh:Violation ;
+          sh:sourceConstraintComponent sh:MaxInclusiveConstraintComponent ;
+          sh:value "a" ;
+        ] ;
     ] ;
 .
 ex:InvalidResource1

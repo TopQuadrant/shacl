@@ -80,7 +80,8 @@ public class GraphValidationTestCaseType implements TestCaseType {
 			Dataset dataset = ARQFactory.get().getDataset(dataModel);
 			URI shapesGraphURI = SHACLUtil.withShapesGraph(dataset);
 
-			Model actualResults = new ModelConstraintValidator().validateModel(dataset, shapesGraphURI, null, true, null, null);
+			Resource actualReport = new ModelConstraintValidator().validateModel(dataset, shapesGraphURI, null, true, null, null);
+			Model actualResults = actualReport.getModel();
 			if(getResource().hasProperty(DASH.includeSuggestions, JenaDatatypes.TRUE)) {
 				Model shapesModel = dataset.getNamedModel(shapesGraphURI.toString());
 				addSuggestions(dataModel, shapesModel, actualResults);
@@ -91,27 +92,31 @@ public class GraphValidationTestCaseType implements TestCaseType {
 			for(Property ignoredProperty : IGNORED_PROPERTIES) {
 				actualResults.removeAll(null, ignoredProperty, (RDFNode)null);
 			}
-			Model expected = JenaUtil.createDefaultModel();
-			for(Statement s : getResource().listProperties(DASH.expectedResult).toList()) {
+			Model expectedModel = JenaUtil.createDefaultModel();
+			Resource expectedReport = getResource().getPropertyResourceValue(DASH.expectedResult);
+			for(Statement s : expectedReport.listProperties().toList()) {
+				expectedModel.add(s);
+			}
+			for(Statement s : expectedReport.listProperties(SH.result).toList()) {
 				for(Statement t : s.getResource().listProperties().toList()) {
 					if(t.getPredicate().equals(DASH.suggestion)) {
-						addStatements(expected, t);
+						addStatements(expectedModel, t);
 					}
 					else if(SH.resultPath.equals(t.getPredicate())) {
-						expected.add(t.getSubject(), t.getPredicate(),
-								SHACLPaths.clonePath(t.getResource(), expected));
+						expectedModel.add(t.getSubject(), t.getPredicate(),
+								SHACLPaths.clonePath(t.getResource(), expectedModel));
 					}
 					else {
-						expected.add(t);
+						expectedModel.add(t);
 					}
 				}
 			}
-			if(expected.getGraph().isIsomorphicWith(actualResults.getGraph())) {
+			if(expectedModel.getGraph().isIsomorphicWith(actualResults.getGraph())) {
 				createResult(results, DASH.SuccessTestCaseResult);
 			}
 			else {
 				createFailure(results, 
-						"Mismatching validation results. Expected " + expected.size() + " triples, found " + actualResults.size());
+						"Mismatching validation results. Expected " + expectedModel.size() + " triples, found " + actualResults.size());
 			}
 		}
 	}

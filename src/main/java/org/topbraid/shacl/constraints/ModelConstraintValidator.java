@@ -22,6 +22,7 @@ import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.progress.ProgressMonitor;
 import org.topbraid.spin.system.SPINLabels;
+import org.topbraid.spin.util.JenaDatatypes;
 import org.topbraid.spin.util.JenaUtil;
 
 /**
@@ -37,7 +38,7 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 	public static final String FILTER_VAR_NAME = "FILTER_SHAPE";
 
 	public ModelConstraintValidator() {
-		super(JenaUtil.createMemoryModel());
+		super(JenaUtil.createMemoryModel().createResource(SH.ValidationReport));
 	}
 	
 	
@@ -49,9 +50,9 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 	 * @param minSeverity  the minimum severity, e.g. sh:Error or null for all
 	 * @param validateShapes  true to also check schema-level resources (sh:parameter etc)
 	 * @param monitor  an optional ProgressMonitor
-	 * @return a Model containing violation results - empty if OK
+	 * @return an instance of sh:ValidationReport in the results Model
 	 */
-	public Model validateModel(Dataset dataset, URI shapesGraphURI, Resource minSeverity, boolean validateShapes, Function<RDFNode,String> labelFunction, ProgressMonitor monitor) throws InterruptedException {
+	public Resource validateModel(Dataset dataset, URI shapesGraphURI, Resource minSeverity, boolean validateShapes, Function<RDFNode,String> labelFunction, ProgressMonitor monitor) throws InterruptedException {
 		
 		if(dataset.getDefaultModel() == null) {
 			throw new IllegalArgumentException("Dataset requires a default model");
@@ -73,10 +74,11 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 			monitor.beginTask("Validating constraints for " + map.size() + " shapes...", map.size());
 		}
 		
-		resultsModel.setNsPrefixes(dataset.getDefaultModel());
+		report.getModel().setNsPrefixes(dataset.getDefaultModel());
+		boolean violations = false;
 		for(Resource shape : map.keySet()) {
 			for(SHConstraint constraint : map.get(shape)) {
-				validateConstraintForShape(dataset, shapesGraphURI, minSeverity, constraint, shape, labelFunction, monitor);
+				violations |= validateConstraintForShape(dataset, shapesGraphURI, minSeverity, constraint, shape, labelFunction, monitor);
 				if(monitor != null) {
 					monitor.worked(1);
 					if(monitor.isCanceled()) {
@@ -86,7 +88,9 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 			}
 		}
 		
-		return resultsModel;
+		report.addProperty(SH.conforms, violations ? JenaDatatypes.FALSE : JenaDatatypes.TRUE);
+		
+		return report;
 	}
 	
 	
@@ -181,7 +185,8 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 	}
 	
 	
-	private void validateConstraintForShape(Dataset dataset, URI shapesGraphURI, Resource minSeverity, SHConstraint constraint, Resource shape, Function<RDFNode,String> labelFunction, ProgressMonitor monitor) {
+	private boolean validateConstraintForShape(Dataset dataset, URI shapesGraphURI, Resource minSeverity, SHConstraint constraint, Resource shape, Function<RDFNode,String> labelFunction, ProgressMonitor monitor) {
+		boolean violations = false;
 		for(ConstraintExecutable executable : constraint.getExecutables()) {
 			Resource severity = executable.getSeverity();
 			if(SHACLUtil.hasMinSeverity(severity, minSeverity)) {
@@ -189,8 +194,9 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 					monitor.subTask("Validating Shape " + SPINLabels.get().getLabel(shape));
 				}
 				ExecutionLanguage lang = ExecutionLanguageSelector.get().getLanguageForConstraint(executable);
-				lang.executeConstraint(dataset, shape, shapesGraphURI, executable, null, resultsModel, labelFunction, new LinkedList<Resource>());
+				violations |= lang.executeConstraint(dataset, shape, shapesGraphURI, executable, null, report, labelFunction, new LinkedList<Resource>());
 			}
 		}
+		return violations;
 	}
 }

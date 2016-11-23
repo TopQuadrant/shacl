@@ -23,12 +23,16 @@ ex:Anon
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
   dash:expectedResult [
-      rdf:type sh:ValidationResult ;
-      sh:focusNode ex:Issue_1 ;
-      sh:resultPath ex:assignedTo ;
-      sh:resultSeverity sh:Violation ;
-      sh:sourceConstraintComponent sh:ShapeConstraintComponent ;
-      sh:value ex:Anon ;
+      rdf:type sh:ValidationReport ;
+      sh:conforms "false"^^xsd:boolean ;
+      sh:result [
+          rdf:type sh:ValidationResult ;
+          sh:focusNode ex:Issue_1 ;
+          sh:resultPath ex:assignedTo ;
+          sh:resultSeverity sh:Violation ;
+          sh:sourceConstraintComponent sh:ShapeConstraintComponent ;
+          sh:value ex:Anon ;
+        ] ;
     ] ;
 .
 ex:Issue

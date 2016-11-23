@@ -460,8 +460,8 @@ dash:ValidationTestCase
   rdfs:subClassOf dash:TestCase ;
   sh:property [
       sh:predicate dash:expectedResult ;
-      sh:class sh:AbstractResult ;
-      sh:description "The expected validation results." ;
+      sh:class sh:ValidationReport ;
+      sh:description "The expected validation report." ;
       sh:name "expected result" ;
     ] ;
 .

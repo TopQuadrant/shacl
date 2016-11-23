@@ -36,11 +36,11 @@ import org.topbraid.spin.util.JenaUtil;
 public class NodeConstraintValidator extends AbstractConstraintValidator {
 	
 	public NodeConstraintValidator() {
-		this(JenaUtil.createMemoryModel());
+		this(JenaUtil.createMemoryModel().createResource(SH.ValidationReport));
 	}
 	
-	public NodeConstraintValidator(Model resultsModel) {
-		super(resultsModel);
+	public NodeConstraintValidator(Resource report) {
+		super(report);
 	}
 
 
@@ -103,9 +103,9 @@ public class NodeConstraintValidator extends AbstractConstraintValidator {
 	 * @param minSeverity  the minimum severity level or null for all constraints
 	 * @param constraintFilter  a filter that all SHACLConstraints must pass, or null for all constraints
 	 * @param monitor  an optional progress monitor
-	 * @return a Model with constraint violations
+	 * @return an instance of sh:ValidationReport in the results Model
 	 */
-	public Model validateNode(Dataset dataset, URI shapesGraphURI, Node focusNode, Resource minSeverity, Predicate<SHConstraint> constraintFilter, Function<RDFNode,String> labelFunction, boolean validateShapes, ProgressMonitor monitor) throws InterruptedException {
+	public Resource validateNode(Dataset dataset, URI shapesGraphURI, Node focusNode, Resource minSeverity, Predicate<SHConstraint> constraintFilter, Function<RDFNode,String> labelFunction, boolean validateShapes, ProgressMonitor monitor) throws InterruptedException {
 		
 		Model shapesModel = dataset.getNamedModel(shapesGraphURI.toString());
 		
@@ -120,7 +120,7 @@ public class NodeConstraintValidator extends AbstractConstraintValidator {
 			addResourceViolations(dataset, shapesGraphURI, focusNode, shape.asNode(), properties, minSeverity, constraintFilter, labelFunction, monitor);
 		}
 		
-		return resultsModel;
+		return report;
 	}
 
 	
@@ -134,11 +134,11 @@ public class NodeConstraintValidator extends AbstractConstraintValidator {
 	 * @param constraintFilter  a filter that all SHACLConstraints must pass, or null for all constraints
 	 * @param labelFunction  an optional function used to insert resource labels into message templates
 	 * @param monitor  an optional progress monitor
-	 * @return a Model with constraint violations
+	 * @return an instance of sh:ValidationReport in the results Model
 	 */
-	public Model validateNodeAgainstShape(Dataset dataset, URI shapesGraphURI, Node focusNode, Node shape, Resource minSeverity, Predicate<SHConstraint> constraintFilter, Function<RDFNode,String> labelFunction, ProgressMonitor monitor) {
+	public Resource validateNodeAgainstShape(Dataset dataset, URI shapesGraphURI, Node focusNode, Node shape, Resource minSeverity, Predicate<SHConstraint> constraintFilter, Function<RDFNode,String> labelFunction, ProgressMonitor monitor) {
 		addResourceViolations(dataset, shapesGraphURI, focusNode, shape, SHACLUtil.getAllConstraintProperties(true), minSeverity, constraintFilter, labelFunction, monitor);
-		return resultsModel;
+		return report;
 	}
 
 
@@ -158,7 +158,7 @@ public class NodeConstraintValidator extends AbstractConstraintValidator {
 			Resource severity = executable.getSeverity();
 			if(SHACLUtil.hasMinSeverity(severity, minSeverity)) {
 				ExecutionLanguage lang = ExecutionLanguageSelector.get().getLanguageForConstraint(executable);
-				violations |= lang.executeConstraint(dataset, shape, shapesGraphURI, executable, focusNode, resultsModel, labelFunction, resultsList);
+				violations |= lang.executeConstraint(dataset, shape, shapesGraphURI, executable, focusNode, report, labelFunction, resultsList);
 			}
 		}
 		return violations;
@@ -202,7 +202,8 @@ public class NodeConstraintValidator extends AbstractConstraintValidator {
 		}
 		
 		if(SPARQLExecutionLanguage.createDetails) {
-			Resource result = resultsModel.createResource(violations ? SH.ValidationResult : DASH.SuccessResult);
+			Resource result = report.getModel().createResource(violations ? SH.ValidationResult : DASH.SuccessResult);
+			report.addProperty(SH.result, result);
 			result.addProperty(SH.focusNode, focusRDFNode);
 			result.addProperty(SH.sourceShape, shape);
 			result.addProperty(SH.sourceConstraint, shape);

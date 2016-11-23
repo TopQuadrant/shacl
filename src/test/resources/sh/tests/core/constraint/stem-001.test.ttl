@@ -19,18 +19,22 @@
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
   dash:expectedResult [
-      rdf:type sh:ValidationResult ;
-      sh:focusNode <http://example.org> ;
-      sh:resultSeverity sh:Violation ;
-      sh:sourceConstraintComponent sh:StemConstraintComponent ;
-      sh:value <http://example.org> ;
-    ] ;
-  dash:expectedResult [
-      rdf:type sh:ValidationResult ;
-      sh:focusNode "http://example.org/A" ;
-      sh:resultSeverity sh:Violation ;
-      sh:sourceConstraintComponent sh:StemConstraintComponent ;
-      sh:value "http://example.org/A" ;
+      rdf:type sh:ValidationReport ;
+      sh:conforms "false"^^xsd:boolean ;
+      sh:result [
+          rdf:type sh:ValidationResult ;
+          sh:focusNode <http://example.org> ;
+          sh:resultSeverity sh:Violation ;
+          sh:sourceConstraintComponent sh:StemConstraintComponent ;
+          sh:value <http://example.org> ;
+        ] ;
+      sh:result [
+          rdf:type sh:ValidationResult ;
+          sh:focusNode "http://example.org/A" ;
+          sh:resultSeverity sh:Violation ;
+          sh:sourceConstraintComponent sh:StemConstraintComponent ;
+          sh:value "http://example.org/A" ;
+        ] ;
     ] ;
 .
 ex:ShapeWithStem

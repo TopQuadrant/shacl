@@ -19,25 +19,29 @@
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
   dash:expectedResult [
-      rdf:type sh:ValidationResult ;
-      sh:focusNode ex:InvalidInstance1 ;
-      sh:resultPath ex:testProperty ;
-      sh:resultSeverity sh:Violation ;
-      sh:sourceConstraintComponent sh:UniqueLangConstraintComponent ;
-    ] ;
-  dash:expectedResult [
-      rdf:type sh:ValidationResult ;
-      sh:focusNode ex:InvalidInstance2 ;
-      sh:resultPath ex:testProperty ;
-      sh:resultSeverity sh:Violation ;
-      sh:sourceConstraintComponent sh:UniqueLangConstraintComponent ;
-    ] ;
-  dash:expectedResult [
-      rdf:type sh:ValidationResult ;
-      sh:focusNode ex:InvalidInstance2 ;
-      sh:resultPath ex:testProperty ;
-      sh:resultSeverity sh:Violation ;
-      sh:sourceConstraintComponent sh:UniqueLangConstraintComponent ;
+      rdf:type sh:ValidationReport ;
+      sh:conforms "false"^^xsd:boolean ;
+      sh:result [
+          rdf:type sh:ValidationResult ;
+          sh:focusNode ex:InvalidInstance1 ;
+          sh:resultPath ex:testProperty ;
+          sh:resultSeverity sh:Violation ;
+          sh:sourceConstraintComponent sh:UniqueLangConstraintComponent ;
+        ] ;
+      sh:result [
+          rdf:type sh:ValidationResult ;
+          sh:focusNode ex:InvalidInstance2 ;
+          sh:resultPath ex:testProperty ;
+          sh:resultSeverity sh:Violation ;
+          sh:sourceConstraintComponent sh:UniqueLangConstraintComponent ;
+        ] ;
+      sh:result [
+          rdf:type sh:ValidationResult ;
+          sh:focusNode ex:InvalidInstance2 ;
+          sh:resultPath ex:testProperty ;
+          sh:resultSeverity sh:Violation ;
+          sh:sourceConstraintComponent sh:UniqueLangConstraintComponent ;
+        ] ;
     ] ;
 .
 ex:InvalidInstance1
