@@ -28,6 +28,8 @@ public class SPIN {
 	public final static String PREFIX = "spin";
 	
 	
+	public final static String INVERSE_OBJECT_VAR_NAME = "object";
+	
 	public final static String THIS_VAR_NAME = "this";
 
 
@@ -115,6 +117,8 @@ public class SPIN {
 	public final static Property fix = ResourceFactory.createProperty(NS + "fix");
 
 	public final static Property imports = ResourceFactory.createProperty(NS + "imports");
+	
+	public final static Property inverseBody = ResourceFactory.createProperty(NS + "inverseBody");
 
 	public final static Property labelTemplate = ResourceFactory.createProperty(NS + "labelTemplate");
 

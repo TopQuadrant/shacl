@@ -112,7 +112,11 @@ public class SH {
 
     public final static Property description = ResourceFactory.createProperty(NS + "description");
 
+    public final static Property disjoint = ResourceFactory.createProperty(NS + "disjoint");
+
     public final static Property entailment = ResourceFactory.createProperty(NS + "entailment");
+
+    public final static Property equals = ResourceFactory.createProperty(NS + "equals");
 
     public final static Property focusNode = ResourceFactory.createProperty(NS + "focusNode");
 
@@ -124,11 +128,17 @@ public class SH {
 
     public final static Property labelTemplate = ResourceFactory.createProperty(NS + "labelTemplate");
 
+    public final static Property lessThan = ResourceFactory.createProperty(NS + "lessThan");
+
+    public final static Property lessThanOrEquals = ResourceFactory.createProperty(NS + "lessThanOrEquals");
+
     public final static Property maxCount = ResourceFactory.createProperty(NS + "maxCount");
 
     public final static Property maxExclusive = ResourceFactory.createProperty(NS + "maxExclusive");
 
     public final static Property maxInclusive = ResourceFactory.createProperty(NS + "maxInclusive");
+
+    public final static Property maxLength = ResourceFactory.createProperty(NS + "maxLength");
 
     public final static Property member = ResourceFactory.createProperty(NS + "member");
 
@@ -139,6 +149,8 @@ public class SH {
     public final static Property minExclusive = ResourceFactory.createProperty(NS + "minExclusive");
 
     public final static Property minInclusive = ResourceFactory.createProperty(NS + "minInclusive");
+
+    public final static Property minLength = ResourceFactory.createProperty(NS + "minLength");
 
     public final static Property name = ResourceFactory.createProperty(NS + "name");
 
@@ -159,6 +171,8 @@ public class SH {
     public final static Property parameter = ResourceFactory.createProperty(NS + "parameter");
 
     public final static Property path = ResourceFactory.createProperty(NS + "path");
+
+    public final static Property pattern = ResourceFactory.createProperty(NS + "pattern");
 
     public final static Property predicate = ResourceFactory.createProperty(NS + "predicate");
 
@@ -207,6 +221,8 @@ public class SH {
     public final static Property targetObjectsOf = ResourceFactory.createProperty(NS + "targetObjectsOf");
     
     public final static Property targetSubjectsOf = ResourceFactory.createProperty(NS + "targetSubjectsOf");
+
+    public final static Property uniqueLang = ResourceFactory.createProperty(NS + "uniqueLang");
 
     public final static Property update = ResourceFactory.createProperty(NS + "update");
 

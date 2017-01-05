@@ -4,11 +4,14 @@
  *******************************************************************************/
 package org.topbraid.spin.system;
 
+import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.topbraid.spin.util.JenaUtil;
 
@@ -77,6 +80,19 @@ public class SPINLabels {
 			else {
 				return "<" + resource.getURI() + ">";
 			}
+		}
+		else if(resource.isAnon() && resource.getModel() != null && resource.hasProperty(RDF.first)) {
+			StringBuffer buffer = new StringBuffer("[");
+			Iterator<RDFNode> members = resource.as(RDFList.class).iterator();
+			while(members.hasNext()) {
+				RDFNode member = members.next();
+				buffer.append(SPINLabels.get().getNodeLabel(member));
+				if(members.hasNext()) {
+					buffer.append(", ");
+				}
+			}
+			buffer.append("]");
+			return buffer.toString();
 		}
 		else {
 			return resource.toString();

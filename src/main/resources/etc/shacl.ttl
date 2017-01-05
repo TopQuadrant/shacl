@@ -1,5 +1,5 @@
 # W3C Shapes Constraint Language (SHACL) Vocabulary
-# Draft last edited 2016-11-21
+# Draft last edited 2017-01-05
 
 @prefix owl:  <http://www.w3.org/2002/07/owl#> .
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -1106,27 +1106,6 @@ sh:pattern
 	a rdf:Property ;
 	rdfs:label "pattern"@en ;
 	rdfs:comment "Specifies a regular expression pattern that the string representations of the value nodes must match."@en ;
-	rdfs:range xsd:string ;
-	rdfs:isDefinedBy sh: .
-
-
-sh:StemConstraintComponent
-	a sh:ConstraintComponent ;
-	rdfs:label "Stem constraint component"@en ;
-	rdfs:comment "A constraint component that can be used to verify that every value node is an IRI and the IRI starts with a given string value."@en ;
-	sh:parameter sh:StemConstraintComponent-stem ;
-	rdfs:isDefinedBy sh: .
-
-sh:StemConstraintComponent-stem
-	a sh:Parameter ;
-	sh:predicate sh:stem ;
-	sh:datatype xsd:string ;
-	rdfs:isDefinedBy sh: .
-
-sh:stem
-	a rdf:Property ;
-	rdfs:label "stem"@en ;
-	rdfs:comment "Specifies a string value that the IRI of the value nodes must start with."@en ;
 	rdfs:range xsd:string ;
 	rdfs:isDefinedBy sh: .
 

@@ -8,33 +8,38 @@ import java.util.List;
 
 import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.atlas.json.JsonObject;
-import org.topbraid.shacl.vocabulary.DASH;
-import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.arq.ARQFactory;
-import org.topbraid.spin.util.ExceptionUtil;
-import org.topbraid.spin.util.JenaUtil;
-
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
+import org.topbraid.shacl.vocabulary.DASH;
+import org.topbraid.shacl.vocabulary.SH;
+import org.topbraid.spin.arq.ARQFactory;
+import org.topbraid.spin.arq.SPINThreadFunctionRegistry;
+import org.topbraid.spin.arq.SPINThreadFunctions;
+import org.topbraid.spin.util.ExceptionUtil;
+import org.topbraid.spin.util.JenaUtil;
 
 public class QueryTestCaseType implements TestCaseType {
 
 	public static String createResultSetJSON(String queryString, Model model) {
-		Query query = ARQFactory.get().createQuery(model, queryString);
-		QueryExecution qexec = ARQFactory.get().createQueryExecution(query, model);
-		ResultSet actualResults = qexec.execSelect();
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		ResultSetFormatter.outputAsJSON(os, actualResults);
-		qexec.close();
+		SPINThreadFunctions old = SPINThreadFunctionRegistry.register(model);
 		try {
+			Query query = ARQFactory.get().createQuery(model, queryString);
+			QueryExecution qexec = ARQFactory.get().createQueryExecution(query, model);
+			ResultSet actualResults = qexec.execSelect();
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			ResultSetFormatter.outputAsJSON(os, actualResults);
+			qexec.close();
 			return os.toString("UTF-8");
 		} 
 		catch (UnsupportedEncodingException e) {
 			throw ExceptionUtil.throwUnchecked(e);
+		}
+		finally {
+			SPINThreadFunctionRegistry.unregister(old);
 		}
 	}
 

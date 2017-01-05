@@ -42,7 +42,7 @@ public class TargetContainsPFunction extends PropertyFunctionBase {
 		argObject = Substitute.substitute(argObject, binding);
 		
 		if(!argObject.getArg().isVariable()) {
-			throw new ExprEvalException("Right hand side " + URI + " must be a variable");
+			throw new ExprEvalException("Right hand side of " + URI + " must be a variable");
 		}
 		
 		Node targetNode = argSubject.getArgList().get(0);

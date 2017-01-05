@@ -84,6 +84,34 @@ WHERE {
     ?this ?anyP ?anyO .
 }""" ;
 .
+dash:ClosedByTypesConstraintComponent
+  rdf:type sh:ConstraintComponent ;
+  rdfs:comment "A constraint component that can be used to declare that focus nodes are \"closed\" based on their rdf:types, meaning that focus nodes may only have values for the properties that are explicitly enumerated via sh:property/sh:predicate in property constraints at their rdf:types and the superclasses of those. This assumes that the type classes are also shapes." ;
+  rdfs:label "Closed by types constraint component" ;
+  sh:parameter [
+      sh:predicate dash:closedByTypes ;
+      sh:datatype xsd:boolean ;
+      sh:description "True to indicate that the focus nodes are closed by their types. A constraint violation is reported for each property value of the focus node where the property is not among those that are explicitly declared via sh:property/sh:predicate in any of the rdf:types of the focus node (and their superclasses). The property rdf:type is always permitted." ;
+    ] ;
+  sh:shapeValidator [
+      rdf:type sh:SPARQLSelectValidator ;
+      sh:message "Property {?path} is not among those permitted for any of the types" ;
+      sh:prefixes <http://datashapes.org/dash> ;
+      sh:select """SELECT $this (?predicate AS ?path) ?value
+WHERE {
+    $this ?predicate ?value .
+	FILTER (?predicate != rdf:type) .
+	FILTER NOT EXISTS {
+		$this rdf:type ?type .
+		?type rdfs:subClassOf* ?class .
+		GRAPH $shapesGraph {
+			?class sh:property/sh:predicate ?predicate .
+		}
+	}
+}""" ;
+    ] ;
+  sh:targetClass sh:Shape ;
+.
 dash:DateOrDateTime
   rdf:type rdf:List ;
   rdf:first xsd:date ;
@@ -323,6 +351,7 @@ dash:QueryTestCase
   rdfs:comment "A test case running a given SPARQL SELECT query and comparing its results with those stored as JSON Result Set in the expected result property." ;
   rdfs:label "Query test case" ;
   rdfs:subClassOf dash:TestCase ;
+  rdfs:subClassOf sh:SPARQLSelectExecutable ;
   sh:property [
       sh:predicate dash:expectedResult ;
       sh:datatype xsd:string ;
@@ -366,6 +395,20 @@ In many cases, there may be multiple possible suggestions to fix a problem. For 
   rdfs:subClassOf dash:SuggestionGenerator ;
   rdfs:subClassOf sh:SPARQLSelectExecutable ;
   rdfs:subClassOf sh:SPARQLUpdateExecutable ;
+.
+dash:StemConstraintComponent
+  rdf:type sh:ConstraintComponent ;
+  rdfs:comment "A constraint component that can be used to verify that every value node is an IRI and the IRI starts with a given string value."@en ;
+  rdfs:label "Stem constraint component"@en ;
+  sh:parameter dash:StemConstraintComponent-stem ;
+  sh:targetClass sh:PropertyConstraint ;
+  sh:targetClass sh:Shape ;
+  sh:validator dash:hasStem ;
+.
+dash:StemConstraintComponent-stem
+  rdf:type sh:Parameter ;
+  sh:predicate dash:stem ;
+  sh:datatype xsd:string ;
 .
 dash:StringOrLangString
   rdf:type rdf:List ;
@@ -478,6 +521,10 @@ dash:addedTriple
   rdfs:domain dash:GraphUpdate ;
   rdfs:label "added triple" ;
   rdfs:range rdf:Statement ;
+.
+dash:closedByTypes
+  rdf:type rdf:Property ;
+  rdfs:label "closed by types" ;
 .
 dash:composite
   rdf:type rdf:Property ;
@@ -719,6 +766,12 @@ dash:propertySuggestionGenerator
 dash:rootClass
   rdf:type rdf:Property ;
   rdfs:label "root class" ;
+.
+dash:stem
+  rdf:type rdf:Property ;
+  rdfs:comment "Specifies a string value that the IRI of the value nodes must start with."@en ;
+  rdfs:label "stem"@en ;
+  rdfs:range xsd:string ;
 .
 dash:subSetOf
   rdf:type rdf:Property ;
@@ -1005,11 +1058,6 @@ sh:QualifiedMinCountConstraintComponent
 .
 sh:ShapeConstraintComponent
   sh:targetClass sh:PropertyConstraint ;
-.
-sh:StemConstraintComponent
-  sh:targetClass sh:PropertyConstraint ;
-  sh:targetClass sh:Shape ;
-  sh:validator dash:hasStem ;
 .
 sh:UniqueLangConstraintComponent
   sh:propertyValidator [

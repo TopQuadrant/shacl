@@ -258,18 +258,15 @@ tosh:SystemNamespaceShape
   rdfs:label "System namespace shape" ;
   sh:sparql [
       rdf:type sh:SPARQLConstraint ;
+      sh:message "Not a IRI from a system namespace" ;
       sh:prefixes <http://topbraid.org/tosh> ;
       sh:select """SELECT $this
 WHERE {
-	{
-    	FILTER (!isIRI($this)) .		
-	}
-	UNION
-	{
-    	FILTER isIRI($this) .
-		BIND (IRI(afn:namespace($this)) AS ?ns) .
-		FILTER NOT EXISTS { ?ns tosh:systemNamespace true } .
-	}
+    FILTER (!isIRI($this) ||
+			(isIRI($this) && EXISTS {
+				BIND (IRI(afn:namespace($this)) AS ?ns) .
+				FILTER NOT EXISTS { ?ns tosh:systemNamespace true } .
+			} )) .
 }""" ;
     ] ;
 .
@@ -946,11 +943,6 @@ sh:ShapeConstraintComponent-shape
   tosh:viewWidget swa:SourceCodeViewer ;
   sh:group tosh:ComplexConstraintPropertyGroup ;
   sh:order 0 ;
-.
-sh:StemConstraintComponent-stem
-  tosh:editWidget swa:PlainTextFieldEditor ;
-  sh:group tosh:StringBasedConstraintPropertyGroup ;
-  sh:order 2 ;
 .
 sh:UniqueLangConstraintComponent-uniqueLang
   sh:group tosh:StringBasedConstraintPropertyGroup ;
