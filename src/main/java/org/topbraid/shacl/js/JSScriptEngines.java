@@ -52,15 +52,16 @@ public class JSScriptEngines {
 	
 	
 	public void executeLibraries(ScriptEngine engine, SHJSExecutable exec, Set<Resource> visited, boolean doScript) throws Exception {
+		visited.add(exec);
 		for(Resource library : JenaUtil.getResourceProperties(exec, SHJS.library)) {
 			if(!visited.contains(library)) {
 				executeLibraries(engine, library.as(SHJSExecutable.class), visited, true);
 			}
-			for(Statement s : exec.listProperties(SHJS.scriptURL).toList()) {
-				if(s.getObject().isLiteral()) {
-					String url = s.getString();
-					executeScriptFromURL(engine, url);
-				}
+		}
+		for(Statement s : exec.listProperties(SHJS.scriptURL).toList()) {
+			if(s.getObject().isLiteral()) {
+				String url = s.getString();
+				executeScriptFromURL(engine, url);
 			}
 		}
 		if(doScript) {

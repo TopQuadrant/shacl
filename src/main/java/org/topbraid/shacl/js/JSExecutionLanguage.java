@@ -123,12 +123,13 @@ public class JSExecutionLanguage implements ExecutionLanguage {
 				}
 			}
 
+			Resource validator = null;
 			if(executable instanceof JSConstraintExecutable) {
 				SHJSConstraint jsc = (SHJSConstraint) executable.getConstraint();
 				script = jsc.getScript();
 			}
 			else {
-				Resource validator = ((ComponentConstraintExecutable)executable).getValidator(getExecutableType());
+				validator = ((ComponentConstraintExecutable)executable).getValidator(getExecutableType());
 				script = JenaUtil.getStringProperty(validator, SHJS.script);
 			}
 			
@@ -141,10 +142,19 @@ public class JSExecutionLanguage implements ExecutionLanguage {
 				Object resultObj;
 				engine.put("$this", JSFactory.asJSTerm(theFocusNode.asNode()));
 				
-				// TODO: Generalize for property shapes
-				engine.put("$value", JSFactory.asJSTerm(theFocusNode.asNode()));
-
+				if(validator != null) {
+					Resource component = ((ComponentConstraintExecutable)executable).getComponent();
+					Resource context = ((ComponentConstraintExecutable)executable).getContext();
+					if(SH.PropertyShape.equals(context) && component.hasProperty(SH.propertyValidator, validator)) {
+						engine.put("$path", JSFactory.asJSTerm(executable.getConstraint().getRequiredProperty(SH.path).getObject().asNode()));
+					}
+					else if(SH.NodeShape.equals(context)) {
+						engine.put("$value", JSFactory.asJSTerm(theFocusNode.asNode()));
+					}
+				}
+				
 				resultObj = invocable.invokeFunction(functionName);
+				
 				if(NashornUtil.isArray(resultObj)) {
 					for(Object ro : NashornUtil.asArray(resultObj)) {
 						Resource result = createValidationResult(report, shape, executable, theFocusNode);
@@ -211,6 +221,10 @@ public class JSExecutionLanguage implements ExecutionLanguage {
 		result.addProperty(SH.sourceConstraintComponent, SHJS.JSConstraintComponent);
 		result.addProperty(SH.sourceShape, shape);
 		result.addProperty(SH.focusNode, focusNode);
+		Resource path = JenaUtil.getResourceProperty(executable.getConstraint(), SH.path);
+		if(path != null) {
+			result.addProperty(SH.resultPath, path);
+		}
 		return result;
 	}
 
