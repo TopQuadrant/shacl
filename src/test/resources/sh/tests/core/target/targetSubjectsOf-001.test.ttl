@@ -19,9 +19,8 @@
 .
 <http://datashapes.org/sh/tests/core/target/targetSubjectsOf-001.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of sh:targetProperty 001" ;
+  rdfs:label "Test of sh:targetSubjectsOf 001" ;
   owl:imports <http://datashapes.org/dash> ;
-  owl:versionInfo "Created with TopBraid Composer" ;
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
@@ -41,9 +40,9 @@ ex:MyClass
   rdf:type rdfs:Class ;
 .
 ex:MyShape
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   sh:property [
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:maxCount 1 ;
     ] ;
   sh:targetSubjectsOf ex:myProperty ;

@@ -3,9 +3,11 @@ package org.topbraid.shacl.constraints;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.topbraid.shacl.constraints.sparql.SPARQLExecutionLanguage;
-
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
+import org.topbraid.shacl.constraints.sparql.SPARQLExecutionLanguage;
+import org.topbraid.shacl.js.JSExecutionLanguage;
+import org.topbraid.shacl.util.SHACLUtil;
 
 /**
  * Selects a suitable execution language for a given executable.
@@ -27,6 +29,8 @@ public class ExecutionLanguageSelector {
 	public ExecutionLanguageSelector() {
 		languages.add(SPARQLExecutionLanguage.get());
 		languages.add(new FallbackExecutionLanguage());
+		
+		addLanguage(new JSExecutionLanguage());
 	}
 
 	
@@ -36,6 +40,9 @@ public class ExecutionLanguageSelector {
 	 */
 	public void addLanguage(ExecutionLanguage language) {
 		languages.add(1, language);
+		if(language.getParameter() != null) {
+			SHACLUtil.addConstraintProperty(language.getParameter());
+		}
 	}
 	
 	
@@ -49,6 +56,16 @@ public class ExecutionLanguageSelector {
 	}
 	
 	
+	public ExecutionLanguage getLanguageForParameter(Property parameter) {
+		for(int i = 0; i < languages.size(); i++) {
+			if(parameter.equals(languages.get(i).getParameter())) {
+				return languages.get(i);
+			}
+		}
+		return null;
+	}
+	
+	
 	public ExecutionLanguage getLanguageForTarget(Resource executable) {
 		for(ExecutionLanguage lang : languages) {
 			if(lang.canExecuteTarget(executable)) {
@@ -56,5 +73,15 @@ public class ExecutionLanguageSelector {
 			}
 		}
 		return null;
+	}
+	
+	
+	public boolean isConstraintComponentWithLanguage(Resource cc) {
+		for(ExecutionLanguage lang : languages) {
+			if(cc.equals(lang.getConstraintComponent())) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

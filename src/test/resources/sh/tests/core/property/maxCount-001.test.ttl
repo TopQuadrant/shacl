@@ -41,9 +41,9 @@ ex:Person
   rdfs:subClassOf rdfs:Resource ;
 .
 ex:PersonShape
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   sh:property [
-      sh:predicate ex:firstName ;
+      sh:path ex:firstName ;
       sh:datatype xsd:string ;
       sh:maxCount 1 ;
     ] ;

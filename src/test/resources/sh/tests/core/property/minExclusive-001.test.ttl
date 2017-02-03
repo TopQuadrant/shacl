@@ -49,10 +49,10 @@ ex:InvalidInstance2
 .
 ex:TestShape
   rdf:type rdfs:Class ;
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   rdfs:label "Test shape" ;
   sh:property [
-      sh:predicate ex:testProperty ;
+      sh:path ex:testProperty ;
       rdfs:label "test property" ;
       sh:minExclusive 40 ;
     ] ;

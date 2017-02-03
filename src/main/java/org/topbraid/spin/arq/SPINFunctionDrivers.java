@@ -9,7 +9,9 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.topbraid.shacl.arq.SHACLJSFunctionDriver;
 import org.topbraid.shacl.arq.SHACLSPARQLFunctionDriver;
+import org.topbraid.shacl.js.SHJS;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaDatatypes;
@@ -43,6 +45,7 @@ public class SPINFunctionDrivers implements SPINFunctionDriver {
 		register(SPIN.body, new SPINBodyFunctionDriver());
 		register(SH.ask, new SHACLSPARQLFunctionDriver());
 		register(SH.select, new SHACLSPARQLFunctionDriver());
+		register(SHJS.script, new SHACLJSFunctionDriver());
 	}
 
 

@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
@@ -17,6 +18,7 @@ import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
@@ -67,6 +69,12 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
  
 	
 	@Override
+	public SHConstraint asConstraint(Resource c) {
+		return SHFactory.asSPARQLConstraint(c);
+	}
+
+
+	@Override
 	public boolean canExecuteConstraint(ConstraintExecutable executable) {
 		if(SHFactory.isSPARQLConstraint(executable.getConstraint()) &&
 				executable.getConstraint().hasProperty(SH.select)) {
@@ -74,7 +82,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		}
 		else if(executable instanceof ComponentConstraintExecutable) {
 			ComponentConstraintExecutable cce = (ComponentConstraintExecutable)executable;
-			Resource validator = cce.getValidator();
+			Resource validator = cce.getValidator(SH.SPARQLExecutable);
 			if(validator != null && (validator.hasProperty(SH.select) || validator.hasProperty(SH.ask))) {
 				return true;
 			}
@@ -163,24 +171,29 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		if(executable instanceof ComponentConstraintExecutable) {
 			((ComponentConstraintExecutable)executable).addBindings(bindings);
 		}
+		
+		List<RDFNode> focusNodes;
+		
 		if(focusNode == null) {
-			query = SPARQLSubstitutions.insertTargetClauses(query, shape, dataset, bindings);
+			focusNodes = selectFocusNodes(shape, dataset, shapesGraphURI);
+			if(focusNodes.isEmpty()) {
+				// Bypass everything if set of focus nodes is empty
+				return false;
+			}
+		}
+		else {
+			focusNodes = Collections.singletonList(focusNode);
 		}
 		
-		if(SHFactory.isPropertyConstraint(executable.getConstraint()) || SHFactory.isParameter(executable.getConstraint())) {
-			String path = constraint.hasProperty(SH.predicate) ?
-				"<" + SHFactory.asPropertyConstraint(executable.getConstraint()).getPredicate() + ">" :
-				SHACLPaths.getPathString(JenaUtil.getResourceProperty(executable.getConstraint(), SH.path));
+		if(SHFactory.isPropertyShape(executable.getConstraint()) || SHFactory.isParameter(executable.getConstraint())) {
+			String path = SHACLPaths.getPathString(JenaUtil.getResourceProperty(executable.getConstraint(), SH.path));
 			query = SPARQLSubstitutions.substitutePaths(query, path, shape.getModel());
+			bindings.add(SH.currentShapeVar.getVarName(), executable.getConstraint());
 		}
-
-		if(focusNode != null) {
-			bindings.add(SH.thisVar.getVarName(), focusNode);
+		else {
+			bindings.add(SH.currentShapeVar.getVarName(), shape);
 		}
-		bindings.add(SH.currentShapeVar.getVarName(), shape);
 		bindings.add(SH.shapesGraphVar.getVarName(), ResourceFactory.createResource(shapesGraphURI.toString()));
-		
-		QueryExecution qexec = SPARQLSubstitutions.createQueryExecution(query, dataset, bindings);
 
 		long startTime = System.currentTimeMillis();
 		
@@ -191,14 +204,20 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		Model nestedResults = JenaUtil.createMemoryModel();
 		HasShapeFunction.setResultsModel(nestedResults);
 		
-		int violationCount;
+		int violationCount = 0;
 		try {
-			violationCount = executeSelectQuery(report, nestedResults, constraint, shape, focusNode, executable, qexec, labelFunction, resultsList);
+			// Brute force algorithm: execute for each focus node individually
+			for(RDFNode fn : focusNodes) {
+				bindings.add(SH.thisVar.getVarName(), fn); // Overwrite any previous binding
+				QueryExecution qexec = SPARQLSubstitutions.createQueryExecution(query, dataset, bindings);
+				violationCount += executeSelectQuery(report, nestedResults, constraint, shape, focusNode, executable, qexec, labelFunction, resultsList);
+			}			
 		}
 		finally {
 			HasShapeFunction.setShapesGraph(oldShapesGraphURI);
 			HasShapeFunction.setResultsModel(oldNestedResults);
 		}
+
 		if(SPINStatisticsManager.get().isRecording()) {
 			long endTime = System.currentTimeMillis();
 			long duration = endTime - startTime;
@@ -226,7 +245,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		}
 		else if(executable instanceof ComponentConstraintExecutable) {
 			ComponentConstraintExecutable cce = (ComponentConstraintExecutable) executable;
-			Resource validator = cce.getValidator();
+			Resource validator = cce.getValidator(getExecutableType());
 			if(validator != null) {
 				if(JenaUtil.hasIndirectType(validator, SH.SPARQLAskValidator)) {
 					return createSPARQLFromAskValidator(cce, validator);
@@ -319,11 +338,8 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 						}
 						
 						RDFNode resultFocusNode = thisValue;
-						if(SHFactory.isPropertyConstraintWithPath(constraint)) {
+						if(SHFactory.isPropertyShape(constraint) || SHFactory.isParameter(constraint)) {
 							result.addProperty(SH.resultPath, SHACLPaths.clonePath(SHFactory.asPropertyConstraint(constraint).getPath(), result.getModel()));
-						}
-						else if(SHFactory.isPropertyConstraint(constraint) || SHFactory.isParameter(constraint)) {
-							result.addProperty(SH.resultPath, SHFactory.asPropertyConstraint(constraint).getPredicate());
 						}
 						else {
 							RDFNode pathValue = sol.get(SH.pathVar.getVarName());
@@ -425,6 +441,12 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 
 	
 	@Override
+	public Resource getConstraintComponent() {
+		return SH.SPARQLConstraintComponent;
+	}
+
+
+	@Override
 	public boolean isNodeInTarget(RDFNode focusNode, Dataset dataset, Resource executable, SHParameterizableTarget parameterizableTarget) {
 
 		// If sh:sparql exists only, then we expect run the query with ?this pre-bound
@@ -460,13 +482,25 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 	}
 	
 	
+	@Override
+	public Resource getExecutableType() {
+		return SH.SPARQLExecutable;
+	}
+
+
+	@Override
+	public Property getParameter() {
+		return SH.sparql;
+	}
+
+
 	private String createSPARQLFromAskValidator(ComponentConstraintExecutable executable, Resource validator) {
 		String valueVar = "?value";
 		while(executable.getComponent().getParametersMap().containsKey(valueVar)) {
 			valueVar += "_";
 		}
 		StringBuffer sb = new StringBuffer();
-		if(SH.Shape.equals(executable.getContext())) {
+		if(SH.NodeShape.equals(executable.getContext())) {
 			sb.append("SELECT $this ?value\nWHERE {\n");
 			sb.append("    BIND ($this AS ");
 			sb.append(valueVar);
@@ -479,7 +513,6 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 				SPARQLSubstitutions.addMessageVarNames(message.getLexicalForm(), otherVarNames);
 			}
 			otherVarNames.remove(SH.pathVar.getVarName());
-			otherVarNames.remove(SH.predicateVar.getVarName());
 			otherVarNames.remove(SH.valueVar.getVarName());
 			for(String varName : otherVarNames) {
 				sb.append(" ?" + varName);
@@ -493,9 +526,7 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		String sparql = JenaUtil.getStringProperty(validator, SH.ask);
 		int firstIndex = sparql.indexOf('{');
 		int lastIndex = sparql.lastIndexOf('}');
-		// Temp hack injecting a dummy BIND to work-around ISSUE in jena if optFilterPlacement is on
-		// TODO: The underlying issue seems to have been fixed in Jena 3.1, so this may be deleted.
-		String body = "{ BIND(true AS ?qyueyru). " + sparql.substring(firstIndex + 1, lastIndex + 1);
+		String body = "{" + sparql.substring(firstIndex + 1, lastIndex + 1);
 		sb.append("    FILTER NOT EXISTS " + body + "\n}");
 		
 		return withPrefixes(sb.toString(), validator);
@@ -513,6 +544,28 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 		catch(Exception ex) {
 			return ARQFactory.get().createQuery(withPrefixes("SELECT ?this WHERE {" + sparql + "}", host));
 		}
+	}
+	
+	
+	private List<RDFNode> selectFocusNodes(Resource shape, Dataset dataset, URI shapesGraphURI) {
+		List<RDFNode> results = new LinkedList<RDFNode>();
+		StringBuffer sb = new StringBuffer("SELECT DISTINCT ?this\nWHERE {\n");
+		SPARQLSubstitutions.appendTargets(sb, shape, dataset);
+		sb.append("\n}");
+		Query query = ARQFactory.get().createQuery(dataset.getDefaultModel(), sb.toString());
+		QuerySolutionMap bindings = new QuerySolutionMap();
+		bindings.add(SH.currentShapeVar.getName(), shape);
+		bindings.add(SH.shapesGraphVar.getVarName(), ResourceFactory.createResource(shapesGraphURI.toString()));
+		try(QueryExecution qexec = ARQFactory.get().createQueryExecution(query, dataset, bindings)) {
+			ResultSet rs = qexec.execSelect();
+			while(rs.hasNext()) {
+				RDFNode focusNode = rs.next().get("this");
+				if(focusNode != null) {
+					results.add(focusNode);
+				}
+			}
+		}
+		return results;
 	}
 	
 	

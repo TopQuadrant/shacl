@@ -20,7 +20,7 @@ import org.topbraid.shacl.constraints.sparql.SPARQLExecutionLanguage;
 import org.topbraid.shacl.model.SHConstraint;
 import org.topbraid.shacl.model.SHFactory;
 import org.topbraid.shacl.model.SHParameterizableTarget;
-import org.topbraid.shacl.model.SHShape;
+import org.topbraid.shacl.model.SHNodeShape;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
@@ -111,7 +111,7 @@ public class NodeConstraintValidator extends AbstractConstraintValidator {
 		
 		List<Property> properties = SHACLUtil.getAllConstraintProperties(validateShapes);
 		
-		RDFNode focusRDFNode = (Resource) dataset.getDefaultModel().asRDFNode(focusNode);
+		RDFNode focusRDFNode = dataset.getDefaultModel().asRDFNode(focusNode);
 		Set<Resource> shapes = getShapesForNode(focusRDFNode, dataset, shapesModel);
 		for(Resource shape : shapes) {
 			if(monitor != null && monitor.isCanceled()) {
@@ -175,7 +175,7 @@ public class NodeConstraintValidator extends AbstractConstraintValidator {
 		
 		RDFNode focusRDFNode = dataset.getDefaultModel().asRDFNode(focusNode);
 		Model shapesModel = dataset.getNamedModel(shapesGraphURI.toString());
-		SHShape shape = SHFactory.asShape(shapesModel.asRDFNode(shapeNode));
+		SHNodeShape shape = SHFactory.asNodeShape(shapesModel.asRDFNode(shapeNode));
 		
 		List<Resource> resultsList = new LinkedList<Resource>();
 		
@@ -193,7 +193,7 @@ public class NodeConstraintValidator extends AbstractConstraintValidator {
 					}
 				}
 				else if(SHFactory.isParameterizableConstraint(c)) {
-					SHConstraint constraint = SHFactory.asParameterizableConstraint(c);
+					SHConstraint constraint = SHFactory.asShape(c);
 					if(constraintFilter == null || constraintFilter.test(constraint)) {
 						violations |= addQueryResults(constraint, shape, focusRDFNode, dataset, shapesGraphURI, minSeverity, labelFunction, resultsList, monitor);
 					}

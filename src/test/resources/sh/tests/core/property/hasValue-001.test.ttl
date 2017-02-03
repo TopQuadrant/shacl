@@ -40,10 +40,10 @@ ex:MalePerson
   rdfs:subClassOf rdfs:Resource ;
 .
 ex:PersonShape
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   rdfs:label "Person shape" ;
   sh:property [
-      sh:predicate ex:gender ;
+      sh:path ex:gender ;
       rdfs:label "gender" ;
       sh:datatype xsd:string ;
       sh:hasValue "male" ;

@@ -12,7 +12,7 @@
 
 <http://datashapes.org/sh/tests/core/property/not-001.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of not-001" ;
+  rdfs:label "Test of sh:not in property shape 001" ;
   owl:imports <http://datashapes.org/dash> ;
   owl:versionInfo "Created with TopBraid Composer" ;
 .
@@ -38,10 +38,10 @@ ex:InvalidResource1
   rdfs:label "Invalid resource1" ;
 .
 ex:TestShape
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   rdfs:label "Test shape" ;
   sh:property [
-      sh:predicate ex:property ;
+      sh:path ex:property ;
       sh:not [
           sh:datatype xsd:integer ;
         ] ;

@@ -1,4 +1,4 @@
 package org.topbraid.shacl.model;
 
-public interface SHFunction extends SHParameterizable, SHSPARQLExecutable {
+public interface SHFunction extends SHParameterizable {
 }

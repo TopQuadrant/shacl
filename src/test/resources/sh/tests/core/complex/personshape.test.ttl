@@ -67,21 +67,21 @@ ex:Person
   rdfs:subClassOf rdfs:Resource ;
 .
 ex:PersonShape
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   rdfs:label "Person shape" ;
   sh:closed "true"^^xsd:boolean ;
   sh:ignoredProperties (
       rdf:type
     ) ;
   sh:property [
-      sh:predicate ex:child ;
+      sh:path ex:child ;
       sh:class ex:Person ;
       sh:description "A person's children." ;
       sh:name "child" ;
       sh:nodeKind sh:IRI ;
     ] ;
   sh:property [
-      sh:predicate ex:ssn ;
+      sh:path ex:ssn ;
       sh:datatype xsd:string ;
       sh:description "A person's social security number." ;
       sh:maxCount 1 ;
@@ -89,12 +89,12 @@ ex:PersonShape
       sh:pattern "^\\d{3}-\\d{2}-\\d{4}$" ;
     ] ;
   sh:property [
-      sh:description "A person's parent are represented using ex:child walked in the inverse direction." ;
-      sh:maxCount 2 ;
-      sh:name "parent" ;
       sh:path [
           sh:inversePath ex:child ;
         ] ;
+      sh:description "A person's parent are represented using ex:child walked in the inverse direction." ;
+      sh:maxCount 2 ;
+      sh:name "parent" ;
     ] ;
   sh:targetClass ex:Person ;
 .

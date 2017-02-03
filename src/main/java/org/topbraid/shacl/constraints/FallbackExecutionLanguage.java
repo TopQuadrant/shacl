@@ -6,8 +6,11 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.topbraid.shacl.model.SHConstraint;
+import org.topbraid.shacl.model.SHConstraintComponent;
 import org.topbraid.shacl.model.SHParameterizableTarget;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
@@ -22,6 +25,12 @@ import org.topbraid.shacl.vocabulary.SH;
 public class FallbackExecutionLanguage implements ExecutionLanguage {
 
 	
+	@Override
+	public SHConstraint asConstraint(Resource c) {
+		return null;
+	}
+
+
 	@Override
 	public boolean canExecuteConstraint(ConstraintExecutable executable) {
 		return true;
@@ -38,6 +47,14 @@ public class FallbackExecutionLanguage implements ExecutionLanguage {
 	public boolean executeConstraint(Dataset dataset, Resource shape,
 			URI shapesGraphURI, ConstraintExecutable executable,
 			RDFNode focusNode, Resource report, Function<RDFNode,String> labelFunction, List<Resource> resultsList) {
+		
+		if(executable instanceof ComponentConstraintExecutable) {
+			SHConstraintComponent cc = ((ComponentConstraintExecutable)executable).getComponent();
+			if(SH.PropertyConstraintComponent.equals(cc) || ExecutionLanguageSelector.get().isConstraintComponentWithLanguage(cc)) {
+				return false;
+			}
+		}
+		
 		Resource result = report.getModel().createResource(DASH.FailureResult);
 		report.addProperty(SH.result, result);
 		result.addProperty(SH.resultMessage, "No suitable validator found for constraint");
@@ -59,6 +76,24 @@ public class FallbackExecutionLanguage implements ExecutionLanguage {
 	public Iterable<RDFNode> executeTarget(Dataset dataset,
 			Resource executable, SHParameterizableTarget parameterizableTarget) {
 		return Collections.emptyList();
+	}
+
+
+	@Override
+	public Resource getConstraintComponent() {
+		return null;
+	}
+
+
+	@Override
+	public Resource getExecutableType() {
+		return null;
+	}
+
+
+	@Override
+	public Property getParameter() {
+		return null;
 	}
 
 

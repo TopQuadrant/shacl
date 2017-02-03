@@ -72,6 +72,7 @@ public class TestDASHTestCases {
 	
 	@Test
 	public void testTestCase() {
+		System.out.println(" - " + testCase.getResource());
 		Model results = JenaUtil.createMemoryModel();
 		try {
 			testCase.run(results);

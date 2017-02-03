@@ -12,9 +12,8 @@
 
 <http://datashapes.org/sh/tests/core/target/targetObjectsOf-001.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of targetObjectsOf-001" ;
+  rdfs:label "Test of sh:targetObjectsOf 001" ;
   owl:imports <http://datashapes.org/dash> ;
-  owl:versionInfo "Created with TopBraid Composer" ;
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
@@ -44,7 +43,7 @@ ex:InvalidResource2
   ex:testProperty rdfs:Resource ;
 .
 ex:TestShape
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   rdfs:label "Test shape" ;
   sh:datatype xsd:integer ;
   sh:targetObjectsOf ex:testProperty ;

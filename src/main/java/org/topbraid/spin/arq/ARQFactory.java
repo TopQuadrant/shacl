@@ -11,8 +11,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.http.auth.AuthScope ;
+import org.apache.http.auth.Credentials ;
+import org.apache.http.auth.UsernamePasswordCredentials ;
+import org.apache.http.client.CredentialsProvider ;
+import org.apache.http.client.HttpClient ;
+import org.apache.http.impl.client.BasicCredentialsProvider ;
+import org.apache.http.impl.client.HttpClients ;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryFactory;
@@ -20,6 +28,7 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.Syntax;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.riot.web.HttpOp ;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.sparql.core.DatasetImpl;
@@ -323,14 +332,10 @@ public class ARQFactory {
 	 */
 	public QueryExecution createQueryExecution(Query query, Model model, QuerySolution initialBinding) {
 		Dataset dataset = getDataset(model);
-		if(dataset != null) {
-			return createQueryExecution(query, dataset, initialBinding);
+		if(dataset == null) {
+		    dataset = DatasetFactory.create(model);
 		}
-		else {
-			QueryExecution qexec = QueryExecutionFactoryFilter.get().create(query, model, initialBinding);
-			adjustQueryExecution(qexec);
-			return qexec;
-		}
+        return createQueryExecution(query, dataset, initialBinding);
 	}
 	
 	
@@ -338,11 +343,23 @@ public class ARQFactory {
 		return createQueryExecution(query, dataset, null);
 	}
 	
+	/** Fine-grained control for development : switch on and off query printing */ 
+	public static boolean LOG_QUERIES = false;
 	
 	public QueryExecution createQueryExecution(Query query, Dataset dataset, QuerySolution initialBinding) {
 		if(!query.getGraphURIs().isEmpty() || !query.getNamedGraphURIs().isEmpty()) {
 			dataset = new FromDataset(dataset, query);
 		}
+		
+		if ( LOG_QUERIES ) {
+		    // And the data - can be long.
+//    		System.err.println("~~ ~~");
+//    		RDFDataMgr.write(System.err, dataset.getDefaultModel(), Lang.TTL);
+    		System.err.println("~~ ~~");
+    		System.err.println(initialBinding);
+    		System.err.println(query);
+		}
+		
 		QueryExecution qexec = QueryExecutionFactoryFilter.get().create(query, dataset, initialBinding);
 		adjustQueryExecution(qexec);
 		return qexec;
@@ -376,19 +393,47 @@ public class ARQFactory {
 			List<String> defaultGraphURIs, 
 			List<String> namedGraphURIs, 
 			String user, 
-			char[] password) {
-		QueryEngineHTTP qexec = (QueryEngineHTTP) QueryExecutionFactoryFilter.get().sparqlService(service, query);
+			String password) {
+	    HttpClient httpClient = buildHttpClient(service, user, password);
+		QueryEngineHTTP qexec = (QueryEngineHTTP) QueryExecutionFactoryFilter.get().sparqlService(service, query, httpClient);
 		if( defaultGraphURIs.size() > 0 ) {
 			qexec.setDefaultGraphURIs(defaultGraphURIs);
 		}
 		if( namedGraphURIs.size() > 0 ) {
 			qexec.setNamedGraphURIs(namedGraphURIs);
 		}
-		if( user != null ) {
-			qexec.setBasicAuthentication(user, password);
-		}
 		return qexec;
 	}
+	
+    public static HttpClient buildHttpClient(String serviceURI, String user, String password) {
+        if ( user == null )
+            return HttpOp.getDefaultHttpClient();
+        CredentialsProvider credsProvider = new BasicCredentialsProvider();
+        Credentials credentials = new UsernamePasswordCredentials(user, password);
+        credsProvider.setCredentials(AuthScope.ANY, credentials);
+        return HttpClients.custom()
+            .setDefaultCredentialsProvider(credsProvider)
+            .build();
+        
+        // Example for scoped credentials 
+        // See http://jena.staging.apache.org/documentation/query/http-auth.html
+//      CredentialsProvider credsProvider = new BasicCredentialsProvider();
+//      Credentials unscopedCredentials = new UsernamePasswordCredentials("user", "passwd");
+//      credsProvider.setCredentials(AuthScope.ANY, unscopedCredentials);
+//      Credentials scopedCredentials = new UsernamePasswordCredentials("user", "passwd");
+//      final String host = "http://example.com/sparql";
+//      final int port = 80;
+//      final String realm = "aRealm";
+//      final String schemeName = "DIGEST";
+//      AuthScope authscope = new AuthScope(host, port, realm, schemeName);
+//      credsProvider.setCredentials(authscope, scopedCredentials);
+//      return HttpClients.custom()
+//          .setDefaultCredentialsProvider(credsProvider)
+//          .build();
+        
+    }
+
+
 	
 	
 	public UpdateRequest createUpdateRequest(String parsableString) {

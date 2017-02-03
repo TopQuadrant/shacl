@@ -1,10 +1,9 @@
 package org.topbraid.spin.query;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QuerySolution;
+import org.apache.commons.lang3.time.FastDateFormat ;
+import org.apache.http.client.HttpClient ;
+import org.apache.jena.atlas.lib.DateTimeUtils ;
+import org.apache.jena.query.* ;
 import org.apache.jena.rdf.model.Model;
 import org.apache.log4j.Logger;
 
@@ -12,6 +11,10 @@ public class QueryExecutionFactoryFilter {
 	static final String LOG_NAME = "QueryLog";
 	private Logger logger;
 	private static QueryExecutionFactoryFilter singleton = new QueryExecutionFactoryFilter();
+	
+	// ---- Support for controlling printing queries while running. See function "printQuery".
+	private static boolean PRINT = false;
+    // ---- Support for controlling printing queries while running.
 	
 	/**
 	 * Gets the singleton instance of this class.
@@ -49,11 +52,13 @@ public class QueryExecutionFactoryFilter {
 		return QueryExecutionFactory.sparqlService(service, query);
 	}
 	
-	
-	
-	
-	
+    public QueryExecution sparqlService(String service, Query query, HttpClient httpClient) {
+        return QueryExecutionFactory.sparqlService(service, query, httpClient);
+    }
+    
 	private void analyzeRequest(Query query, Model model, QuerySolution initialBinding) {
+        printQuery(query, initialBinding);
+
 		if(logger.isTraceEnabled()) {	
 			logger.trace("QUERY[" + analyzeQuery(query) 
 				+ "]\nMODEL[" + analyzeModel(model) + "]" 
@@ -62,12 +67,35 @@ public class QueryExecutionFactoryFilter {
 	}
 	
 	private void analyzeRequest(Query query, Dataset dataset, QuerySolution initialBinding) {
+	    printQuery(query, initialBinding);
+	    
 		if(logger.isTraceEnabled()) {	
 			logger.trace("QUERY[" + analyzeQuery(query) 
 				+ "]\nDATASET[" + analyzeDataset(dataset) + "]" 
 				+  serializeBindings(initialBinding));
 		}
 	}
+	
+	private static FastDateFormat timestamp = FastDateFormat.getInstance("HH:mm:ss.SSS") ;
+	// Development support. Dynmically controlled print query.
+	private void printQuery(Query query, QuerySolution initialBinding) {
+	    if ( PRINT ) {
+	        String time = DateTimeUtils.nowAsString(timestamp); 
+            System.err.print("~~ ");
+            System.err.print(time);
+            System.err.println(" ~~");
+            System.err.println(initialBinding);
+            System.err.print(query);
+        }
+	}
+
+    /**
+     * Allow query printing to be switched on/off around specific sections of code that
+     * are issuing queries.
+     */
+    public static void enableQueryPrinting(boolean value) {
+        PRINT = value;
+    }
 		
 	private String serializeBindings(QuerySolution bindings) {
 		if(bindings == null) return "";

@@ -110,7 +110,7 @@ public class SHParameterizableImpl extends SHResourceImpl implements SHParameter
 	@Override
 	public boolean isOptionalParameter(Property predicate) {
 		for(SHParameter param : getParameters()) {
-			if(param.hasProperty(SH.predicate, predicate) && param.hasProperty(SH.optional, JenaDatatypes.TRUE)) {
+			if(param.hasProperty(SH.path, predicate) && param.hasProperty(SH.optional, JenaDatatypes.TRUE)) {
 				return true;
 			}
 		}

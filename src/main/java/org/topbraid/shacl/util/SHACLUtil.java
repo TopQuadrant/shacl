@@ -32,11 +32,11 @@ import org.topbraid.shacl.constraints.ExecutionLanguage;
 import org.topbraid.shacl.constraints.ExecutionLanguageSelector;
 import org.topbraid.shacl.model.SHConstraintComponent;
 import org.topbraid.shacl.model.SHFactory;
+import org.topbraid.shacl.model.SHNodeShape;
 import org.topbraid.shacl.model.SHParameter;
 import org.topbraid.shacl.model.SHParameterizableTarget;
-import org.topbraid.shacl.model.SHPropertyConstraint;
+import org.topbraid.shacl.model.SHPropertyShape;
 import org.topbraid.shacl.model.SHResult;
-import org.topbraid.shacl.model.SHShape;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.ARQFactory;
@@ -72,9 +72,9 @@ public class SHACLUtil {
 
 	private final static Set<Resource> classesWithDefaultType = new HashSet<Resource>();
 	static {
-		classesWithDefaultType.add(SH.Shape);
+		classesWithDefaultType.add(SH.NodeShape);
 		classesWithDefaultType.add(SH.Parameter);
-		classesWithDefaultType.add(SH.PropertyConstraint);
+		classesWithDefaultType.add(SH.PropertyShape);
 		classesWithDefaultType.add(SH.SPARQLConstraint);
 	}
 	
@@ -99,19 +99,24 @@ public class SHACLUtil {
 			"    ?type rdfs:subClassOf* ?class .\n" +
 			"    ?shape <" + SH.targetClass + ">* ?class .\n" +
 			"    ?shape <" + SH.property + ">|<" + SH.parameter + "> ?p .\n" +
-			"    ?p <" + SH.predicate + "> ?arg1 .\n" +
+			"    ?p <" + SH.path + "> ?arg1 .\n" +
 			"    ?p rdfs:label ?label .\n" +
 			"}");
+	
+	public static void addConstraintProperty(Property property) {
+		constraintProperties.add(property);
+		constraintPropertiesIncludingParameter.add(property);
+	}
 
 	public static void addDirectPropertiesOfClass(Resource cls, Collection<Property> results) {
 		for(Resource argument : JenaUtil.getResourceProperties(cls, SH.parameter)) {
-			Resource predicate = JenaUtil.getPropertyResourceValue(argument, SH.predicate);
+			Resource predicate = JenaUtil.getPropertyResourceValue(argument, SH.path);
 			if(predicate != null && predicate.isURIResource() && !results.contains(predicate)) {
 				results.add(JenaUtil.asProperty(predicate));
 			}
 		}
 		for(Resource property : JenaUtil.getResourceProperties(cls, SH.property)) {
-			Resource predicate = JenaUtil.getPropertyResourceValue(property, SH.predicate);
+			Resource predicate = JenaUtil.getPropertyResourceValue(property, SH.path);
 			if(predicate != null && predicate.isURIResource() && !results.contains(predicate)) {
 				results.add(JenaUtil.asProperty(predicate));
 			}
@@ -208,7 +213,7 @@ public class SHACLUtil {
 		for(Statement s : model.listStatements(null, SH.targetClass, (RDFNode)null).toList()) {
 			if(s.getObject().isResource()) {
 				if(validateShapes || (!JenaUtil.hasIndirectType(s.getSubject(), SH.ConstraintComponent) &&
-						!SH.PropertyConstraint.equals(s.getObject())) &&
+						!SH.PropertyShape.equals(s.getObject())) &&
 						!SH.Constraint.equals(s.getObject())) {
 					for(Resource instance : JenaUtil.getAllInstances(s.getResource())) {
 						results.add(instance.asNode());
@@ -305,7 +310,7 @@ public class SHACLUtil {
 	
 	public static SHConstraintComponent getConstraintComponentOfValidator(Resource validator) {
 		for(Statement s : validator.getModel().listStatements(null, null, validator).toList()) {
-			if(SH.validator.equals(s.getPredicate()) || SH.shapeValidator.equals(s.getPredicate()) || SH.propertyValidator.equals(s.getPredicate())) {
+			if(SH.validator.equals(s.getPredicate()) || SH.nodeValidator.equals(s.getPredicate()) || SH.propertyValidator.equals(s.getPredicate())) {
 				return s.getSubject().as(SHConstraintComponent.class);
 			}
 		}
@@ -315,7 +320,7 @@ public class SHACLUtil {
 	
 	public static Resource getDefaultTypeForConstraintPredicate(Property predicate) {
 		if(SH.property.equals(predicate)) {
-			return SH.PropertyConstraint;
+			return SH.PropertyShape;
 		}
 		else if(SH.parameter.equals(predicate)) {
 			return SH.Parameter;
@@ -329,7 +334,7 @@ public class SHACLUtil {
 	public static SHParameter getParameterAtClass(Resource cls, Property predicate) {
 		for(Resource c : JenaUtil.getAllSuperClassesStar(cls)) {
 			for(Resource arg : JenaUtil.getResourceProperties(c, SH.parameter)) {
-				if(arg.hasProperty(SH.predicate, predicate)) {
+				if(arg.hasProperty(SH.path, predicate)) {
 					return SHFactory.asParameter(arg);
 				}
 			}
@@ -389,10 +394,10 @@ public class SHACLUtil {
 		return null;
 	}
 	
-	public static SHPropertyConstraint getPropertyConstraintAtClass(Resource cls, Property predicate) {
+	public static SHPropertyShape getPropertyConstraintAtClass(Resource cls, Property predicate) {
 		for(Resource c : JenaUtil.getAllSuperClassesStar(cls)) {
 			for(Resource arg : JenaUtil.getResourceProperties(c, SH.property)) {
-				if(arg.hasProperty(SH.predicate, predicate)) {
+				if(arg.hasProperty(SH.path, predicate)) {
 					return SHFactory.asPropertyConstraint(arg);
 				}
 			}
@@ -401,9 +406,9 @@ public class SHACLUtil {
 	}
 	
 	
-	public static SHPropertyConstraint getPropertyConstraintAtInstance(Resource instance, Property predicate) {
+	public static SHPropertyShape getPropertyConstraintAtInstance(Resource instance, Property predicate) {
 		for(Resource type : JenaUtil.getTypes(instance)) {
-			SHPropertyConstraint property = getPropertyConstraintAtClass(type, predicate);
+			SHPropertyShape property = getPropertyConstraintAtClass(type, predicate);
 			if(property != null) {
 				return property;
 			}
@@ -455,13 +460,13 @@ public class SHACLUtil {
 	 * @param node  the (focus) node
 	 * @return a List of shapes
 	 */
-	public static List<SHShape> getAllShapesAtNode(RDFNode node) {
+	public static List<SHNodeShape> getAllShapesAtNode(RDFNode node) {
 		return getAllShapesAtNode(node, node instanceof Resource ? JenaUtil.getTypes((Resource)node) : null);
 	}
 	
 	
-	public static List<SHShape> getAllShapesAtNode(RDFNode node, Iterable<Resource> types) {
-		List<SHShape> results = new LinkedList<SHShape>();
+	public static List<SHNodeShape> getAllShapesAtNode(RDFNode node, Iterable<Resource> types) {
+		List<SHNodeShape> results = new LinkedList<SHNodeShape>();
 		if(node instanceof Resource) {
 			Set<Resource> reached = new HashSet<Resource>();
 			for(Resource type : types) {
@@ -482,15 +487,15 @@ public class SHACLUtil {
 	 * @param clsOrShape  the class or Shape to get the shapes of
 	 * @return the shapes, ordered by the most specialized (subclass) first
 	 */
-	public static List<SHShape> getAllShapesAtClassOrShape(Resource clsOrShape) {
-		List<SHShape> results = new LinkedList<SHShape>();
+	public static List<SHNodeShape> getAllShapesAtClassOrShape(Resource clsOrShape) {
+		List<SHNodeShape> results = new LinkedList<SHNodeShape>();
 		Set<Resource> reached = new HashSet<Resource>();
 		addAllShapesAtClassOrShape(clsOrShape, results, reached);
 		return results;
 	}
 	
 	
-	private static void addAllShapesAtClassOrShape(Resource clsOrShape, List<SHShape> results, Set<Resource> reached) {
+	private static void addAllShapesAtClassOrShape(Resource clsOrShape, List<SHNodeShape> results, Set<Resource> reached) {
 		addDirectShapesAtClassOrShape(clsOrShape, results);
 		reached.add(clsOrShape);
 		for(Resource superClass : JenaUtil.getSuperClasses(clsOrShape)) {
@@ -508,16 +513,16 @@ public class SHACLUtil {
 	 * @param clsOrShape  the class or Shape to get the shapes of
 	 * @return the shapes
 	 */
-	public static Collection<SHShape> getDirectShapesAtClassOrShape(Resource clsOrShape) {
-		List<SHShape> results = new LinkedList<SHShape>();
+	public static Collection<SHNodeShape> getDirectShapesAtClassOrShape(Resource clsOrShape) {
+		List<SHNodeShape> results = new LinkedList<SHNodeShape>();
 		addDirectShapesAtClassOrShape(clsOrShape, results);
 		return results;
 	}
 
 
-	private static void addDirectShapesAtClassOrShape(Resource clsOrShape, List<SHShape> results) {
+	private static void addDirectShapesAtClassOrShape(Resource clsOrShape, List<SHNodeShape> results) {
 		if(JenaUtil.hasIndirectType(clsOrShape, SH.Shape) && !results.contains(clsOrShape)) {
-			results.add(SHFactory.asShape(clsOrShape));
+			results.add(SHFactory.asNodeShape(clsOrShape));
 		}
 		// More correct would be: if(JenaUtil.hasIndirectType(clsOrShape, RDFS.Class)) {
 		{
@@ -525,7 +530,7 @@ public class SHACLUtil {
 			while(it.hasNext()) {
 				Resource subject = it.next().getSubject();
 				if(!results.contains(subject)) {
-					SHShape shape = SHFactory.asShape(subject);
+					SHNodeShape shape = SHFactory.asNodeShape(subject);
 					if(!shape.isDeactivated()) {
 						results.add(shape);
 					}

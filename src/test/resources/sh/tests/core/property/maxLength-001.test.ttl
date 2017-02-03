@@ -12,7 +12,7 @@
 
 <http://datashapes.org/sh/tests/core/property/maxLength-001.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of sh:maxLength" ;
+  rdfs:label "Test of sh:maxLength 001" ;
   owl:imports <http://datashapes.org/dash> ;
   owl:versionInfo "Created with TopBraid Composer" ;
 .
@@ -37,10 +37,10 @@ ex:InvalidInstance1
 .
 ex:TestShape
   rdf:type rdfs:Class ;
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   rdfs:label "Test shape" ;
   sh:property [
-      sh:predicate ex:testProperty ;
+      sh:path ex:testProperty ;
       rdfs:label "test property" ;
       sh:datatype xsd:string ;
       sh:maxLength 2 ;

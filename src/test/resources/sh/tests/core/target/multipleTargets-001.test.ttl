@@ -12,7 +12,7 @@
 
 <http://datashapes.org/sh/tests/core/target/multipleTargets-001.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of multipleTargets-001" ;
+  rdfs:label "Test of multiple targets 001" ;
   owl:imports <http://datashapes.org/dash> ;
   owl:versionInfo "Created with TopBraid Composer" ;
 .
@@ -34,7 +34,7 @@ ex:InvalidResource1
   ex:property1 "Also a value" ;
 .
 ex:TestShape
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   rdfs:label "Test shape" ;
   sh:in (
       ex:ValidResource1

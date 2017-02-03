@@ -111,10 +111,11 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 		}
 		for(Resource shape : shapes) {
 			List<SHConstraint> list = new LinkedList<SHConstraint>();
-			list.add(SHFactory.asShape(shape));
+			list.add(SHFactory.asNodeShape(shape));
 			map.put(shape, list);
 		}
 		
+		ExecutionLanguageSelector executionLanguageSelector = ExecutionLanguageSelector.get();
 		for(Property constraintProperty : constraintProperties) {
 			for(Statement s : shapesModel.listStatements(null, constraintProperty, (RDFNode)null).toList()) {
 				if(s.getObject().isResource()) {
@@ -131,13 +132,14 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 							type = SHACLUtil.getResourceDefaultType(c);
 						}
 						if(type != null) {
-							if(SH.SPARQLConstraint.equals(type)) {
-								list.add(SHFactory.asSPARQLConstraint(c));
+							ExecutionLanguage lang = executionLanguageSelector.getLanguageForParameter(constraintProperty);
+							if(lang != null) {
+								list.add(lang.asConstraint(c));
 							}
-							else if(JenaUtil.hasSuperClass(type, SH.Constraint)) {
-								// Only execute property constraints if sh:predicate is present
-								if(c.hasProperty(SH.predicate) || c.hasProperty(SH.path)) {
-									list.add(SHFactory.asParameterizableConstraint(c));
+							else if(SH.PropertyShape.equals(type) || JenaUtil.hasSuperClass(type, SH.PropertyShape)) {
+								// Only execute property shapes if sh:path is present
+								if(c.hasProperty(SH.path)) {
+									list.add(SHFactory.asShape(c));
 								}
 							}
 						}

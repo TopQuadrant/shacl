@@ -46,9 +46,9 @@ ex:InvalidInstance2
   ex:value 42 ;
 .
 ex:MyShape
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   sh:property [
-      sh:predicate ex:value ;
+      sh:path ex:value ;
       sh:datatype xsd:string ;
     ] ;
   sh:targetNode ex:InvalidInstance1 ;

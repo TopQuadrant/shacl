@@ -46,15 +46,15 @@ ex:InvalidResource1
 .
 ex:TestShape
   rdf:type rdfs:Class ;
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   rdfs:label "Test shape" ;
   sh:property [
-      sh:predicate ex:dateProperty ;
+      sh:path ex:dateProperty ;
       rdfs:label "date property" ;
       sh:datatype xsd:date ;
     ] ;
   sh:property [
-      sh:predicate ex:integerProperty ;
+      sh:path ex:integerProperty ;
       rdfs:label "integer property" ;
       sh:datatype xsd:integer ;
     ] ;

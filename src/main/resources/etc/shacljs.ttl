@@ -1,0 +1,84 @@
+# baseURI: http://www.w3.org/ns/shacljs
+# imports: http://www.w3.org/ns/shacl#
+
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+sh:JSConstraint
+  rdf:type rdfs:Class ;
+  rdfs:label "JavaScript Constraint" ;
+  rdfs:subClassOf sh:JSExecutable ;
+.
+sh:JSConstraint-js
+  rdf:type sh:Parameter ;
+  sh:path sh:js ;
+.
+sh:JSConstraintComponent
+  rdf:type sh:ConstraintComponent ;
+  rdfs:comment "A constraint component with the parameter sh:js linking to a sh:JSConstraint containing a sh:script." ;
+  rdfs:label "JavaScript constraint component" ;
+  sh:parameter sh:JSConstraint-js ;
+.
+sh:JSExecutable
+  rdf:type rdfs:Class ;
+  rdfs:comment "Abstract base class of resources that declare an executable JavaScript." ;
+  rdfs:label "JavaScript executable" ;
+  rdfs:subClassOf rdfs:Resource ;
+.
+sh:JSFunction
+  rdf:type rdfs:Class ;
+  rdfs:comment "A JavaScript function declares a SPARQL function that executes a JavaScript script when called. The arguments of the function become named variables starting with $. For example, the argument ex:test can be accessed by the script via the variable $test. The script must end with a return statement producing a single RDF term, or null." ;
+  rdfs:label "JavaScript function"@en ;
+  rdfs:subClassOf sh:Function ;
+  rdfs:subClassOf sh:JSExecutable ;
+.
+sh:JSLibrary
+  rdf:type rdfs:Class ;
+  rdfs:comment "Represents a JavaScript library, typically identified by one or more URLs of files to include." ;
+  rdfs:label "JavaScript Library" ;
+  rdfs:subClassOf sh:JSExecutable ;
+.
+sh:JSValidator
+  rdf:type rdfs:Class ;
+  rdfs:comment "A SHACL validator based on JavaScript. This can be used to declare SHACL constraint components that perform JavaScript-based validation when used." ;
+  rdfs:label "JavaScript Validator" ;
+  rdfs:subClassOf sh:JSExecutable ;
+  rdfs:subClassOf sh:Validator ;
+.
+sh:js
+  rdf:type rdf:Property ;
+  rdfs:domain sh:Shape ;
+  rdfs:label "JavaScript constraint" ;
+  rdfs:range sh:JSConstraint ;
+.
+sh:library
+  rdf:type rdf:Property ;
+  rdfs:comment "Declares which JavaScript libraries are needed to execute the associated script." ;
+  rdfs:domain sh:JSExecutable ;
+  rdfs:label "library" ;
+  rdfs:range sh:JSLibrary ;
+.
+sh:script
+  rdf:type rdf:Property ;
+  rdfs:comment "The JavaScript code to execute. Depending on the subclass, this has different execution contracts and expected results." ;
+  rdfs:domain sh:JSExecutable ;
+  rdfs:label "script" ;
+  rdfs:range xsd:string ;
+.
+sh:scriptURL
+  rdf:type rdf:Property ;
+  rdfs:comment "Declares one or more URLs of a sh:JSLibrary. This should be the absolute URL of a JavaScript file. Implementations may redirect those to local files." ;
+  rdfs:domain sh:JSLibrary ;
+  rdfs:label "script URL" ;
+  rdfs:range xsd:anyURI ;
+.
+<http://www.w3.org/ns/shacljs>
+  rdf:type owl:Ontology ;
+  rdfs:comment "Defines the terms used by the SHACL-JS vocabulary." ;
+  rdfs:seeAlso <http://w3c.github.io/data-shapes/shacl-js/> ;
+  owl:imports sh: ;
+  owl:versionInfo "This file contains proposed additions to the SHACL namespace, and may at some stage be added to the main shacl.ttl file." ;
+.

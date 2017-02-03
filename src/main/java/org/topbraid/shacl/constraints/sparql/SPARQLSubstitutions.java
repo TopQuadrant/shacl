@@ -166,7 +166,7 @@ public class SPARQLSubstitutions {
 	}
 	
 	
-	private static void appendTargets(StringBuffer sb, Resource shape, Dataset dataset) {
+	static void appendTargets(StringBuffer sb, Resource shape, Dataset dataset) {
 		
 		List<String> targets = new LinkedList<String>();
 		

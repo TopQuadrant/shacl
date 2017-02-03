@@ -126,7 +126,7 @@ public class SPINARQPFunction extends PropertyFunctionBase implements PropertyFu
 	}
 
 	
-	@Override
+    @Override
 	public QueryIterator exec(Binding binding, PropFuncArg argSubject, Node predicate,
 			PropFuncArg argObject, ExecutionContext context) {
 

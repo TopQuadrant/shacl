@@ -78,9 +78,9 @@ ex:InvalidRectangle3
 .
 ex:Rectangle
   rdf:type rdfs:Class ;
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   sh:property [
-      sh:predicate ex:area ;
+      sh:path ex:area ;
       sh:datatype xsd:integer ;
       sh:derivedValues [
           rdf:type sh:SPARQLValuesDeriver ;
@@ -96,11 +96,11 @@ ex:Rectangle
         ] ;
     ] ;
   sh:property [
-      sh:predicate ex:height ;
+      sh:path ex:height ;
       sh:datatype xsd:integer ;
     ] ;
   sh:property [
-      sh:predicate ex:width ;
+      sh:path ex:width ;
       sh:datatype xsd:integer ;
     ] ;
 .

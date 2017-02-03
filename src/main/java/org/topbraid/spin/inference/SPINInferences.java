@@ -272,7 +272,7 @@ public class SPINInferences {
 			SPINExplanations explanations, 
 			String explanationText, 
 			Set<Statement> newRules, 
-			boolean thisUnbound, 
+			boolean thisUnbound,
 			ProgressMonitor monitor) {
 		
 		// Check if query is needed at all

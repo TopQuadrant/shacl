@@ -58,9 +58,9 @@ ex:SuperClassInstance
   rdf:type ex:SuperClass ;
 .
 ex:TestShape
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   sh:property [
-      sh:predicate ex:testProperty ;
+      sh:path ex:testProperty ;
       rdfs:label "test property" ;
       sh:class ex:SuperClass ;
     ] ;

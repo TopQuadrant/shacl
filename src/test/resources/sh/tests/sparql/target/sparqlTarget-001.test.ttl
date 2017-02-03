@@ -14,7 +14,6 @@
   rdf:type owl:Ontology ;
   rdfs:label "Test of sh:SPARQLTarget 001" ;
   owl:imports <http://datashapes.org/dash> ;
-  owl:versionInfo "Created with TopBraid Composer" ;
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
@@ -35,10 +34,10 @@ ex:InvalidInstance1
   rdfs:label "Invalid instance1" ;
 .
 ex:TestShape
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   rdfs:label "Test shape" ;
   sh:property [
-      sh:predicate rdfs:label ;
+      sh:path rdfs:label ;
       rdfs:comment "Must not have any rdfs:label" ;
       rdfs:label "label" ;
       sh:datatype xsd:string ;
@@ -47,10 +46,11 @@ ex:TestShape
   sh:target [
       rdf:type sh:SPARQLTarget ;
       sh:prefixes <http://datashapes.org/sh/tests/sparql/target/sparqlTarget-001.test> ;
-      sh:select """SELECT ?this
-WHERE {
-    ?this a owl:Thing .
-}""" ;
+      sh:select """
+      	SELECT ?this
+		WHERE {
+    		?this a owl:Thing .
+		}""" ;
     ] ;
 .
 ex:ValidInstance1

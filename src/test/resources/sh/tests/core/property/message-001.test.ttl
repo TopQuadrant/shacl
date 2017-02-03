@@ -12,15 +12,15 @@
 
 <http://datashapes.org/sh/tests/core/property/message-001.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of message-001" ;
+  rdfs:label "Test of sh:message 001" ;
   owl:imports <http://datashapes.org/dash> ;
   owl:versionInfo "Created with TopBraid Composer" ;
 .
 ex:TestShape
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   rdfs:label "Test shape" ;
   sh:property [
-      sh:predicate ex:testProperty ;
+      sh:path ex:testProperty ;
       sh:message "Not enough values for this property" ;
       sh:minCount 1 ;
     ] ;

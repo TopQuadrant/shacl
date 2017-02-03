@@ -12,7 +12,7 @@
 
 <http://datashapes.org/sh/tests/core/target/targetSubjectsOf-002.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of targetObjectsOf 002" ;
+  rdfs:label "Test of targetSubjectsOf 002" ;
   owl:imports <http://datashapes.org/dash> ;
 .
 ex:GraphValidationTestCase
@@ -49,9 +49,9 @@ ex:MyClass
   rdf:type rdfs:Class ;
 .
 ex:MyShape
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   sh:property [
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:maxCount 1 ;
     ] ;
   sh:targetClass ex:MyClass ;

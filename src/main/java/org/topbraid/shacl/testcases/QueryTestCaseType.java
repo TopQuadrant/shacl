@@ -28,12 +28,12 @@ public class QueryTestCaseType implements TestCaseType {
 		SPINThreadFunctions old = SPINThreadFunctionRegistry.register(model);
 		try {
 			Query query = ARQFactory.get().createQuery(model, queryString);
-			QueryExecution qexec = ARQFactory.get().createQueryExecution(query, model);
-			ResultSet actualResults = qexec.execSelect();
-			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			ResultSetFormatter.outputAsJSON(os, actualResults);
-			qexec.close();
-			return os.toString("UTF-8");
+			try(QueryExecution qexec = ARQFactory.get().createQueryExecution(query, model)) {
+    			ResultSet actualResults = qexec.execSelect();
+    			ByteArrayOutputStream os = new ByteArrayOutputStream();
+    			ResultSetFormatter.outputAsJSON(os, actualResults);
+                return os.toString("UTF-8");
+			}
 		} 
 		catch (UnsupportedEncodingException e) {
 			throw ExceptionUtil.throwUnchecked(e);
@@ -73,7 +73,7 @@ public class QueryTestCaseType implements TestCaseType {
 				createResult(results, DASH.SuccessTestCaseResult);
 			}
 			else {
-				createFailure(results, "Mismatching result set");
+				createFailure(results, "Mismatching result set. Actual: " + actual);
 			}
 		}
 	}

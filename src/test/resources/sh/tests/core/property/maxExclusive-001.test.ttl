@@ -57,9 +57,9 @@ ex:InvalidResource3
   ex:property "a" ;
 .
 ex:MyShape
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   sh:property [
-      sh:predicate ex:property ;
+      sh:path ex:property ;
       sh:maxExclusive 1 ;
     ] ;
   sh:targetNode ex:InvalidResource1 ;

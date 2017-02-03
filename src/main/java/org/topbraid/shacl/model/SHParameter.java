@@ -1,4 +1,4 @@
 package org.topbraid.shacl.model;
 
-public interface SHParameter extends SHPropertyConstraint {
+public interface SHParameter extends SHPropertyShape {
 }

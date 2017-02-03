@@ -18,8 +18,8 @@ import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.XSD;
-import org.topbraid.shacl.model.SHPropertyConstraint;
-import org.topbraid.shacl.model.SHShape;
+import org.topbraid.shacl.model.SHPropertyShape;
+import org.topbraid.shacl.model.SHNodeShape;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.vocabulary.ARG;
@@ -101,7 +101,7 @@ class IsMultiFunctionHelper {
 		if(SHACLUtil.exists(graph)) {
 			Model model = ModelFactory.createModelForGraph(graph);
 			Resource cls = (Resource) model.asRDFNode(type);
-			for(SHShape shape : SHACLUtil.getDirectShapesAtClassOrShape(cls)) {
+			for(SHNodeShape shape : SHACLUtil.getDirectShapesAtClassOrShape(cls)) {
 				if(!shape.isDeactivated()) {
 					if(hasShapeMaxCount1(shape, property)) {
 						return false;
@@ -141,8 +141,8 @@ class IsMultiFunctionHelper {
 	}
 
 
-	private static boolean hasShapeMaxCount1(SHShape shape, Node predicateNode) {
-		for(SHPropertyConstraint c : shape.getPropertyConstraints(shape.getModel().asRDFNode(predicateNode))) {
+	private static boolean hasShapeMaxCount1(SHNodeShape shape, Node predicateNode) {
+		for(SHPropertyShape c : shape.getPropertyConstraints(shape.getModel().asRDFNode(predicateNode))) {
 			if(!c.isDeactivated()) {
 				Integer maxCount = JenaUtil.getIntegerProperty(c, SH.maxCount);
 				if(maxCount != null && maxCount < 2) {

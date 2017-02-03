@@ -58,7 +58,7 @@ public class SHACLFunctions {
 			if(validator.isURIResource() && 
 					!FunctionRegistry.get().isRegistered(validator.getURI()) &&
 					JenaUtil.hasIndirectType(validator, SH.SPARQLAskValidator)) {
-				FunctionFactory arqFunction = new SHACLARQFunction(component, validator);
+				FunctionFactory arqFunction = new SHACLSPARQLARQFunction(component, validator);
 				if(arqFunction != null) {
 					FunctionRegistry.get().put(validator.getURI(), arqFunction);
 				}

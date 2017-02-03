@@ -12,9 +12,8 @@
 
 <http://datashapes.org/sh/tests/core/property/pattern-002.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of pattern-002" ;
+  rdfs:label "Test of sh:pattern in property shape 002" ;
   owl:imports <http://datashapes.org/dash> ;
-  owl:versionInfo "Created with TopBraid Composer" ;
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
@@ -38,10 +37,10 @@ ex:InvalidInstance1
 .
 ex:TestShape
   rdf:type rdfs:Class ;
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   rdfs:label "Test shape" ;
   sh:property [
-      sh:predicate ex:property ;
+      sh:path ex:property ;
       rdfs:label "property" ;
       sh:datatype xsd:string ;
       sh:flags "i" ;

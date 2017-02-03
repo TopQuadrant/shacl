@@ -14,14 +14,10 @@ import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.QuerySolutionMap;
-import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.core.DatasetImpl;
 import org.apache.jena.sparql.core.Substitute;
 import org.apache.jena.sparql.engine.binding.Binding;
@@ -34,15 +30,10 @@ import org.apache.jena.sparql.serializer.SerializationContext;
 import org.apache.jena.sparql.sse.SSE;
 import org.apache.jena.sparql.util.ExprUtils;
 import org.apache.jena.sparql.util.FmtUtils;
-import org.topbraid.shacl.constraints.sparql.SPARQLExecutionLanguage;
-import org.topbraid.shacl.model.SHConstraintComponent;
 import org.topbraid.shacl.model.SHFunction;
 import org.topbraid.shacl.model.SHParameter;
 import org.topbraid.shacl.model.SHParameterizable;
 import org.topbraid.shacl.vocabulary.DASH;
-import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.arq.ARQFactory;
-import org.topbraid.spin.arq.DatasetWithDifferentDefaultModel;
 import org.topbraid.spin.arq.SPINFunctionFactory;
 import org.topbraid.spin.statistics.SPINStatistics;
 import org.topbraid.spin.statistics.SPINStatisticsManager;
@@ -51,89 +42,40 @@ import org.topbraid.spin.util.JenaUtil;
 
 
 /**
- * An ARQ function that delegates its functionality into a user-defined SHACL function.
- * 
- * There are two ways of declaring such functions:
- * - as sh:Function (similar to SPIN functions)
- * - from constraint components that point at sh:SPARQLAskValidators
- * This class has two constructors for those two cases.
- * 
- * Use the SHACLFunctions class to install them from their definitions in a Model.
+ * An ARQ function that is based on a SHACL function definition.
  * 
  * @author Holger Knublauch
  */
-public class SHACLARQFunction implements org.apache.jena.sparql.function.Function, SPINFunctionFactory {
-	
-	private org.apache.jena.query.Query arqQuery;
+public abstract class SHACLARQFunction implements org.apache.jena.sparql.function.Function, SPINFunctionFactory {
 	
 	private boolean cachable;
 	
-	private List<String> paramNames = new ArrayList<String>();
+	protected List<String> paramNames = new ArrayList<String>();
 	
-	private String queryString;
-	
-	private SHFunction shaclFunction;
+	private SHFunction shFunction;
 	
 
 	/**
-	 * Constructs a new SHACLARQFunction based on a given sh:ConstraintComponent
-	 * and a given validator (which must be a value of sh:nodeValidator, sh:propertyValidator etc.
-	 * @param component  the constraint component (defining the sh:parameters)
-	 * @param askValidator  the sh:SPARQLAskValidator resource
-	 */
-	public SHACLARQFunction(SHConstraintComponent component, Resource askValidator) {
-		
-		try {
-			queryString = JenaUtil.getStringProperty(askValidator, SH.ask);
-			arqQuery = ARQFactory.get().createQuery(SPARQLExecutionLanguage.withPrefixes(queryString, askValidator));
-		}
-		catch(Exception ex) {
-			throw new IllegalArgumentException("Validator " + askValidator + " does not define a valid body", ex);
-		}
-		if(!arqQuery.isAskType()) {
-            throw new ExprEvalException("Body must be ASK query");
-		}
-		
-		paramNames.add("value");
-		addParameters(component);
-		paramNames.add("shapesGraph");
-	}
-	
-
-	/**
-	 * Constructs a new SHACLARQFunction based on a given sh:Function.
+	 * Constructs a new SHARQFunction based on a given sh:Function.
 	 * The shaclFunction must be associated with the Model containing
 	 * the triples of its definition.
 	 * @param shaclFunction  the SHACL function
 	 */
-	public SHACLARQFunction(SHFunction shaclFunction) {
-		
-		this.shaclFunction = shaclFunction;
-		
-		this.cachable = shaclFunction.hasProperty(DASH.cachable, JenaDatatypes.TRUE);
-		
-		try {
-			queryString = shaclFunction.getSPARQL();
-			arqQuery = ARQFactory.get().createQuery(shaclFunction.getModel(), queryString);
+	protected SHACLARQFunction(SHFunction shaclFunction) {
+		this.shFunction = shaclFunction;
+		if(shaclFunction != null) {
+			this.cachable = shaclFunction.hasProperty(DASH.cachable, JenaDatatypes.TRUE);
 		}
-		catch(Exception ex) {
-			throw new IllegalArgumentException("Function " + shaclFunction.getURI() + " does not define a valid body", ex);
-		}
-		if(!arqQuery.isAskType() && !arqQuery.isSelectType()) {
-            throw new ExprEvalException("Body must be ASK or SELECT query");
-		}
-
-		addParameters(shaclFunction);
 	}
 
 
-	private void addParameters(SHParameterizable parameterizable) {
+	protected void addParameters(SHParameterizable parameterizable) {
 		JenaUtil.setGraphReadOptimization(true);
 		try {
 			for(SHParameter param : parameterizable.getOrderedParameters()) {
 				String varName = param.getVarName();
 				if(varName == null) {
-					throw new IllegalStateException("Parameter " + param + " of " + parameterizable + " does not have a valid predicate");
+					throw new IllegalStateException(param + " of " + parameterizable + " does not have a valid predicate");
 				}
 				paramNames.add(varName);
 			}
@@ -202,7 +144,7 @@ public class SHACLARQFunction implements org.apache.jena.sparql.function.Functio
 		if(SPINStatisticsManager.get().isRecording() && SPINStatisticsManager.get().isRecordingSPINFunctions()) {
 			StringBuffer sb = new StringBuffer();
 			sb.append("SHACL Function ");
-			sb.append(SSE.format(NodeFactory.createURI(uri), model));
+			sb.append(SSE.str(NodeFactory.createURI(uri), model));
 			sb.append("(");
 			for(int i = 0; i < args.size(); i++) {
 				if(i > 0) {
@@ -241,7 +183,7 @@ public class SHACLARQFunction implements org.apache.jena.sparql.function.Functio
 			}
 			finally {
 				long endTime = System.currentTimeMillis();
-				SPINStatistics stats = new SPINStatistics(sb.toString(), queryString, endTime - startTime, startTime, NodeFactory.createURI(uri));
+				SPINStatistics stats = new SPINStatistics(sb.toString(), getQueryString(), endTime - startTime, startTime, NodeFactory.createURI(uri));
 				SPINStatisticsManager.get().addSilently(Collections.singleton(stats));
 			}
 			return result;
@@ -257,60 +199,18 @@ public class SHACLARQFunction implements org.apache.jena.sparql.function.Functio
 	}
 
 
-	public NodeValue executeBody(Model model, QuerySolution bindings) {
-		return executeBody(null, model, bindings);
-	}
+	public abstract NodeValue executeBody(Dataset dataset, Model model, QuerySolution bindings);
 	
 	
-	private QueryExecution createQueryExecution(Dataset dataset, Model defaultModel, QuerySolution bindings) {
-	    if(dataset == null) {
-            return ARQFactory.get().createQueryExecution(arqQuery, defaultModel, bindings);
-	    }
-	    else {
-	    	Dataset newDataset = new DatasetWithDifferentDefaultModel(defaultModel, dataset);
-	    	return ARQFactory.get().createQueryExecution(arqQuery, newDataset, bindings);
-	    }
-	}
-	
-	
-	public NodeValue executeBody(Dataset dataset, Model defaultModel, QuerySolution bindings) {
-	    try( QueryExecution qexec = createQueryExecution(dataset, defaultModel, bindings) ) {
-	        if(arqQuery.isAskType()) {
-	            boolean result = qexec.execAsk();
-	            return NodeValue.makeBoolean(result);
-	        }
-	        else {
-	            ResultSet rs = qexec.execSelect();
-	            if(rs.hasNext()) {
-	                QuerySolution s = rs.nextSolution();
-	                List<String> resultVars = rs.getResultVars();
-	                String varName = resultVars.get(0);
-	                RDFNode resultNode = s.get(varName);
-	                if(resultNode != null) {
-	                    return NodeValue.makeNode(resultNode.asNode());
-	                }
-	            }
-	            throw new ExprEvalException("Empty result set for SHACL function");
-	        }
-	    }
-	}
-	
-
-	/**
-	 * Gets the Jena Query object for execution.
-	 * @return the Jena Query
-	 */
-	public org.apache.jena.query.Query getBodyQuery() {
-		return arqQuery;
-	}
+	protected abstract String getQueryString();
 	
 	
 	/**
-	 * Gets the underlying SHACLFunction Model object for this ARQ function.
-	 * @return the SHACLFunction (may be null)
+	 * Gets the underlying sh:Function Model object for this ARQ function.
+	 * @return the sh:Function (may be null)
 	 */
 	public SHFunction getSHACLFunction() {
-		return shaclFunction;
+		return shFunction;
 	}
 	
 	

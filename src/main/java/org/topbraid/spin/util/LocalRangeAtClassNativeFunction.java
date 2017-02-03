@@ -18,7 +18,7 @@ import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.XSD;
-import org.topbraid.shacl.model.SHShape;
+import org.topbraid.shacl.model.SHNodeShape;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.AbstractFunction2;
@@ -191,7 +191,7 @@ public class LocalRangeAtClassNativeFunction extends AbstractFunction2 {
 		
 		if(SHACLUtil.exists(graph)) {
 			
-			for(SHShape shape : SHACLUtil.getDirectShapesAtClassOrShape((Resource)ModelFactory.createModelForGraph(graph).asRDFNode(type))) {
+			for(SHNodeShape shape : SHACLUtil.getDirectShapesAtClassOrShape((Resource)ModelFactory.createModelForGraph(graph).asRDFNode(type))) {
 				
 				Node paramResult = walkPropertyConstraint(graph, shape.asNode(), property, SH.parameter.asNode());
 				if(paramResult != null) {
@@ -223,7 +223,7 @@ public class LocalRangeAtClassNativeFunction extends AbstractFunction2 {
 		while(it.hasNext()) {
 			Node constraint = it.next().getObject();
 			if(constraint.isBlank() || constraint.isURI()) {
-				if(graph.contains(constraint, SH.predicate.asNode(), predicate)) {
+				if(graph.contains(constraint, SH.path.asNode(), predicate)) {
 					Node valueType = getObject(constraint, SH.class_.asNode(), graph);
 					if(valueType != null) {
 						it.close();

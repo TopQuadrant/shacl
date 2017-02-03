@@ -36,10 +36,10 @@ ex:InvalidResource
   owl:versionInfo "1.0" ;
 .
 ex:TestShape
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   rdfs:label "Test shape" ;
   sh:property [
-      sh:predicate owl:versionInfo ;
+      sh:path owl:versionInfo ;
       sh:maxCount 0 ;
     ] ;
   sh:targetNode ex:InvalidResource ;

@@ -61,9 +61,9 @@ ex:InvalidResource3
   ex:property2 4 ;
 .
 ex:MyShape
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   sh:property [
-      sh:predicate ex:property1 ;
+      sh:path ex:property1 ;
       sh:lessThan ex:property2 ;
     ] ;
   sh:targetNode ex:InvalidResource1 ;

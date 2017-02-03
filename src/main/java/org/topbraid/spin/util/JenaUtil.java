@@ -660,6 +660,19 @@ public class JenaUtil {
 	}
 	
 	
+	public static Resource getResourcePropertyWithType(Resource subject, Property predicate, Resource type) {
+		StmtIterator it = subject.listProperties(predicate);
+		while(it.hasNext()) {
+			Statement s = it.next();
+			if(s.getObject().isResource() && JenaUtil.hasIndirectType(s.getResource(), type)) {
+				it.close();
+				return s.getResource();
+			}
+		}
+		return null;
+	}
+	
+	
 	public static List<Resource> getResourceProperties(Resource subject, Property predicate) {
 		List<Resource> results = new LinkedList<Resource>();
 		StmtIterator it = subject.listProperties(predicate);

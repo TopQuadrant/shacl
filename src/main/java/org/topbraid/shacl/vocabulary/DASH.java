@@ -52,6 +52,8 @@ public class DASH {
 
     public final static Resource TestCase = ResourceFactory.createResource(NS + "TestCase");
 
+    public final static Resource TestEnvironment = ResourceFactory.createResource(NS + "TestEnvironment");
+
     public final static Resource ValidationTestCase = ResourceFactory.createResource(NS + "ValidationTestCase");
 
 
@@ -87,7 +89,11 @@ public class DASH {
 
     public final static Property testCase = ResourceFactory.createProperty(NS + "testCase");
 
+    public final static Property testEnvironment = ResourceFactory.createProperty(NS + "testEnvironment");
+
     public final static Property testGraph = ResourceFactory.createProperty(NS + "testGraph");
+    
+    public final static Property testModifiesEnvironment = ResourceFactory.createProperty(NS + "testModifiesEnvironment");
 
 
     public static String getURI() {

@@ -5,7 +5,7 @@ import java.util.List;
 import org.topbraid.shacl.constraints.ConstraintExecutable;
 
 /**
- * Shared interface of SHACLSPARQLConstraint and SHACLParameterizableConstraint.
+ * Shared interface of SHSPARQLConstraint and SHShape.
  * 
  * @author Holger Knublauch
  */
@@ -15,7 +15,7 @@ public interface SHConstraint extends SHResource {
 	
 	
 	/**
-	 * Checks if this constraint has been deactivated.
+	 * Checks if this constraint or shape has been deactivated.
 	 * @return true if deactivated
 	 */
 	boolean isDeactivated();

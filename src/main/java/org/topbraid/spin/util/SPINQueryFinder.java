@@ -9,6 +9,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.jena.query.Query;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.update.UpdateRequest;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.model.Argument;
 import org.topbraid.spin.model.Ask;
@@ -21,14 +28,6 @@ import org.topbraid.spin.model.TemplateCall;
 import org.topbraid.spin.model.update.Update;
 import org.topbraid.spin.system.SPINLabels;
 import org.topbraid.spin.vocabulary.SPIN;
-
-import org.apache.jena.query.Query;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.update.UpdateRequest;
 
 
 /**
@@ -130,24 +129,28 @@ public class SPINQueryFinder {
 		if(spinQueryText == null) {
 			spinQueryText = queryString;
 		}
-		Integer thisDepth = null;
-		if(!thisUnbound && withClass &&
-				(spinCommand instanceof Construct || spinCommand instanceof Update || spinCommand instanceof Ask) ) {
-			if(SPINUtil.containsThis((CommandWithWhere)spinCommand)) {
-				queryString = SPINUtil.addThisTypeClause(queryString);
-			}
-		}
 		CommandWrapper wrapper = null;
 		if(spinCommand instanceof org.topbraid.spin.model.Query) {
 			Query arqQuery = ARQFactory.get().createQuery(queryString);
 			if(arqQuery.isConstructType() || (allowAsk && arqQuery.isAskType())) {
-				wrapper = new QueryWrapper(arqQuery, source, spinQueryText, (org.topbraid.spin.model.Query)spinCommand, label, s, thisUnbound, thisDepth);
+				boolean thisDeep = NestedQueries.hasNestedBlocksUsingThis(arqQuery.getQueryPattern());
+				if(!thisUnbound && withClass && !thisDeep && SPINUtil.containsThis((CommandWithWhere)spinCommand)) {
+					queryString = SPINUtil.addThisTypeClause(queryString);
+					arqQuery = ARQFactory.get().createQuery(queryString);
+				}
+				wrapper = new QueryWrapper(arqQuery, source, spinQueryText, (org.topbraid.spin.model.Query)spinCommand, label, s, thisUnbound, thisDeep);
 			}
 		}
 		else if(spinCommand instanceof Update) {
 			UpdateRequest updateRequest = ARQFactory.get().createUpdateRequest(queryString);
 			org.apache.jena.update.Update operation = updateRequest.getOperations().get(0);
-			wrapper = new UpdateWrapper(operation, source, spinQueryText, (Update)spinCommand, label, s, thisUnbound, thisDepth);
+			boolean thisDeep = NestedQueries.hasNestedBlocksUsingThis(operation);
+			if(!thisUnbound && withClass && !thisDeep && SPINUtil.containsThis((CommandWithWhere)spinCommand)) {
+				queryString = SPINUtil.addThisTypeClause(queryString);
+				updateRequest = ARQFactory.get().createUpdateRequest(queryString);
+				operation = updateRequest.getOperations().get(0);
+			}
+			wrapper = new UpdateWrapper(operation, source, spinQueryText, (Update)spinCommand, label, s, thisUnbound, thisDeep);
 		}
 		return wrapper;
 	}

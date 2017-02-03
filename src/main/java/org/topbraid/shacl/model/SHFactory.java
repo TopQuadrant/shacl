@@ -11,17 +11,21 @@ import org.apache.jena.vocabulary.RDFS;
 import org.topbraid.shacl.arq.functions.HasShapeFunction;
 import org.topbraid.shacl.arq.functions.IsValidForDatatypeFunction;
 import org.topbraid.shacl.arq.functions.TargetContainsPFunction;
+import org.topbraid.shacl.js.SHJS;
 import org.topbraid.shacl.model.impl.SHConstraintComponentImpl;
-import org.topbraid.shacl.model.impl.SHFunctionImpl;
+import org.topbraid.shacl.model.impl.SHJSConstraintImpl;
+import org.topbraid.shacl.model.impl.SHJSExecutableImpl;
+import org.topbraid.shacl.model.impl.SHJSFunctionImpl;
+import org.topbraid.shacl.model.impl.SHNodeShapeImpl;
 import org.topbraid.shacl.model.impl.SHParameterImpl;
 import org.topbraid.shacl.model.impl.SHParameterizableImpl;
 import org.topbraid.shacl.model.impl.SHParameterizableInstanceImpl;
 import org.topbraid.shacl.model.impl.SHParameterizableTargetImpl;
-import org.topbraid.shacl.model.impl.SHPropertyConstraintImpl;
+import org.topbraid.shacl.model.impl.SHPropertyShapeImpl;
 import org.topbraid.shacl.model.impl.SHResultImpl;
 import org.topbraid.shacl.model.impl.SHSPARQLConstraintImpl;
+import org.topbraid.shacl.model.impl.SHSPARQLFunctionImpl;
 import org.topbraid.shacl.model.impl.SHSPARQLTargetImpl;
-import org.topbraid.shacl.model.impl.SHShapeImpl;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.shacl.vocabulary.TOSH;
@@ -37,17 +41,20 @@ public class SHFactory {
     
 	private static void init(Personality<RDFNode> p) {
 		p.add(SHConstraintComponent.class, new SimpleImplementation(SH.ConstraintComponent.asNode(), SHConstraintComponentImpl.class));
-		p.add(SHFunction.class, new SimpleImplementation(SH.Function.asNode(), SHFunctionImpl.class));
+		p.add(SHJSConstraint.class, new SimpleImplementation(SHJS.JSConstraint.asNode(), SHJSConstraintImpl.class));
+		p.add(SHJSExecutable.class, new SimpleImplementation(SHJS.JSExecutable.asNode(), SHJSExecutableImpl.class));
+		p.add(SHJSFunction.class, new SimpleImplementation(SHJS.JSFunction.asNode(), SHJSFunctionImpl.class));
     	p.add(SHParameter.class, new SimpleImplementation(SH.Parameter.asNode(), SHParameterImpl.class));
     	p.add(SHParameterizable.class, new SimpleImplementation(SH.Parameterizable.asNode(), SHParameterizableImpl.class));
     	p.add(SHParameterizableInstance.class, new SimpleImplementation(RDFS.Resource.asNode(), SHParameterizableInstanceImpl.class));
     	p.add(SHParameterizableTarget.class, new SimpleImplementation(SH.Target.asNode(), SHParameterizableTargetImpl.class));
-    	p.add(SHPropertyConstraint.class, new SimpleImplementation(SH.PropertyConstraint.asNode(), SHPropertyConstraintImpl.class));
+    	p.add(SHPropertyShape.class, new SimpleImplementation(SH.PropertyShape.asNode(), SHPropertyShapeImpl.class));
     	p.add(SHResult.class, new SimpleImplementation(SH.AbstractResult.asNode(), SHResultImpl.class));
-    	p.add(SHShape.class, new SimpleImplementation(SH.Shape.asNode(), SHShapeImpl.class));
+    	p.add(SHNodeShape.class, new SimpleImplementation(SH.NodeShape.asNode(), SHNodeShapeImpl.class));
 		p.add(SHSPARQLConstraint.class, new SimpleImplementation(SH.SPARQLConstraint.asNode(), SHSPARQLConstraintImpl.class));
+		p.add(SHSPARQLFunction.class, new SimpleImplementation(SH.SPARQLFunction.asNode(), SHSPARQLFunctionImpl.class));
 		p.add(SHSPARQLTarget.class, new SimpleImplementation(SH.SPARQLTarget.asNode(), SHSPARQLTargetImpl.class));
-    	
+
 		FunctionRegistry.get().put(TOSH.hasShape.getURI(), HasShapeFunction.class);
 		FunctionRegistry.get().put("http://spinrdf.org/spif#isValidForDatatype", IsValidForDatatypeFunction.class);
 		PropertyFunctionRegistry.get().put(TargetContainsPFunction.URI, TargetContainsPFunction.class);
@@ -59,8 +66,8 @@ public class SHFactory {
 	}
 	
 	
-	public static SHFunction asFunction(RDFNode resource) {
-		return resource.as(SHFunction.class);
+	public static SHSPARQLFunction asSPARQLFunction(RDFNode resource) {
+		return resource.as(SHSPARQLFunction.class);
 	}
 	
 	
@@ -74,13 +81,13 @@ public class SHFactory {
 	}
 	
 	
-	public static SHPropertyConstraint asPropertyConstraint(RDFNode node) {
-		return node.as(SHPropertyConstraint.class);
+	public static SHPropertyShape asPropertyConstraint(RDFNode node) {
+		return node.as(SHPropertyShape.class);
 	}
 	
 	
-	public static SHShape asShape(RDFNode node) {
-		return node.as(SHShape.class);
+	public static SHNodeShape asNodeShape(RDFNode node) {
+		return node.as(SHNodeShape.class);
 	}
 	
 	
@@ -99,15 +106,15 @@ public class SHFactory {
 	}
 	
 	
-	public static SHParameterizableConstraint asParameterizableConstraint(RDFNode node) {
-		if(node instanceof Resource && isPropertyConstraint((Resource)node)) {
+	public static SHShape asShape(RDFNode node) {
+		if(node instanceof Resource && isPropertyShape((Resource)node)) {
 			return asPropertyConstraint(node);
 		}
 		else if(node instanceof Resource && isParameter((Resource)node)) {
 			return asParameter(node);
 		}
 		else {
-			return asShape(node);
+			return asNodeShape(node);
 		}
 	}
 	
@@ -131,7 +138,7 @@ public class SHFactory {
 	
 	/**
 	 * Checks if a given node is a Shape.  Note this is just an approximation based
-	 * on a couple of hard-coded properties.  It should really rely on sh:defaultValueType.
+	 * on a couple of hard-coded properties.
 	 * @param node  the node to test
 	 * @return true if node is a Shape
 	 */
@@ -143,7 +150,7 @@ public class SHFactory {
 			else if(node.isAnon() && !((Resource)node).hasProperty(RDF.type)) {
 				// TODO: This logic is not really correct - it should also test that if
 				//       other rdf:type triples are present
-				if(node.getModel().contains(null, SH.shape, node)) {
+				if(node.getModel().contains(null, SH.node, node)) {
 					return true;
 				}
 			}
@@ -159,8 +166,8 @@ public class SHFactory {
 				return  node.getModel().contains(null, SH.property, node) ||
 						node.getModel().contains(null, SH.parameter, node);
 			}
-			else if(r.hasProperty(RDF.type, SH.Shape) ||
-					r.hasProperty(RDF.type, SH.PropertyConstraint) ||
+			else if(r.hasProperty(RDF.type, SH.NodeShape) ||
+					r.hasProperty(RDF.type, SH.PropertyShape) ||
 					r.hasProperty(RDF.type, SH.Parameter)) {
 				return true;
 			}
@@ -206,13 +213,8 @@ public class SHFactory {
 	}
 	
 	
-	public static boolean isPropertyConstraint(Resource resource) {
-		return resource.hasProperty(RDF.type, SH.PropertyConstraint) ||
+	public static boolean isPropertyShape(Resource resource) {
+		return resource.hasProperty(RDF.type, SH.PropertyShape) ||
 				resource.getModel().contains(null, SH.property, resource);
-	}
-	
-	
-	public static boolean isPropertyConstraintWithPath(Resource resource) {
-		return resource.hasProperty(SH.path) && isPropertyConstraint(resource);
 	}
 }

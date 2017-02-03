@@ -168,7 +168,7 @@ public class SPINARQFunction implements org.apache.jena.sparql.function.Function
 		if(SPINStatisticsManager.get().isRecording() && SPINStatisticsManager.get().isRecordingSPINFunctions()) {
 			StringBuffer sb = new StringBuffer();
 			sb.append("SPIN Function ");
-			sb.append(SSE.format(NodeFactory.createURI(uri), model));
+			sb.append(SSE.str(NodeFactory.createURI(uri), model));
 			sb.append("(");
 			for(int i = 0; i < args.size(); i++) {
 				if(i > 0) {

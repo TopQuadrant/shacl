@@ -58,8 +58,8 @@ public class JenaDatatypes {
 		otherDatatypeURIs.add(XSD.anyURI.getURI());
 		otherDatatypeURIs.add(XSD.base64Binary.getURI());
 		otherDatatypeURIs.add(XSD.date.getURI());
-		// PLAT-921 : Add XSD.dateTimeStamp here.
 		otherDatatypeURIs.add(XSD.dateTime.getURI());
+		otherDatatypeURIs.add(XSD.dateTimeStamp.getURI());
 		otherDatatypeURIs.add(XSD.duration.getURI());
 		otherDatatypeURIs.add(XSD.ENTITY.getURI());
 		otherDatatypeURIs.add(XSD.gDay.getURI());

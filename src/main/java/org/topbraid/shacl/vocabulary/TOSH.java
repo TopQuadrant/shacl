@@ -20,6 +20,7 @@ public class TOSH {
     
     public final static Resource hasShape = ResourceFactory.createResource(NS + "hasShape");
 
+    public final static Resource JSLibrary = ResourceFactory.createResource(NS + "JSLibrary");
     
     public final static Property useDeclaredDatatype = ResourceFactory.createProperty(NS + "useDeclaredDatatype");
 

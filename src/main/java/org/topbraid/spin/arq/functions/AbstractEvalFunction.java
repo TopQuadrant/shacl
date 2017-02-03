@@ -67,7 +67,7 @@ abstract class AbstractEvalFunction extends AbstractFunction implements Function
 				sb.append("?arg" + (i + 1));
 			}
 			else {
-				sb.append(SSE.format(nodes[i], env.getActiveGraph().getPrefixMapping()));
+				sb.append(SSE.str(nodes[i], env.getActiveGraph().getPrefixMapping()));
 			}
 		}
 		sb.append(")");

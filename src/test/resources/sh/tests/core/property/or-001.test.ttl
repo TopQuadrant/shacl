@@ -12,9 +12,8 @@
 
 <http://datashapes.org/sh/tests/core/property/or-001.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of or-001" ;
+  rdfs:label "Test of sh:or in property shape 001" ;
   owl:imports <http://datashapes.org/dash> ;
-  owl:versionInfo "Created with TopBraid Composer" ;
 .
 ex:Address
   rdf:type rdfs:Class ;
@@ -22,10 +21,10 @@ ex:Address
   rdfs:subClassOf rdfs:Resource ;
 .
 ex:AddressShape
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   rdfs:label "Address shape" ;
   sh:property [
-      sh:predicate ex:address ;
+      sh:path ex:address ;
       sh:or (
           [
             sh:datatype xsd:string ;

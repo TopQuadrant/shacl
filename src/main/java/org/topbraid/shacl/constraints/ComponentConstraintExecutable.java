@@ -12,7 +12,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.topbraid.shacl.model.SHConstraintComponent;
 import org.topbraid.shacl.model.SHFactory;
 import org.topbraid.shacl.model.SHParameter;
-import org.topbraid.shacl.model.SHParameterizableConstraint;
+import org.topbraid.shacl.model.SHShape;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.system.SPINLabels;
 import org.topbraid.spin.util.JenaUtil;
@@ -29,7 +29,7 @@ public class ComponentConstraintExecutable extends ConstraintExecutable {
 	
 	private SHConstraintComponent component;
 	
-	private SHParameterizableConstraint constraint;
+	private SHShape constraint;
 	
 	private Resource context;
 
@@ -37,11 +37,11 @@ public class ComponentConstraintExecutable extends ConstraintExecutable {
 	private RDFNode parameterValue;
 	
 	
-	public ComponentConstraintExecutable(SHParameterizableConstraint constraint, 
+	public ComponentConstraintExecutable(SHShape constraint, 
 			SHConstraintComponent component, Resource context) {
 		super(constraint);
 		
-		if(!SH.Shape.equals(context) && !SH.PropertyConstraint.equals(context)) {
+		if(!SH.NodeShape.equals(context) && !SH.PropertyShape.equals(context)) {
 			throw new IllegalArgumentException("Invalid context: " + context);
 		}
 		this.constraint = constraint;
@@ -50,7 +50,7 @@ public class ComponentConstraintExecutable extends ConstraintExecutable {
 	}
 	
 	
-	public ComponentConstraintExecutable(SHParameterizableConstraint constraint, 
+	public ComponentConstraintExecutable(SHShape constraint, 
 			SHConstraintComponent component, Resource context, RDFNode parameterValue) {
 		this(constraint, component, context);
 		this.parameterValue = parameterValue;
@@ -98,7 +98,8 @@ public class ComponentConstraintExecutable extends ConstraintExecutable {
 			return constraintMessages;
 		}
 		else {
-			Resource validator = getValidator();
+			ExecutionLanguage lang = ExecutionLanguageSelector.get().getLanguageForConstraint(this);
+			Resource validator = getValidator(lang.getExecutableType());
 			if(validator != null) {
 				return JenaUtil.getLiteralProperties(validator, SH.message);
 			}
@@ -114,12 +115,12 @@ public class ComponentConstraintExecutable extends ConstraintExecutable {
 	}
 
 
-	public Resource getValidator() {
+	public Resource getValidator(Resource executableType) {
 		
-		Property predicate = SH.PropertyConstraint.equals(context) ? SH.propertyValidator : SH.shapeValidator;
-		Resource validator = JenaUtil.getResourceProperty(component, predicate);
+		Property predicate = SH.PropertyShape.equals(context) ? SH.propertyValidator : SH.nodeValidator;
+		Resource validator = JenaUtil.getResourcePropertyWithType(component, predicate, executableType);
 		if(validator == null) {
-			validator = JenaUtil.getResourceProperty(component, SH.validator);
+			validator = JenaUtil.getResourcePropertyWithType(component, SH.validator, executableType);
 		}
 		
 		return validator;
@@ -127,8 +128,8 @@ public class ComponentConstraintExecutable extends ConstraintExecutable {
 	
 	
 	/**
-	 * Checks if all non-optional parameters are present, also checking for either sh:predicate or sh:path
-	 * in the case of property constraints.
+	 * Checks if all non-optional parameters are present, also checking for sh:path
+	 * in the case of property shapes.
 	 * @return true  if complete
 	 */
 	public boolean isComplete() {
@@ -139,8 +140,8 @@ public class ComponentConstraintExecutable extends ConstraintExecutable {
 			}
 		}
 		
-		if(SHFactory.isPropertyConstraint(constraint)) {
-			if(!constraint.hasProperty(SH.path) && !constraint.hasProperty(SH.predicate)) {
+		if(SHFactory.isPropertyShape(constraint)) {
+			if(!constraint.hasProperty(SH.path)) {
 				return false;
 			}
 		}

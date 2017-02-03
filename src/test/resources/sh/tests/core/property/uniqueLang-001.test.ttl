@@ -12,9 +12,8 @@
 
 <http://datashapes.org/sh/tests/core/property/uniqueLang-001.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of uniqueLang-001" ;
+  rdfs:label "Test of sh:uniqueLang in property shape 001" ;
   owl:imports <http://datashapes.org/dash> ;
-  owl:versionInfo "Created with TopBraid Composer" ;
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
@@ -61,10 +60,10 @@ ex:InvalidInstance2
 .
 ex:TestShape
   rdf:type rdfs:Class ;
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   rdfs:label "Test shape" ;
   sh:property [
-      sh:predicate ex:testProperty ;
+      sh:path ex:testProperty ;
       rdfs:label "test property" ;
       sh:uniqueLang "true"^^xsd:boolean ;
     ] ;

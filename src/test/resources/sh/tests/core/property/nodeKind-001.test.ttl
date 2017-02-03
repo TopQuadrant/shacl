@@ -12,9 +12,8 @@
 
 <http://datashapes.org/sh/tests/core/property/nodeKind-001.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of nodeKind-001" ;
+  rdfs:label "Test of sh:nodeKind in property shape 001" ;
   owl:imports <http://datashapes.org/dash> ;
-  owl:versionInfo "Created with TopBraid Composer" ;
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
@@ -271,49 +270,49 @@ ex:MyClass
   rdfs:label "My class" ;
 .
 ex:ShapeWithBlankNode
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   sh:property [
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:nodeKind sh:BlankNode ;
     ] ;
   sh:targetClass ex:MyClass ;
 .
 ex:ShapeWithBlankNodeOrIRI
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   sh:property [
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:nodeKind sh:BlankNodeOrIRI ;
     ] ;
   sh:targetClass ex:MyClass ;
 .
 ex:ShapeWithBlankNodeOrLiteral
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   sh:property [
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:nodeKind sh:BlankNodeOrLiteral ;
     ] ;
   sh:targetClass ex:MyClass ;
 .
 ex:ShapeWithIRI
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   sh:property [
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:nodeKind sh:IRI ;
     ] ;
   sh:targetClass ex:MyClass ;
 .
 ex:ShapeWithIRIOrLiteral
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   sh:property [
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:nodeKind sh:IRIOrLiteral ;
     ] ;
   sh:targetClass ex:MyClass ;
 .
 ex:ShapeWithLiteral
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   sh:property [
-      sh:predicate ex:myProperty ;
+      sh:path ex:myProperty ;
       sh:nodeKind sh:Literal ;
     ] ;
   sh:targetClass ex:MyClass ;

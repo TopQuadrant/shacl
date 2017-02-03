@@ -7,7 +7,7 @@ import org.apache.jena.enhanced.EnhGraph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.vocabulary.RDFS;
 import org.topbraid.shacl.constraints.ConstraintExecutable;
-import org.topbraid.shacl.constraints.SPARQLConstraintExecutable;
+import org.topbraid.shacl.constraints.sparql.SPARQLConstraintExecutable;
 import org.topbraid.shacl.model.SHSPARQLConstraint;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaDatatypes;

@@ -4,7 +4,7 @@ import org.apache.jena.enhanced.EnhGraph;
 import org.apache.jena.graph.Node;
 import org.topbraid.shacl.model.SHParameter;
 
-public class SHParameterImpl extends SHPropertyConstraintImpl implements SHParameter {
+public class SHParameterImpl extends SHPropertyShapeImpl implements SHParameter {
 	
 	public SHParameterImpl(Node node, EnhGraph graph) {
 		super(node, graph);

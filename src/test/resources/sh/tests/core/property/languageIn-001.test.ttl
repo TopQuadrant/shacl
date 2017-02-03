@@ -58,9 +58,9 @@ ex:Mountain
   ex:prefLabel "Mountain"@en ;
 .
 ex:NewZealandLanguagesShape
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   sh:property [
-      sh:predicate ex:prefLabel ;
+      sh:path ex:prefLabel ;
       sh:languageIn (
           "en"
           "mi"

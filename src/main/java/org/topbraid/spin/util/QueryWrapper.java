@@ -1,10 +1,9 @@
 package org.topbraid.spin.util;
 
-import org.topbraid.spin.model.Command;
-
 import org.apache.jena.query.Query;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.topbraid.spin.model.Command;
 
 
 /**
@@ -20,8 +19,8 @@ public class QueryWrapper extends CommandWrapper {
 	private org.topbraid.spin.model.Query spinQuery;
 	
 	
-	public QueryWrapper(Query query, Resource source, String text, org.topbraid.spin.model.Query spinQuery, String label, Statement statement, boolean thisUnbound, Integer thisDepth) {
-		super(source, text, label, statement, thisUnbound, thisDepth);
+	public QueryWrapper(Query query, Resource source, String text, org.topbraid.spin.model.Query spinQuery, String label, Statement statement, boolean thisUnbound, boolean thisDeep) {
+		super(source, text, label, statement, thisUnbound, thisDeep);
 		this.query = query;
 		this.spinQuery = spinQuery;
 	}

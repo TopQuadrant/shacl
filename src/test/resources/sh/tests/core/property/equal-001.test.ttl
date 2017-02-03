@@ -79,9 +79,9 @@ ex:InvalidResource4
   ex:property2 "A" ;
 .
 ex:MyShape
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   sh:property [
-      sh:predicate ex:property1 ;
+      sh:path ex:property1 ;
       sh:equals ex:property2 ;
     ] ;
   sh:targetNode ex:InvalidResource1 ;

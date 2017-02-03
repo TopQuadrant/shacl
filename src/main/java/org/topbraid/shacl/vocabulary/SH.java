@@ -46,6 +46,8 @@ public class SH {
     public final static Resource Literal = ResourceFactory.createResource(NS + "Literal");
 
     public final static Resource MaxCountConstraintComponent = ResourceFactory.createResource(NS + "MaxCountConstraintComponent");
+
+    public final static Resource NodeShape = ResourceFactory.createResource(NS + "NodeShape");
     
     public final static Resource Parameter = ResourceFactory.createResource(NS + "Parameter");
 
@@ -53,7 +55,9 @@ public class SH {
     
     public final static Resource PrefixDeclaration = ResourceFactory.createResource(NS + "PrefixDeclaration");
 
-    public final static Resource PropertyConstraint = ResourceFactory.createResource(NS + "PropertyConstraint");
+    public final static Resource PropertyShape = ResourceFactory.createResource(NS + "PropertyShape");
+
+    public final static Resource PropertyConstraintComponent = ResourceFactory.createResource(NS + "PropertyConstraintComponent");
 
     public final static Resource ResultAnnotation = ResourceFactory.createResource(NS + "ResultAnnotation");
 
@@ -62,6 +66,8 @@ public class SH {
     public final static Resource SPARQLAskValidator = ResourceFactory.createResource(NS + "SPARQLAskValidator");
     
     public final static Resource SPARQLConstraint = ResourceFactory.createResource(NS + "SPARQLConstraint");
+    
+    public final static Resource SPARQLConstraintComponent = ResourceFactory.createResource(NS + "SPARQLConstraintComponent");
 
     public final static Resource SPARQLExecutable = ResourceFactory.createResource(NS + "SPARQLExecutable");
 
@@ -155,8 +161,12 @@ public class SH {
     public final static Property name = ResourceFactory.createProperty(NS + "name");
 
     public final static Property namespace = ResourceFactory.createProperty(NS + "namespace");
+    
+    public final static Property node = ResourceFactory.createProperty(NS + "node");
 
     public final static Property nodeKind = ResourceFactory.createProperty(NS + "nodeKind");
+
+    public final static Property nodeValidator = ResourceFactory.createProperty(NS + "nodeValidator");
     
     public final static Property not = ResourceFactory.createProperty(NS + "not");
 
@@ -173,8 +183,6 @@ public class SH {
     public final static Property path = ResourceFactory.createProperty(NS + "path");
 
     public final static Property pattern = ResourceFactory.createProperty(NS + "pattern");
-
-    public final static Property predicate = ResourceFactory.createProperty(NS + "predicate");
 
     public final static Property prefix = ResourceFactory.createProperty(NS + "prefix");
 
@@ -197,12 +205,8 @@ public class SH {
     public final static Property select = ResourceFactory.createProperty(NS + "select");
 
     public final static Property severity = ResourceFactory.createProperty(NS + "severity");
-    
-    public final static Property shape = ResourceFactory.createProperty(NS + "shape");
 
     public final static Property shapesGraph = ResourceFactory.createProperty(NS + "shapesGraph");
-
-    public final static Property shapeValidator = ResourceFactory.createProperty(NS + "shapeValidator");
 
     public final static Property sourceConstraint = ResourceFactory.createProperty(NS + "sourceConstraint");
     
@@ -244,8 +248,6 @@ public class SH {
 	public static final Var PATHVar = Var.alloc("PATH");
 
 	public static final Var pathVar = Var.alloc(path.getLocalName());
-
-	public static final Var predicateVar = Var.alloc(predicate.getLocalName());
 
 	public static final Var shapesGraphVar = Var.alloc("shapesGraph");
 	

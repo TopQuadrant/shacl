@@ -6,11 +6,10 @@ package org.topbraid.spin.util;
 
 import java.util.Map;
 
-import org.topbraid.spin.model.Command;
-
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.topbraid.spin.model.Command;
 
 
 /**
@@ -35,17 +34,17 @@ public abstract class CommandWrapper {
 	
 	private String text;
 	
-	private Integer thisDepth;
+	private boolean thisDeep;
 	
 	private boolean thisUnbound;
 	
 	
-	public CommandWrapper(Resource source, String text, String label, Statement statement, boolean thisUnbound, Integer thisDepth) {
+	public CommandWrapper(Resource source, String text, String label, Statement statement, boolean thisUnbound, boolean thisDeep) {
 		this.label = label;
 		this.statement = statement;
 		this.source = source;
 		this.text = text;
-		this.thisDepth = thisDepth;
+		this.thisDeep = thisDeep;
 		this.thisUnbound = thisUnbound;
 	}
 	
@@ -83,17 +82,13 @@ public abstract class CommandWrapper {
 	
 	
 	/**
-	 * Gets the maximum depth of ?this in the element tree.
-	 * May be null if either not computed (?thisUnbound) or ?this does not exist.
-	 * @return the max depth of ?this or null
+	 * Checks if ?this is used in any nested block.
+	 * In such cases, ?this cannot be bound via a BGP inside of the query but needs to be
+	 * bound in an outside loop
+	 * @return true  if ?this is used deep within the query
 	 */
-	public Integer getThisDepth() {
-		return thisDepth;
-	}
-	
-	
 	public boolean isThisDeep() {
-		return thisDepth != null && thisDepth > 1;
+		return thisDeep;
 	}
 	
 	

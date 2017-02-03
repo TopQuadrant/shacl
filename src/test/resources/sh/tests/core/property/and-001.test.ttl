@@ -17,20 +17,20 @@
   owl:versionInfo "Created with TopBraid Composer" ;
 .
 ex:AddressShape
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   rdfs:label "Address shape" ;
   sh:property [
-      sh:predicate ex:address ;
+      sh:path ex:address ;
       sh:and (
           [
             sh:property [
-                sh:predicate ex:suburb ;
+                sh:path ex:suburb ;
                 sh:minCount 1 ;
               ] ;
           ]
           [
             sh:property [
-                sh:predicate ex:postalCode ;
+                sh:path ex:postalCode ;
                 sh:minCount 1 ;
               ] ;
           ]
