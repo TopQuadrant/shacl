@@ -14,7 +14,7 @@ public class SHJSExecutableImpl extends SHResourceImpl implements SHJSExecutable
 
 	
 	@Override
-	public String getScript() {
-		return JenaUtil.getStringProperty(this, SHJS.script);
+	public String getFunctionName() {
+		return JenaUtil.getStringProperty(this, SHJS.jsFunctionName);
 	}
 }

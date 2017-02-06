@@ -30,8 +30,8 @@ public class SHJSConstraintImpl extends SHResourceImpl implements SHJSConstraint
 	
 	
 	@Override
-	public String getScript() {
-		return JenaUtil.getStringProperty(this, SHJS.script);
+	public String getFunctionName() {
+		return JenaUtil.getStringProperty(this, SHJS.jsFunctionName);
 	}
 
 
@@ -59,7 +59,7 @@ public class SHJSConstraintImpl extends SHResourceImpl implements SHJSConstraint
 			return message;
 		}
 
-		String script = getScript();
+		String script = getFunctionName();
 		if(script != null) {
 			return script;
 		}

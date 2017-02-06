@@ -4,14 +4,10 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-
-import javax.script.Invocable;
-import javax.script.ScriptEngine;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
@@ -38,6 +34,13 @@ import org.topbraid.spin.util.JenaUtil;
 
 public class JSExecutionLanguage implements ExecutionLanguage {
 	
+	private static JSExecutionLanguage singleton = new JSExecutionLanguage();
+	
+	public static JSExecutionLanguage get() {
+		return singleton;
+	}
+
+	
 	@Override
 	public SHConstraint asConstraint(Resource c) {
 		return c.as(SHJSConstraint.class);
@@ -47,12 +50,12 @@ public class JSExecutionLanguage implements ExecutionLanguage {
 	@Override
 	public boolean canExecuteConstraint(ConstraintExecutable executable) {
 		if(executable instanceof JSConstraintExecutable) {
-			return executable.getConstraint().hasProperty(SHJS.script);
+			return executable.getConstraint().hasProperty(SHJS.jsFunctionName);
 		}
 		else if(executable instanceof ComponentConstraintExecutable) {
 			ComponentConstraintExecutable cce = (ComponentConstraintExecutable)executable;
 			Resource validator = cce.getValidator(SHJS.JSValidator);
-			if(validator != null && (validator.hasProperty(SHJS.script))) {
+			if(validator != null && (validator.hasProperty(SHJS.jsFunctionName))) {
 				return true;
 			}
 		}
@@ -90,70 +93,61 @@ public class JSExecutionLanguage implements ExecutionLanguage {
 			focusNodes = Collections.singletonList(focusNode);
 		}
 
-		ScriptEngine engine = JSScriptEngines.get().createScriptEngine();
+		JSScriptEngine engine = SHACLScriptEngineManager.getCurrentEngine();
 		
-		String script = null;
+		String functionName = null;
 		JSGraph shapesJSGraph = new JSGraph(dataset.getNamedModel(shapesGraphURI.toString()).getGraph());
 		Model dataModel = dataset.getDefaultModel();
 		JSGraph dataJSGraph = new JSGraph(dataModel.getGraph());
 		try {
 			
-			Set<Resource> visited = new HashSet<>();
 			SHJSExecutable as = executable.getConstraint().as(SHJSExecutable.class);
-			JSScriptEngines.get().executeLibraries(engine, as, visited, false);
+			engine.executeLibraries(as);
 			
+			QuerySolutionMap bindings = new QuerySolutionMap();
 			if(shape != null) {
-				engine.put("$currentShape", JSFactory.asJSTerm(shape.asNode()));
+				bindings.add("currentShape", shape);
 			}
 			
 			engine.put("$shapesGraph", shapesJSGraph);
-			
 			engine.put("$dataGraph", dataJSGraph);
 			
 			if(executable instanceof ComponentConstraintExecutable) {
-				QuerySolutionMap bindings = new QuerySolutionMap();
 				((ComponentConstraintExecutable)executable).addBindings(bindings);
-				Iterator<String> varNames = bindings.varNames();
-				while(varNames.hasNext()) {
-					String varName = varNames.next();
-					RDFNode value = bindings.get(varName);
-					if(value != null) {
-						engine.put("$" + varName, JSFactory.asJSTerm(value.asNode()));
-					}
-				}
 			}
 
 			Resource validator = null;
 			if(executable instanceof JSConstraintExecutable) {
 				SHJSConstraint jsc = (SHJSConstraint) executable.getConstraint();
-				script = jsc.getScript();
+				functionName = jsc.getFunctionName();
 			}
 			else {
 				validator = ((ComponentConstraintExecutable)executable).getValidator(getExecutableType());
-				script = JenaUtil.getStringProperty(validator, SHJS.script);
+				functionName = JenaUtil.getStringProperty(validator, SHJS.jsFunctionName);
+				engine.executeLibraries(validator);
 			}
 			
-			String functionName = JSScriptEngines.get().installFunction(engine, script);
-
 			boolean returnResult = false;
 			
-			Invocable invocable = (Invocable) engine;
 			for(RDFNode theFocusNode : focusNodes) {
 				Object resultObj;
-				engine.put("$this", JSFactory.asJSTerm(theFocusNode.asNode()));
+				bindings.add("focusNode", theFocusNode);
 				
 				if(validator != null) {
 					Resource component = ((ComponentConstraintExecutable)executable).getComponent();
 					Resource context = ((ComponentConstraintExecutable)executable).getContext();
 					if(SH.PropertyShape.equals(context) && component.hasProperty(SH.propertyValidator, validator)) {
-						engine.put("$path", JSFactory.asJSTerm(executable.getConstraint().getRequiredProperty(SH.path).getObject().asNode()));
+						bindings.add("path", executable.getConstraint().getRequiredProperty(SH.path).getObject());
 					}
 					else if(SH.NodeShape.equals(context)) {
-						engine.put("$value", JSFactory.asJSTerm(theFocusNode.asNode()));
+						bindings.add("value", theFocusNode);
 					}
 				}
+				else {
+					bindings.add("value", theFocusNode);
+				}
 				
-				resultObj = invocable.invokeFunction(functionName);
+				resultObj = engine.invokeFunction(functionName, bindings);
 				
 				if(NashornUtil.isArray(resultObj)) {
 					for(Object ro : NashornUtil.asArray(resultObj)) {
@@ -202,7 +196,7 @@ public class JSExecutionLanguage implements ExecutionLanguage {
 				result.addProperty(SH.focusNode, focusNode);
 			}
 			resultsList.add(result);
-			FailureLog.get().logFailure("Could not execute JavaScript constraint \"" + script + "\": " + ex);
+			FailureLog.get().logFailure("Could not execute JavaScript function \"" + functionName + "\": " + ex);
 			return true;
 		}
 		finally {

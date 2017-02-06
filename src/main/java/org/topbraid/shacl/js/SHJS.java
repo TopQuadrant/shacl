@@ -31,12 +31,12 @@ public class SHJS {
 
     
     public final static Property js = ResourceFactory.createProperty(NS + "js");
+    
+    public final static Property jsFunctionName = ResourceFactory.createProperty(NS + "jsFunctionName");
 
-    public final static Property library = ResourceFactory.createProperty(NS + "library");
+    public final static Property jsLibrary = ResourceFactory.createProperty(NS + "jsLibrary");
 
-    public final static Property script = ResourceFactory.createProperty(NS + "script");
-
-    public final static Property scriptURL = ResourceFactory.createProperty(NS + "scriptURL");
+    public final static Property jsLibraryURL = ResourceFactory.createProperty(NS + "jsLibraryURL");
 
 
     public static String getURI() {

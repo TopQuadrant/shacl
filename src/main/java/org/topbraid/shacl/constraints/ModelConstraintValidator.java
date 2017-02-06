@@ -16,6 +16,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDFS;
+import org.topbraid.shacl.js.SHACLScriptEngineManager;
 import org.topbraid.shacl.model.SHConstraint;
 import org.topbraid.shacl.model.SHFactory;
 import org.topbraid.shacl.util.SHACLUtil;
@@ -74,20 +75,25 @@ public class ModelConstraintValidator extends AbstractConstraintValidator {
 			monitor.beginTask("Validating constraints for " + map.size() + " shapes...", map.size());
 		}
 		
-		report.getModel().setNsPrefixes(dataset.getDefaultModel());
 		boolean violations = false;
-		for(Resource shape : map.keySet()) {
-			for(SHConstraint constraint : map.get(shape)) {
-				violations |= validateConstraintForShape(dataset, shapesGraphURI, minSeverity, constraint, shape, labelFunction, monitor);
-				if(monitor != null) {
-					monitor.worked(1);
-					if(monitor.isCanceled()) {
-						throw new InterruptedException();
+		report.getModel().setNsPrefixes(dataset.getDefaultModel());
+		boolean nested = SHACLScriptEngineManager.begin();
+		try {
+			for(Resource shape : map.keySet()) {
+				for(SHConstraint constraint : map.get(shape)) {
+					violations |= validateConstraintForShape(dataset, shapesGraphURI, minSeverity, constraint, shape, labelFunction, monitor);
+					if(monitor != null) {
+						monitor.worked(1);
+						if(monitor.isCanceled()) {
+							throw new InterruptedException();
+						}
 					}
 				}
 			}
 		}
-		
+		finally {
+			SHACLScriptEngineManager.end(nested);
+		}
 		report.addProperty(SH.conforms, violations ? JenaDatatypes.FALSE : JenaDatatypes.TRUE);
 		
 		return report;

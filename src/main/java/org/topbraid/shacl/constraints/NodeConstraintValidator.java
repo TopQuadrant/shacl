@@ -17,10 +17,11 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDF;
 import org.topbraid.shacl.constraints.sparql.SPARQLExecutionLanguage;
+import org.topbraid.shacl.js.SHACLScriptEngineManager;
 import org.topbraid.shacl.model.SHConstraint;
 import org.topbraid.shacl.model.SHFactory;
-import org.topbraid.shacl.model.SHParameterizableTarget;
 import org.topbraid.shacl.model.SHNodeShape;
+import org.topbraid.shacl.model.SHParameterizableTarget;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
@@ -113,11 +114,17 @@ public class NodeConstraintValidator extends AbstractConstraintValidator {
 		
 		RDFNode focusRDFNode = dataset.getDefaultModel().asRDFNode(focusNode);
 		Set<Resource> shapes = getShapesForNode(focusRDFNode, dataset, shapesModel);
-		for(Resource shape : shapes) {
-			if(monitor != null && monitor.isCanceled()) {
-				throw new InterruptedException();
+		boolean nested = SHACLScriptEngineManager.begin();
+		try {
+			for(Resource shape : shapes) {
+				if(monitor != null && monitor.isCanceled()) {
+					throw new InterruptedException();
+				}
+				addResourceViolations(dataset, shapesGraphURI, focusNode, shape.asNode(), properties, minSeverity, constraintFilter, labelFunction, monitor);
 			}
-			addResourceViolations(dataset, shapesGraphURI, focusNode, shape.asNode(), properties, minSeverity, constraintFilter, labelFunction, monitor);
+		}
+		finally {
+			SHACLScriptEngineManager.end(nested);
 		}
 		
 		return report;
@@ -137,7 +144,13 @@ public class NodeConstraintValidator extends AbstractConstraintValidator {
 	 * @return an instance of sh:ValidationReport in the results Model
 	 */
 	public Resource validateNodeAgainstShape(Dataset dataset, URI shapesGraphURI, Node focusNode, Node shape, Resource minSeverity, Predicate<SHConstraint> constraintFilter, Function<RDFNode,String> labelFunction, ProgressMonitor monitor) {
-		addResourceViolations(dataset, shapesGraphURI, focusNode, shape, SHACLUtil.getAllConstraintProperties(true), minSeverity, constraintFilter, labelFunction, monitor);
+		boolean nested = SHACLScriptEngineManager.begin();
+		try {
+			addResourceViolations(dataset, shapesGraphURI, focusNode, shape, SHACLUtil.getAllConstraintProperties(true), minSeverity, constraintFilter, labelFunction, monitor);
+		}
+		finally {
+			SHACLScriptEngineManager.end(nested);
+		}
 		return report;
 	}
 

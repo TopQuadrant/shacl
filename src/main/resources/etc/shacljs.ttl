@@ -39,7 +39,7 @@ sh:JSLibrary
   rdf:type rdfs:Class ;
   rdfs:comment "Represents a JavaScript library, typically identified by one or more URLs of files to include." ;
   rdfs:label "JavaScript Library" ;
-  rdfs:subClassOf sh:JSExecutable ;
+  rdfs:subClassOf rdfs:Resource ;
 .
 sh:JSValidator
   rdf:type rdfs:Class ;
@@ -54,25 +54,25 @@ sh:js
   rdfs:label "JavaScript constraint" ;
   rdfs:range sh:JSConstraint ;
 .
-sh:library
+sh:jsFunctionName
   rdf:type rdf:Property ;
-  rdfs:comment "Declares which JavaScript libraries are needed to execute the associated script." ;
+  rdfs:comment "The name of the JavaScript function to execute. Depending on the subclass, this has different execution contracts and expected results." ;
   rdfs:domain sh:JSExecutable ;
-  rdfs:label "library" ;
-  rdfs:range sh:JSLibrary ;
-.
-sh:script
-  rdf:type rdf:Property ;
-  rdfs:comment "The JavaScript code to execute. Depending on the subclass, this has different execution contracts and expected results." ;
-  rdfs:domain sh:JSExecutable ;
-  rdfs:label "script" ;
+  rdfs:label "JavaScript function name" ;
   rdfs:range xsd:string ;
 .
-sh:scriptURL
+sh:jsLibrary
   rdf:type rdf:Property ;
-  rdfs:comment "Declares one or more URLs of a sh:JSLibrary. This should be the absolute URL of a JavaScript file. Implementations may redirect those to local files." ;
+  rdfs:comment "Declares which JavaScript libraries are needed to execute this." ;
+  rdfs:domain sh:JSExecutable ;
+  rdfs:label "JavaScript library" ;
+  rdfs:range sh:JSLibrary ;
+.
+sh:jsLibraryURL
+  rdf:type rdf:Property ;
+  rdfs:comment "Declares the URLs of a sh:JSLibrary. This should be the absolute URL of a JavaScript file. Implementations may redirect those to local files." ;
   rdfs:domain sh:JSLibrary ;
-  rdfs:label "script URL" ;
+  rdfs:label "JavaScript library URL" ;
   rdfs:range xsd:anyURI ;
 .
 <http://www.w3.org/ns/shacljs>

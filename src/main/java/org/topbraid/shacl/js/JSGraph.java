@@ -14,7 +14,7 @@ public class JSGraph {
 	
 	private Graph graph;
 	
-	private Set<Stream> openStreams = new HashSet<Stream>();
+	private Set<JSTripleIterator> openIterators = new HashSet<>();
 	
 	
 	public JSGraph(Graph graph) {
@@ -23,7 +23,7 @@ public class JSGraph {
 	
 	
 	public void close() {
-		for(Stream stream : openStreams) {
+		for(JSTripleIterator stream : openIterators) {
 			stream.closeIterator();
 		}
 	}
@@ -34,30 +34,30 @@ public class JSGraph {
 	}
 	
 	
-	public Stream match(Object subjectSOM, Object predicateSOM, Object objectSOM) {
+	public JSTripleIterator find(Object subjectSOM, Object predicateSOM, Object objectSOM) {
 		Node subject = JSFactory.getNode(subjectSOM);
 		Node predicate = JSFactory.getNode(predicateSOM);
 		Node object = JSFactory.getNode(objectSOM);
 		ExtendedIterator<Triple> it = getGraph().find(subject, predicate, object);
-		Stream stream = new Stream(it);
-		openStreams.add(stream);
-		return stream;
+		JSTripleIterator jsit = new JSTripleIterator(it);
+		openIterators.add(jsit);
+		return jsit;
 	}
 	
 	
-	public class Stream {
+	public class JSTripleIterator {
 		
 		private ExtendedIterator<Triple> it;
 		
 		
-		Stream(ExtendedIterator<Triple> it) {
+		JSTripleIterator(ExtendedIterator<Triple> it) {
 			this.it = it;
 		}
 		
 		
 		public void close() {
 			closeIterator();
-			openStreams.remove(this);
+			openIterators.remove(this);
 		}
 		
 		
@@ -66,14 +66,39 @@ public class JSGraph {
 		}
 		
 		
-		public JSTriple read() {
+		public JSNext next() {
 			if(it.hasNext()) {
 				Triple triple = it.next();
-				JSTriple jsTriple = JSFactory.asJSTriple(triple);
-				return jsTriple;
+				return new JSNext(triple);
 			}
 			else {
 				close();
+				return new JSNext(null);
+			}
+		}
+	}
+	
+	
+	public class JSNext {
+		
+		private Triple triple;
+		
+		
+		JSNext(Triple triple) {
+			this.triple = triple;
+		}
+		
+		
+		public boolean getDone() {
+			return triple == null;
+		}
+		
+		
+		public JSTriple getValue() {
+			if(triple != null) {
+				return JSFactory.asJSTriple(triple);
+			}
+			else {
 				return null;
 			}
 		}

@@ -23,14 +23,13 @@ public class ExecutionLanguageSelector {
 	}
 
 	
-	private final List<ExecutionLanguage> languages = new LinkedList<ExecutionLanguage>();
+	private final List<ExecutionLanguage> languages = new LinkedList<>();
 	
 	
 	public ExecutionLanguageSelector() {
 		languages.add(SPARQLExecutionLanguage.get());
+		languages.add(JSExecutionLanguage.get());
 		languages.add(new FallbackExecutionLanguage());
-		
-		addLanguage(new JSExecutionLanguage());
 	}
 
 	
@@ -39,7 +38,7 @@ public class ExecutionLanguageSelector {
 	 * @param language  the language to add
 	 */
 	public void addLanguage(ExecutionLanguage language) {
-		languages.add(1, language);
+		languages.add(2, language);
 		if(language.getParameter() != null) {
 			SHACLUtil.addConstraintProperty(language.getParameter());
 		}
@@ -83,5 +82,26 @@ public class ExecutionLanguageSelector {
 			}
 		}
 		return false;
+	}
+	
+	
+	/**
+	 * Can be used to make the JavaScript engine the preferred implementation over SPARQL.
+	 * By default, SPARQL is preferred.
+	 * In cases where a constraint component has multiple validators, it would then chose
+	 * the JavaScript one.
+	 * @param value  true to make JS
+	 */
+	public void setJSPreferred(boolean value) {
+		languages.remove(0);
+		languages.remove(0);
+		if(value) {
+			languages.add(0, JSExecutionLanguage.get());
+			languages.add(1, SPARQLExecutionLanguage.get());
+		}
+		else {
+			languages.add(0, SPARQLExecutionLanguage.get());
+			languages.add(1, JSExecutionLanguage.get());
+		}
 	}
 }

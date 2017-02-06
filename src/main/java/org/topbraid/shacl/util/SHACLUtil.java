@@ -30,6 +30,7 @@ import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.topbraid.shacl.constraints.ExecutionLanguage;
 import org.topbraid.shacl.constraints.ExecutionLanguageSelector;
+import org.topbraid.shacl.js.SHJS;
 import org.topbraid.shacl.model.SHConstraintComponent;
 import org.topbraid.shacl.model.SHFactory;
 import org.topbraid.shacl.model.SHNodeShape;
@@ -82,6 +83,7 @@ public class SHACLUtil {
 	static {
 		constraintProperties.add(SH.property);
 		constraintProperties.add(SH.sparql);
+		constraintProperties.add(SHJS.js);
 	}
 	
 	private final static List<Property> constraintPropertiesIncludingParameter = new LinkedList<Property>();

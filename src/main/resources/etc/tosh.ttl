@@ -15,6 +15,26 @@
 dash:
   tosh:systemNamespace "true"^^xsd:boolean ;
 .
+dash:BaseJSLibrary
+  rdf:type sh:JSLibrary ;
+  rdfs:comment "Declares some basic functions to work with RDF data in JavaScript. This is very early work, completely unfinished." ;
+  rdfs:label "Base JavaScript library" ;
+  sh:script """function _Namespace (nsuri) {
+	return function (localName) {
+		return TermFactory.namedNode(nsuri + localName);
+	}
+}
+
+// Suggested container object for all frequently needed namespaces
+// Usage to get rdf:type: NS.rdf(\"type\")
+var NS = {
+	rdf : _Namespace('http://www.w3.org/1999/02/22-rdf-syntax-ns#'),
+	rdfs : _Namespace('http://www.w3.org/2000/01/rdf-schema#'),
+	sh : _Namespace('http://www.w3.org/ns/shacl#'),
+	owl : _Namespace('http://www.w3.org/2002/07/owl#'),
+	xsd : _Namespace('http://www.w3.org/2001/XMLSchema#')
+}""" ;
+.
 dash:NonRecursiveConstraintComponent
   dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
   sh:property [
@@ -122,25 +142,6 @@ tosh:DisplayPropertyGroup
   rdfs:comment "A group for properties that are primarily for display purposes (names, ordering etc)." ;
   rdfs:label "Display" ;
   sh:order 1 ;
-.
-tosh:JSLibrary
-  rdf:type sh:JSLibrary ;
-  rdfs:comment "Declares some basic functions to work with RDF data in JavaScript." ;
-  rdfs:label "TopBraid JavaScript library" ;
-  sh:script """function _TBNamespace (nsuri) {
-	return function (localName) {
-		return TermFactory.namedNode(nsuri + localName);
-	}
-}
-
-var TB = {
-	rdf : _TBNamespace('http://www.w3.org/1999/02/22-rdf-syntax-ns#'),
-	rdfs : _TBNamespace('http://www.w3.org/2000/01/rdf-schema#'),
-	sh : _TBNamespace('http://www.w3.org/ns/shacl#'),
-	owl : _TBNamespace('http://www.w3.org/2002/07/owl#'),
-	xsd : _TBNamespace('http://www.w3.org/2001/XMLSchema#')
-}
-""" ;
 .
 tosh:MemberShapeConstraintComponent
   rdf:type sh:ConstraintComponent ;
