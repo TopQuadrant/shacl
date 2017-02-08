@@ -1,5 +1,6 @@
 package org.topbraid.shacl.js.model;
 
+import org.apache.jena.datatypes.TypeMapper;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 
@@ -22,7 +23,7 @@ public class TermFactory {
 	
 	public JSLiteral literal(String value, Object langOrDatatype) {
 		if(langOrDatatype instanceof JSNamedNode) {
-			return new JSLiteral(NodeFactory.createLiteral(value, ((JSNamedNode)langOrDatatype).getValue()));
+			return new JSLiteral(NodeFactory.createLiteral(value, TypeMapper.getInstance().getTypeByName(((JSNamedNode)langOrDatatype).getValue())));
 		}
 		else if(langOrDatatype instanceof String) {
 			return new JSLiteral(NodeFactory.createLiteral(value, (String)langOrDatatype));

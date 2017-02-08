@@ -18,6 +18,8 @@ public interface JSScriptEngine {
 	void executeLibraries(Resource exec) throws Exception;
 	
 	void executeScriptFromURL(String url) throws Exception;
+
+	Object get(String varName);
 	
 	Object invokeFunction(String functionName, QuerySolution bindings) throws javax.script.ScriptException, java.lang.NoSuchMethodException;
 

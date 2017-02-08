@@ -1,5 +1,7 @@
 package org.topbraid.shacl.arq;
 
+import javax.script.ScriptException;
+
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.Dataset;
@@ -13,6 +15,7 @@ import org.topbraid.shacl.js.SHACLScriptEngineManager;
 import org.topbraid.shacl.js.model.JSFactory;
 import org.topbraid.shacl.model.SHJSExecutable;
 import org.topbraid.shacl.model.SHJSFunction;
+import org.topbraid.spin.util.ExceptionUtil;
 import org.topbraid.spin.util.JenaDatatypes;
 
 public class SHACLJSARQFunction extends SHACLARQFunction {
@@ -61,6 +64,9 @@ public class SHACLJSARQFunction extends SHACLARQFunction {
 					return NodeValue.booleanReturn((Boolean)result);
 				}
 			}
+		}
+		catch(ScriptException ex) {
+			ExceptionUtil.throwUnchecked(ex);
 		}
 		catch(Exception ex) {
 			ex.printStackTrace();

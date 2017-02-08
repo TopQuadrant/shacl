@@ -91,6 +91,12 @@ public class NashornScriptEngine implements JSScriptEngine {
 	}
 	
 	
+	@Override
+	public Object get(String varName) {
+		return engine.get(varName);
+	}
+
+
 	protected final ScriptEngine getEngine() {
 		return engine;
 	}
@@ -122,6 +128,9 @@ public class NashornScriptEngine implements JSScriptEngine {
 		while(varNames.hasNext()) {
 			String varName = varNames.next();
 			int index = functionParams.indexOf(varName);
+			if(index < 0) {
+				index = functionParams.indexOf("$" + varName);
+			}
 			if(index >= 0) {
 				RDFNode value = bindings.get(varName);
 				if(value != null) {

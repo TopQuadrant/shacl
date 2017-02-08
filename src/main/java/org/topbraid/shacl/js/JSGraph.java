@@ -66,39 +66,13 @@ public class JSGraph {
 		}
 		
 		
-		public JSNext next() {
+		public JSTriple next() {
 			if(it.hasNext()) {
 				Triple triple = it.next();
-				return new JSNext(triple);
-			}
-			else {
-				close();
-				return new JSNext(null);
-			}
-		}
-	}
-	
-	
-	public class JSNext {
-		
-		private Triple triple;
-		
-		
-		JSNext(Triple triple) {
-			this.triple = triple;
-		}
-		
-		
-		public boolean getDone() {
-			return triple == null;
-		}
-		
-		
-		public JSTriple getValue() {
-			if(triple != null) {
 				return JSFactory.asJSTriple(triple);
 			}
 			else {
+				close();
 				return null;
 			}
 		}

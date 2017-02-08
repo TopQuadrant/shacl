@@ -1,6 +1,5 @@
 # baseURI: http://topbraid.org/tosh
 # imports: http://datashapes.org/dash
-# imports: http://www.w3.org/ns/shacljs
 # prefix: tosh
 
 @prefix dash: <http://datashapes.org/dash#> .
@@ -14,26 +13,6 @@
 
 dash:
   tosh:systemNamespace "true"^^xsd:boolean ;
-.
-dash:BaseJSLibrary
-  rdf:type sh:JSLibrary ;
-  rdfs:comment "Declares some basic functions to work with RDF data in JavaScript. This is very early work, completely unfinished." ;
-  rdfs:label "Base JavaScript library" ;
-  sh:script """function _Namespace (nsuri) {
-	return function (localName) {
-		return TermFactory.namedNode(nsuri + localName);
-	}
-}
-
-// Suggested container object for all frequently needed namespaces
-// Usage to get rdf:type: NS.rdf(\"type\")
-var NS = {
-	rdf : _Namespace('http://www.w3.org/1999/02/22-rdf-syntax-ns#'),
-	rdfs : _Namespace('http://www.w3.org/2000/01/rdf-schema#'),
-	sh : _Namespace('http://www.w3.org/ns/shacl#'),
-	owl : _Namespace('http://www.w3.org/2002/07/owl#'),
-	xsd : _Namespace('http://www.w3.org/2001/XMLSchema#')
-}""" ;
 .
 dash:NonRecursiveConstraintComponent
   dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
@@ -61,7 +40,6 @@ dash:RootClassConstraintComponent
 This namespace also includes the function tosh:hasShape, which can be used to implement some advanced constraint components using SPARQL only.""" ;
   rdfs:label "TopBraid Data Shapes Library" ;
   owl:imports <http://datashapes.org/dash> ;
-  owl:imports <http://www.w3.org/ns/shacljs> ;
   sh:declare [
       rdf:type sh:PrefixDeclaration ;
       sh:namespace "http://jena.hpl.hp.com/ARQ/function#"^^xsd:anyURI ;

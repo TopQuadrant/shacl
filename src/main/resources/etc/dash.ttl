@@ -1,6 +1,7 @@
 # baseURI: http://datashapes.org/dash
 # imports: http://topbraid.org/tosh
 # imports: http://www.w3.org/ns/shacl#
+# imports: http://www.w3.org/ns/shacljs
 # prefix: dash
 
 @prefix dash: <http://datashapes.org/dash#> .
@@ -15,12 +16,13 @@
 
 <http://datashapes.org/dash>
   rdf:type owl:Ontology ;
-  rdfs:comment """DASH defines SPARQL-based validators for all SHACL Core constraint component. These are (among others) utilized by TopBraid and its API. Note that constraint components that require validation of nested shapes (such as sh:shape) are not implementable without a function such as tosh:hasShape.
+  rdfs:comment """DASH defines SPARQL-based validators for many SHACL Core constraint components. These are (among others) utilized by TopBraid and its API. Note that constraint components that require validation of nested shapes (such as sh:node) are not implementable without a function such as tosh:hasShape.
 
 DASH is also a SHACL library for frequently needed features and design patterns. All features in this library are 100% standards compliant and will work on any engine that fully supports SHACL.""" ;
   rdfs:label "DASH Data Shapes Library" ;
   owl:imports <http://topbraid.org/tosh> ;
   owl:imports sh: ;
+  owl:imports <http://www.w3.org/ns/shacljs> ;
   sh:declare [
       sh:namespace "http://datashapes.org/dash#"^^xsd:anyURI ;
       sh:prefix "dash" ;
@@ -111,6 +113,12 @@ WHERE {
       sh:description "True to indicate that the focus nodes are closed by their types. A constraint violation is reported for each property value of the focus node where the property is not among those that are explicitly declared via sh:property/sh:path in any of the rdf:types of the focus node (and their superclasses). The property rdf:type is always permitted." ;
     ] ;
   sh:targetClass sh:Shape ;
+.
+dash:DASHJSLibrary
+  rdf:type sh:JSLibrary ;
+  rdfs:label "DASH JavaScript library" ;
+  sh:jsLibrary dash:RDFQueryJSLibrary ;
+  sh:jsLibraryURL "http://datashapes.org/js/dash.js"^^xsd:anyURI ;
 .
 dash:DateOrDateTime
   rdf:type rdf:List ;
@@ -365,6 +373,11 @@ dash:QueryTestCase
       sh:minCount 1 ;
       sh:name "SPARQL query" ;
     ] ;
+.
+dash:RDFQueryJSLibrary
+  rdf:type sh:JSLibrary ;
+  rdfs:label "rdfQuery JavaScript Library" ;
+  sh:jsLibraryURL "http://datashapes.org/js/rdfquery.js"^^xsd:anyURI ;
 .
 dash:RootClassConstraintComponent
   rdf:type sh:ConstraintComponent ;
@@ -846,6 +859,11 @@ sh:AndConstraintComponent
 sh:ClassConstraintComponent
   sh:targetClass sh:Shape ;
   sh:validator dash:hasClass ;
+  sh:validator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "hasClass" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
 .
 sh:ClosedConstraintComponent
   sh:nodeValidator [
@@ -875,6 +893,11 @@ sh:ClosedConstraintComponent
 .
 sh:DatatypeConstraintComponent
   sh:targetClass sh:Shape ;
+  sh:validator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "hasDatatype" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
 .
 sh:DerivedValuesConstraintComponent
   sh:targetClass sh:Shape ;
@@ -993,6 +1016,11 @@ sh:LessThanOrEqualsConstraintComponent
 .
 sh:MaxCountConstraintComponent
   sh:propertyValidator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "propertyMaxCount" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
+  sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
       sh:message "More than {$maxCount} values" ;
       sh:prefixes <http://datashapes.org/dash> ;
@@ -1020,6 +1048,11 @@ sh:MaxLengthConstraintComponent
   sh:validator dash:hasMaxLength ;
 .
 sh:MinCountConstraintComponent
+  sh:propertyValidator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "propertyMinCount" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
       sh:message "Less than {$minCount} values" ;
@@ -1055,9 +1088,19 @@ sh:NodeConstraintComponent
 sh:NodeKindConstraintComponent
   sh:targetClass sh:Shape ;
   sh:validator dash:hasNodeKind ;
+  sh:validator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "hasNodeKind" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
 .
 sh:NotConstraintComponent
   sh:targetClass sh:Shape ;
+  sh:validator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "hasNot" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
 .
 sh:OrConstraintComponent
   sh:targetClass sh:Shape ;

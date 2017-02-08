@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,6 +18,7 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDFS;
 import org.topbraid.shacl.constraints.ComponentConstraintExecutable;
 import org.topbraid.shacl.constraints.ConstraintExecutable;
@@ -33,6 +35,8 @@ import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaUtil;
 
 public class JSExecutionLanguage implements ExecutionLanguage {
+	
+	private final static String SHACL = "SHACL";
 	
 	private static JSExecutionLanguage singleton = new JSExecutionLanguage();
 	
@@ -98,6 +102,8 @@ public class JSExecutionLanguage implements ExecutionLanguage {
 		String functionName = null;
 		JSGraph shapesJSGraph = new JSGraph(dataset.getNamedModel(shapesGraphURI.toString()).getGraph());
 		Model dataModel = dataset.getDefaultModel();
+		Object oldSHACL = engine.get(SHACL);
+		engine.put(SHACL, new SHACLObject(shapesGraphURI, dataset));
 		JSGraph dataJSGraph = new JSGraph(dataModel.getGraph());
 		try {
 			
@@ -133,51 +139,73 @@ public class JSExecutionLanguage implements ExecutionLanguage {
 				Object resultObj;
 				bindings.add("focusNode", theFocusNode);
 				
+				List<RDFNode> valueNodes = new LinkedList<>();
 				if(validator != null) {
 					Resource component = ((ComponentConstraintExecutable)executable).getComponent();
 					Resource context = ((ComponentConstraintExecutable)executable).getContext();
-					if(SH.PropertyShape.equals(context) && component.hasProperty(SH.propertyValidator, validator)) {
-						bindings.add("path", executable.getConstraint().getRequiredProperty(SH.path).getObject());
+					if(SH.PropertyShape.equals(context)) {
+						if(component.hasProperty(SH.propertyValidator, validator)) {
+							bindings.add("path", executable.getConstraint().getRequiredProperty(SH.path).getObject());
+							valueNodes.add(null);
+						}
+						else if(!theFocusNode.isLiteral()) {
+							// TODO: Support paths
+							Property path = JenaUtil.asProperty(executable.getConstraint().getPropertyResourceValue(SH.path));
+							StmtIterator it = theFocusNode.getModel().listStatements((Resource)theFocusNode, path, (RDFNode)null);
+							while(it.hasNext()) {
+								valueNodes.add(it.next().getObject());
+							}
+						}
 					}
 					else if(SH.NodeShape.equals(context)) {
 						bindings.add("value", theFocusNode);
+						valueNodes.add(theFocusNode);
 					}
 				}
 				else {
-					bindings.add("value", theFocusNode);
+					valueNodes.add(theFocusNode);
 				}
 				
-				resultObj = engine.invokeFunction(functionName, bindings);
-				
-				if(NashornUtil.isArray(resultObj)) {
-					for(Object ro : NashornUtil.asArray(resultObj)) {
-						Resource result = createValidationResult(report, shape, executable, theFocusNode);
-						if(ro instanceof Map) {
-							Object value = ((Map)ro).get("value");
-							if(value instanceof JSTerm) {
-								Node valueNode = JSFactory.getNode(value);
-								if(valueNode != null) {
-									result.addProperty(SH.value, dataModel.asRDFNode(valueNode));
+				for(RDFNode valueNode : valueNodes) {
+					
+					bindings.add("value", valueNode);
+					
+					resultObj = engine.invokeFunction(functionName, bindings);
+					
+					if(NashornUtil.isArray(resultObj)) {
+						for(Object ro : NashornUtil.asArray(resultObj)) {
+							Resource result = createValidationResult(report, shape, executable, theFocusNode);
+							if(ro instanceof Map) {
+								Object value = ((Map)ro).get("value");
+								if(value instanceof JSTerm) {
+									Node resultValueNode = JSFactory.getNode(value);
+									if(resultValueNode != null) {
+										result.addProperty(SH.value, dataModel.asRDFNode(resultValueNode));
+									}
 								}
 							}
+							returnResult = true;
 						}
-						returnResult = true;
 					}
-				}
-				else if(resultObj instanceof Boolean) {
-					if(!(Boolean)resultObj) {
+					else if(resultObj instanceof Boolean) {
+						if(!(Boolean)resultObj) {
+							Resource result = createValidationResult(report, shape, executable, theFocusNode);
+							if(valueNode != null) {
+								result.addProperty(SH.value, valueNode);
+							}
+							resultsList.add(result);
+							returnResult = true;
+						}
+					}
+					else if(resultObj instanceof String) {
 						Resource result = createValidationResult(report, shape, executable, theFocusNode);
-						result.addProperty(SH.value, theFocusNode);
+						result.addProperty(SH.resultMessage, (String)resultObj);
+						if(valueNode != null) {
+							result.addProperty(SH.value, valueNode);
+						}
 						resultsList.add(result);
 						returnResult = true;
 					}
-				}
-				else if(resultObj instanceof String) {
-					Resource result = createValidationResult(report, shape, executable, theFocusNode);
-					result.addProperty(SH.resultMessage, (String)resultObj);
-					result.addProperty(SH.value, theFocusNode);
-					resultsList.add(result);
-					returnResult = true;
 				}
 			}
 			return returnResult;
@@ -202,6 +230,7 @@ public class JSExecutionLanguage implements ExecutionLanguage {
 		finally {
 			dataJSGraph.close();
 			shapesJSGraph.close();
+			engine.put(SHACL, oldSHACL);
 		}
 	}
 
@@ -212,7 +241,12 @@ public class JSExecutionLanguage implements ExecutionLanguage {
 		report.addProperty(SH.result, result);
 		result.addProperty(SH.resultSeverity, SH.Violation); // TODO: Generalize
 		result.addProperty(SH.sourceConstraint, executable.getConstraint());
-		result.addProperty(SH.sourceConstraintComponent, SHJS.JSConstraintComponent);
+		if(executable instanceof ComponentConstraintExecutable) {
+			result.addProperty(SH.sourceConstraintComponent, ((ComponentConstraintExecutable)executable).getComponent());
+		}
+		else {	
+			result.addProperty(SH.sourceConstraintComponent, SHJS.JSConstraintComponent);
+		}
 		result.addProperty(SH.sourceShape, shape);
 		result.addProperty(SH.focusNode, focusNode);
 		Resource path = JenaUtil.getResourceProperty(executable.getConstraint(), SH.path);
