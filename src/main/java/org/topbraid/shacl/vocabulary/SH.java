@@ -243,8 +243,6 @@ public class SH {
 
 	public static final Var failureVar = Var.alloc("failure");
 
-	public static final Var focusNodeVar = Var.alloc(focusNode.getLocalName());
-
 	public static final Var PATHVar = Var.alloc("PATH");
 
 	public static final Var pathVar = Var.alloc(path.getLocalName());

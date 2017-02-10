@@ -22,6 +22,8 @@ public interface JSScriptEngine {
 	Object get(String varName);
 	
 	Object invokeFunction(String functionName, QuerySolution bindings) throws javax.script.ScriptException, java.lang.NoSuchMethodException;
+	
+	Object invokeFunctionOrdered(String functionName, Object[] args) throws javax.script.ScriptException, java.lang.NoSuchMethodException;
 
 	void put(String varName, Object value);
 }

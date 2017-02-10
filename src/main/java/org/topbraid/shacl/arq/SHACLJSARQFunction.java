@@ -54,6 +54,9 @@ public class SHACLJSARQFunction extends SHACLARQFunction {
 				else if(result instanceof String) {
 					return NodeValue.makeNode(NodeFactory.createLiteral((String)result));
 				}
+				else if(result instanceof Long) {
+					return NodeValue.makeNode(JenaDatatypes.createInteger(((Long)result).intValue()).asNode());
+				}
 				else if(result instanceof Integer) {
 					return NodeValue.makeNode(JenaDatatypes.createInteger((Integer)result).asNode());
 				}

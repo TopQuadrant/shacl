@@ -49,6 +49,8 @@ public class NashornScriptEngine implements JSScriptEngine {
 	// not installed twice
 	private Set<Resource> visitedLibraries = new HashSet<>();
 	
+	private Set<String> loadedURLs = new HashSet<>();
+	
 	
 	public NashornScriptEngine() {
 		engine = new ScriptEngineManager().getEngineByName("nashorn");
@@ -85,9 +87,12 @@ public class NashornScriptEngine implements JSScriptEngine {
 	
 	
 	public void executeScriptFromURL(String url) throws Exception {
-		Reader reader = new InputStreamReader(new URL(url).openStream());
-		engine.eval(reader);
-		reader.close();
+		if(!loadedURLs.contains(url)) {
+			loadedURLs.add(url);
+			Reader reader = new InputStreamReader(new URL(url).openStream());
+			engine.eval(reader);
+			reader.close();
+		}
 	}
 	
 	
@@ -138,6 +143,13 @@ public class NashornScriptEngine implements JSScriptEngine {
 				}
 			}
 		}
+		return invokeFunctionOrdered(functionName, params);
+	}
+
+
+	@Override
+	public Object invokeFunctionOrdered(String functionName, Object[] params)
+			throws ScriptException, NoSuchMethodException {
 		return ((Invocable) engine).invokeFunction(functionName, params);
 	}
 

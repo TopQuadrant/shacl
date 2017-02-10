@@ -25,6 +25,7 @@ ex:GraphValidationTestCase
           sh:focusNode ex:InvalidResource1 ;
           sh:resultPath rdfs:label ;
           sh:resultSeverity sh:Violation ;
+          sh:sourceConstraintComponent sh:SPARQLConstraintComponent ;
           sh:value "Invalid resource 1" ;
         ] ;
       sh:result [
@@ -32,6 +33,7 @@ ex:GraphValidationTestCase
           sh:focusNode ex:InvalidResource2 ;
           sh:resultPath rdfs:label ;
           sh:resultSeverity sh:Violation ;
+          sh:sourceConstraintComponent sh:SPARQLConstraintComponent ;
           sh:value "Invalid label 1" ;
         ] ;
       sh:result [
@@ -39,6 +41,7 @@ ex:GraphValidationTestCase
           sh:focusNode ex:InvalidResource2 ;
           sh:resultPath rdfs:label ;
           sh:resultSeverity sh:Violation ;
+          sh:sourceConstraintComponent sh:SPARQLConstraintComponent ;
           sh:value "Invalid label 2" ;
         ] ;
     ] ;

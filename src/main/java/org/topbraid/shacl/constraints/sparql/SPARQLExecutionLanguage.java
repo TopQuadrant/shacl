@@ -190,6 +190,11 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 			query = SPARQLSubstitutions.substitutePaths(query, path, shape.getModel());
 			bindings.add(SH.currentShapeVar.getVarName(), executable.getConstraint());
 		}
+		else if(!(executable instanceof ComponentConstraintExecutable) && SHFactory.isPropertyShape(shape)) {
+			String path = SHACLPaths.getPathString(JenaUtil.getResourceProperty(shape, SH.path));
+			query = SPARQLSubstitutions.substitutePaths(query, path, shape.getModel());
+			bindings.add(SH.currentShapeVar.getVarName(), shape);
+		}
 		else {
 			bindings.add(SH.currentShapeVar.getVarName(), shape);
 		}
@@ -314,7 +319,10 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 						if(executable instanceof ComponentConstraintExecutable) {
 							result.addProperty(SH.sourceConstraintComponent, ((ComponentConstraintExecutable)executable).getComponent());
 						}
-						
+						else {
+							result.addProperty(SH.sourceConstraintComponent, SH.SPARQLConstraintComponent);
+						}
+
 						if(selectMessage != null) {
 							result.addProperty(SH.resultMessage, selectMessage);
 						}
@@ -341,15 +349,19 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 						if(SHFactory.isPropertyShape(constraint) || SHFactory.isParameter(constraint)) {
 							result.addProperty(SH.resultPath, SHACLPaths.clonePath(SHFactory.asPropertyConstraint(constraint).getPath(), result.getModel()));
 						}
+						else if(!(executable instanceof ComponentConstraintExecutable) && SHFactory.isPropertyShape(shape)) {
+							result.addProperty(SH.resultPath, SHACLPaths.clonePath(JenaUtil.getResourceProperty(shape, SH.path), result.getModel()));
+						}
 						else {
 							RDFNode pathValue = sol.get(SH.pathVar.getVarName());
 							if(pathValue != null && pathValue.isURIResource()) {
 								result.addProperty(SH.resultPath, pathValue);
 							}
+							/*
 							RDFNode focusNodeValue = sol.get(SH.focusNodeVar.getVarName());
 							if(focusNodeValue != null) {
 								resultFocusNode = focusNodeValue;
-							}
+							}*/
 						}
 						
 						RDFNode selectValue = sol.get(SH.valueVar.getVarName());
@@ -374,6 +386,9 @@ public class SPARQLExecutionLanguage implements ExecutionLanguage {
 				success.addProperty(SH.sourceConstraint, executable.getConstraint());
 				if(executable instanceof ComponentConstraintExecutable) {
 					success.addProperty(SH.sourceConstraintComponent, ((ComponentConstraintExecutable)executable).getComponent());
+				}
+				else {
+					success.addProperty(SH.sourceConstraintComponent, SH.SPARQLConstraintComponent);
 				}
 				if(focusNode != null) {
 					success.addProperty(SH.focusNode, focusNode);

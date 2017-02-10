@@ -128,6 +128,17 @@ function AbstractQuery() {
 }
 
 /**
+ * Creates a new query that adds a binding for a given variable into
+ * each solution produced by the input query.
+ * @param varName  the name of the variable to bind
+ * @param bindFunction  a function that takes a solution object
+ *                      and returns a node or null based on it.
+ */
+AbstractQuery.prototype.bind = function(varName, bindFunction) {
+	return new BindQuery(this, varName, bindFunction);
+}
+
+/**
  * Creates a new query that filters the solutions produced by this.
  * @param filterFunction  a function that takes a solution object
  *                        and returns true iff that solution is valid
@@ -135,15 +146,6 @@ function AbstractQuery() {
 AbstractQuery.prototype.filter = function(filterFunction) {
 	return new FilterQuery(this, filterFunction);
 }
-
-// TODO: add other SPARQL-like query types
-//       - .distinct()
-//       - .bind(varName, function(solution))
-//       - .
-//       - .limit()
-//       - .path(s, path, o)   (this is complex)
-//       - .sort(varName, [comparatorFunction])
-//       - .union(otherQuery)
 
 /**
  * Creates a new query doing a triple match.
@@ -166,8 +168,25 @@ AbstractQuery.prototype.first = function() {
 }
 
 /**
+ * Creates a new query that only allows the first n solutions through.
+ * @param limit  the maximum number of results to allow
+ */
+AbstractQuery.prototype.limit = function(limit) {
+	return new LimitQuery(this, limit);
+}
+
+/**
+ * Creates a new query that sorts all input solutions by the bindings
+ * for a given variable.
+ * @param varName  the name of the variable to sort by
+ */
+AbstractQuery.prototype.orderByVar = function(varName) {
+	return new OrderByVarQuery(this, varName);
+}
+
+/**
  * Turns all results into an array.
- * @return a array consisting of solution objects
+ * @return an array consisting of solution objects
  */
 AbstractQuery.prototype.toArray = function() {
 	var results = [];
@@ -175,6 +194,61 @@ AbstractQuery.prototype.toArray = function() {
 		results.push(n);
 	}
 	return results;
+}
+
+/**
+ * Turns all results into an array of bindings for a given variable.
+ * @return an array consisting of RDF node objects
+ */
+AbstractQuery.prototype.toNodeArray = function(varName) {
+	var results = [];
+	for(var n = this.nextSolution(); n != null; n = this.nextSolution()) {
+		results.push(n[varName]);
+	}
+	return results;
+}
+
+// TODO: add other SPARQL-like query types
+//       - .distinct()
+//       - .path(s, path, o)   (this is complex)
+//       - .union(otherQuery)
+
+
+// END OF PUBLIC API ------------------------
+
+
+// class BindQuery
+// Takes all input solutions but adds a value for a given variable so that
+// the value is computed by a given function based on the current solution.
+// It is illegal to use a variable that already has a value from the input.
+
+function BindQuery(input, varName, bindFunction) {
+	this.source = input.source;
+	this.input = input;
+	this.bindFunction = bindFunction;
+	this.varName = varName;
+}
+
+BindQuery.prototype = Object.create(AbstractQuery.prototype);
+
+BindQuery.prototype.close = function() {
+	this.input.close();
+}
+
+// Pulls the next result from the input Query and passes it into 
+// the given bind function to add a new node
+BindQuery.prototype.nextSolution = function() {
+	var result = this.input.nextSolution();
+	if(result == null) {
+		return null;
+	}
+	else {
+		var newNode = this.bindFunction(result);
+		if(newNode) {
+			result[this.varName] = newNode;
+		}
+		return result;
+	}
 }
 
 
@@ -205,6 +279,36 @@ FilterQuery.prototype.nextSolution = function() {
 		else if(this.filterFunction(result) === true) {
 			return result;
 		}
+	}
+}
+
+
+// class LimitQuery
+// Only allows the first n values of the input query through
+
+function LimitQuery(input, limit) {
+	this.source = input.source;
+	this.input = input;
+	this.limit = limit;
+}
+
+LimitQuery.prototype = Object.create(AbstractQuery.prototype);
+
+LimitQuery.prototype.close = function() {
+	this.input.close();
+}
+
+// Pulls the next result from the input Query unless the number
+// of previous calls has exceeded the given limit
+LimitQuery.prototype.nextSolution = function() {
+	print("Next limit " + this.limit);
+	if(this.limit > 0) {
+		this.limit--;
+		return this.input.nextSolution();
+	}
+	else {
+		this.input.close();
+		return null;
 	}
 }
 
@@ -275,6 +379,39 @@ RDFTripleQuery.prototype.nextSolution = function() {
 }
 
 
+// class OrderByVarQuery
+// Sorts all solutions from the input stream by a given variable
+
+function OrderByVarQuery(input, varName) {
+	this.input = input;
+	this.source = input.source;
+	this.varName = varName;
+}
+
+OrderByVarQuery.prototype = Object.create(AbstractQuery.prototype);
+
+OrderByVarQuery.prototype.close = function() {
+	this.input.close();
+}
+
+OrderByVarQuery.prototype.nextSolution = function() {
+	if(!this.solutions) {
+		this.solutions = this.input.toArray();
+		var varName = this.varName;
+		this.solutions.sort(function(s1, s2) {
+				return compareTerms(s1[varName], s2[varName]);
+			});
+		this.index = 0;
+	}
+	if(this.index < this.solutions.length) {
+		return this.solutions[this.index++];
+	}
+	else {
+		return null;
+	}
+}
+
+
 // class StartQuery
 // This simply produces a single result: the initial solution
 
@@ -310,4 +447,42 @@ function createSolution(base) {
 		}
 	}
 	return result;
+}
+
+
+function compareTerms(t1, t2) {
+	if(!t1) {
+		return !t2 ? 0 : 1;
+	}
+	else if(!t2) {
+		return -1;
+	}
+	var bt = t1.termType.localeCompare(t2.termType);
+	if(bt != 0) {
+		return bt;
+	}
+	else {
+		// TODO: Does not handle numeric or date comparison
+		var bv = t1.value.localeCompare(t2.value);
+		if(bv != 0) {
+			return bv;
+		}
+		else {
+			if(t1.termType === "Literal") {
+				var bd = t1.datatype.value.localeCompare(t2.datatype.value);
+				if(bd != 0) {
+					return bd;
+				}
+				else if(RDF.langString.equals(t1.datatype)) {
+					return t1.language.localeCompare(t2.language);
+				}
+				else {
+					return 0;
+				}
+			}
+			else {
+				return 0;
+			}
+		}
+	}
 }
