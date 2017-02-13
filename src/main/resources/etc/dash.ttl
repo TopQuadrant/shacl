@@ -855,6 +855,11 @@ owl:Class
 .
 sh:AndConstraintComponent
   sh:targetClass sh:Shape ;
+  sh:validator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "isAnd" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
 .
 sh:ClassConstraintComponent
   sh:targetClass sh:Shape ;
@@ -890,6 +895,11 @@ sh:ClosedConstraintComponent
 """ ;
     ] ;
   sh:targetClass sh:Shape ;
+  sh:validator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "validateClosed" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
 .
 sh:DatatypeConstraintComponent
   sh:targetClass sh:Shape ;
@@ -903,6 +913,11 @@ sh:DerivedValuesConstraintComponent
   sh:targetClass sh:Shape ;
 .
 sh:DisjointConstraintComponent
+  sh:propertyValidator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "propertyDisjoint" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
       sh:message "Property must not share any values with {$disjoint}" ;
@@ -918,6 +933,11 @@ sh:DisjointConstraintComponent
   sh:targetClass sh:Shape ;
 .
 sh:EqualsConstraintComponent
+  sh:propertyValidator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "propertyEquals" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
       sh:message "Must have same values as {$equals}" ;
@@ -954,12 +974,22 @@ sh:Function
 .
 sh:HasValueConstraintComponent
   sh:nodeValidator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "nodeHasValue" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
+  sh:nodeValidator [
       rdf:type sh:SPARQLAskValidator ;
       sh:ask """ASK {
     FILTER ($value = $hasValue)
 }""" ;
       sh:message "Value must be {$hasValue}" ;
       sh:prefixes <http://datashapes.org/dash> ;
+    ] ;
+  sh:propertyValidator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "propertyHasValue" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
@@ -977,12 +1007,22 @@ sh:HasValueConstraintComponent
 sh:InConstraintComponent
   sh:targetClass sh:Shape ;
   sh:validator dash:isIn ;
+  sh:validator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "isIn" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
 .
 sh:LanguageInConstraintComponent
   sh:targetClass sh:Shape ;
   sh:validator dash:isLanguageIn ;
 .
 sh:LessThanConstraintComponent
+  sh:propertyValidator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "propertyLessThan" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
       sh:message "Value is not < value of {$lessThan}" ;
@@ -999,6 +1039,11 @@ sh:LessThanConstraintComponent
   sh:targetClass sh:Shape ;
 .
 sh:LessThanOrEqualsConstraintComponent
+  sh:propertyValidator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "propertyLessThanOrEquals" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
       sh:message "Value is not <= value of {$lessThanOrEquals}" ;
@@ -1038,14 +1083,29 @@ sh:MaxCountConstraintComponent
 sh:MaxExclusiveConstraintComponent
   sh:targetClass sh:Shape ;
   sh:validator dash:hasMaxExclusive ;
+  sh:validator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "hasMaxExclusive" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
 .
 sh:MaxInclusiveConstraintComponent
   sh:targetClass sh:Shape ;
   sh:validator dash:hasMaxInclusive ;
+  sh:validator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "hasMaxInclusive" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
 .
 sh:MaxLengthConstraintComponent
   sh:targetClass sh:Shape ;
   sh:validator dash:hasMaxLength ;
+  sh:validator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "hasMaxLength" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
 .
 sh:MinCountConstraintComponent
   sh:propertyValidator [
@@ -1073,17 +1133,37 @@ sh:MinCountConstraintComponent
 sh:MinExclusiveConstraintComponent
   sh:targetClass sh:Shape ;
   sh:validator dash:hasMinExclusive ;
+  sh:validator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "hasMinExclusive" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
 .
 sh:MinInclusiveConstraintComponent
   sh:targetClass sh:Shape ;
   sh:validator dash:hasMinInclusive ;
+  sh:validator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "hasMinInclusive" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
 .
 sh:MinLengthConstraintComponent
   sh:targetClass sh:Shape ;
   sh:validator dash:hasMinLength ;
+  sh:validator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "hasMinLength" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
 .
 sh:NodeConstraintComponent
   sh:targetClass sh:Shape ;
+  sh:validator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "hasNode" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
 .
 sh:NodeKindConstraintComponent
   sh:targetClass sh:Shape ;
@@ -1104,18 +1184,44 @@ sh:NotConstraintComponent
 .
 sh:OrConstraintComponent
   sh:targetClass sh:Shape ;
+  sh:validator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "isOr" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
 .
 sh:PatternConstraintComponent
   sh:targetClass sh:Shape ;
   sh:validator dash:hasPattern ;
+  sh:validator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "hasPattern" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
 .
 sh:QualifiedMaxCountConstraintComponent
+  sh:propertyValidator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "propertyQualifiedMaxCount" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
   sh:targetClass sh:Shape ;
 .
 sh:QualifiedMinCountConstraintComponent
+  sh:propertyValidator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "propertyQualifiedMinCount" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+      sh:message "Less than {$qualifiedMinCount} values have shape {$qualifiedValueShape}" ;
+    ] ;
   sh:targetClass sh:Shape ;
 .
 sh:UniqueLangConstraintComponent
+  sh:propertyValidator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "propertyUniqueLang" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
       sh:message "Language \"{?lang}\" used more than once" ;
@@ -1140,6 +1246,11 @@ sh:UniqueLangConstraintComponent
 .
 sh:XorConstraintComponent
   sh:targetClass sh:Shape ;
+  sh:validator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "isXor" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
 .
 sh:derivedValues
   dash:defaultValueType sh:SPARQLValuesDeriver ;

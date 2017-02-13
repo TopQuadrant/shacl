@@ -1,0 +1,98 @@
+# baseURI: http://datashapes.org/js/tests/function/simpleJSFunctions.test
+# imports: http://datashapes.org/dash
+# prefix: ex
+
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix ex: <http://datashapes.org/js/tests/function/simpleJSFunctions.test#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://datashapes.org/js/tests/function/simpleJSFunctions.test>
+  rdf:type owl:Ontology ;
+  rdfs:label "Test of simple JS functions" ;
+  owl:imports <http://datashapes.org/dash> ;
+  owl:versionInfo "Created with TopBraid Composer" ;
+.
+ex:SimpleJSFunctionsLibrary
+  rdf:type sh:JSLibrary ;
+  rdfs:label "Simple JSFunctions library" ;
+  sh:jsLibraryURL "http://datashapes.org/js/tests/function/simpleJSFunctions.js"^^xsd:anyURI ;
+.
+ex:booleanFunction
+  rdf:type sh:JSFunction ;
+  rdfs:label "boolean function" ;
+  sh:jsFunctionName "booleanFunction" ;
+  sh:jsLibrary ex:SimpleJSFunctionsLibrary ;
+  sh:returnType xsd:boolean ;
+.
+ex:floatFunction
+  rdf:type sh:JSFunction ;
+  sh:jsFunctionName "floatFunction" ;
+  sh:jsLibrary ex:SimpleJSFunctionsLibrary ;
+  sh:returnType xsd:float ;
+.
+ex:integerFunction
+  rdf:type sh:JSFunction ;
+  rdfs:label "integer function" ;
+  sh:jsFunctionName "integerFunction" ;
+  sh:jsLibrary ex:SimpleJSFunctionsLibrary ;
+  sh:returnType xsd:integer ;
+.
+ex:nodeFunction
+  rdf:type sh:JSFunction ;
+  rdfs:label "node function" ;
+  sh:jsFunctionName "nodeFunction" ;
+  sh:jsLibrary ex:SimpleJSFunctionsLibrary ;
+.
+ex:stringFunction
+  rdf:type sh:JSFunction ;
+  sh:jsFunctionName "stringFunction" ;
+  sh:jsLibrary ex:SimpleJSFunctionsLibrary ;
+  sh:returnType xsd:string ;
+.
+ex:testBooleanFunction
+  rdf:type dash:FunctionTestCase ;
+  dash:expectedResult "true"^^xsd:boolean ;
+  dash:expression "ex:booleanFunction()" ;
+.
+ex:testFloatFunction
+  rdf:type dash:FunctionTestCase ;
+  dash:expectedResult 4.2 ;
+  dash:expression "ex:floatFunction()" ;
+.
+ex:testIntegerFunction
+  rdf:type dash:FunctionTestCase ;
+  dash:expectedResult 42 ;
+  dash:expression "ex:integerFunction()" ;
+.
+ex:testNodeFunction
+  rdf:type dash:FunctionTestCase ;
+  dash:expectedResult <http://aldi.de> ;
+  dash:expression "ex:nodeFunction()" ;
+.
+ex:testStringFunction
+  rdf:type dash:FunctionTestCase ;
+  dash:expectedResult "Hello" ;
+  dash:expression "ex:stringFunction()" ;
+.
+ex:testWithArguments
+  rdf:type dash:FunctionTestCase ;
+  dash:expectedResult <http://aldi.de/product_4_2> ;
+  dash:expression "ex:withArguments(4, 2)" ;
+.
+ex:withArguments
+  rdf:type sh:JSFunction ;
+  sh:jsFunctionName "withArguments" ;
+  sh:jsLibrary ex:SimpleJSFunctionsLibrary ;
+  sh:parameter [
+      sh:path ex:arg1 ;
+      sh:name "arg1" ;
+    ] ;
+  sh:parameter [
+      sh:path ex:arg2 ;
+      sh:name "arg2" ;
+    ] ;
+.

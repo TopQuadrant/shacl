@@ -1,0 +1,100 @@
+# baseURI: http://datashapes.org/js/tests-rdfquery/basic.test
+# imports: http://datashapes.org/dash
+# prefix: ex
+
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix ex: <http://datashapes.org/js/tests-rdfquery/basic.test#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://datashapes.org/js/tests-rdfquery/basic.test>
+  rdf:type owl:Ontology ;
+  rdfs:label "Test of basic" ;
+  owl:imports <http://datashapes.org/dash> ;
+  owl:versionInfo "Created with TopBraid Composer" ;
+.
+ex:TestJSLibrary
+  rdf:type sh:JSLibrary ;
+  rdfs:label "Test JSLibrary" ;
+  sh:jsLibrary dash:RDFQueryJSLibrary ;
+  sh:jsLibraryURL "http://datashapes.org/js/tests-rdfquery/basic.js"^^xsd:anyURI ;
+.
+ex:bindNewLabel
+  rdf:type sh:JSFunction ;
+  rdfs:label "bind new label" ;
+  sh:jsFunctionName "bindNewLabel" ;
+  sh:jsLibrary ex:TestJSLibrary ;
+  sh:returnType rdf:langString ;
+.
+ex:countAllSubClasses
+  rdf:type sh:JSFunction ;
+  sh:jsFunctionName "countAllSubClasses" ;
+  sh:jsLibrary ex:TestJSLibrary ;
+.
+ex:getFirstType
+  rdf:type sh:JSFunction ;
+  sh:jsFunctionName "getFirstType" ;
+  sh:jsLibrary ex:TestJSLibrary ;
+.
+ex:joinTwoBGPsThenFilter
+  rdf:type sh:JSFunction ;
+  rdfs:label "join two BGPs then filter" ;
+  sh:jsFunctionName "joinTwoBGPsThenFilter" ;
+  sh:jsLibrary ex:TestJSLibrary ;
+.
+ex:limit10
+  rdf:type sh:JSFunction ;
+  rdfs:label "limit10" ;
+  sh:jsFunctionName "limit10" ;
+  sh:jsLibrary ex:TestJSLibrary ;
+.
+ex:orderByVarProperty
+  rdf:type sh:JSFunction ;
+  rdfs:label "order by var property" ;
+  sh:jsFunctionName "orderByVarProperty" ;
+  sh:jsLibrary ex:TestJSLibrary ;
+.
+ex:startEmpty
+  rdf:type sh:JSFunction ;
+  rdfs:label "start empty" ;
+  sh:jsFunctionName "startEmpty" ;
+  sh:jsLibrary ex:TestJSLibrary ;
+.
+ex:testBindNewLabel
+  rdf:type dash:FunctionTestCase ;
+  dash:expectedResult "Class"@en-US ;
+  dash:expression "ex:bindNewLabel()" ;
+.
+ex:testCountAllSubClasses
+  rdf:type dash:FunctionTestCase ;
+  dash:expectedResult "2"^^xsd:decimal ;
+  dash:expression "ex:countAllSubClasses()" ;
+.
+ex:testGetFirstType
+  rdf:type dash:FunctionTestCase ;
+  dash:expectedResult rdfs:Class ;
+  dash:expression "ex:getFirstType()" ;
+.
+ex:testJoinTwoBGPsThenFilter
+  rdf:type dash:FunctionTestCase ;
+  dash:expectedResult rdfs:Class ;
+  dash:expression "ex:joinTwoBGPsThenFilter()" ;
+.
+ex:testLimit10
+  rdf:type dash:FunctionTestCase ;
+  dash:expectedResult 10 ;
+  dash:expression "ex:limit10()" ;
+.
+ex:testOrderByVarProperty
+  rdf:type dash:FunctionTestCase ;
+  dash:expectedResult "true"^^xsd:boolean ;
+  dash:expression "ex:orderByVarProperty()" ;
+.
+ex:testStartEmpty
+  rdf:type dash:FunctionTestCase ;
+  dash:expectedResult "OK" ;
+  dash:expression "ex:startEmpty()" ;
+.

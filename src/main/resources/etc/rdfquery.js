@@ -97,6 +97,19 @@ var RDFS = {
 	subPropertyOf : NS.rdfs("subPropertyOf")
 }
 
+var SH = {
+	NodeShape : NS.sh("NodeShape"),
+	PropertyShape : NS.sh("PropertyShape"),
+	Shape : NS.sh("Shape"),
+	qualifiedValueShape : NS.sh("qualifiedValueShape"),
+	qualifiedValueShapesDisjoint : NS.sh("qualifiedValueShapesDisjoint"),
+	property : NS.sh("property"),
+	targetClass : NS.sh("targetClass"),
+	targetNode : NS.sh("targetNode"),
+	targetObjectsOf : NS.sh("targetObjectsOf"),
+	targetSubjectsOf : NS.sh("targetSubjectsOf")
+}
+
 var XSD = {
 	boolean : NS.xsd("boolean"),
 	date : NS.xsd("date"),
@@ -106,6 +119,9 @@ var XSD = {
 	integer : NS.xsd("integer"),
 	string : NS.xsd("string")
 };
+
+var XSDTrue = TermFactory.literal("true", XSD.boolean);
+var XSDFalse = TermFactory.literal("false", XSD.boolean);
 
 
 /**
@@ -126,6 +142,8 @@ function RDFQuery(graph, initialSolution) {
 
 function AbstractQuery() {
 }
+
+    // Query constructor functions...
 
 /**
  * Creates a new query that adds a binding for a given variable into
@@ -158,16 +176,6 @@ AbstractQuery.prototype.find = function(s, p, o) {
 }
 
 /**
- * Gets the next solution and closes the query.
- * @return a solution object
- */
-AbstractQuery.prototype.first = function() {
-	var n = this.nextSolution();
-	this.close();
-	return n;
-}
-
-/**
  * Creates a new query that only allows the first n solutions through.
  * @param limit  the maximum number of results to allow
  */
@@ -182,6 +190,55 @@ AbstractQuery.prototype.limit = function(limit) {
  */
 AbstractQuery.prototype.orderByVar = function(varName) {
 	return new OrderByVarQuery(this, varName);
+}
+
+/**
+ * Creates a new query doing a match where the predicate may be a RDF Path object.
+ * NOTE: Currently not implemented, just an alias for find(s, p, o), i.e. only
+ *       predicate "paths" are supported right now.
+ * @param s  the match subject or a variable name (string) - must have a value
+             at execution time!
+ * @param path  the match path object (e.g. a NamedNode for a simple predicate hop)
+ * @param o  the match object or a variable name (string)
+ */
+AbstractQuery.prototype.path = function(s, path, o) {
+	// TODO: Support paths, for example
+	// - PredicatePaths: NamedNode
+	// - SequencePaths: [path1, path2]
+	// - AlternativePaths: { or : [ path1, path2 ] }
+	// - InversePaths: { inverse : path }
+	// - ZeroOrMorePaths: { zeroOrMore : path }
+	// - OneOrMorePaths: { oneOrMore : path }
+	// - ZeroOrOnePaths: { zeroOrOne : path }
+	return new RDFTripleQuery(this, s, path, o);
+}
+
+// TODO: add other SPARQL-like query types
+//       - .distinct()
+//       - .path(s, path, o)   (this is complex)
+//       - .union(otherQuery)
+
+
+	// Terminal functions - exhaust the solution iterators
+
+/**
+ * Gets the next solution and closes the query.
+ * @return a solution object
+ */
+AbstractQuery.prototype.first = function() {
+	var n = this.nextSolution();
+	this.close();
+	return n;
+}
+
+AbstractQuery.prototype.forEach = function(callback) {
+	for(var n = this.nextSolution(); n; n = this.nextSolution()) {
+		callback(n);
+	}
+}
+
+AbstractQuery.prototype.hasSolution = function() {
+	return this.first() != null;
 }
 
 /**
@@ -208,10 +265,18 @@ AbstractQuery.prototype.toNodeArray = function(varName) {
 	return results;
 }
 
-// TODO: add other SPARQL-like query types
-//       - .distinct()
-//       - .path(s, path, o)   (this is complex)
-//       - .union(otherQuery)
+/**
+ * Turns all results into a set of bindings for a given variable.
+ * The set has functions .contains and .toArray. 
+ * @return a set consisting of RDF node objects
+ */
+AbstractQuery.prototype.toNodeSet = function(varName) {
+	var results = new NodeSet();
+	for(var n = this.nextSolution(); n != null; n = this.nextSolution()) {
+		results.add(n[varName]);
+	}
+	return results;
+}
 
 
 // END OF PUBLIC API ------------------------
@@ -301,7 +366,6 @@ LimitQuery.prototype.close = function() {
 // Pulls the next result from the input Query unless the number
 // of previous calls has exceeded the given limit
 LimitQuery.prototype.nextSolution = function() {
-	print("Next limit " + this.limit);
 	if(this.limit > 0) {
 		this.limit--;
 		return this.input.nextSolution();
@@ -485,4 +549,37 @@ function compareTerms(t1, t2) {
 			}
 		}
 	}
+}
+
+
+// class NodeSet
+// (a super-primitive implementation for now!)
+
+function NodeSet() {
+	this.values = [];
+}
+
+NodeSet.prototype.add = function(node) {
+	if(!this.contains(node)) {
+		this.values.push(node);
+	}
+}
+
+NodeSet.prototype.addAll = function(nodes) {
+	for(var i = 0; i < nodes.length; i++) {
+		this.add(nodes[i]);
+	}
+}
+
+NodeSet.prototype.contains = function(node) {
+	for(var i = 0; i < this.values.length; i++) {
+		if(this.values[i].equals(node)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+NodeSet.prototype.toArray = function() {
+	return this.values;
 }

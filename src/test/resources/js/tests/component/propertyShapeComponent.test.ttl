@@ -1,0 +1,86 @@
+# baseURI: http://datashapes.org/js/tests/component/propertyShapeComponent.test
+# imports: http://datashapes.org/dash
+# prefix: ex
+
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix ex: <http://datashapes.org/js/tests/component/propertyShapeComponent.test#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://datashapes.org/js/tests/component/propertyShapeComponent.test>
+  rdf:type owl:Ontology ;
+  rdfs:label "Test of propertyShapeComponent" ;
+  owl:imports <http://datashapes.org/dash> ;
+  owl:versionInfo "Created with TopBraid Composer" ;
+.
+ex:Class
+  rdf:type rdfs:Class ;
+  rdfs:label "Class" ;
+.
+ex:GraphValidationTestCase
+  rdf:type dash:GraphValidationTestCase ;
+  dash:expectedResult [
+      rdf:type sh:ValidationReport ;
+      sh:conforms "false"^^xsd:boolean ;
+      sh:result [
+          rdf:type sh:ValidationResult ;
+          sh:focusNode ex:InvalidInstance0 ;
+          sh:resultPath ex:property ;
+          sh:resultSeverity sh:Violation ;
+          sh:sourceConstraintComponent ex:minCardinalityComponent ;
+        ] ;
+      sh:result [
+          rdf:type sh:ValidationResult ;
+          sh:focusNode ex:InvalidInstance1 ;
+          sh:resultPath ex:property ;
+          sh:resultSeverity sh:Violation ;
+          sh:sourceConstraintComponent ex:minCardinalityComponent ;
+        ] ;
+    ] ;
+.
+ex:InvalidInstance0
+  rdf:type ex:Class ;
+.
+ex:InvalidInstance1
+  rdf:type ex:Class ;
+  ex:property ex:A ;
+.
+ex:TestShape
+  rdf:type sh:NodeShape ;
+  sh:property [
+      sh:path ex:property ;
+      ex:minCardinality 2 ;
+    ] ;
+  sh:targetClass ex:Class ;
+.
+ex:ValidInstance2
+  rdf:type ex:Class ;
+  ex:property ex:A ;
+  ex:property ex:B ;
+.
+ex:ValidInstance3
+  rdf:type ex:Class ;
+  ex:property ex:A ;
+  ex:property ex:B ;
+  ex:property ex:C ;
+.
+ex:minCardinalityComponent
+  rdf:type sh:ConstraintComponent ;
+  rdfs:label "min cardinality component" ;
+  sh:parameter [
+      sh:path ex:minCardinality ;
+      sh:datatype xsd:integer ;
+      sh:name "min cardinality" ;
+    ] ;
+  sh:propertyValidator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "propertyShape" ;
+      sh:jsLibrary [
+          rdf:type sh:JSLibrary ;
+          sh:jsLibraryURL "http://datashapes.org/js/tests/component/propertyShapeComponent.js"^^xsd:anyURI ;
+        ] ;
+    ] ;
+.

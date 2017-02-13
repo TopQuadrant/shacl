@@ -54,6 +54,13 @@ ex:GraphValidationTestCase
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:QualifiedMinCountConstraintComponent ;
         ] ;
+      sh:result [
+          rdf:type sh:ValidationResult ;
+          sh:focusNode ex:InvalidHand1 ;
+          sh:resultPath ex:digit ;
+          sh:resultSeverity sh:Violation ;
+          sh:sourceConstraintComponent sh:QualifiedMinCountConstraintComponent ;
+        ] ;
     ] ;
 .
 ex:Hand

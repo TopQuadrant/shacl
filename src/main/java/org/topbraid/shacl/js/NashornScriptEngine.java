@@ -4,9 +4,11 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.script.Invocable;
@@ -43,7 +45,13 @@ public class NashornScriptEngine implements JSScriptEngine {
 			"    });\n" +
 			"}";
 	
+	public static final String DASH_JS = "http://datashapes.org/js/dash.js";
+
+	public static final String RDFQUERY_JS = "http://datashapes.org/js/rdfquery.js";
+
 	private ScriptEngine engine;
+	
+	private Map<String,List<String>> functionParametersMap = new HashMap<>();
 	
 	// Remembers which sh:libraries executables were already handled so that they are
 	// not installed twice
@@ -86,12 +94,28 @@ public class NashornScriptEngine implements JSScriptEngine {
 	}
 	
 	
-	public void executeScriptFromURL(String url) throws Exception {
+	public final void executeScriptFromURL(String url) throws Exception {
 		if(!loadedURLs.contains(url)) {
 			loadedURLs.add(url);
-			Reader reader = new InputStreamReader(new URL(url).openStream());
+			Reader reader = createScriptReader(url);
 			engine.eval(reader);
 			reader.close();
+		}
+	}
+
+
+	protected Reader createScriptReader(String url) throws Exception {
+		if(DASH_JS.equals(url)) {
+			return new InputStreamReader(NashornScriptEngine.class.getResourceAsStream("/etc/dash.js"));
+		}
+		else if(RDFQUERY_JS.equals(url)) {
+			return new InputStreamReader(NashornScriptEngine.class.getResourceAsStream("/etc/rdfquery.js"));
+		}
+		else if(url.startsWith("http://datashapes.org/js/")) {
+			return new InputStreamReader(NashornScriptEngine.class.getResourceAsStream(url.substring(21)));
+		}
+		else {
+			return new InputStreamReader(new URL(url).openStream());
 		}
 	}
 	
@@ -108,6 +132,10 @@ public class NashornScriptEngine implements JSScriptEngine {
 	
 	
 	private List<String> getFunctionParameters(String functionName) throws ScriptException {
+		List<String> cached = functionParametersMap.get(functionName);
+		if(cached != null) {
+			return cached;
+		}
 		Object what = engine.get(functionName);
 		try {
 			String funcString = what.toString();
@@ -117,6 +145,7 @@ public class NashornScriptEngine implements JSScriptEngine {
 			for(Object param : params) {
 				results.add((String)param);
 			}
+			functionParametersMap.put(functionName, results);
 			return results;
 		}
 		catch(Exception ex) {
