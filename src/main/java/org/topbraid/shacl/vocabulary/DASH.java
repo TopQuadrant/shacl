@@ -40,9 +40,9 @@ public class DASH {
 
     public final static Resource InferencingTestCase = ResourceFactory.createResource(NS + "InferencingTestCase");
 
-    public final static Resource None = ResourceFactory.createResource(NS + "None");
-
     public final static Resource QueryTestCase = ResourceFactory.createResource(NS + "QueryTestCase");
+
+    public final static Resource ParameterConstraintComponent = ResourceFactory.createResource(NS + "ParameterConstraintComponent");
 
     public final static Resource SPARQLUpdateSuggestionGenerator = ResourceFactory.createResource(NS + "SPARQLUpdateSuggestionGenerator");
 
@@ -94,6 +94,8 @@ public class DASH {
     public final static Property testGraph = ResourceFactory.createProperty(NS + "testGraph");
     
     public final static Property testModifiesEnvironment = ResourceFactory.createProperty(NS + "testModifiesEnvironment");
+    
+    public final static Property validateShapes = ResourceFactory.createProperty(NS + "validateShapes");
 
 
     public static String getURI() {

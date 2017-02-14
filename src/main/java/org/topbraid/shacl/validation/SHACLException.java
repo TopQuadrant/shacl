@@ -1,4 +1,4 @@
-package org.topbraid.shacl.constraints;
+package org.topbraid.shacl.validation;
 
 /**
  * An Exception signaling invalid input to the constraint validation engine.

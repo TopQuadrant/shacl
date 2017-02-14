@@ -1,4 +1,4 @@
-package org.topbraid.shacl.constraints;
+package org.topbraid.shacl.validation;
 
 import java.util.function.Function;
 

@@ -1,9 +1,7 @@
 // Functions implementing the validators of SHACL-JS
-// Work in progress!
 
-// TODO:
-// - sh:property
-// - sh:qualifiedXY
+// There is no validator for sh:property as this is expected to be
+// natively implemented by the surrounding engine.
 
 function hasClass($value, $class) {
 	return new RDFQueryUtil($dataGraph).isInstanceOf($value, $class);
@@ -68,11 +66,11 @@ function hasNodeKind($value, $nodeKind) {
 }
 
 function hasNode($value, $node) {
-	return SHACL.validateNode($value, $node, $dataGraph, $shapesGraph).length == 0;
+	return SHACL.validateNode($value, $node).length == 0;
 }
 
 function hasNot($value, $not) {
-	return SHACL.validateNode($value, $not, $dataGraph, $shapesGraph).length > 0;
+	return SHACL.validateNode($value, $not).length > 0;
 }
 
 function hasPattern($value, $pattern, $flags) {
@@ -86,7 +84,7 @@ function hasPattern($value, $pattern, $flags) {
 function isAnd($value, $and) {
 	var shapes = new RDFQueryUtil($shapesGraph).rdfListToArray($and);
 	for(var i = 0; i < shapes.length; i++) {
-		if(SHACL.validateNode($value, shapes[i], $dataGraph, $shapesGraph).length > 0) {
+		if(SHACL.validateNode($value, shapes[i]).length > 0) {
 			return false;
 		}
 	}
@@ -102,7 +100,7 @@ function isIn($value, $in) {
 function isOr($value, $or) {
 	var shapes = new RDFQueryUtil($shapesGraph).rdfListToArray($or);
 	for(var i = 0; i < shapes.length; i++) {
-		if(SHACL.validateNode($value, shapes[i], $dataGraph, $shapesGraph).length == 0) {
+		if(SHACL.validateNode($value, shapes[i]).length == 0) {
 			return true;
 		}
 	}
@@ -113,7 +111,7 @@ function isXor($value, $xor) {
 	var shapes = new RDFQueryUtil($shapesGraph).rdfListToArray($xor);
 	var count = 0;
 	for(var i = 0; i < shapes.length; i++) {
-		if(SHACL.validateNode($value, shapes[i], $dataGraph, $shapesGraph).length == 0) {
+		if(SHACL.validateNode($value, shapes[i]).length == 0) {
 			count++;
 		}
 	}
@@ -122,6 +120,10 @@ function isXor($value, $xor) {
 
 function nodeHasValue($focusNode, $hasValue) {
 	return $focusNode.equals($hasValue);
+}
+
+function nodeProperty($focusNode, $property) {
+	return SHACL.validateNode($focusNode, $property);
 }
 
 function propertyDisjoint($focusNode, $path, $disjoint) {
@@ -231,7 +233,7 @@ function propertyQualifiedHelper($focusNode, $path, $qualifiedValueShape, $curre
 	return RDFQuery($dataGraph).
 		path($focusNode, toRDFQueryPath($path), "value").
 		filter(function(sol) { 
-			return SHACL.validateNode(sol.value, $qualifiedValueShape, $dataGraph, $shapesGraph).length == 0 &&
+			return SHACL.validateNode(sol.value, $qualifiedValueShape).length == 0 &&
 				!propertyQualifiedConformsToASibling(sol.value, siblingShapes.toArray()); 
 		}).
 		toArray().length;
@@ -239,7 +241,7 @@ function propertyQualifiedHelper($focusNode, $path, $qualifiedValueShape, $curre
 
 function propertyQualifiedConformsToASibling(value, siblingShapes) {
 	for(var i = 0; i < siblingShapes.length; i++) {
-		if(SHACL.validateNode(value, siblingShapes[i], $dataGraph, $shapesGraph).length == 0) {
+		if(SHACL.validateNode(value, siblingShapes[i]).length == 0) {
 			return true;
 		}
 	}

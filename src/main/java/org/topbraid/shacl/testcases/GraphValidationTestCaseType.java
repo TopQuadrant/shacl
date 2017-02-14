@@ -15,10 +15,12 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.topbraid.shacl.arq.SHACLPaths;
-import org.topbraid.shacl.constraints.ModelConstraintValidator;
-import org.topbraid.shacl.constraints.SHACLSuggestionGenerator;
-import org.topbraid.shacl.constraints.SHACLSuggestionGeneratorFactory;
 import org.topbraid.shacl.util.SHACLUtil;
+import org.topbraid.shacl.validation.SHACLSuggestionGenerator;
+import org.topbraid.shacl.validation.SHACLSuggestionGeneratorFactory;
+import org.topbraid.shacl.validation.ShapesGraph;
+import org.topbraid.shacl.validation.ValidationEngineFactory;
+import org.topbraid.shacl.validation.predicates.ExcludeMetaShapesPredicate;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.ARQFactory;
@@ -80,7 +82,9 @@ public class GraphValidationTestCaseType implements TestCaseType {
 			Dataset dataset = ARQFactory.get().getDataset(dataModel);
 			URI shapesGraphURI = SHACLUtil.withShapesGraph(dataset);
 
-			Resource actualReport = new ModelConstraintValidator().validateModel(dataset, shapesGraphURI, null, true, null, null);
+			ShapesGraph shapesGraph = new ShapesGraph(dataset.getNamedModel(shapesGraphURI.toString()), 
+					getResource().hasProperty(DASH.validateShapes, JenaDatatypes.TRUE) ? null : new ExcludeMetaShapesPredicate());
+			Resource actualReport = ValidationEngineFactory.get().create(dataset, shapesGraphURI, shapesGraph, null).validateAll();
 			Model actualResults = actualReport.getModel();
 			if(getResource().hasProperty(DASH.includeSuggestions, JenaDatatypes.TRUE)) {
 				Model shapesModel = dataset.getNamedModel(shapesGraphURI.toString());

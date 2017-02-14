@@ -1,4 +1,4 @@
-package org.topbraid.shacl.constraints;
+package org.topbraid.shacl.util;
 
 import org.topbraid.shacl.vocabulary.SH;
 

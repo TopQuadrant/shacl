@@ -13,14 +13,15 @@ import org.apache.jena.sparql.expr.ExprEvalException;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.function.FunctionEnv;
 import org.apache.jena.vocabulary.RDF;
-import org.topbraid.shacl.constraints.FailureLog;
-import org.topbraid.shacl.constraints.NodeConstraintValidator;
-import org.topbraid.shacl.constraints.sparql.SPARQLExecutionLanguage;
+import org.topbraid.shacl.util.FailureLog;
+import org.topbraid.shacl.validation.DefaultShapesGraphProvider;
+import org.topbraid.shacl.validation.ShapesGraph;
+import org.topbraid.shacl.validation.ValidationEngineFactory;
+import org.topbraid.shacl.validation.sparql.AbstractSPARQLExecutor;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.AbstractFunction3;
 import org.topbraid.spin.util.JenaDatatypes;
-import org.topbraid.spin.util.JenaUtil;
 
 /**
  * The implementation of the tosh:hasShape function.
@@ -91,7 +92,7 @@ public class HasShapeFunction extends AbstractFunction3 {
 						throw new ExprEvalException("Propagating failure from nested shapes");
 					}
 
-					if(SPARQLExecutionLanguage.createDetails) {
+					if(AbstractSPARQLExecutor.createDetails) {
 						boolean result = true;
 						for(Resource r : results.listSubjectsWithProperty(RDF.type, SH.ValidationResult).toList()) {
 							if(!results.contains(null, SH.detail, r)) {
@@ -118,8 +119,13 @@ public class HasShapeFunction extends AbstractFunction3 {
 
 
 	private Model doRun(RDFNode resource, Resource shape, Dataset dataset) {
-		Resource local = JenaUtil.createMemoryModel().createResource(SH.ValidationReport);
-		return new NodeConstraintValidator(local).validateNodeAgainstShape(
-				dataset, shapesGraph.get(), resource.asNode(), shape.asNode(), null, null, null, null).getModel();
+		URI shapesGraphURI = shapesGraph.get();
+		if(shapesGraphURI == null) {
+			shapesGraphURI = DefaultShapesGraphProvider.get().getDefaultShapesGraphURI(dataset);
+		}
+		Model shapesModel = dataset.getNamedModel(shapesGraphURI.toString());
+		ShapesGraph vsg = new ShapesGraph(shapesModel, null);
+		return ValidationEngineFactory.get().create(dataset, shapesGraphURI, vsg, null).validateNodeAgainstShape(
+				resource.asNode(), shape.asNode()).getModel();
 	}
 }

@@ -1,4 +1,4 @@
-package org.topbraid.shacl.constraints;
+package org.topbraid.shacl.validation;
 
 import org.apache.jena.rdf.model.Model;
 

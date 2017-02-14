@@ -1,6 +1,7 @@
-package org.topbraid.shacl.constraints.sparql;
+package org.topbraid.shacl.validation.sparql;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,10 +22,13 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.shared.PrefixMapping;
+import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDFS;
 import org.topbraid.shacl.arq.functions.TargetContainsPFunction;
-import org.topbraid.shacl.constraints.SHACLException;
+import org.topbraid.shacl.validation.SHACLException;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.system.SPINLabels;
@@ -38,6 +42,9 @@ import org.topbraid.spin.util.JenaUtil;
  * @author Holger Knublauch
  */
 public class SPARQLSubstitutions {
+	
+	// Flag to bypass sh:prefixes and instead use all prefixes in the Jena object of the shapes graph.
+	public static boolean useGraphPrefixes = false;
 
 	// Currently switched to old setInitialBinding solution
 	private static boolean USE_TRANSFORM = false;
@@ -63,7 +70,7 @@ public class SPARQLSubstitutions {
 	}
 	
 	
-	static QueryExecution createQueryExecution(Query query, Dataset dataset, QuerySolution bindings) {
+	public static QueryExecution createQueryExecution(Query query, Dataset dataset, QuerySolution bindings) {
 		if(USE_TRANSFORM && bindings != null) {
 			Map<Var,Node> substitutions = new HashMap<Var,Node>();
 			Iterator<String> varNames = bindings.varNames();
@@ -136,14 +143,16 @@ public class SPARQLSubstitutions {
 					if(labelTemplate.charAt(varEnd) == '}') {
 						String varName = labelTemplate.substring(i + 2, varEnd);
 						RDFNode varValue = bindings.get(varName);
-						if(labelFunction != null) {
-							buffer.append(labelFunction.apply(varValue));
-						}
-						else if(varValue instanceof Resource) {
-							buffer.append(SPINLabels.get().getLabel((Resource)varValue));
-						}
-						else if(varValue instanceof Literal) {
-							buffer.append(varValue.asNode().getLiteralLexicalForm());
+						if(varValue != null) {
+							if(labelFunction != null) {
+								buffer.append(labelFunction.apply(varValue));
+							}
+							else if(varValue instanceof Resource) {
+								buffer.append(SPINLabels.get().getLabel((Resource)varValue));
+							}
+							else if(varValue instanceof Literal) {
+								buffer.append(varValue.asNode().getLiteralLexicalForm());
+							}
 						}
 						break;
 					}
@@ -220,4 +229,69 @@ public class SPARQLSubstitutions {
 		return  "        GRAPH $" + SH.shapesGraphVar.getName() + " { $" + SH.currentShapeVar.getName() + " <" + SH.target + "> " + targetVar + "} .\n" +
 				"        (" + targetVar + " $" + SH.shapesGraphVar.getName() + ") <" + TargetContainsPFunction.URI + "> ?this .\n";
 	}
- }
+	
+	
+	/**
+	 * Gets a parsable SPARQL string based on a fragment and prefix declarations.
+	 * Depending on the setting of the flag useGraphPrefixes, this either uses the
+	 * prefixes from the Jena graph of the given executable, or strictly uses sh:prefixes.
+	 * @param str  the query fragment (e.g. starting with SELECT)
+	 * @param executable  the sh:SPARQLExecutable potentially holding the sh:prefixes
+	 * @return the parsable SPARQL string
+	 */
+	public static String withPrefixes(String str, Resource executable) {
+		if(useGraphPrefixes) {
+			return ARQFactory.get().createPrefixDeclarations(executable.getModel()) + str;
+		}
+		else {
+			StringBuffer sb = new StringBuffer();
+			PrefixMapping pm = new PrefixMappingImpl();
+			Set<Resource> reached = new HashSet<Resource>();
+			for(Resource ontology : JenaUtil.getResourceProperties(executable, SH.prefixes)) {
+				String duplicate = collectPrefixes(ontology, pm, reached);
+				if(duplicate != null) {
+					throw new SHACLException("Duplicate prefix declaration for prefix " + duplicate);
+				}
+			}
+			for(String prefix : pm.getNsPrefixMap().keySet()) {
+				sb.append("PREFIX ");
+				sb.append(prefix);
+				sb.append(": <");
+				sb.append(pm.getNsPrefixURI(prefix));
+				sb.append(">\n");
+			}
+			sb.append(str);
+			return sb.toString();
+		}
+	}
+	
+	
+	// Returns the duplicate prefix, if any
+	private static String collectPrefixes(Resource ontology, PrefixMapping pm, Set<Resource> reached) {
+		
+		reached.add(ontology);
+		
+		for(Resource decl : JenaUtil.getResourceProperties(ontology, SH.declare)) {
+			String prefix = JenaUtil.getStringProperty(decl, SH.prefix);
+			String ns = JenaUtil.getStringProperty(decl, SH.namespace);
+			if(prefix != null && ns != null) {
+				String oldNS = pm.getNsPrefixURI(prefix);
+				if(oldNS != null && !oldNS.equals(ns)) {
+					return prefix;
+				}
+				pm.setNsPrefix(prefix, ns);
+			}
+		}
+		
+		for(Resource imp : JenaUtil.getResourceProperties(ontology, OWL.imports)) {
+			if(!reached.contains(imp)) {
+				String duplicate = collectPrefixes(imp, pm, reached);
+				if(duplicate != null) {
+					return duplicate;
+				}
+			}
+		}
+		
+		return null;
+	}
+}

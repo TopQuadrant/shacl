@@ -1,6 +1,7 @@
 package org.topbraid.shacl.util;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -28,9 +29,6 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
-import org.topbraid.shacl.constraints.ExecutionLanguage;
-import org.topbraid.shacl.constraints.ExecutionLanguageSelector;
-import org.topbraid.shacl.js.SHJS;
 import org.topbraid.shacl.model.SHConstraintComponent;
 import org.topbraid.shacl.model.SHFactory;
 import org.topbraid.shacl.model.SHNodeShape;
@@ -38,6 +36,8 @@ import org.topbraid.shacl.model.SHParameter;
 import org.topbraid.shacl.model.SHParameterizableTarget;
 import org.topbraid.shacl.model.SHPropertyShape;
 import org.topbraid.shacl.model.SHResult;
+import org.topbraid.shacl.validation.TargetPlugin;
+import org.topbraid.shacl.validation.TargetPlugins;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.ARQFactory;
@@ -79,19 +79,6 @@ public class SHACLUtil {
 		classesWithDefaultType.add(SH.SPARQLConstraint);
 	}
 	
-	private final static List<Property> constraintProperties = new LinkedList<Property>();
-	static {
-		constraintProperties.add(SH.property);
-		constraintProperties.add(SH.sparql);
-		constraintProperties.add(SHJS.js);
-	}
-	
-	private final static List<Property> constraintPropertiesIncludingParameter = new LinkedList<Property>();
-	static {
-		constraintPropertiesIncludingParameter.addAll(constraintProperties);
-		constraintPropertiesIncludingParameter.add(SH.parameter);
-	}
-	
 	private static Query propertyLabelQuery = ARQFactory.get().createQuery(
 			"PREFIX rdfs: <" + RDFS.getURI() + ">\n" +
 			"PREFIX sh: <" + SH.NS + ">\n" +
@@ -104,12 +91,8 @@ public class SHACLUtil {
 			"    ?p <" + SH.path + "> ?arg1 .\n" +
 			"    ?p rdfs:label ?label .\n" +
 			"}");
-	
-	public static void addConstraintProperty(Property property) {
-		constraintProperties.add(property);
-		constraintPropertiesIncludingParameter.add(property);
-	}
 
+	
 	public static void addDirectPropertiesOfClass(Resource cls, Collection<Property> results) {
 		for(Resource argument : JenaUtil.getResourceProperties(cls, SH.parameter)) {
 			Resource predicate = JenaUtil.getPropertyResourceValue(argument, SH.path);
@@ -181,11 +164,6 @@ public class SHACLUtil {
 			union.setBaseGraph(baseGraph);
 			return ModelFactory.createModelForGraph(union);
 		}
-	}
-
-
-	public static List<Property> getAllConstraintProperties(boolean validateShapes) {
-		return validateShapes ? constraintPropertiesIncludingParameter : constraintProperties;
 	}
 	
 	
@@ -400,7 +378,7 @@ public class SHACLUtil {
 		for(Resource c : JenaUtil.getAllSuperClassesStar(cls)) {
 			for(Resource arg : JenaUtil.getResourceProperties(c, SH.property)) {
 				if(arg.hasProperty(SH.path, predicate)) {
-					return SHFactory.asPropertyConstraint(arg);
+					return SHFactory.asPropertyShape(arg);
 				}
 			}
 		}
@@ -450,8 +428,13 @@ public class SHACLUtil {
 			executable = type;
 			parameterizableTarget = SHFactory.asParameterizableTarget(target);
 		}
-		ExecutionLanguage language = ExecutionLanguageSelector.get().getLanguageForTarget(executable);
-		return language.executeTarget(dataset, executable, parameterizableTarget);
+		TargetPlugin plugin = TargetPlugins.get().getLanguageForTarget(executable);
+		if(plugin != null) {
+			return plugin.executeTarget(dataset, executable, parameterizableTarget);
+		}
+		else {
+			return new ArrayList<RDFNode>();
+		}
 	}
 	
 	

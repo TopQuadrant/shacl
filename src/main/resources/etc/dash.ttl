@@ -191,7 +191,7 @@ dash:GraphUpdate
 dash:GraphValidationTestCase
   rdf:type rdfs:Class ;
   rdf:type sh:Shape ;
-  rdfs:comment "A test case that performs SHACL constraint validation on the whole graph and compares the results with the expected validation results stored with the test case." ;
+  rdfs:comment "A test case that performs SHACL constraint validation on the whole graph and compares the results with the expected validation results stored with the test case. By default this excludes meta-validation (i.e. the validation of the shape definitions themselves). If that's desired, set dash:validateShapes to true." ;
   rdfs:label "Graph validation test case" ;
   rdfs:subClassOf dash:ValidationTestCase ;
 .
@@ -305,6 +305,16 @@ dash:None
   rdfs:comment "A Shape that is violated for every possible focus node." ;
   rdfs:label "None" ;
   sh:in () ;
+.
+dash:ParameterConstraintComponent
+  rdf:type sh:ConstraintComponent ;
+  rdfs:comment "A constraint component that can be used to verify that all value nodes conform to the given Parameter."@en ;
+  rdfs:label "Parameter constraint component"@en ;
+  sh:parameter dash:ParameterConstraintComponent-parameter ;
+.
+dash:ParameterConstraintComponent-parameter
+  rdf:type sh:Parameter ;
+  sh:path sh:parameter ;
 .
 dash:PrimaryKeyConstraintComponent
   rdf:type sh:ConstraintComponent ;
@@ -820,6 +830,13 @@ dash:testModifiesEnvironment
   rdfs:comment "Indicates whether this test modifies the specified dash:testEnvironment. If set to true then a test runner can make sure to wipe out the previous environment, while leaving it false (or undefined) means that the test runner can reuse the environment from the previous test case. As setting up and tearing down tests is sometimes slow, this flag can significantly accelerate test execution." ;
   rdfs:domain dash:TestCase ;
   rdfs:label "test modifies environment" ;
+  rdfs:range xsd:boolean ;
+.
+dash:validateShapes
+  rdf:type rdf:Property ;
+  rdfs:comment "True to also validate the shapes itself (i.e. parameter declarations)." ;
+  rdfs:domain dash:GraphValidationTestCase ;
+  rdfs:label "validate shapes" ;
   rdfs:range xsd:boolean ;
 .
 dash:valueCount

@@ -11,7 +11,6 @@ import org.apache.jena.vocabulary.RDFS;
 import org.topbraid.shacl.arq.functions.HasShapeFunction;
 import org.topbraid.shacl.arq.functions.IsValidForDatatypeFunction;
 import org.topbraid.shacl.arq.functions.TargetContainsPFunction;
-import org.topbraid.shacl.js.SHJS;
 import org.topbraid.shacl.model.impl.SHConstraintComponentImpl;
 import org.topbraid.shacl.model.impl.SHJSConstraintImpl;
 import org.topbraid.shacl.model.impl.SHJSExecutableImpl;
@@ -28,6 +27,7 @@ import org.topbraid.shacl.model.impl.SHSPARQLFunctionImpl;
 import org.topbraid.shacl.model.impl.SHSPARQLTargetImpl;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.vocabulary.SH;
+import org.topbraid.shacl.vocabulary.SHJS;
 import org.topbraid.shacl.vocabulary.TOSH;
 import org.topbraid.spin.util.JenaUtil;
 import org.topbraid.spin.util.SimpleImplementation;
@@ -81,7 +81,7 @@ public class SHFactory {
 	}
 	
 	
-	public static SHPropertyShape asPropertyConstraint(RDFNode node) {
+	public static SHPropertyShape asPropertyShape(RDFNode node) {
 		return node.as(SHPropertyShape.class);
 	}
 	
@@ -108,7 +108,7 @@ public class SHFactory {
 	
 	public static SHShape asShape(RDFNode node) {
 		if(node instanceof Resource && isPropertyShape((Resource)node)) {
-			return asPropertyConstraint(node);
+			return asPropertyShape(node);
 		}
 		else if(node instanceof Resource && isParameter((Resource)node)) {
 			return asParameter(node);

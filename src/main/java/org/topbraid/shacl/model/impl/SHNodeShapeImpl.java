@@ -31,12 +31,12 @@ public class SHNodeShapeImpl extends SHShapeImpl implements SHNodeShape {
 		List<SHPropertyShape> results = new LinkedList<SHPropertyShape>();
 		for(Resource property : JenaUtil.getResourceProperties(this, SH.parameter)) {
 			if(property.hasProperty(SH.path, predicate)) {
-				results.add(SHFactory.asPropertyConstraint(property));
+				results.add(SHFactory.asPropertyShape(property));
 			}
 		}
 		for(Resource property : JenaUtil.getResourceProperties(this, SH.property)) {
 			if(property.hasProperty(SH.path, predicate)) {
-				results.add(SHFactory.asPropertyConstraint(property));
+				results.add(SHFactory.asPropertyShape(property));
 			}
 		}
 		return results;

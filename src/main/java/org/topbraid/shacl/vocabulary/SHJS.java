@@ -1,9 +1,8 @@
-package org.topbraid.shacl.js;
+package org.topbraid.shacl.vocabulary;
 
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
-import org.topbraid.shacl.vocabulary.SH;
 
 /**
  * Vocabulary for http://www.w3.org/ns/shacljs

@@ -536,7 +536,7 @@ sh:ConstraintComponent
 sh:validator
 	a rdf:Property ;
 	rdfs:label "validator"@en ;
-	rdfs:comment "The validator(s) used to evaluate either node or property constraints."@en ;
+	rdfs:comment "The validator(s) used to evaluate either node or property shapes."@en ;
 	rdfs:domain sh:ConstraintComponent ;
 	rdfs:range sh:Validator ;
 	rdfs:isDefinedBy sh: .
@@ -1108,7 +1108,7 @@ sh:pattern
 sh:PropertyConstraintComponent
 	a sh:ConstraintComponent ;
 	rdfs:label "Property constraint component"@en ;
-	rdfs:comment "A constraint component that can be used to verify that all value nodes conform to the given property constraint."@en ;
+	rdfs:comment "A constraint component that can be used to verify that all value nodes conform to the given property shape."@en ;
 	sh:parameter sh:PropertyConstraintComponent-property ;
 	rdfs:isDefinedBy sh: .
 
@@ -1314,7 +1314,7 @@ sh:description
 sh:group
 	a rdf:Property ;
 	rdfs:label "group"@en ;
-	rdfs:comment "Can be used to link to a property group to indicate that the constraint belongs to a group of related property constraints."@en ;
+	rdfs:comment "Can be used to link to a property group to indicate that the constraint belongs to a group of related property shapes."@en ;
 	rdfs:domain sh:PropertyShape ;
 	rdfs:range sh:PropertyGroup ;
 	rdfs:isDefinedBy sh: .
@@ -1338,7 +1338,7 @@ sh:order
 sh:PropertyGroup
 	a rdfs:Class ;
 	rdfs:label "Property group"@en ;
-	rdfs:comment "Instances of this class represent groups of property constraints that belong together."@en ;
+	rdfs:comment "Instances of this class represent groups of property shapes that belong together."@en ;
 	rdfs:subClassOf rdfs:Resource ;
 	rdfs:isDefinedBy sh: .
 

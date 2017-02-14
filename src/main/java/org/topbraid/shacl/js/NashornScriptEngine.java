@@ -22,6 +22,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.topbraid.shacl.js.model.JSFactory;
 import org.topbraid.shacl.js.model.TermFactory;
+import org.topbraid.shacl.vocabulary.SHJS;
 import org.topbraid.spin.util.ExceptionUtil;
 import org.topbraid.spin.util.JenaUtil;
 
@@ -110,9 +111,6 @@ public class NashornScriptEngine implements JSScriptEngine {
 		}
 		else if(RDFQUERY_JS.equals(url)) {
 			return new InputStreamReader(NashornScriptEngine.class.getResourceAsStream("/etc/rdfquery.js"));
-		}
-		else if(url.startsWith("http://datashapes.org/js/")) {
-			return new InputStreamReader(NashornScriptEngine.class.getResourceAsStream(url.substring(21)));
 		}
 		else {
 			return new InputStreamReader(new URL(url).openStream());

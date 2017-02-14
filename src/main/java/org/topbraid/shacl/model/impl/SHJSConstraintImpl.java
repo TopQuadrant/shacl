@@ -1,16 +1,11 @@
 package org.topbraid.shacl.model.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.jena.enhanced.EnhGraph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.vocabulary.RDFS;
-import org.topbraid.shacl.constraints.ConstraintExecutable;
-import org.topbraid.shacl.js.JSConstraintExecutable;
-import org.topbraid.shacl.js.SHJS;
 import org.topbraid.shacl.model.SHJSConstraint;
 import org.topbraid.shacl.vocabulary.SH;
+import org.topbraid.shacl.vocabulary.SHJS;
 import org.topbraid.spin.util.JenaDatatypes;
 import org.topbraid.spin.util.JenaUtil;
 
@@ -19,15 +14,7 @@ public class SHJSConstraintImpl extends SHResourceImpl implements SHJSConstraint
 	public SHJSConstraintImpl(Node node, EnhGraph graph) {
 		super(node, graph);
 	}
-
-	
-	@Override
-	public List<ConstraintExecutable> getExecutables() {
-		List<ConstraintExecutable> results = new ArrayList<ConstraintExecutable>(1);
-		results.add(new JSConstraintExecutable(this));
-		return results;
-	}
-	
+		
 	
 	@Override
 	public String getFunctionName() {

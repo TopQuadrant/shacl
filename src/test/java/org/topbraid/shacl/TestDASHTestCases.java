@@ -3,6 +3,9 @@ package org.topbraid.shacl;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.URL;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,15 +22,44 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.topbraid.shacl.js.JSScriptEngine;
+import org.topbraid.shacl.js.JSScriptEngineFactory;
+import org.topbraid.shacl.js.NashornScriptEngine;
 import org.topbraid.shacl.testcases.TestCase;
 import org.topbraid.shacl.testcases.TestCaseType;
 import org.topbraid.shacl.testcases.TestCaseTypes;
+import org.topbraid.shacl.util.SHACLSystemModel;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaUtil;
 
 @RunWith(Parameterized.class)
 public class TestDASHTestCases {
+	
+	static {
+		// Redirect loading of text JS files to local folder
+		JSScriptEngineFactory.set(new JSScriptEngineFactory() {
+			@Override
+			public JSScriptEngine createScriptEngine() {
+				return new NashornScriptEngine() {
+					protected Reader createScriptReader(String url) throws Exception {
+						if(DASH_JS.equals(url)) {
+							return new InputStreamReader(NashornScriptEngine.class.getResourceAsStream("/etc/dash.js"));
+						}
+						else if(RDFQUERY_JS.equals(url)) {
+							return new InputStreamReader(NashornScriptEngine.class.getResourceAsStream("/etc/rdfquery.js"));
+						}
+						else if(url.startsWith("http://datashapes.org/js/")) {
+							return new InputStreamReader(NashornScriptEngine.class.getResourceAsStream(url.substring(21)));
+						}
+						else {
+							return new InputStreamReader(new URL(url).openStream());
+						}
+					}
+				};
+			}
+		});
+	}
 
 	@Parameters(name="{0}")
 	public static Collection<Object[]> data() throws Exception {
