@@ -12,6 +12,13 @@ public interface SHShape extends SHResource {
 	
 	
 	/**
+	 * Gets the value resource of sh:path or null (for node shapes).
+	 * @return the path resource
+	 */
+	Resource getPath();
+	
+	
+	/**
 	 * Returns the sh:severity of this shape, defaulting to sh:Violation.
 	 * @return
 	 */

@@ -31,9 +31,6 @@ public interface SHPropertyShape extends SHShape {
 	 * @return the order or null no sh:order is given
 	 */
 	Integer getOrder();
-	
-	
-	Resource getPath();
 
 
 	/**

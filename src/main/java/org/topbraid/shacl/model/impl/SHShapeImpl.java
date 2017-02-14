@@ -16,6 +16,12 @@ public abstract class SHShapeImpl extends SHParameterizableInstanceImpl implemen
 
 
 	@Override
+	public Resource getPath() {
+		return JenaUtil.getResourceProperty(this, SH.path);
+	}
+
+
+	@Override
 	public Resource getSeverity() {
 		Resource result = JenaUtil.getResourceProperty(this, SH.severity);
 		return result != null ? result : SH.Violation;

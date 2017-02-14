@@ -67,9 +67,15 @@ public abstract class AbstractSPARQLExecutor implements ConstraintExecutor {
 		bindings.add(SH.currentShapeVar.getVarName(), constraint.getShapeResource());
 		bindings.add(SH.shapesGraphVar.getVarName(), ResourceFactory.createResource(engine.getShapesGraphURI().toString()));
 		
-		if(constraint.getShapeResource().isPropertyShape()) {
-			String path = SHACLPaths.getPathString(JenaUtil.getResourceProperty(constraint.getShapeResource(), SH.path));
-			query = SPARQLSubstitutions.substitutePaths(query, path, constraint.getShapeResource().getModel());
+		Resource path = constraint.getShapeResource().getPath();
+		if(path != null) {
+			if(path.isAnon()) {
+				String pathString = SHACLPaths.getPathString(JenaUtil.getResourceProperty(constraint.getShapeResource(), SH.path));
+				query = SPARQLSubstitutions.substitutePaths(query, pathString, constraint.getShapeResource().getModel());
+			}
+			else {
+				bindings.add(SH.PATHVar.getName(), path);
+			}
 		}
 		
 		URI oldShapesGraphURI = HasShapeFunction.getShapesGraph();

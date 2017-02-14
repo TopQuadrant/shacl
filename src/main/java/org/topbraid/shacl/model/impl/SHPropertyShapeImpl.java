@@ -82,12 +82,6 @@ public class SHPropertyShapeImpl extends SHShapeImpl implements SHPropertyShape 
 
 
 	@Override
-	public Resource getPath() {
-		return JenaUtil.getResourceProperty(this, SH.path);
-	}
-
-
-	@Override
 	public Property getPredicate() {
 		Resource r = JenaUtil.getResourceProperty(this, SH.path);
 		if(r != null && r.isURIResource()) {

@@ -1221,6 +1221,7 @@ sh:QualifiedMaxCountConstraintComponent
       rdf:type sh:JSValidator ;
       sh:jsFunctionName "propertyQualifiedMaxCount" ;
       sh:jsLibrary dash:DASHJSLibrary ;
+      sh:message "More than {$qualifiedMaxCount} values have shape {$qualifiedValueShape}" ;
     ] ;
   sh:targetClass sh:Shape ;
 .
