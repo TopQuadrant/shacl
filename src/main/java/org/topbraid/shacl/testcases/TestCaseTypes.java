@@ -15,6 +15,7 @@ public class TestCaseTypes {
 		types.add(new FunctionTestCaseType());
 		types.add(new GraphValidationTestCaseType());
 		//types.add(new InferencingTestCaseType());
+		types.add(new JSTestCaseType());
 		types.add(new QueryTestCaseType());
 	}
 	

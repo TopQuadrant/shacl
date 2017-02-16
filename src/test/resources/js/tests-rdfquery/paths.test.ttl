@@ -1,0 +1,110 @@
+# baseURI: http://datashapes.org/js/tests-rdfquery/paths.test
+# imports: http://datashapes.org/dash
+# prefix: ex
+
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix ex: <http://datashapes.org/js/tests-rdfquery/paths.test#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://datashapes.org/js/tests-rdfquery/paths.test>
+  rdf:type owl:Ontology ;
+  rdfs:label "Test of paths" ;
+  owl:imports <http://datashapes.org/dash> ;
+  owl:versionInfo "Created with TopBraid Composer" ;
+.
+ex:MergedClass
+  rdf:type rdfs:Class ;
+  rdfs:label "Merged class" ;
+  rdfs:subClassOf ex:MiddleClass1 ;
+  rdfs:subClassOf ex:MiddleClass2 ;
+.
+ex:MiddleClass1
+  rdf:type rdfs:Class ;
+  rdfs:label "Middle class1" ;
+  rdfs:subClassOf ex:RootClass ;
+  rdfs:subClassOf ex:SiblingClass ;
+.
+ex:MiddleClass2
+  rdf:type rdfs:Class ;
+  rdfs:label "Middle class2" ;
+  rdfs:subClassOf ex:RootClass ;
+.
+ex:RootClass
+  rdf:type rdfs:Class ;
+  rdfs:label "Root class" ;
+  rdfs:subClassOf rdfs:Resource ;
+.
+ex:SiblingClass
+  rdf:type rdfs:Class ;
+  rdfs:label "Sibling class" ;
+  rdfs:subClassOf rdfs:Resource ;
+.
+ex:inversePathSingle
+  rdf:type dash:JSTestCase ;
+  dash:expectedResult 2 ;
+  rdfs:label "inverse path single" ;
+  sh:jsFunctionName "inversePathSingle" ;
+  sh:jsLibrary <http://datashapes.org/js/tests-rdfquery/paths.test#paths.js> ;
+.
+ex:oneOrMore
+  rdf:type dash:JSTestCase ;
+  dash:expectedResult 5 ;
+  rdfs:label "one or more" ;
+  sh:jsLibrary <http://datashapes.org/js/tests-rdfquery/paths.test#paths.js> ;
+.
+ex:orPathLabelOrComment
+  rdf:type dash:JSTestCase ;
+  dash:expectedResult 2 ;
+  rdfs:label "or path label or comment" ;
+  sh:jsFunctionName "orPathLabelOrComment" ;
+  sh:jsLibrary <http://datashapes.org/js/tests-rdfquery/paths.test#paths.js> ;
+.
+<http://datashapes.org/js/tests-rdfquery/paths.test#paths.js>
+  rdf:type sh:JSLibrary ;
+  sh:jsLibrary dash:RDFQueryJSLibrary ;
+  sh:jsLibraryURL "http://datashapes.org/js/tests-rdfquery/paths.js"^^xsd:anyURI ;
+.
+ex:predicatePathChain
+  rdf:type dash:JSTestCase ;
+  dash:expectedResult "Shape"@en ;
+  sh:jsFunctionName "predicatePathChain" ;
+  sh:jsLibrary <http://datashapes.org/js/tests-rdfquery/paths.test#paths.js> ;
+.
+ex:predicatePathSingle
+  rdf:type dash:JSTestCase ;
+  dash:expectedResult "Shape"@en ;
+  rdfs:label "predicate path single" ;
+  sh:jsFunctionName "predicatePathSingle" ;
+  sh:jsLibrary <http://datashapes.org/js/tests-rdfquery/paths.test#paths.js> ;
+.
+ex:sequencePath2
+  rdf:type dash:JSTestCase ;
+  dash:expectedResult rdfs:Class ;
+  rdfs:label "sequence path2" ;
+  sh:jsFunctionName "sequencePath2" ;
+  sh:jsLibrary <http://datashapes.org/js/tests-rdfquery/paths.test#paths.js> ;
+.
+ex:sequencePath3
+  rdf:type dash:JSTestCase ;
+  dash:expectedResult rdfs:Class ;
+  rdfs:label "sequence path3" ;
+  sh:jsFunctionName "sequencePath3" ;
+  sh:jsLibrary <http://datashapes.org/js/tests-rdfquery/paths.test#paths.js> ;
+.
+ex:zeroOrMore
+  rdf:type dash:JSTestCase ;
+  dash:expectedResult 6 ;
+  rdfs:label "zero or more" ;
+  sh:jsFunctionName "zeroOrMore" ;
+  sh:jsLibrary <http://datashapes.org/js/tests-rdfquery/paths.test#paths.js> ;
+.
+ex:zeroOrOne
+  rdf:type dash:JSTestCase ;
+  dash:expectedResult 2 ;
+  sh:jsFunctionName "zeroOrOne" ;
+  sh:jsLibrary <http://datashapes.org/js/tests-rdfquery/paths.test#paths.js> ;
+.

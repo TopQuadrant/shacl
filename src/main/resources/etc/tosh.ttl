@@ -79,32 +79,6 @@ tosh:ConstraintMetadataPropertyGroup
   rdf:type sh:PropertyGroup ;
   rdfs:label "Constraint Metadata" ;
 .
-tosh:ConstraintShape
-  rdf:type sh:NodeShape ;
-  rdfs:label "Constraint shape" ;
-  sh:property tosh:ConstraintShape-deactivated ;
-  sh:property tosh:ConstraintShape-severity ;
-  sh:targetClass sh:Constraint ;
-.
-tosh:ConstraintShape-deactivated
-  rdf:type sh:PropertyShape ;
-  sh:path sh:deactivated ;
-  sh:description "Can be used to deactivate the whole constraint." ;
-  sh:group tosh:AboutPropertyGroup ;
-  sh:name "deactivated" ;
-  sh:order "1"^^xsd:decimal ;
-.
-tosh:ConstraintShape-severity
-  rdf:type sh:PropertyShape ;
-  sh:path sh:severity ;
-  tosh:editWidget swa:InstancesSelectEditor ;
-  sh:class sh:Severity ;
-  sh:description "The severity to be used for validation results produced by the associated constraint." ;
-  sh:group tosh:AboutPropertyGroup ;
-  sh:maxCount 1 ;
-  sh:name "severity" ;
-  sh:order "2"^^xsd:decimal ;
-.
 tosh:DeleteTripleSuggestionGenerator
   rdf:type dash:SPARQLUpdateSuggestionGenerator ;
   rdfs:label "Delete triple suggestion generator" ;
@@ -246,6 +220,33 @@ tosh:RelationshipPropertyGroup
   rdfs:label "Relationship" ;
   sh:order 8 ;
 .
+tosh:ShapeShape
+  rdf:type sh:NodeShape ;
+  rdfs:label "Shape of shapes" ;
+  sh:property tosh:ShapeShape-deactivated ;
+  sh:property tosh:ShapeShape-severity ;
+  sh:targetClass sh:Shape ;
+.
+tosh:ShapeShape-deactivated
+  rdf:type sh:PropertyShape ;
+  sh:path sh:deactivated ;
+  sh:description "Can be used to deactivate the whole constraint." ;
+  sh:group tosh:AboutPropertyGroup ;
+  sh:maxCount 1 ;
+  sh:name "deactivated" ;
+  sh:order "1"^^xsd:decimal ;
+.
+tosh:ShapeShape-severity
+  rdf:type sh:PropertyShape ;
+  sh:path sh:severity ;
+  tosh:editWidget swa:InstancesSelectEditor ;
+  sh:class sh:Severity ;
+  sh:description "The severity to be used for validation results produced by the associated constraint." ;
+  sh:group tosh:AboutPropertyGroup ;
+  sh:maxCount 1 ;
+  sh:name "severity" ;
+  sh:order "2"^^xsd:decimal ;
+.
 tosh:StringBasedConstraintPropertyGroup
   rdf:type sh:PropertyGroup ;
   tosh:openable "true"^^xsd:boolean ;
@@ -378,7 +379,6 @@ tosh:hasDatatype
 			FILTER (datatype($value) = $datatype && spif:isValidForDatatype($value, $datatype)) .
 		}
 		""" ;
-  sh:message "Value does not have datatype {$datatype}" ;
   sh:prefixes <http://topbraid.org/tosh> ;
 .
 tosh:hasShape
@@ -767,7 +767,6 @@ sh:MinLengthConstraintComponent-minLength
 sh:NodeConstraintComponent
   sh:nodeValidator [
       rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Value does not have shape {$node}" ;
       sh:prefixes <http://topbraid.org/tosh> ;
       sh:select """
 		SELECT $this ($this AS $value) ?failure
@@ -780,7 +779,6 @@ sh:NodeConstraintComponent
     ] ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Value does not have shape {$shape}" ;
       sh:prefixes <http://topbraid.org/tosh> ;
       sh:select """
 		SELECT DISTINCT $this ?value ?failure
@@ -809,7 +807,6 @@ sh:NodeKindConstraintComponent-nodeKind
 sh:NotConstraintComponent
   sh:nodeValidator [
       rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Value does have shape {$not}" ;
       sh:prefixes <http://topbraid.org/tosh> ;
       sh:select """
 		SELECT $this ($this AS ?value) ?failure
@@ -822,7 +819,6 @@ sh:NotConstraintComponent
     ] ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Value does have shape {$not}" ;
       sh:prefixes <http://topbraid.org/tosh> ;
       sh:select """
 		SELECT DISTINCT $this ?value ?failure
@@ -844,7 +840,7 @@ sh:NotConstraintComponent-not
 sh:OrConstraintComponent
   sh:nodeValidator [
       rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Focus node has none of the shapes from the 'or'" ;
+      sh:message "Focus node has none of the shapes from the 'or' list" ;
       sh:prefixes <http://topbraid.org/tosh> ;
       sh:select """
 		SELECT $this ?failure ($this AS ?value)
@@ -857,7 +853,7 @@ sh:OrConstraintComponent
     ] ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Value has none of the shapes from the 'or'" ;
+      sh:message "Value has none of the shapes from the 'or' list" ;
       sh:prefixes <http://topbraid.org/tosh> ;
       sh:select """
 		SELECT DISTINCT $this ?value ?failure
@@ -910,15 +906,15 @@ sh:UniqueLangConstraintComponent-uniqueLang
   sh:maxCount 1 ;
   sh:order 8 ;
 .
-sh:XorConstraintComponent
+sh:XoneConstraintComponent
   sh:nodeValidator [
       rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Focus node has {?count} of the shapes from the 'xor' list" ;
+      sh:message "Focus node has {?count} of the shapes from the 'exactly one' list" ;
       sh:prefixes <http://topbraid.org/tosh> ;
       sh:select """
 		SELECT $this ?failure ?count ($this AS ?value)
 		WHERE {
-			BIND (tosh:countShapesWithMatchResult($this, $xor, $shapesGraph, true) AS ?count)
+			BIND (tosh:countShapesWithMatchResult($this, $xone, $shapesGraph, true) AS ?count)
 			BIND (!bound(?count) AS ?failure) .
 			FILTER IF(?failure, true, ?count != 1) .
 		}
@@ -926,20 +922,20 @@ sh:XorConstraintComponent
     ] ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Value has {?count} of the shapes from the 'xor' list" ;
+      sh:message "Value node has {?count} of the shapes from the 'exactly one' list" ;
       sh:prefixes <http://topbraid.org/tosh> ;
       sh:select """
 		SELECT DISTINCT $this ?value ?failure ?count
 		WHERE { 
 			$this $PATH ?value .
-			BIND (tosh:countShapesWithMatchResult(?value, $xor, $shapesGraph, true) AS ?count)
+			BIND (tosh:countShapesWithMatchResult(?value, $xone, $shapesGraph, true) AS ?count)
 			BIND (!bound(?count) AS ?failure) .
 			FILTER IF(?failure, true, ?count != 1) .
 		}
 """ ;
     ] ;
 .
-sh:XorConstraintComponent-xor
+sh:XoneConstraintComponent-xone
   tosh:editWidget swa:SourceCodeEditor ;
   tosh:viewWidget swa:SourceCodeViewer ;
   sh:group tosh:ComplexConstraintPropertyGroup ;

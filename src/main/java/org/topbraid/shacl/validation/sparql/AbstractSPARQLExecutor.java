@@ -172,7 +172,7 @@ public abstract class AbstractSPARQLExecutor implements ConstraintExecutor {
 							result.addProperty(SH.resultMessage, selectMessage);
 						}
 						else {
-							addDefaultMessages(engine, messageHolder, result, bindings, sol);
+							addDefaultMessages(engine, messageHolder, constraint.getComponent(), result, bindings, sol);
 						}
 						
 						RDFNode resultFocusNode = thisValue;
@@ -212,15 +212,20 @@ public abstract class AbstractSPARQLExecutor implements ConstraintExecutor {
 	}
 
 	
-	private void addDefaultMessages(ValidationEngine engine, Resource messageHolder, Resource result, 
+	private void addDefaultMessages(ValidationEngine engine, Resource messageHolder, Resource fallback, Resource result, 
 				QuerySolution bindings, QuerySolution solution) {
+		boolean found = false;
 		for(Statement s : messageHolder.listProperties(SH.message).toList()) {
 			if(s.getObject().isLiteral()) {
 				QuerySolutionMap map = new QuerySolutionMap();
 				map.addAll(bindings);
 				map.addAll(solution);
 				engine.addResultMessage(result, s.getLiteral(), map);
+				found = true;
 			}
+		}
+		if(!found && fallback != null) {
+			addDefaultMessages(engine, fallback, null, result, bindings, solution);
 		}
 	}
 

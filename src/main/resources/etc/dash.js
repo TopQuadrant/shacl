@@ -3,14 +3,21 @@
 // There is no validator for sh:property as this is expected to be
 // natively implemented by the surrounding engine.
 
+var XSDIntegerTypes = new NodeSet();
+XSDIntegerTypes.add(XSD.integer);
+
+var XSDDecimalTypes = new NodeSet();
+XSDDecimalTypes.addAll(XSDIntegerTypes.toArray());
+XSDDecimalTypes.add(XSD.decimal);
+XSDDecimalTypes.add(XSD.float);
+
 function hasClass($value, $class) {
 	return new RDFQueryUtil($dataGraph).isInstanceOf($value, $class);
 }
 
 function hasDatatype($value, $datatype) {
 	if($value.termType === "Literal") {
-		// TODO: Check for ill-formed XSD literals
-		return $datatype.equals($value.datatype);
+		return $datatype.equals($value.datatype) && isValidForDatatype($value.value, $datatype);
 	}
 	else {
 		return false;
@@ -107,8 +114,23 @@ function isOr($value, $or) {
 	return false;
 }
 
-function isXor($value, $xor) {
-	var shapes = new RDFQueryUtil($shapesGraph).rdfListToArray($xor);
+// TODO: Support more datatypes
+function isValidForDatatype(lex, datatype) {
+	if(XSDIntegerTypes.contains(datatype)) {
+		var r = parseInt(lex);
+		return !isNaN(r);
+	}
+	else if(XSDDecimalTypes.contains(datatype)) {
+		var r = parseFloat(lex);
+		return !isNan(r);
+	}
+	else {
+		return true;
+	}
+}
+
+function isXone($value, $xone) {
+	var shapes = new RDFQueryUtil($shapesGraph).rdfListToArray($xone);
 	var count = 0;
 	for(var i = 0; i < shapes.length; i++) {
 		if(SHACL.validateNode($value, shapes[i]).length == 0) {
@@ -305,6 +327,46 @@ function validateClosed($value, $closed, $ignoredProperties, $currentShape) {
 
 
 function toRDFQueryPath(shPath) {
+	if(shPath.termType === "NamedNode") {
+		return shPath;
+	}
+	else if(shPath.termType === "BlankNode") {
+		var util = new RDFQueryUtil($shapesGraph);
+		if(util.getObject(shPath, RDF.first)) {
+			var paths = util.rdfListToArray(shPath);
+			var result = [];
+			for(var i = 0; i < paths.length; i++) {
+				result.push(toRDFQueryPath(paths[i]));
+			}
+			return result;
+		}
+		var alternativePath = util.getObject(shPath, SH.alternativePath);
+		if(alternativePath) {
+			var paths = util.rdfListToArray(alternativePath);
+			var result = [];
+			for(var i = 0; i < paths.length; i++) {
+				result.push(toRDFQueryPath(paths[i]));
+			}
+			return { or : result };
+		}
+		var zeroOrMorePath = util.getObject(shPath, SH.zeroOrMorePath);
+		if(zeroOrMorePath) {
+			return { zeroOrMore : toRDFQueryPath(zeroOrMorePath) };
+		}
+		var oneOrMorePath = util.getObject(shPath, SH.oneOrMorePath);
+		if(oneOrMorePath) {
+			return { oneOrMore : toRDFQueryPath(oneOrMorePath) };
+		}
+		var zeroOrOnePath = util.getObject(shPath, SH.zeroOrOnePath);
+		if(zeroOrOnePath) {
+			return { zeroOrOne : toRDFQueryPath(zeroOrOnePath) };
+		}
+		var inversePath = util.getObject(shPath, SH.inversePath);
+		if(inversePath) {
+			return { inverse : toRDFQueryPath(inversePath) };
+		}
+	}
+	throw "Unsupported SHACL path " + shPath;
 	// TODO: implement conforming to AbstractQuery.path syntax
 	return shPath;
 }
@@ -322,13 +384,19 @@ RDFQueryUtil.prototype.getInstancesOf = function($class) {
 	classes.add($class);
 	var car = classes.toArray();
 	for(var i = 0; i < car.length; i++) {
-		set.addAll($RDFQuery(this.source).find("instance", RDF.type, car[i]).toNodeArray("instance"));
+		set.addAll(RDFQuery(this.source).find("instance", RDF.type, car[i]).toNodeArray("instance"));
 	}
 	return set;
 }
 
 RDFQueryUtil.prototype.getObject = function($subject, $predicate) {
-	return RDFQuery(this.source).find($subject, $predicate, "object").first().object;
+	if(!$subject) {
+		throw "Missing subject";
+	}
+	if(!$predicate) {
+		throw "Missing predicate";
+	}
+	return RDFQuery(this.source).find($subject, $predicate, "object").get("object");
 }
 
 RDFQueryUtil.prototype.getSubClassesOf = function($class) {

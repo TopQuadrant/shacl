@@ -1,18 +1,18 @@
-# baseURI: http://datashapes.org/sh/tests/core/node/xor-001.test
+# baseURI: http://datashapes.org/sh/tests/core/node/xone-001.test
 # imports: http://datashapes.org/dash
 # prefix: ex
 
 @prefix dash: <http://datashapes.org/dash#> .
-@prefix ex: <http://datashapes.org/sh/tests/core/node/xor-001.test#> .
+@prefix ex: <http://datashapes.org/sh/tests/core/node/xone-001.test#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://datashapes.org/sh/tests/core/node/xor-001.test>
+<http://datashapes.org/sh/tests/core/node/xone-001.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of sh:xor in node shape 001" ;
+  rdfs:label "Test of sh:xone in node shape 001" ;
   owl:imports <http://datashapes.org/dash> ;
 .
 ex:Bob
@@ -39,15 +39,15 @@ ex:GraphValidationTestCase
           rdf:type sh:ValidationResult ;
           sh:focusNode ex:Dory ;
           sh:resultSeverity sh:Violation ;
-          sh:sourceConstraintComponent sh:XorConstraintComponent ;
+          sh:sourceConstraintComponent sh:XoneConstraintComponent ;
           sh:value ex:Dory ;
         ] ;
     ] ;
 .
-ex:XorConstraintExampleShape
+ex:XoneConstraintExampleShape
   rdf:type sh:NodeShape ;
   sh:targetClass ex:Person ;
-  sh:xor (
+  sh:xone (
       [
         sh:property [
             sh:path ex:fullName ;

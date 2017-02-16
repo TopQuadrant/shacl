@@ -207,6 +207,19 @@ dash:InferencingTestCase
       sh:name "expected result" ;
     ] ;
 .
+dash:JSTestCase
+  rdf:type rdfs:Class ;
+  rdfs:comment "A test case that calls a given JavaScript function like a sh:JSFunction and compares its result with the dash:expectedResult." ;
+  rdfs:label "JavaScript test case" ;
+  rdfs:subClassOf dash:TestCase ;
+  rdfs:subClassOf sh:JSFunction ;
+  sh:property [
+      sh:path dash:expectedResult ;
+      sh:description "The expected result of the JavaScript function call, as an RDF node." ;
+      sh:maxCount 1 ;
+      sh:name "expected result" ;
+    ] ;
+.
 dash:ListNodeShape
   rdf:type sh:NodeShape ;
   rdfs:comment "Defines constraints on what it means for a node to be a node within a well-formed RDF list. Note that this does not check whether the rdf:rest items are also well-formed lists as this would lead to unsupported recursion." ;
@@ -302,7 +315,7 @@ dash:NonRecursiveConstraintComponent-nonRecursive
 .
 dash:None
   rdf:type sh:Shape ;
-  rdfs:comment "A Shape that is violated for every possible focus node." ;
+  rdfs:comment "A Shape that is no node can conform to." ;
   rdfs:label "None" ;
   sh:in () ;
 .
@@ -321,10 +334,10 @@ dash:PrimaryKeyConstraintComponent
   rdfs:comment "Enforces a constraint that the given property (sh:path) serves as primary key for all resources in the target of the shape. If a property has been declared to be the primary key then each resource must have exactly one value for that property. Furthermore, the URIs of those resources must start with a given string (dash:uriStart), followed by the URL-encoded primary key value. For example if dash:uriStart is \"http://example.org/country-\" and the primary key for an instance is \"de\" then the URI must be \"http://example.org/country-de\". Finally, as a result of the URI policy, there can not be any other resource with the same value under the same primary key policy." ;
   rdfs:label "Primary key constraint component" ;
   sh:labelTemplate "The property {?predicate} is the primary key and URIs start with {?uriStart}" ;
+  sh:message "Violation of primary key constraint" ;
   sh:parameter dash:PrimaryKeyConstraintComponent-uriStart ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Violation of primary key constraint" ;
       sh:prefixes <http://datashapes.org/dash> ;
       sh:select """SELECT DISTINCT $this
 WHERE {
@@ -420,6 +433,7 @@ dash:StemConstraintComponent
   rdf:type sh:ConstraintComponent ;
   rdfs:comment "A constraint component that can be used to verify that every value node is an IRI and the IRI starts with a given string value."@en ;
   rdfs:label "Stem constraint component"@en ;
+  sh:message "Value does not have stem {$stem}" ;
   sh:parameter dash:StemConstraintComponent-stem ;
   sh:targetClass sh:Shape ;
   sh:validator dash:hasStem ;
@@ -598,7 +612,6 @@ dash:hasMaxExclusive
   rdfs:comment "Checks whether a given node (?value) has value less than (<) the provided ?maxExclusive. Returns false if this cannot be determined, e.g. because values do not have comparable types." ;
   rdfs:label "has max exclusive" ;
   sh:ask "ASK { FILTER ($value < $maxExclusive) }" ;
-  sh:message "Value is not < {$maxExclusive}" ;
   sh:prefixes <http://datashapes.org/dash> ;
 .
 dash:hasMaxInclusive
@@ -606,7 +619,6 @@ dash:hasMaxInclusive
   rdfs:comment "Checks whether a given node (?value) has value less than or equal to (<=) the provided ?maxInclusive. Returns false if this cannot be determined, e.g. because values do not have comparable types." ;
   rdfs:label "has max inclusive" ;
   sh:ask "ASK { FILTER ($value <= $maxInclusive) }" ;
-  sh:message "Value is not <= {$maxInclusive}" ;
   sh:prefixes <http://datashapes.org/dash> ;
 .
 dash:hasMaxLength
@@ -618,7 +630,6 @@ dash:hasMaxLength
 			FILTER (STRLEN(str($value)) <= $maxLength) .
 		}
 		""" ;
-  sh:message "Value has more than {$maxLength} characters" ;
   sh:prefixes <http://datashapes.org/dash> ;
 .
 dash:hasMinExclusive
@@ -626,7 +637,6 @@ dash:hasMinExclusive
   rdfs:comment "Checks whether a given node (?value) has value greater than (>) the provided ?minExclusive. Returns false if this cannot be determined, e.g. because values do not have comparable types." ;
   rdfs:label "has min exclusive" ;
   sh:ask "ASK { FILTER ($value > $minExclusive) }" ;
-  sh:message "Value is not > {$minExclusive}" ;
   sh:prefixes <http://datashapes.org/dash> ;
 .
 dash:hasMinInclusive
@@ -634,7 +644,6 @@ dash:hasMinInclusive
   rdfs:comment "Checks whether a given node (?value) has value greater than or equal to (>=) the provided ?minInclusive. Returns false if this cannot be determined, e.g. because values do not have comparable types." ;
   rdfs:label "has min inclusive" ;
   sh:ask "ASK { FILTER ($value >= $minInclusive) }" ;
-  sh:message "Value is not >= {$minInclusive}" ;
   sh:prefixes <http://datashapes.org/dash> ;
 .
 dash:hasMinLength
@@ -646,7 +655,6 @@ dash:hasMinLength
 			FILTER (STRLEN(str($value)) >= $minLength) .
 		}
 		""" ;
-  sh:message "Value has less than {$minLength} characters" ;
   sh:prefixes <http://datashapes.org/dash> ;
 .
 dash:hasNodeKind
@@ -660,7 +668,6 @@ dash:hasNodeKind
 				(isBlank($value)   && $nodeKind IN ( sh:BlankNode, sh:BlankNodeOrIRI, sh:BlankNodeOrLiteral ) )) .
 		}
 		""" ;
-  sh:message "Value has not node kind {$nodeKind}" ;
   sh:prefixes <http://datashapes.org/dash> ;
 .
 dash:hasPattern
@@ -668,7 +675,6 @@ dash:hasPattern
   rdfs:comment "Checks whether the string representation of a given node (?value) matches a given regular expression (?pattern). Returns false if the value is a blank node." ;
   rdfs:label "has pattern" ;
   sh:ask "ASK { FILTER (!isBlank($value) && IF(bound($flags), regex(str($value), $pattern, $flags), regex(str($value), $pattern))) }" ;
-  sh:message "Value does not match pattern \"{$pattern}\"" ;
   sh:prefixes <http://datashapes.org/dash> ;
 .
 dash:hasRootClass
@@ -684,7 +690,6 @@ dash:hasStem
   rdfs:comment "Checks whether a given node is an IRI starting with a given stem." ;
   rdfs:label "has stem" ;
   sh:ask "ASK { FILTER (isIRI($value) && STRSTARTS(str($value), $stem)) }" ;
-  sh:message "Value does not have stem {$stem}" ;
   sh:prefixes <http://datashapes.org/dash> ;
 .
 dash:isDeactivated
@@ -710,7 +715,6 @@ dash:isIn
 			}
 		}
 		""" ;
-  sh:message "Value is not in {$in}" ;
   sh:prefixes <http://datashapes.org/dash> ;
 .
 dash:isLanguageIn
@@ -726,7 +730,6 @@ dash:isLanguageIn
 				} }
 		}
 		""" ;
-  sh:message "Language does not match any of {$languageIn}" ;
   sh:prefixes <http://datashapes.org/dash> ;
 .
 dash:isNodeKindBlankNode
@@ -919,6 +922,7 @@ sh:ClosedConstraintComponent
     ] ;
 .
 sh:DatatypeConstraintComponent
+  sh:message "Value does not have datatype {$datatype}" ;
   sh:targetClass sh:Shape ;
   sh:validator [
       rdf:type sh:JSValidator ;
@@ -950,6 +954,7 @@ sh:DisjointConstraintComponent
   sh:targetClass sh:Shape ;
 .
 sh:EqualsConstraintComponent
+  sh:message "Must have same values as {$equals}" ;
   sh:propertyValidator [
       rdf:type sh:JSValidator ;
       sh:jsFunctionName "propertyEquals" ;
@@ -957,7 +962,6 @@ sh:EqualsConstraintComponent
     ] ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Must have same values as {$equals}" ;
       sh:prefixes <http://datashapes.org/dash> ;
       sh:select """
 		SELECT DISTINCT $this ?value
@@ -994,6 +998,7 @@ sh:HasValueConstraintComponent
       rdf:type sh:JSValidator ;
       sh:jsFunctionName "nodeHasValue" ;
       sh:jsLibrary dash:DASHJSLibrary ;
+      sh:message "Value must be {$hasValue}" ;
     ] ;
   sh:nodeValidator [
       rdf:type sh:SPARQLAskValidator ;
@@ -1007,6 +1012,7 @@ sh:HasValueConstraintComponent
       rdf:type sh:JSValidator ;
       sh:jsFunctionName "propertyHasValue" ;
       sh:jsLibrary dash:DASHJSLibrary ;
+      sh:message "Missing expected value {$hasValue}" ;
     ] ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
@@ -1022,6 +1028,7 @@ sh:HasValueConstraintComponent
   sh:targetClass sh:Shape ;
 .
 sh:InConstraintComponent
+  sh:message "Value is not in {$in}" ;
   sh:targetClass sh:Shape ;
   sh:validator dash:isIn ;
   sh:validator [
@@ -1031,10 +1038,12 @@ sh:InConstraintComponent
     ] ;
 .
 sh:LanguageInConstraintComponent
+  sh:message "Language does not match any of {$languageIn}" ;
   sh:targetClass sh:Shape ;
   sh:validator dash:isLanguageIn ;
 .
 sh:LessThanConstraintComponent
+  sh:message "Value is not < value of {$lessThan}" ;
   sh:propertyValidator [
       rdf:type sh:JSValidator ;
       sh:jsFunctionName "propertyLessThan" ;
@@ -1042,7 +1051,6 @@ sh:LessThanConstraintComponent
     ] ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Value is not < value of {$lessThan}" ;
       sh:prefixes <http://datashapes.org/dash> ;
       sh:select """
 		SELECT DISTINCT $this ?value
@@ -1056,6 +1064,7 @@ sh:LessThanConstraintComponent
   sh:targetClass sh:Shape ;
 .
 sh:LessThanOrEqualsConstraintComponent
+  sh:message "Value is not <= value of {$lessThanOrEquals}" ;
   sh:propertyValidator [
       rdf:type sh:JSValidator ;
       sh:jsFunctionName "propertyLessThanOrEquals" ;
@@ -1063,7 +1072,6 @@ sh:LessThanOrEqualsConstraintComponent
     ] ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Value is not <= value of {$lessThanOrEquals}" ;
       sh:prefixes <http://datashapes.org/dash> ;
       sh:select """
 		SELECT DISTINCT $this ?value
@@ -1077,6 +1085,7 @@ sh:LessThanOrEqualsConstraintComponent
   sh:targetClass sh:Shape ;
 .
 sh:MaxCountConstraintComponent
+  sh:message "More than {$maxCount} values" ;
   sh:propertyValidator [
       rdf:type sh:JSValidator ;
       sh:jsFunctionName "propertyMaxCount" ;
@@ -1084,7 +1093,6 @@ sh:MaxCountConstraintComponent
     ] ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
-      sh:message "More than {$maxCount} values" ;
       sh:prefixes <http://datashapes.org/dash> ;
       sh:select """
 		SELECT $this
@@ -1098,6 +1106,7 @@ sh:MaxCountConstraintComponent
   sh:targetClass sh:Shape ;
 .
 sh:MaxExclusiveConstraintComponent
+  sh:message "Value is not < {$maxExclusive}" ;
   sh:targetClass sh:Shape ;
   sh:validator dash:hasMaxExclusive ;
   sh:validator [
@@ -1107,6 +1116,7 @@ sh:MaxExclusiveConstraintComponent
     ] ;
 .
 sh:MaxInclusiveConstraintComponent
+  sh:message "Value is not <= {$maxInclusive}" ;
   sh:targetClass sh:Shape ;
   sh:validator dash:hasMaxInclusive ;
   sh:validator [
@@ -1116,6 +1126,7 @@ sh:MaxInclusiveConstraintComponent
     ] ;
 .
 sh:MaxLengthConstraintComponent
+  sh:message "Value has more than {$maxLength} characters" ;
   sh:targetClass sh:Shape ;
   sh:validator dash:hasMaxLength ;
   sh:validator [
@@ -1125,6 +1136,7 @@ sh:MaxLengthConstraintComponent
     ] ;
 .
 sh:MinCountConstraintComponent
+  sh:message "Less than {$minCount} values" ;
   sh:propertyValidator [
       rdf:type sh:JSValidator ;
       sh:jsFunctionName "propertyMinCount" ;
@@ -1132,7 +1144,6 @@ sh:MinCountConstraintComponent
     ] ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Less than {$minCount} values" ;
       sh:prefixes <http://datashapes.org/dash> ;
       sh:select """
 		SELECT $this
@@ -1148,6 +1159,7 @@ sh:MinCountConstraintComponent
   sh:targetClass sh:Shape ;
 .
 sh:MinExclusiveConstraintComponent
+  sh:message "Value is not > {$minExclusive}" ;
   sh:targetClass sh:Shape ;
   sh:validator dash:hasMinExclusive ;
   sh:validator [
@@ -1157,6 +1169,7 @@ sh:MinExclusiveConstraintComponent
     ] ;
 .
 sh:MinInclusiveConstraintComponent
+  sh:message "Value is not >= {$minInclusive}" ;
   sh:targetClass sh:Shape ;
   sh:validator dash:hasMinInclusive ;
   sh:validator [
@@ -1166,6 +1179,7 @@ sh:MinInclusiveConstraintComponent
     ] ;
 .
 sh:MinLengthConstraintComponent
+  sh:message "Value has less than {$minLength} characters" ;
   sh:targetClass sh:Shape ;
   sh:validator dash:hasMinLength ;
   sh:validator [
@@ -1175,6 +1189,7 @@ sh:MinLengthConstraintComponent
     ] ;
 .
 sh:NodeConstraintComponent
+  sh:message "Value does not have shape {$node}" ;
   sh:targetClass sh:Shape ;
   sh:validator [
       rdf:type sh:JSValidator ;
@@ -1183,6 +1198,7 @@ sh:NodeConstraintComponent
     ] ;
 .
 sh:NodeKindConstraintComponent
+  sh:message "Value does not have node kind {$nodeKind}" ;
   sh:targetClass sh:Shape ;
   sh:validator dash:hasNodeKind ;
   sh:validator [
@@ -1192,6 +1208,7 @@ sh:NodeKindConstraintComponent
     ] ;
 .
 sh:NotConstraintComponent
+  sh:message "Value does have shape {$not}" ;
   sh:targetClass sh:Shape ;
   sh:validator [
       rdf:type sh:JSValidator ;
@@ -1208,6 +1225,7 @@ sh:OrConstraintComponent
     ] ;
 .
 sh:PatternConstraintComponent
+  sh:message "Value does not match pattern \"{$pattern}\"" ;
   sh:targetClass sh:Shape ;
   sh:validator dash:hasPattern ;
   sh:validator [
@@ -1217,24 +1235,25 @@ sh:PatternConstraintComponent
     ] ;
 .
 sh:QualifiedMaxCountConstraintComponent
+  sh:message "More than {$qualifiedMaxCount} values have shape {$qualifiedValueShape}" ;
   sh:propertyValidator [
       rdf:type sh:JSValidator ;
       sh:jsFunctionName "propertyQualifiedMaxCount" ;
       sh:jsLibrary dash:DASHJSLibrary ;
-      sh:message "More than {$qualifiedMaxCount} values have shape {$qualifiedValueShape}" ;
     ] ;
   sh:targetClass sh:Shape ;
 .
 sh:QualifiedMinCountConstraintComponent
+  sh:message "Less than {$qualifiedMinCount} values have shape {$qualifiedValueShape}" ;
   sh:propertyValidator [
       rdf:type sh:JSValidator ;
       sh:jsFunctionName "propertyQualifiedMinCount" ;
       sh:jsLibrary dash:DASHJSLibrary ;
-      sh:message "Less than {$qualifiedMinCount} values have shape {$qualifiedValueShape}" ;
     ] ;
   sh:targetClass sh:Shape ;
 .
 sh:UniqueLangConstraintComponent
+  sh:message "Language \"{?lang}\" used more than once" ;
   sh:propertyValidator [
       rdf:type sh:JSValidator ;
       sh:jsFunctionName "propertyUniqueLang" ;
@@ -1242,7 +1261,6 @@ sh:UniqueLangConstraintComponent
     ] ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Language \"{?lang}\" used more than once" ;
       sh:prefixes <http://datashapes.org/dash> ;
       sh:select """
 		SELECT DISTINCT $this ?lang
@@ -1262,11 +1280,11 @@ sh:UniqueLangConstraintComponent
     ] ;
   sh:targetClass sh:Shape ;
 .
-sh:XorConstraintComponent
+sh:XoneConstraintComponent
   sh:targetClass sh:Shape ;
   sh:validator [
       rdf:type sh:JSValidator ;
-      sh:jsFunctionName "isXor" ;
+      sh:jsFunctionName "isXone" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
 .

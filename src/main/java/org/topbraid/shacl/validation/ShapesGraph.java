@@ -97,7 +97,7 @@ public class ShapesGraph {
 				}
 			}
 
-			// Turn the shape Resource objects into VShapes
+			// Turn the shape Resource objects into Shape instances
 			this.rootShapes = new LinkedList<Shape>();
 			for(Resource candidate : candidates) {
 				SHShape shape = SHFactory.asShape(candidate);

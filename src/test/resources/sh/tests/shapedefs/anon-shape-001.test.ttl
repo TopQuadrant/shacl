@@ -28,6 +28,7 @@ ex:GraphValidationTestCase
           sh:sourceConstraintComponent sh:MinCountConstraintComponent ;
         ] ;
     ] ;
+  dash:validateShapes "true"^^xsd:boolean ;
 .
 ex:InvalidNode1
   rdf:type ex:Person ;

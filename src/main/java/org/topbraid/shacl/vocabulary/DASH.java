@@ -40,9 +40,13 @@ public class DASH {
 
     public final static Resource InferencingTestCase = ResourceFactory.createResource(NS + "InferencingTestCase");
 
+    public final static Resource JSTestCase = ResourceFactory.createResource(NS + "JSTestCase");
+
     public final static Resource QueryTestCase = ResourceFactory.createResource(NS + "QueryTestCase");
 
     public final static Resource ParameterConstraintComponent = ResourceFactory.createResource(NS + "ParameterConstraintComponent");
+
+    public final static Resource RDFQueryJSLibrary = ResourceFactory.createResource(NS + "RDFQueryJSLibrary");
 
     public final static Resource SPARQLUpdateSuggestionGenerator = ResourceFactory.createResource(NS + "SPARQLUpdateSuggestionGenerator");
 

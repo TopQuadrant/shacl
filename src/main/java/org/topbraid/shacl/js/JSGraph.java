@@ -9,6 +9,7 @@ import org.apache.jena.graph.Triple;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.topbraid.shacl.js.model.JSFactory;
 import org.topbraid.shacl.js.model.JSTriple;
+import org.topbraid.shacl.util.FailureLog;
 
 public class JSGraph {
 	
@@ -23,6 +24,9 @@ public class JSGraph {
 	
 	
 	public void close() {
+		if(!openIterators.isEmpty()) {
+			FailureLog.get().logFailure("JavaScript graph session ended but " + openIterators.size() + " iterators have not been closed. Make sure to close them programmatically to avoid resource leaks and locking problems.");
+		}
 		for(JSTripleIterator stream : openIterators) {
 			stream.closeIterator();
 		}

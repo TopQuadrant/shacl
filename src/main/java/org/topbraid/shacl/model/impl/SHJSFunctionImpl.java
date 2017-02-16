@@ -15,6 +15,12 @@ public class SHJSFunctionImpl extends SHParameterizableImpl implements SHJSFunct
 	
 	@Override
 	public String getFunctionName() {
-		return JenaUtil.getStringProperty(this, SHJS.jsFunctionName);
+		String result = JenaUtil.getStringProperty(this, SHJS.jsFunctionName);
+		if(result == null) {
+			return getLocalName();
+		}
+		else {
+			return result;
+		}
 	}
 }

@@ -45,7 +45,7 @@ public class SPINFunctionDrivers implements SPINFunctionDriver {
 		register(SPIN.body, new SPINBodyFunctionDriver());
 		register(SH.ask, new SHACLSPARQLFunctionDriver());
 		register(SH.select, new SHACLSPARQLFunctionDriver());
-		register(SHJS.jsFunctionName, new SHACLJSFunctionDriver());
+		register(SHJS.jsLibrary, new SHACLJSFunctionDriver());
 	}
 
 

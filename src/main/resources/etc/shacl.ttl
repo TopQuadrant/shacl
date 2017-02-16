@@ -1,5 +1,5 @@
 # W3C Shapes Constraint Language (SHACL) Vocabulary
-# Draft last edited 2017-02-02
+# Draft last edited 2017-02-16
 
 @prefix owl:  <http://www.w3.org/2002/07/owl#> .
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -1216,21 +1216,21 @@ sh:uniqueLang
 	rdfs:isDefinedBy sh: .
 
 
-sh:XorConstraintComponent
+sh:XoneConstraintComponent
 	a sh:ConstraintComponent ;
-	rdfs:label "Xor constraint component"@en ;
+	rdfs:label "Exactly one constraint component"@en ;
 	rdfs:comment "A constraint component that can be used to restrict the value nodes so that they conform to exactly one out of several provided shapes."@en ;
-	sh:parameter sh:XorConstraintComponent-xor ;
+	sh:parameter sh:XoneConstraintComponent-xone ;
 	rdfs:isDefinedBy sh: .
 
-sh:XorConstraintComponent-xor
+sh:XoneConstraintComponent-xone
 	a sh:Parameter ;
-	sh:path sh:xor ;
+	sh:path sh:xone ;
 	rdfs:isDefinedBy sh: .
 
-sh:xor
+sh:xone
 	a rdf:Property ;
-	rdfs:label "xor"@en ;
+	rdfs:label "exactly one"@en ;
 	rdfs:comment "Specifies a list of shapes so that the value nodes must conform to exactly one of the shapes."@en ;
 	rdfs:range rdf:List ;    # members: sh:Shape ;
 	rdfs:isDefinedBy sh: .

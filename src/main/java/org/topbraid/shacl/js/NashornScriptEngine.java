@@ -135,6 +135,9 @@ public class NashornScriptEngine implements JSScriptEngine {
 			return cached;
 		}
 		Object what = engine.get(functionName);
+		if(what == null) {
+			throw new ScriptException("Cannot find JavaScript function \"" + functionName + "\"");
+		}
 		try {
 			String funcString = what.toString();
 			Object result = ((Invocable) engine).invokeFunction(ARGS_FUNCTION_NAME, funcString);

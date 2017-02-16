@@ -64,7 +64,8 @@ var NS = {
 var OWL = {
 	Class : NS.owl("Class"),
 	DatatypeProperty : NS.owl("DatatypeProperty"),
-	ObjectProperty : NS.owl("ObjectProperty")
+	ObjectProperty : NS.owl("ObjectProperty"),
+	Thing : NS.owl("Thing")
 }
 
 var RDF = {
@@ -98,16 +99,32 @@ var RDFS = {
 }
 
 var SH = {
+	ConstraintComponent : NS.sh("ConstraintComponent"),	
+	JSValidator : NS.sh("JSValidator"),
 	NodeShape : NS.sh("NodeShape"),
+	PropertyConstraintComponent : NS.sh("PropertyConstraintComponent"),	
 	PropertyShape : NS.sh("PropertyShape"),
 	Shape : NS.sh("Shape"),
+	alternativePath : NS.sh("alternativePath"),
+	inversePath : NS.sh("inversePath"),
+	jsFunctionName : NS.sh("jsFunctionName"),
 	qualifiedValueShape : NS.sh("qualifiedValueShape"),
 	qualifiedValueShapesDisjoint : NS.sh("qualifiedValueShapesDisjoint"),
+	nodeValidator : NS.sh("nodeValidator"),
+	oneOrMorePath : NS.sh("oneOrMorePath"),
+	optional : NS.sh("optional"),
+	parameter : NS.sh("parameter"),
+	path : NS.sh("path"),
 	property : NS.sh("property"),
+	propertyValidator : NS.sh("propertyValidator"),
+	target : NS.sh("target"),
 	targetClass : NS.sh("targetClass"),
 	targetNode : NS.sh("targetNode"),
 	targetObjectsOf : NS.sh("targetObjectsOf"),
-	targetSubjectsOf : NS.sh("targetSubjectsOf")
+	targetSubjectsOf : NS.sh("targetSubjectsOf"),
+	validator : NS.sh("validator"),
+	zeroOrMorePath : NS.sh("zeroOrMorePath"),
+	zeroOrOnePath : NS.sh("zeroOrOnePath")
 }
 
 var XSD = {
@@ -194,23 +211,27 @@ AbstractQuery.prototype.orderByVar = function(varName) {
 
 /**
  * Creates a new query doing a match where the predicate may be a RDF Path object.
- * NOTE: Currently not implemented, just an alias for find(s, p, o), i.e. only
- *       predicate "paths" are supported right now.
+ * Note: This is currently not using lazy evaluation and will always walk all matches.
+ * Path syntax:
+ * - PredicatePaths: NamedNode
+ * - SequencePaths: [path1, path2]
+ * - AlternativePaths: { or : [ path1, path2 ] }
+ * - InversePaths: { inverse : path }   LIMITATION: Only supports NamedNodes for path here
+ * - ZeroOrMorePaths: { zeroOrMore : path }
+ * - OneOrMorePaths: { oneOrMore : path }
+ * - ZeroOrOnePaths: { zeroOrOne : path }
  * @param s  the match subject or a variable name (string) - must have a value
-             at execution time!
+ *           at execution time!
  * @param path  the match path object (e.g. a NamedNode for a simple predicate hop)
  * @param o  the match object or a variable name (string)
  */
 AbstractQuery.prototype.path = function(s, path, o) {
-	// TODO: Support paths, for example
-	// - PredicatePaths: NamedNode
-	// - SequencePaths: [path1, path2]
-	// - AlternativePaths: { or : [ path1, path2 ] }
-	// - InversePaths: { inverse : path }
-	// - ZeroOrMorePaths: { zeroOrMore : path }
-	// - OneOrMorePaths: { oneOrMore : path }
-	// - ZeroOrOnePaths: { zeroOrOne : path }
-	return new RDFTripleQuery(this, s, path, o);
+	if(path && path.termType === "NamedNode") {
+		return new RDFTripleQuery(this, s, path, o);
+	}
+	else {
+		return new PathQuery(this, s, path, o);
+	}
 }
 
 // TODO: add other SPARQL-like query types
@@ -234,6 +255,22 @@ AbstractQuery.prototype.first = function() {
 AbstractQuery.prototype.forEach = function(callback) {
 	for(var n = this.nextSolution(); n; n = this.nextSolution()) {
 		callback(n);
+	}
+}
+
+/**
+ * Gets the next solution and, if that exists, returns the binding for a
+ * given variable from that solution.
+ * @param varName  the name of the binding to get
+ * @return the value of the variable or null or undefined if it doesn't exist
+ */
+AbstractQuery.prototype.get = function(varName) {
+	var s = this.first();
+	if(s) {
+		return s[varName];
+	}
+	else {
+		return null;
 	}
 }
 
@@ -377,6 +414,106 @@ LimitQuery.prototype.nextSolution = function() {
 }
 
 
+// class OrderByVarQuery
+// Sorts all solutions from the input stream by a given variable
+
+function OrderByVarQuery(input, varName) {
+	this.input = input;
+	this.source = input.source;
+	this.varName = varName;
+}
+
+OrderByVarQuery.prototype = Object.create(AbstractQuery.prototype);
+
+OrderByVarQuery.prototype.close = function() {
+	this.input.close();
+}
+
+OrderByVarQuery.prototype.nextSolution = function() {
+	if(!this.solutions) {
+		this.solutions = this.input.toArray();
+		var varName = this.varName;
+		this.solutions.sort(function(s1, s2) {
+				return compareTerms(s1[varName], s2[varName]);
+			});
+		this.index = 0;
+	}
+	if(this.index < this.solutions.length) {
+		return this.solutions[this.index++];
+	}
+	else {
+		return null;
+	}
+}
+
+
+// class PathQuery
+// Expects subject and path to be bound and produces all bindings
+// for the object variable or matches that by evaluating the given path
+
+function PathQuery(input, subject, path, object) {
+	this.input = input;
+	this.source = input.source;
+	this.subject = subject;
+	if(path == null) {
+		throw "Path cannot be unbound";
+	}
+	this.path = path;
+	this.object = object;
+}
+
+PathQuery.prototype = Object.create(AbstractQuery.prototype);
+
+PathQuery.prototype.close = function() {
+	this.input.close();
+}
+
+PathQuery.prototype.nextSolution = function() {
+
+	var r = this.pathResults;
+	if(r) {
+		var n = r[this.pathIndex++];
+		var result = createSolution(this.inputSolution);
+		if(typeof this.object === 'string') {
+			result[this.object] = n;
+		}
+		if(this.pathIndex == r.length) {
+			delete this.pathResults; // Mark as exhausted
+		}
+		return result;
+	}
+	
+	// Pull from input
+	this.inputSolution = this.input.nextSolution();
+	if(this.inputSolution) {
+		var sm = (typeof this.subject === 'string') ? this.inputSolution[this.subject] : this.subject;
+		if(sm == null) {
+			throw "Path cannot have unbound subject";
+		}
+		var om = (typeof this.object === 'string') ? this.inputSolution[this.object] : this.object;
+		var pathResultsSet = new NodeSet();
+		addPathValues(this.source, sm, this.path, pathResultsSet);
+		this.pathResults = pathResultsSet.toArray();
+		if(this.pathResults.length == 0) {
+			delete this.pathResults;
+		}
+		else if(om) {
+			delete this.pathResults;
+			if(pathResultsSet.contains(om)) {
+				return this.inputSolution;
+			}
+		}
+		else {
+			this.pathIndex = 0;
+		}
+		return this.nextSolution();
+	}
+	else {
+		return null;
+	}
+}
+
+
 // class RDFTripleQuery
 // Joins the solutions from the input Query with triple matches against
 // the current input graph.
@@ -436,39 +573,6 @@ RDFTripleQuery.prototype.nextSolution = function() {
 		var om = (typeof this.o === 'string') ? this.inputSolution[this.o] : this.o;
 		this.ownIterator = this.source.find(sm, pm, om)
 		return this.nextSolution();
-	}
-	else {
-		return null;
-	}
-}
-
-
-// class OrderByVarQuery
-// Sorts all solutions from the input stream by a given variable
-
-function OrderByVarQuery(input, varName) {
-	this.input = input;
-	this.source = input.source;
-	this.varName = varName;
-}
-
-OrderByVarQuery.prototype = Object.create(AbstractQuery.prototype);
-
-OrderByVarQuery.prototype.close = function() {
-	this.input.close();
-}
-
-OrderByVarQuery.prototype.nextSolution = function() {
-	if(!this.solutions) {
-		this.solutions = this.input.toArray();
-		var varName = this.varName;
-		this.solutions.sort(function(s1, s2) {
-				return compareTerms(s1[varName], s2[varName]);
-			});
-		this.index = 0;
-	}
-	if(this.index < this.solutions.length) {
-		return this.solutions[this.index++];
 	}
 	else {
 		return null;
@@ -551,6 +655,18 @@ function compareTerms(t1, t2) {
 	}
 }
 
+function getLocalName(uri) {
+	// TODO: This is not the 100% correct local name algorithm
+	var index = uri.lastIndexOf("#"); 
+	if(index < 0) {
+		index = uri.lastIndexOf("/");
+	}
+	if(index < 0) {
+		throw "Cannot get local name of " + uri;
+	}
+	return uri.substring(index + 1);
+}
+
 
 // class NodeSet
 // (a super-primitive implementation for now!)
@@ -580,6 +696,79 @@ NodeSet.prototype.contains = function(node) {
 	return false;
 }
 
+NodeSet.prototype.forEach = function(callback) {
+	for(var i = 0; i < this.values.length; i++) {
+		callback(this.values[i]);
+	}
+}
+
+NodeSet.prototype.size = function() {
+	return this.values.length;
+}
+
 NodeSet.prototype.toArray = function() {
 	return this.values;
+}
+
+
+// Simple Path syntax implementation:
+// Adds all matches for a given subject and path combination into a given NodeSet.
+// This should really be doing lazy evaluation and only up to the point
+// where the match object is found.
+function addPathValues(graph, subject, path, set) {
+	if(path.termType === "NamedNode") {
+		set.addAll(RDFQuery(graph).find(subject, path, "object").toNodeArray("object"));
+	}
+	else if(Array.isArray(path)) {
+		var s = new NodeSet();
+		s.add(subject);
+		for(var i = 0; i < path.length; i++) {
+			var a = s.toArray();
+			s = new NodeSet();
+			for(var j = 0; j < a.length; j++) {
+				addPathValues(graph, a[j], path[i], s);
+			}
+		}
+		set.addAll(s.toArray());
+	}
+	else if(path.or) {
+		for(var i = 0; i < path.or.length; i++) {
+			addPathValues(graph, subject, path.or[i], set);
+		}
+	}
+	else if(path.inverse) {
+		if(path.inverse.termType === "NamedNode") {
+			set.addAll(RDFQuery(graph).find("subject", path.inverse, subject).toNodeArray("subject"));
+		}
+		else {
+			throw "Unsupported: Inverse paths only work for named nodes";
+		}
+	}
+	else if(path.zeroOrOne) {
+		addPathValues(graph, subject, path.zeroOrOne, set);
+		set.add(subject);
+	}
+	else if(path.zeroOrMore) {
+		walkPath(graph, subject, path.zeroOrMore, set, new NodeSet());
+		set.add(subject);
+	}
+	else if(path.oneOrMore) {
+		walkPath(graph, subject, path.oneOrMore, set, new NodeSet());
+	}
+	else {
+		throw "Unsupported path object: " + path;
+	}
+}
+
+function walkPath(graph, subject, path, set, visited) {
+	visited.add(subject);
+	var s = new NodeSet();
+	addPathValues(graph, subject, path, s);
+	var a = s.toArray();
+	set.addAll(a);
+	for(var i = 0; i < a.length; i++) {
+		if(!visited.contains(a[i])) {
+			walkPath(graph, a[i], path, set, visited);
+		}
+	}
 }
