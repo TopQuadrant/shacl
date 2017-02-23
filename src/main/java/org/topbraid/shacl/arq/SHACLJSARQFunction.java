@@ -15,6 +15,7 @@ import org.topbraid.shacl.js.SHACLScriptEngineManager;
 import org.topbraid.shacl.js.model.JSFactory;
 import org.topbraid.shacl.model.SHJSExecutable;
 import org.topbraid.shacl.model.SHJSFunction;
+import org.topbraid.shacl.vocabulary.SHJS;
 import org.topbraid.spin.util.ExceptionUtil;
 import org.topbraid.spin.util.JenaDatatypes;
 
@@ -40,10 +41,10 @@ public class SHACLJSARQFunction extends SHACLARQFunction {
 		JSScriptEngine engine = SHACLScriptEngineManager.getCurrentEngine();
 
 		SHJSExecutable as = getSHACLFunction().as(SHJSExecutable.class);
-		JSGraph dataJSGraph = new JSGraph(dataModel.getGraph());
+		JSGraph dataJSGraph = new JSGraph(dataModel.getGraph(), engine);
 		try {
 			engine.executeLibraries(as);
-			engine.put("$dataGraph", dataJSGraph);
+			engine.put(SHJS.DATA_VAR, dataJSGraph);
 			
 			Object result = engine.invokeFunction(functionName, bindings);
 			if(result != null) {

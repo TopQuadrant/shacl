@@ -74,8 +74,8 @@ public class NashornScriptEngine implements JSScriptEngine {
 	
 	
 	@Override
-	public void eval(String expr) throws ScriptException {
-		engine.eval(expr);
+	public Object eval(String expr) throws ScriptException {
+		return engine.eval(expr);
 	}
 
 

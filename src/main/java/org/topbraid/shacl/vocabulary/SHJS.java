@@ -36,6 +36,11 @@ public class SHJS {
     public final static Property jsLibrary = ResourceFactory.createProperty(NS + "jsLibrary");
 
     public final static Property jsLibraryURL = ResourceFactory.createProperty(NS + "jsLibraryURL");
+    
+    
+    public final static String DATA_VAR = "$data";
+    
+    public final static String SHAPES_VAR = "$shapes";
 
 
     public static String getURI() {

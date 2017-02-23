@@ -91,11 +91,18 @@ dash:ClosedByTypesConstraintComponent
   rdfs:comment "A constraint component that can be used to declare that focus nodes are \"closed\" based on their rdf:types, meaning that focus nodes may only have values for the properties that are explicitly enumerated via sh:property/sh:path in property constraints at their rdf:types and the superclasses of those. This assumes that the type classes are also shapes." ;
   rdfs:label "Closed by types constraint component" ;
   sh:nodeValidator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "validateClosedByTypesNode" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+      sh:message "Property is not among those permitted for any of the types" ;
+    ] ;
+  sh:nodeValidator [
       rdf:type sh:SPARQLSelectValidator ;
       sh:message "Property {?path} is not among those permitted for any of the types" ;
       sh:prefixes <http://datashapes.org/dash> ;
       sh:select """SELECT $this (?predicate AS ?path) ?value
 WHERE {
+	FILTER ($closedByTypes) .
     $this ?predicate ?value .
 	FILTER (?predicate != rdf:type) .
 	FILTER NOT EXISTS {
@@ -107,12 +114,14 @@ WHERE {
 	}
 }""" ;
     ] ;
-  sh:parameter [
-      sh:path dash:closedByTypes ;
-      sh:datatype xsd:boolean ;
-      sh:description "True to indicate that the focus nodes are closed by their types. A constraint violation is reported for each property value of the focus node where the property is not among those that are explicitly declared via sh:property/sh:path in any of the rdf:types of the focus node (and their superclasses). The property rdf:type is always permitted." ;
-    ] ;
+  sh:parameter dash:ClosedByTypesConstraintComponent-closedByTypes ;
   sh:targetClass sh:Shape ;
+.
+dash:ClosedByTypesConstraintComponent-closedByTypes
+  rdf:type sh:Parameter ;
+  sh:path dash:closedByTypes ;
+  sh:datatype xsd:boolean ;
+  sh:description "True to indicate that the focus nodes are closed by their types. A constraint violation is reported for each property value of the focus node where the property is not among those that are explicitly declared via sh:property/sh:path in any of the rdf:types of the focus node (and their superclasses). The property rdf:type is always permitted." ;
 .
 dash:DASHJSLibrary
   rdf:type sh:JSLibrary ;
@@ -291,10 +300,15 @@ For example, \"a person cannot have itself as parent\" can be expressed by setti
 
 To express that a person cannot have itself among any of its (recursive) parents, use a sh:path with the + operator such as ex:parent+.""" ;
   rdfs:label "Non-recursive constraint component" ;
+  sh:message "Points back at itself (recursively)" ;
   sh:parameter dash:NonRecursiveConstraintComponent-nonRecursive ;
   sh:propertyValidator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "validateNonRecursiveProperty" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
+  sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Points back at itself (recursively)" ;
       sh:prefixes <http://datashapes.org/dash> ;
       sh:select """SELECT DISTINCT $this ($this AS ?value)
 WHERE {
@@ -314,7 +328,7 @@ dash:NonRecursiveConstraintComponent-nonRecursive
   sh:name "non-recursive" ;
 .
 dash:None
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   rdfs:comment "A Shape that is no node can conform to." ;
   rdfs:label "None" ;
   sh:in () ;
@@ -336,6 +350,11 @@ dash:PrimaryKeyConstraintComponent
   sh:labelTemplate "The property {?predicate} is the primary key and URIs start with {?uriStart}" ;
   sh:message "Violation of primary key constraint" ;
   sh:parameter dash:PrimaryKeyConstraintComponent-uriStart ;
+  sh:propertyValidator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "validatePrimaryKeyProperty" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
       sh:prefixes <http://datashapes.org/dash> ;
@@ -407,9 +426,15 @@ dash:RootClassConstraintComponent
   rdfs:comment "A constraint component defining the parameter dash:rootClass, which restricts the values to be either the root class itself or one of its subclasses. This is typically used in conjunction with properties that have rdfs:Class as their type." ;
   rdfs:label "Root class constraint component" ;
   sh:labelTemplate "Root class {$rootClass}" ;
+  sh:message "Value must be subclass of {$rootClass}" ;
   sh:parameter dash:RootClassConstraintComponent-rootClass ;
   sh:targetClass sh:PropertyShape ;
   sh:validator dash:hasRootClass ;
+  sh:validator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "validateRootClass" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
 .
 dash:RootClassConstraintComponent-rootClass
   rdf:type sh:Parameter ;
@@ -437,6 +462,11 @@ dash:StemConstraintComponent
   sh:parameter dash:StemConstraintComponent-stem ;
   sh:targetClass sh:Shape ;
   sh:validator dash:hasStem ;
+  sh:validator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "validateStem" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
 .
 dash:StemConstraintComponent-stem
   rdf:type sh:Parameter ;
@@ -455,16 +485,21 @@ dash:StringOrLangString
 dash:SubSetOfConstraintComponent
   rdf:type sh:ConstraintComponent ;
   rdfs:label "Sub set of constraint component" ;
+  sh:message "Must be one of the values of {$subSetOf}" ;
   sh:parameter dash:SubSetOfConstraintComponent-subSetOf ;
   sh:propertyValidator [
       rdf:type sh:SPARQLAskValidator ;
       sh:ask """ASK {
-    $this $subSetOf ?value .
+    $this $subSetOf $value .
 }""" ;
-      sh:message "Must be one of the values of {$subSetOf}" ;
       sh:prefixes <http://datashapes.org/dash> ;
     ] ;
   sh:targetClass sh:PropertyShape ;
+  sh:validator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "validateSubSetOf" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
 .
 dash:SubSetOfConstraintComponent-subSetOf
   rdf:type sh:Parameter ;
@@ -877,7 +912,7 @@ sh:AndConstraintComponent
   sh:targetClass sh:Shape ;
   sh:validator [
       rdf:type sh:JSValidator ;
-      sh:jsFunctionName "isAnd" ;
+      sh:jsFunctionName "validateAnd" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
 .
@@ -886,7 +921,7 @@ sh:ClassConstraintComponent
   sh:validator dash:hasClass ;
   sh:validator [
       rdf:type sh:JSValidator ;
-      sh:jsFunctionName "hasClass" ;
+      sh:jsFunctionName "validateClass" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
 .
@@ -926,17 +961,17 @@ sh:DatatypeConstraintComponent
   sh:targetClass sh:Shape ;
   sh:validator [
       rdf:type sh:JSValidator ;
-      sh:jsFunctionName "hasDatatype" ;
+      sh:jsFunctionName "validateDatatype" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
 .
 sh:DerivedValuesConstraintComponent
-  sh:targetClass sh:Shape ;
+  sh:targetClass sh:PropertyShape ;
 .
 sh:DisjointConstraintComponent
   sh:propertyValidator [
       rdf:type sh:JSValidator ;
-      sh:jsFunctionName "propertyDisjoint" ;
+      sh:jsFunctionName "validateDisjointProperty" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
   sh:propertyValidator [
@@ -957,7 +992,7 @@ sh:EqualsConstraintComponent
   sh:message "Must have same values as {$equals}" ;
   sh:propertyValidator [
       rdf:type sh:JSValidator ;
-      sh:jsFunctionName "propertyEquals" ;
+      sh:jsFunctionName "validateEqualsProperty" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
   sh:propertyValidator [
@@ -996,7 +1031,7 @@ sh:Function
 sh:HasValueConstraintComponent
   sh:nodeValidator [
       rdf:type sh:JSValidator ;
-      sh:jsFunctionName "nodeHasValue" ;
+      sh:jsFunctionName "validateHasValueNode" ;
       sh:jsLibrary dash:DASHJSLibrary ;
       sh:message "Value must be {$hasValue}" ;
     ] ;
@@ -1010,7 +1045,7 @@ sh:HasValueConstraintComponent
     ] ;
   sh:propertyValidator [
       rdf:type sh:JSValidator ;
-      sh:jsFunctionName "propertyHasValue" ;
+      sh:jsFunctionName "validateHasValueProperty" ;
       sh:jsLibrary dash:DASHJSLibrary ;
       sh:message "Missing expected value {$hasValue}" ;
     ] ;
@@ -1033,7 +1068,7 @@ sh:InConstraintComponent
   sh:validator dash:isIn ;
   sh:validator [
       rdf:type sh:JSValidator ;
-      sh:jsFunctionName "isIn" ;
+      sh:jsFunctionName "validateIn" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
 .
@@ -1041,12 +1076,17 @@ sh:LanguageInConstraintComponent
   sh:message "Language does not match any of {$languageIn}" ;
   sh:targetClass sh:Shape ;
   sh:validator dash:isLanguageIn ;
+  sh:validator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "validateLanguageIn" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
 .
 sh:LessThanConstraintComponent
   sh:message "Value is not < value of {$lessThan}" ;
   sh:propertyValidator [
       rdf:type sh:JSValidator ;
-      sh:jsFunctionName "propertyLessThan" ;
+      sh:jsFunctionName "validateLessThanProperty" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
   sh:propertyValidator [
@@ -1067,7 +1107,7 @@ sh:LessThanOrEqualsConstraintComponent
   sh:message "Value is not <= value of {$lessThanOrEquals}" ;
   sh:propertyValidator [
       rdf:type sh:JSValidator ;
-      sh:jsFunctionName "propertyLessThanOrEquals" ;
+      sh:jsFunctionName "validateLessThanOrEqualsProperty" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
   sh:propertyValidator [
@@ -1088,7 +1128,7 @@ sh:MaxCountConstraintComponent
   sh:message "More than {$maxCount} values" ;
   sh:propertyValidator [
       rdf:type sh:JSValidator ;
-      sh:jsFunctionName "propertyMaxCount" ;
+      sh:jsFunctionName "validateMaxCountProperty" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
   sh:propertyValidator [
@@ -1103,7 +1143,7 @@ sh:MaxCountConstraintComponent
 		HAVING (COUNT(DISTINCT ?value) > $maxCount)
 		""" ;
     ] ;
-  sh:targetClass sh:Shape ;
+  sh:targetClass sh:PropertyShape ;
 .
 sh:MaxExclusiveConstraintComponent
   sh:message "Value is not < {$maxExclusive}" ;
@@ -1111,7 +1151,7 @@ sh:MaxExclusiveConstraintComponent
   sh:validator dash:hasMaxExclusive ;
   sh:validator [
       rdf:type sh:JSValidator ;
-      sh:jsFunctionName "hasMaxExclusive" ;
+      sh:jsFunctionName "validateMaxExclusive" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
 .
@@ -1121,7 +1161,7 @@ sh:MaxInclusiveConstraintComponent
   sh:validator dash:hasMaxInclusive ;
   sh:validator [
       rdf:type sh:JSValidator ;
-      sh:jsFunctionName "hasMaxInclusive" ;
+      sh:jsFunctionName "validateMaxInclusive" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
 .
@@ -1131,7 +1171,7 @@ sh:MaxLengthConstraintComponent
   sh:validator dash:hasMaxLength ;
   sh:validator [
       rdf:type sh:JSValidator ;
-      sh:jsFunctionName "hasMaxLength" ;
+      sh:jsFunctionName "validateMaxLength" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
 .
@@ -1139,7 +1179,7 @@ sh:MinCountConstraintComponent
   sh:message "Less than {$minCount} values" ;
   sh:propertyValidator [
       rdf:type sh:JSValidator ;
-      sh:jsFunctionName "propertyMinCount" ;
+      sh:jsFunctionName "validateMinCountProperty" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
   sh:propertyValidator [
@@ -1156,7 +1196,7 @@ sh:MinCountConstraintComponent
 		HAVING (COUNT(DISTINCT ?value) < $minCount)
 		""" ;
     ] ;
-  sh:targetClass sh:Shape ;
+  sh:targetClass sh:PropertyShape ;
 .
 sh:MinExclusiveConstraintComponent
   sh:message "Value is not > {$minExclusive}" ;
@@ -1164,7 +1204,7 @@ sh:MinExclusiveConstraintComponent
   sh:validator dash:hasMinExclusive ;
   sh:validator [
       rdf:type sh:JSValidator ;
-      sh:jsFunctionName "hasMinExclusive" ;
+      sh:jsFunctionName "validateMinExclusive" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
 .
@@ -1174,7 +1214,7 @@ sh:MinInclusiveConstraintComponent
   sh:validator dash:hasMinInclusive ;
   sh:validator [
       rdf:type sh:JSValidator ;
-      sh:jsFunctionName "hasMinInclusive" ;
+      sh:jsFunctionName "validateMinInclusive" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
 .
@@ -1184,7 +1224,7 @@ sh:MinLengthConstraintComponent
   sh:validator dash:hasMinLength ;
   sh:validator [
       rdf:type sh:JSValidator ;
-      sh:jsFunctionName "hasMinLength" ;
+      sh:jsFunctionName "validateMinLength" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
 .
@@ -1193,7 +1233,7 @@ sh:NodeConstraintComponent
   sh:targetClass sh:Shape ;
   sh:validator [
       rdf:type sh:JSValidator ;
-      sh:jsFunctionName "hasNode" ;
+      sh:jsFunctionName "validateNode" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
 .
@@ -1203,7 +1243,7 @@ sh:NodeKindConstraintComponent
   sh:validator dash:hasNodeKind ;
   sh:validator [
       rdf:type sh:JSValidator ;
-      sh:jsFunctionName "hasNodeKind" ;
+      sh:jsFunctionName "validateNodeKind" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
 .
@@ -1212,7 +1252,7 @@ sh:NotConstraintComponent
   sh:targetClass sh:Shape ;
   sh:validator [
       rdf:type sh:JSValidator ;
-      sh:jsFunctionName "hasNot" ;
+      sh:jsFunctionName "validateNot" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
 .
@@ -1220,7 +1260,7 @@ sh:OrConstraintComponent
   sh:targetClass sh:Shape ;
   sh:validator [
       rdf:type sh:JSValidator ;
-      sh:jsFunctionName "isOr" ;
+      sh:jsFunctionName "validateOr" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
 .
@@ -1230,7 +1270,7 @@ sh:PatternConstraintComponent
   sh:validator dash:hasPattern ;
   sh:validator [
       rdf:type sh:JSValidator ;
-      sh:jsFunctionName "hasPattern" ;
+      sh:jsFunctionName "validatePattern" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
 .
@@ -1238,25 +1278,25 @@ sh:QualifiedMaxCountConstraintComponent
   sh:message "More than {$qualifiedMaxCount} values have shape {$qualifiedValueShape}" ;
   sh:propertyValidator [
       rdf:type sh:JSValidator ;
-      sh:jsFunctionName "propertyQualifiedMaxCount" ;
+      sh:jsFunctionName "validateQualifiedMaxCountProperty" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
-  sh:targetClass sh:Shape ;
+  sh:targetClass sh:PropertyShape ;
 .
 sh:QualifiedMinCountConstraintComponent
   sh:message "Less than {$qualifiedMinCount} values have shape {$qualifiedValueShape}" ;
   sh:propertyValidator [
       rdf:type sh:JSValidator ;
-      sh:jsFunctionName "propertyQualifiedMinCount" ;
+      sh:jsFunctionName "validateQualifiedMinCountProperty" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
-  sh:targetClass sh:Shape ;
+  sh:targetClass sh:PropertyShape ;
 .
 sh:UniqueLangConstraintComponent
   sh:message "Language \"{?lang}\" used more than once" ;
   sh:propertyValidator [
       rdf:type sh:JSValidator ;
-      sh:jsFunctionName "propertyUniqueLang" ;
+      sh:jsFunctionName "validateUniqueLangProperty" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
   sh:propertyValidator [
@@ -1278,13 +1318,13 @@ sh:UniqueLangConstraintComponent
 		}
 		""" ;
     ] ;
-  sh:targetClass sh:Shape ;
+  sh:targetClass sh:PropertyShape ;
 .
 sh:XoneConstraintComponent
   sh:targetClass sh:Shape ;
   sh:validator [
       rdf:type sh:JSValidator ;
-      sh:jsFunctionName "isXone" ;
+      sh:jsFunctionName "validateXone" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
 .

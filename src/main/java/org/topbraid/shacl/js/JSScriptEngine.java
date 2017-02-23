@@ -13,7 +13,7 @@ import org.apache.jena.rdf.model.Resource;
  */
 public interface JSScriptEngine {
 	
-	void eval(String expr) throws ScriptException;
+	Object eval(String expr) throws ScriptException;
 
 	void executeLibraries(Resource exec) throws Exception;
 	

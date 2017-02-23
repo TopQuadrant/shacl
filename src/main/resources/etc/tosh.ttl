@@ -14,6 +14,9 @@
 dash:
   tosh:systemNamespace "true"^^xsd:boolean ;
 .
+dash:ClosedByTypesConstraintComponent-closedByTypes
+  sh:group tosh:OtherConstraintPropertyGroup ;
+.
 dash:NonRecursiveConstraintComponent
   dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
   sh:property [
@@ -23,6 +26,9 @@ dash:NonRecursiveConstraintComponent
 .
 dash:RootClassConstraintComponent
   dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
+.
+dash:StemConstraintComponent-stem
+  sh:group tosh:StringBasedConstraintPropertyGroup ;
 .
 <http://spinrdf.org/sp#>
   tosh:systemNamespace "true"^^xsd:boolean ;
@@ -61,7 +67,7 @@ tosh:
 .
 tosh:AboutPropertyGroup
   rdf:type sh:PropertyGroup ;
-  rdfs:label "This Constraint" ;
+  rdfs:label "This Shape" ;
   sh:order 0 ;
 .
 tosh:CardinalityConstraintPropertyGroup
@@ -123,6 +129,12 @@ tosh:MemberShapeConstraintComponent-memberShape
   sh:class sh:Shape ;
   sh:description "The shape that the list members must have." ;
   sh:name "member shape" ;
+.
+tosh:OtherConstraintPropertyGroup
+  rdf:type sh:PropertyGroup ;
+  tosh:openable "true"^^xsd:boolean ;
+  rdfs:label "Other Constraints" ;
+  sh:order 10 ;
 .
 tosh:PropertyPairConstraintPropertyGroup
   rdf:type sh:PropertyGroup ;
@@ -209,7 +221,7 @@ tosh:PropertyShapeShape
       sh:path sh:path ;
       sh:group tosh:AboutPropertyGroup ;
       sh:maxCount 1 ;
-      sh:name "on property/path" ;
+      sh:name "on property" ;
       sh:order 0 ;
     ] ;
   sh:targetClass sh:PropertyShape ;
@@ -561,6 +573,14 @@ sh:ClassConstraintComponent-class
   sh:group tosh:ValueTypeConstraintPropertyGroup ;
   sh:order 2 ;
 .
+sh:ClosedConstraintComponent-closed
+  sh:group tosh:OtherConstraintPropertyGroup ;
+  sh:order "0"^^xsd:decimal ;
+.
+sh:ClosedConstraintComponent-ignoredProperties
+  sh:group tosh:OtherConstraintPropertyGroup ;
+  sh:order "1"^^xsd:decimal ;
+.
 sh:DatatypeConstraintComponent
   dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
   dash:propertySuggestionGenerator [
@@ -631,6 +651,9 @@ WHERE {
       tosh:useDeclaredDatatype "true"^^xsd:boolean ;
     ] ;
 .
+sh:HasValueConstraintComponent-hasValue
+  sh:group tosh:OtherConstraintPropertyGroup ;
+.
 sh:InConstraintComponent
   dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
   dash:propertySuggestionGenerator [
@@ -652,6 +675,12 @@ INSERT {
 WHERE {
 }""" ;
     ] ;
+.
+sh:InConstraintComponent-in
+  sh:group tosh:OtherConstraintPropertyGroup ;
+.
+sh:JSConstraint-js
+  sh:group tosh:ComplexConstraintPropertyGroup ;
 .
 sh:LanguageInConstraintComponent
   dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
@@ -941,3 +970,6 @@ sh:XoneConstraintComponent-xone
   sh:group tosh:ComplexConstraintPropertyGroup ;
   sh:order 13 ;
 .
+[
+  sh:group tosh:ComplexConstraintPropertyGroup ;
+].

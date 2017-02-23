@@ -1,7 +1,7 @@
 function germanLabel(value) {
 	var results = [];
 	var p = TermFactory.namedNode("http://example.org/ns#germanLabel");
-	var s = $dataGraph.find(value, p, null);
+	var s = $data.find(value, p, null);
 	for(var t = s.next(); t; t = s.next()) {
 		var object = t.object;
 		if(object.termType != "Literal" || !object.language.startsWith("de")) {

@@ -10,15 +10,19 @@ import org.apache.jena.util.iterator.ExtendedIterator;
 import org.topbraid.shacl.js.model.JSFactory;
 import org.topbraid.shacl.js.model.JSTriple;
 import org.topbraid.shacl.util.FailureLog;
+import org.topbraid.spin.util.ExceptionUtil;
 
 public class JSGraph {
+	
+	protected JSScriptEngine engine;
 	
 	private Graph graph;
 	
 	private Set<JSTripleIterator> openIterators = new HashSet<>();
 	
 	
-	public JSGraph(Graph graph) {
+	public JSGraph(Graph graph, JSScriptEngine engine) {
+		this.engine = engine;
 		this.graph = graph;
 	}
 	
@@ -46,6 +50,16 @@ public class JSGraph {
 		JSTripleIterator jsit = new JSTripleIterator(it);
 		openIterators.add(jsit);
 		return jsit;
+	}
+	
+	
+	public Object query() {
+		try {
+			return engine.invokeFunctionOrdered("RDFQuery", new Object[] { this });
+		}
+		catch(Exception ex) {
+			throw ExceptionUtil.throwUnchecked(ex);
+		}
 	}
 	
 	

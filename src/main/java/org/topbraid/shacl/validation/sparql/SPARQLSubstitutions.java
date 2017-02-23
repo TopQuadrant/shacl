@@ -30,6 +30,7 @@ import org.apache.jena.vocabulary.RDFS;
 import org.topbraid.shacl.arq.functions.TargetContainsPFunction;
 import org.topbraid.shacl.validation.SHACLException;
 import org.topbraid.shacl.vocabulary.SH;
+import org.topbraid.shacl.vocabulary.SHJS;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.system.SPINLabels;
 import org.topbraid.spin.util.JenaUtil;
@@ -180,7 +181,7 @@ public class SPARQLSubstitutions {
 		List<String> targets = new LinkedList<String>();
 		
 		if(shape.getModel().contains(shape, SH.targetNode, (RDFNode)null)) {
-			targets.add("        GRAPH $shapesGraph { $" + SH.currentShapeVar.getName() + " <" + SH.targetNode + "> ?this } .\n");
+			targets.add("        GRAPH " + SHJS.SHAPES_VAR + " { $" + SH.currentShapeVar.getName() + " <" + SH.targetNode + "> ?this } .\n");
 		}
 		
 		if(JenaUtil.hasIndirectType(shape, RDFS.Class)) {

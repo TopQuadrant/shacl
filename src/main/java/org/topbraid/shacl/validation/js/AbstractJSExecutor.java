@@ -21,8 +21,8 @@ import org.topbraid.shacl.js.model.JSFactory;
 import org.topbraid.shacl.js.model.JSTerm;
 import org.topbraid.shacl.model.SHJSExecutable;
 import org.topbraid.shacl.util.FailureLog;
-import org.topbraid.shacl.validation.ConstraintExecutor;
 import org.topbraid.shacl.validation.Constraint;
+import org.topbraid.shacl.validation.ConstraintExecutor;
 import org.topbraid.shacl.validation.ValidationEngine;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
@@ -42,15 +42,15 @@ public abstract class AbstractJSExecutor implements ConstraintExecutor {
 		Dataset dataset = validationEngine.getDataset();
 		URI shapesGraphURI = validationEngine.getShapesGraphURI();
 		String functionName = null;
-		JSGraph shapesJSGraph = new JSGraph(dataset.getNamedModel(shapesGraphURI.toString()).getGraph());
+		JSGraph shapesJSGraph = new JSGraph(dataset.getNamedModel(shapesGraphURI.toString()).getGraph(), jsEngine);
 		Model dataModel = dataset.getDefaultModel();
 		Object oldSHACL = jsEngine.get(SHACL);
 		jsEngine.put(SHACL, new SHACLObject(shapesGraphURI, dataset));
-		JSGraph dataJSGraph = new JSGraph(dataModel.getGraph());
+		JSGraph dataJSGraph = new JSGraph(dataModel.getGraph(), jsEngine);
 		try {
 			
-			jsEngine.put("$shapesGraph", shapesJSGraph);
-			jsEngine.put("$dataGraph", dataJSGraph);
+			jsEngine.put(SHJS.SHAPES_VAR, shapesJSGraph);
+			jsEngine.put(SHJS.DATA_VAR, dataJSGraph);
 			
 			QuerySolutionMap bindings = new QuerySolutionMap();
 			bindings.add(SH.currentShapeVar.getName(), constraint.getShapeResource());
@@ -142,39 +142,15 @@ public abstract class AbstractJSExecutor implements ConstraintExecutor {
 	}
 	
 	
-	@SuppressWarnings("rawtypes")
 	private void handleJSResultObject(Object resultObj, ValidationEngine engine, Constraint constraint, 
 			RDFNode focusNode, RDFNode valueNode, Resource messageHolder, QuerySolution bindings) throws Exception {
 		if(NashornUtil.isArray(resultObj)) {
 			for(Object ro : NashornUtil.asArray(resultObj)) {
-				Resource result = createValidationResult(engine, constraint, focusNode);
-				if(ro instanceof Map) {
-					Object value = ((Map)ro).get("value");
-					if(value instanceof JSTerm) {
-						Node resultValueNode = JSFactory.getNode(value);
-						if(resultValueNode != null) {
-							result.addProperty(SH.value, result.getModel().asRDFNode(resultValueNode));
-						}
-					}
-					Object message = ((Map)ro).get("message");
-					if(message instanceof String) {
-						result.addProperty(SH.resultMessage, (String)message);
-					}
-					Object path = ((Map)ro).get("path");
-					if(path != null) {
-						Node pathNode = JSFactory.getNode(path);
-						if(pathNode != null && pathNode.isURI()) {
-							result.addProperty(SH.resultPath, result.getModel().asRDFNode(pathNode));
-						}
-					}
-				}
-				else if(ro instanceof String) {
-					result.addProperty(SH.resultMessage, (String)ro);
-				}
-				if(!result.hasProperty(SH.resultMessage)) {
-					addDefaultMessages(engine, messageHolder, constraint.getComponent(), result, bindings, ro instanceof Map ? (Map)ro : null);
-				}
+				createValidationResultFromJSObject(engine, constraint, focusNode, messageHolder, bindings, ro);
 			}
+		}
+		else if(resultObj instanceof Map) {
+			createValidationResultFromJSObject(engine, constraint, focusNode, messageHolder, bindings, resultObj);
 		}
 		else if(resultObj instanceof Boolean) {
 			if(!(Boolean)resultObj) {
@@ -192,6 +168,39 @@ public abstract class AbstractJSExecutor implements ConstraintExecutor {
 				result.addProperty(SH.value, valueNode);
 			}
 			addDefaultMessages(engine, messageHolder, constraint.getComponent(), result, bindings, null);
+		}
+	}
+	
+	
+	@SuppressWarnings("rawtypes")
+	private void createValidationResultFromJSObject(ValidationEngine engine, Constraint constraint, RDFNode focusNode,
+			Resource messageHolder, QuerySolution bindings, Object ro) {
+		Resource result = createValidationResult(engine, constraint, focusNode);
+		if(ro instanceof Map) {
+			Object value = ((Map)ro).get("value");
+			if(value instanceof JSTerm) {
+				Node resultValueNode = JSFactory.getNode(value);
+				if(resultValueNode != null) {
+					result.addProperty(SH.value, result.getModel().asRDFNode(resultValueNode));
+				}
+			}
+			Object message = ((Map)ro).get("message");
+			if(message instanceof String) {
+				result.addProperty(SH.resultMessage, (String)message);
+			}
+			Object path = ((Map)ro).get("path");
+			if(path != null) {
+				Node pathNode = JSFactory.getNode(path);
+				if(pathNode != null && pathNode.isURI()) {
+					result.addProperty(SH.resultPath, result.getModel().asRDFNode(pathNode));
+				}
+			}
+		}
+		else if(ro instanceof String) {
+			result.addProperty(SH.resultMessage, (String)ro);
+		}
+		if(!result.hasProperty(SH.resultMessage)) {
+			addDefaultMessages(engine, messageHolder, constraint.getComponent(), result, bindings, ro instanceof Map ? (Map)ro : null);
 		}
 	}
 }
