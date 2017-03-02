@@ -50,7 +50,7 @@ sh:JSValidator
 .
 sh:js
   rdf:type rdf:Property ;
-  rdfs:domain sh:Shape ;
+  rdfs:comment "Constraints expressed in JavaScript." ;
   rdfs:label "JavaScript constraint" ;
   rdfs:range sh:JSConstraint ;
 .

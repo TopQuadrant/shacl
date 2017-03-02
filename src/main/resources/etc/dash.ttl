@@ -969,24 +969,25 @@ sh:DerivedValuesConstraintComponent
   sh:targetClass sh:PropertyShape ;
 .
 sh:DisjointConstraintComponent
-  sh:propertyValidator [
+  sh:targetClass sh:Shape ;
+  sh:validator [
       rdf:type sh:JSValidator ;
-      sh:jsFunctionName "validateDisjointProperty" ;
+      sh:jsFunctionName "validateDisjoint" ;
       sh:jsLibrary dash:DASHJSLibrary ;
+      sh:message "Value node must not also be one of the values of {$disjoint}" ;
     ] ;
-  sh:propertyValidator [
-      rdf:type sh:SPARQLSelectValidator ;
-      sh:message "Property must not share any values with {$disjoint}" ;
-      sh:prefixes <http://datashapes.org/dash> ;
-      sh:select """
-		SELECT DISTINCT $this ?value
-		WHERE {
-			$this $PATH ?value .
-			$this $disjoint ?value .
+  sh:validator [
+      rdf:type sh:SPARQLAskValidator ;
+      sh:ask """
+		ASK {
+			FILTER NOT EXISTS {
+				$this $disjoint $value .
+			}
 		}
 		""" ;
+      sh:message "Property must not share any values with {$disjoint}" ;
+      sh:prefixes <http://datashapes.org/dash> ;
     ] ;
-  sh:targetClass sh:Shape ;
 .
 sh:EqualsConstraintComponent
   sh:message "Must have same values as {$equals}" ;
@@ -1093,11 +1094,12 @@ sh:LessThanConstraintComponent
       rdf:type sh:SPARQLSelectValidator ;
       sh:prefixes <http://datashapes.org/dash> ;
       sh:select """
-		SELECT DISTINCT $this ?value
+		SELECT $this ?value
 		WHERE {
 			$this $PATH ?value .
 			$this $lessThan ?otherValue .
-			FILTER (!(?value < ?otherValue)) .
+			BIND (?value < ?otherValue AS ?result) .
+			FILTER (!bound(?result) || !(?result)) .
 		}
 		""" ;
     ] ;
@@ -1118,9 +1120,10 @@ sh:LessThanOrEqualsConstraintComponent
 		WHERE {
 			$this $PATH ?value .
 			$this $lessThanOrEquals ?otherValue .
-			FILTER (!(?value <= ?otherValue)) .
+			BIND (?value <= ?otherValue AS ?result) .
+			FILTER (!bound(?result) || !(?result)) .
 		}
-		""" ;
+""" ;
     ] ;
   sh:targetClass sh:Shape ;
 .

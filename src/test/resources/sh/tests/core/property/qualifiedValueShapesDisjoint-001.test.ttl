@@ -78,6 +78,7 @@ ex:HandShape
       sh:qualifiedValueShape [
           sh:class ex:Thumb ;
         ] ;
+      sh:qualifiedValueShapesDisjoint true ;
     ] ;
   sh:property [
       sh:path ex:digit ;
@@ -86,8 +87,8 @@ ex:HandShape
       sh:qualifiedValueShape [
           sh:class ex:Finger ;
         ] ;
+      sh:qualifiedValueShapesDisjoint true ;
     ] ;
-  sh:qualifiedValueShapesDisjoint "true"^^xsd:boolean ;
   sh:targetClass ex:Hand ;
 .
 ex:InvalidHand1

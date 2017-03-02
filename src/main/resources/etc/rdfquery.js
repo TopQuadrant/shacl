@@ -1,6 +1,7 @@
 // rdfquery.js
 // A simple RDF query library for JavaScript
-// Contact: holger@topquadrant.com
+//
+// Contact: Holger Knublauch, TopQuadrant, Inc. (holger@topquadrant.com)
 //
 // The basic idea is that the function RDFQuery produces an initial
 // Query object, which starts with a single "empty" solution.
@@ -10,30 +11,33 @@
 // functions, producing new queries.
 // Invoking nextSolution on a query will pull solutions from its
 // predecessors in a chain of query objects.
-// Finally, functions such as .first() and .toArray() can be used
-// to produce individual values.
 // The solution objects are plain JavaScript objects providing a
 // mapping from variable names to RDF Term objects.
 // Unless a query has been walked to exhaustion, .close() must be called.
 //
-// RDF Term objects are expected to follow the contracts from the
+// Finally, terminal functions such as .getNode() and .getArray() can be used
+// to produce individual values.  All terminal functions close the query.
+//
+// RDF Term/Node objects are expected to follow the contracts from the
 // RDF Representation Task Force's interface specification:
 // https://github.com/rdfjs/representation-task-force/blob/master/interface-spec.md
 //
 // In order to bootstrap all this, graph objects need to implement a
-// function .match(s, p, o) where each parameter is either an RDF term or null
+// function .find(s, p, o) where each parameter is either an RDF term or null
 // producing an iterator object with a .next() function that produces RDF triples
 // (with attributes subject, predicate, object) or null when done.
 //
 // (Note I am not particularly a JavaScript guru so the modularization of this
 // script may be improved to hide private members from public API etc).
 
-/* Example:
+/* 
+Example:
+
 	var result = $data.query().
 		match("owl:Class", "rdfs:label", "?label").
 		match("?otherClass", "rdfs:label", "?label").
 		filter(function(sol) { return !T("owl:Class").equals(sol.otherClass) }).
-		first().otherClass;
+		getNode("?otherClass");
 		
 Equivalent SPARQL:
 		SELECT ?otherClass
@@ -44,19 +48,36 @@ Equivalent SPARQL:
 		} LIMIT 1
 */
 
-if(!this["TermFactory"]) {   // In some environments such as Nashorn this may already have a value
+if(!this["TermFactory"]) {   
+	// In some environments such as Nashorn this may already have a value
+	// In TopBraid this is redirecting to native Jena calls
 	TermFactory = {
 			
 		impl : null,   // This needs to be connected to an API such as $rdf	
 			
+		// Globally registered prefixes for TTL short cuts
 		namespaces : {},	
 		
+		/**
+		 * Registers a new namespace prefix for global TTL short cuts (qnames).
+		 * @param prefix  the prefix to add
+		 * @param namespace  the namespace to add for the prefix
+		 */
 		registerNamespace : function(prefix, namespace) {
+			if(this.namespaces.prefix) {
+				throw "Prefix " + prefix + " already registered"
+			}
 			this.namespaces[prefix] = namespace;
 		},
 		
+		/**
+		 * Produces an RDF term from a TTL string representation.
+		 * Also uses the registered prefixes.
+		 * @param str  a string, e.g. "owl:Thing" or "true" or '"Hello"@en'.
+		 * @return an RDF term
+		 */
 		term : function(str) {
-			// TODO: currently only supports booleans and qnames
+			// TODO: this implementation currently only supports booleans and qnames - better overload to rdflib.js
 			if("true" === str || "false" === str) {
 				return this.literal(str, T("xsd:boolean"))
 			}
@@ -71,29 +92,66 @@ if(!this["TermFactory"]) {   // In some environments such as Nashorn this may al
 			return this.namedNode(ns + str.substring(col + 1));
 		},
 		
-		namedNode : function(uri) {
-			return this.impl.namedNode(uri)
+		/**
+		 * Produces a new blank node.
+		 * @param id  an optional ID for the node
+		 */
+		blankNode : function(id) {
+			return this.impl.blankNode(id);
 		},
 		
+		/**
+		 * Produces a new literal.  For example .literal("42", T("xsd:integer")).
+		 * @param lex  the lexical form, e.g. "42"
+		 * @param langOrDatatype  either a language string or a URI node with the datatype
+		 */
 		literal : function(lex, langOrDatatype) {
 			return this.impl.literal(lex, langOrDatatype)
 		},
 		
-		blankNode : function(id) {
-			return this.impl.blankNode(id);
+		// This function is basically left for Task Force compatibility, but the preferred function is uri()
+		namedNode : function(uri) {
+			return this.impl.namedNode(uri)
+		},
+		
+		/**
+		 * Produces a new URI node.
+		 * @param uri  the URI of the node
+		 */
+		uri : function(uri) {
+			return namedNode(uri);
 		}
 	}
 }
 
+// Install NodeFactory as an alias - unsure which name is best long term:
+// The official name in RDF is "term", while "node" is more commonly understood.
+// Oficially, a "node" must be in a graph though, while "terms" are independent.
+var NodeFactory = TermFactory;
 
-TermFactory.registerNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#")
-TermFactory.registerNamespace("rdfs", "http://www.w3.org/2000/01/rdf-schema#")
-TermFactory.registerNamespace("sh", "http://www.w3.org/ns/shacl#")
-TermFactory.registerNamespace("owl", "http://www.w3.org/2002/07/owl#")
-TermFactory.registerNamespace("xsd", "http://www.w3.org/2001/XMLSchema#")
 
+NodeFactory.registerNamespace("dc", "http://purl.org/dc/elements/1.1/")
+NodeFactory.registerNamespace("dcterms", "http://purl.org/dc/terms/")
+NodeFactory.registerNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#")
+NodeFactory.registerNamespace("rdfs", "http://www.w3.org/2000/01/rdf-schema#")
+NodeFactory.registerNamespace("schema", "http://schema.org/")
+NodeFactory.registerNamespace("sh", "http://www.w3.org/ns/shacl#")
+NodeFactory.registerNamespace("skos", "http://www.w3.org/2004/02/skos/core#")
+NodeFactory.registerNamespace("owl", "http://www.w3.org/2002/07/owl#")
+NodeFactory.registerNamespace("xsd", "http://www.w3.org/2001/XMLSchema#")
+
+// Candidates:
+// NodeFactory.registerNamespace("prov", "http://www.w3.org/ns/prov#");
+
+/**
+ * A shortcut for NodeFactory.term(str) - turns a TTL string representation of an RDF
+ * term into a proper RDF term.
+ * This will also use the globally registered namespace prefixes.
+ * @param str  the string representation, e.g. "owl:Thing"
+ * @returns
+ */
 function T(str) {
-	return TermFactory.term(str)
+	return NodeFactory.term(str)
 }
 
 
@@ -116,12 +174,14 @@ function RDFQuery(graph, initialSolution) {
 function AbstractQuery() {
 }
 
-    // Query constructor functions...
+// ----------------------------------------------------------------------------
+// Query constructor functions, can be chained together
+// ----------------------------------------------------------------------------
 
 /**
  * Creates a new query that adds a binding for a given variable into
  * each solution produced by the input query.
- * @param varName  the name of the variable to bind
+ * @param varName  the name of the variable to bind, starting with "?"
  * @param bindFunction  a function that takes a solution object
  *                      and returns a node or null based on it.
  */
@@ -148,9 +208,13 @@ AbstractQuery.prototype.limit = function(limit) {
 
 /**
  * Creates a new query doing a triple match.
- * @param s  the match subject or null (any) or a variable name (string)
- * @param p  the match predicate or null (any) or a variable name (string)
- * @param o  the match object or null (any) or a variable name (string)
+ * In each subject, predicate, object position, the values can either be
+ * an RDF term object or null (wildcard) or a string.
+ * If it is a string it may either be a variable (starting with "?")
+ * or the TTL representation of an RDF term using the T() function.
+ * @param s  the match subject
+ * @param p  the match predicate
+ * @param o  the match object
  */
 AbstractQuery.prototype.match = function(s, p, o) {
 	return new MatchQuery(this, s, p, o);
@@ -159,7 +223,7 @@ AbstractQuery.prototype.match = function(s, p, o) {
 /**
  * Creates a new query that sorts all input solutions by the bindings
  * for a given variable.
- * @param varName  the name of the variable to sort by
+ * @param varName  the name of the variable to sort by, starting with "?"
  */
 AbstractQuery.prototype.orderBy = function(varName) {
 	return new OrderByQuery(this, varName);
@@ -192,12 +256,20 @@ AbstractQuery.prototype.path = function(s, path, o) {
 
 // TODO: add other SPARQL-like query types
 //       - .distinct()
-//       - .path(s, path, o)   (this is complex)
 //       - .union(otherQuery)
 
 
-	// Terminal functions - exhaust the solution iterators
+// ----------------------------------------------------------------------------
+// Terminal functions - convenience functions to get values.
+// All these functions close the solution iterators.
+// ----------------------------------------------------------------------------
 
+/**
+ * Adds all nodes produced by a given solution variable into a set.
+ * The set must have an add(node) function.
+ * @param varName  the name of the variable, starting with "?"
+ * @param set  the set to add to
+ */
 AbstractQuery.prototype.addAllNodes = function(varName, set) {
 	var attrName = var2Attr(varName);
 	for(var sol = this.nextSolution(); sol; sol = this.nextSolution()) {
@@ -209,21 +281,20 @@ AbstractQuery.prototype.addAllNodes = function(varName, set) {
 }
 
 /**
- * Gets the next solution and closes the query.
- * @return a solution object
+ * Executes a given function for each solution.
+ * @param callback  a function that takes a solution as argument
  */
-AbstractQuery.prototype.first = function() {
-	var n = this.nextSolution();
-	this.close();
-	return n;
-}
-
 AbstractQuery.prototype.forEach = function(callback) {
 	for(var n = this.nextSolution(); n; n = this.nextSolution()) {
 		callback(n);
 	}
 }
 
+/**
+ * Executes a given function for each node in a solution set.
+ * @param varName  the name of a variable, starting with "?"
+ * @param callback  a function that takes a node as argument
+ */
 AbstractQuery.prototype.forEachNode = function(varName, callback) {
 	var attrName = var2Attr(varName);
 	for(var sol = this.nextSolution(); sol; sol = this.nextSolution()) {
@@ -235,30 +306,10 @@ AbstractQuery.prototype.forEachNode = function(varName, callback) {
 }
 
 /**
- * Gets the next solution and, if that exists, returns the binding for a
- * given variable from that solution.
- * @param varName  the name of the binding to get
- * @return the value of the variable or null or undefined if it doesn't exist
- */
-AbstractQuery.prototype.get = function(varName) {
-	var s = this.first();
-	if(s) {
-		return s[var2Attr(varName)];
-	}
-	else {
-		return null;
-	}
-}
-
-AbstractQuery.prototype.hasSolution = function() {
-	return this.first() != null;
-}
-
-/**
- * Turns all results into an array.
+ * Turns all result solutions into an array.
  * @return an array consisting of solution objects
  */
-AbstractQuery.prototype.toArray = function() {
+AbstractQuery.prototype.getArray = function() {
 	var results = [];
 	for(var n = this.nextSolution(); n != null; n = this.nextSolution()) {
 		results.push(n);
@@ -267,10 +318,35 @@ AbstractQuery.prototype.toArray = function() {
 }
 
 /**
+ * Gets the number of (remaining) solutions.
+ * @return the count
+ */
+AbstractQuery.prototype.getCount = function() {
+	return this.getArray().length; // Quick and dirty implementation
+}
+
+/**
+ * Gets the next solution and, if that exists, returns the binding for a
+ * given variable from that solution.
+ * @param varName  the name of the binding to get, starting with "?"
+ * @return the value of the variable or null or undefined if it doesn't exist
+ */
+AbstractQuery.prototype.getNode = function(varName) {
+	var s = this.nextSolution();
+	if(s) {
+		this.close();
+		return s[var2Attr(varName)];
+	}
+	else {
+		return null;
+	}
+}
+
+/**
  * Turns all results into an array of bindings for a given variable.
  * @return an array consisting of RDF node objects
  */
-AbstractQuery.prototype.toNodeArray = function(varName) {
+AbstractQuery.prototype.getNodeArray = function(varName) {
 	var results = [];
 	var attr = var2Attr(varName);
 	for(var n = this.nextSolution(); n != null; n = this.nextSolution()) {
@@ -280,11 +356,12 @@ AbstractQuery.prototype.toNodeArray = function(varName) {
 }
 
 /**
- * Turns all results into a set of bindings for a given variable.
+ * Turns all result bindings for a given variable into a set.
  * The set has functions .contains and .toArray. 
+ * @param varName  the name of the variable, starting with "?"
  * @return a set consisting of RDF node objects
  */
-AbstractQuery.prototype.toNodeSet = function(varName) {
+AbstractQuery.prototype.getNodeSet = function(varName) {
 	var results = new NodeSet();
 	var attr = var2Attr(varName);
 	for(var n = this.nextSolution(); n != null; n = this.nextSolution()) {
@@ -293,8 +370,111 @@ AbstractQuery.prototype.toNodeSet = function(varName) {
 	return results;
 }
 
+/**
+ * Queries the underlying graph for the object of a subject/predicate combination,
+ * where either subject or predicate can be a variable which is substituted with
+ * a value from the next input solution.
+ * Note that even if there are multiple solutions it will just return the "first"
+ * one and since the order of triples in RDF is undefined this may lead to random results.
+ * Unbound values produce errors.
+ * @param subject  an RDF term or a variable (starting with "?") or a TTL representation
+ * @param predicate  an RDF term or a variable (starting with "?") or a TTL representation
+ * @return the object of the "first" triple matching the subject/predicate combination
+ */
+AbstractQuery.prototype.getObject = function(subject, predicate) {
+	var sol = this.nextSolution();
+	if(sol) {
+		this.close();
+		var s;
+		if(typeof subject === 'string') {
+			if(subject.startsWith('?')) {
+				s = sol[var2Attr(subject)];
+			}
+			else {
+				s = T(subject);
+			}
+		}
+		else {
+			s = subject;
+		}
+		if(!s) {
+			throw "getObject() called with null subject";
+		}
+		var p;
+		if(typeof predicate === 'string') {
+			if(predicate.startsWith('?')) {
+				p = sol[var2Attr(predicate)];
+			}
+			else {
+				p = T(predicate);
+			}
+		}
+		else {
+			p = predicate;
+		}
+		if(!p) {
+			throw "getObject() called with null predicate";
+		}
+		
+		var it = this.source.find(s, p, null);
+		var triple = it.next();
+		if(triple) {
+			it.close();
+			return triple.object;
+		}
+	}
+	return null;
+}
 
-// END OF PUBLIC API ------------------------
+/**
+ * Tests if there is any solution and closes the query.
+ * @return true if there is another solution
+ */
+AbstractQuery.prototype.hasSolution = function() {
+	if(this.nextSolution()) {
+		this.close();
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+
+// ----------------------------------------------------------------------------
+// Expression functions - may be used in filter and bind queries
+// ----------------------------------------------------------------------------
+
+/**
+ * Creates a function that takes a solution and compares a given node with
+ * the binding of a given variable from that solution.
+ * @param varName  the name of the variable (starting with "?")
+ * @param node  the node to compare with
+ * @returns true if the solution's variable equals the node
+ */
+function exprEquals(varName, node) {
+	return function(sol) {
+		return node.equals(sol[var2Attr(varName)]);
+	}
+}
+
+/**
+ * Creates a function that takes a solution and compares a given node with
+ * the binding of a given variable from that solution.
+ * @param varName  the name of the variable (starting with "?")
+ * @param node  the node to compare with
+ * @returns true if the solution's variable does not equal the node
+ */
+function exprNotEquals(varName, node) {
+	return function(sol) {
+		return !node.equals(sol[var2Attr(varName)]);
+	}
+}
+
+
+// ----------------------------------------------------------------------------
+// END OF PUBLIC API ----------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 
 // class BindQuery
@@ -505,7 +685,7 @@ OrderByQuery.prototype.close = function() {
 
 OrderByQuery.prototype.nextSolution = function() {
 	if(!this.solutions) {
-		this.solutions = this.input.toArray();
+		this.solutions = this.input.getArray();
 		var attrName = this.attrName;
 		this.solutions.sort(function(s1, s2) {
 				return compareTerms(s1[attrName], s2[attrName]);
@@ -733,6 +913,18 @@ NodeSet.prototype.toArray = function() {
 	return this.values;
 }
 
+NodeSet.prototype.toString = function() {
+	var str = "NodeSet(" + this.size() + "): [";
+	var arr = this.toArray();
+	for(var i = 0; i < arr.length; i++) {
+		if(i > 0) {
+			str += ", ";
+		}
+		str += arr[i];
+	}
+	return str + "]";
+}
+
 
 function var2Attr(varName) {
 	if(!varName.startsWith("?")) {
@@ -752,7 +944,7 @@ function var2Attr(varName) {
 // where the match object is found.
 function addPathValues(graph, subject, path, set) {
 	if(path.uri) {
-		set.addAll(RDFQuery(graph).match(subject, path, "?object").toNodeArray("?object"));
+		set.addAll(RDFQuery(graph).match(subject, path, "?object").getNodeArray("?object"));
 	}
 	else if(Array.isArray(path)) {
 		var s = new NodeSet();
@@ -773,7 +965,7 @@ function addPathValues(graph, subject, path, set) {
 	}
 	else if(path.inverse) {
 		if(path.inverse.isURI()) {
-			set.addAll(RDFQuery(graph).match("?subject", path.inverse, subject).toNodeArray("?subject"));
+			set.addAll(RDFQuery(graph).match("?subject", path.inverse, subject).getNodeArray("?subject"));
 		}
 		else {
 			throw "Unsupported: Inverse paths only work for named nodes";

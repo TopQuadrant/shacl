@@ -62,19 +62,20 @@ ex:HandShape
   rdfs:label "Hand shape" ;
   sh:property ex:HandShape-digit-maxCount4 ;
   sh:property ex:HandShape-digit-minCount1 ;
-  sh:qualifiedValueShapesDisjoint "true"^^xsd:boolean ;
   sh:targetClass ex:Hand ;
 .
 ex:HandShape-digit-maxCount4
   rdf:type sh:PropertyShape ;
   sh:path ex:digit ;
   sh:qualifiedMaxCount 4 ;
+  sh:qualifiedValueShapesDisjoint true ;
   sh:qualifiedValueShape ex:FingerShape ;
 .
 ex:HandShape-digit-minCount1
   rdf:type sh:PropertyShape ;
   sh:path ex:digit ;
   sh:qualifiedMinCount 1 ;
+  sh:qualifiedValueShapesDisjoint true ;
   sh:qualifiedValueShape ex:ThumbShape ;
 .
 ex:InvalidHand1

@@ -5,6 +5,8 @@ import java.net.URI;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.sparql.expr.ExprNotComparableException;
+import org.apache.jena.sparql.expr.NodeValue;
 import org.topbraid.shacl.js.model.JSTerm;
 import org.topbraid.shacl.validation.ShapesGraph;
 import org.topbraid.shacl.validation.ValidationEngineFactory;
@@ -20,6 +22,16 @@ public class SHACLObject {
 	public SHACLObject(URI shapesGraphURI, Dataset dataset) {
 		this.shapesGraphURI = shapesGraphURI;
 		this.dataset = dataset;
+	}
+	
+	
+	public Integer compareNodes(JSTerm node1, JSTerm node2) {
+		try {
+			return NodeValue.compare(NodeValue.makeNode(node1.getNode()), NodeValue.makeNode(node2.getNode()));
+		}
+		catch(ExprNotComparableException ex) {
+			return null;
+		}
 	}
 	
 	

@@ -1,5 +1,5 @@
 # W3C Shapes Constraint Language (SHACL) Vocabulary
-# Draft last edited 2017-02-23
+# Draft last edited 2017-03-02
 
 @prefix owl:  <http://www.w3.org/2002/07/owl#> .
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -1145,6 +1145,7 @@ sh:QualifiedMaxCountConstraintComponent
 	rdfs:comment "A constraint component that can be used to verify that a specified maximum number of value nodes conforms to a given shape."@en ;
 	sh:parameter sh:QualifiedMaxCountConstraintComponent-qualifiedMaxCount ;
 	sh:parameter sh:QualifiedMaxCountConstraintComponent-qualifiedValueShape ;
+	sh:parameter sh:QualifiedMaxCountConstraintComponent-qualifiedValueShapesDisjoint ;
 	rdfs:isDefinedBy sh: .
 
 sh:QualifiedMaxCountConstraintComponent-qualifiedMaxCount
@@ -1158,6 +1159,13 @@ sh:QualifiedMaxCountConstraintComponent-qualifiedValueShape
 	sh:path sh:qualifiedValueShape ;
 	rdfs:isDefinedBy sh: .
 
+sh:QualifiedMaxCountConstraintComponent-qualifiedValueShapesDisjoint
+	a sh:Parameter ;
+	sh:path sh:qualifiedValueShapesDisjoint ;
+	sh:datatype xsd:boolean ;
+	sh:optional true ;
+	rdfs:isDefinedBy sh: .
+
 
 sh:QualifiedMinCountConstraintComponent
 	a sh:ConstraintComponent ;
@@ -1165,6 +1173,7 @@ sh:QualifiedMinCountConstraintComponent
 	rdfs:comment "A constraint component that can be used to verify that a specified minimum number of value nodes conforms to a given shape."@en ;
 	sh:parameter sh:QualifiedMinCountConstraintComponent-qualifiedMinCount ;
 	sh:parameter sh:QualifiedMinCountConstraintComponent-qualifiedValueShape ;
+	sh:parameter sh:QualifiedMinCountConstraintComponent-qualifiedValueShapesDisjoint ;
 	rdfs:isDefinedBy sh: .
 
 sh:QualifiedMinCountConstraintComponent-qualifiedMinCount
@@ -1176,6 +1185,13 @@ sh:QualifiedMinCountConstraintComponent-qualifiedMinCount
 sh:QualifiedMinCountConstraintComponent-qualifiedValueShape
 	a sh:Parameter ;
 	sh:path sh:qualifiedValueShape ;
+	rdfs:isDefinedBy sh: .
+
+sh:QualifiedMinCountConstraintComponent-qualifiedValueShapesDisjoint
+	a sh:Parameter ;
+	sh:path sh:qualifiedValueShapesDisjoint ;
+	sh:datatype xsd:boolean ;
+	sh:optional true ;
 	rdfs:isDefinedBy sh: .
 
 sh:qualifiedMaxCount
@@ -1202,7 +1218,7 @@ sh:qualifiedValueShape
 sh:qualifiedValueShapesDisjoint
 	a rdf:Property ;
 	rdfs:label "qualified value shapes disjoint"@en ;
-	rdfs:comment "Can be used to mark the shapes of qualified value constraints as disjoint."@en ;
+	rdfs:comment "Can be used to mark the qualified value shape to be disjoint with its sibling shapes."@en ;
 	rdfs:range xsd:boolean ;
 	rdfs:isDefinedBy sh: .
 
