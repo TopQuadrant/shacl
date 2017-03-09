@@ -307,7 +307,6 @@ function validateQualifiedHelper($focusNode, $path, $qualifiedValueShape, $quali
 			match("?sibling", "sh:qualifiedValueShape", "?siblingShape").
 			filter(exprNotEquals("?siblingShape", $qualifiedValueShape)) .
 			addAllNodes("?siblingShape", siblingShapes);
-		print("Siblings of " + $qualifiedValueShape + ": " + siblingShapes);
 	}
 	return $data.query().
 		path($focusNode, toRDFQueryPath($path), "?value").

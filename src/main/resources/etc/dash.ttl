@@ -345,6 +345,7 @@ dash:ParameterConstraintComponent-parameter
 .
 dash:PrimaryKeyConstraintComponent
   rdf:type sh:ConstraintComponent ;
+  dash:localConstraint "true"^^xsd:boolean ;
   rdfs:comment "Enforces a constraint that the given property (sh:path) serves as primary key for all resources in the target of the shape. If a property has been declared to be the primary key then each resource must have exactly one value for that property. Furthermore, the URIs of those resources must start with a given string (dash:uriStart), followed by the URL-encoded primary key value. For example if dash:uriStart is \"http://example.org/country-\" and the primary key for an instance is \"de\" then the URI must be \"http://example.org/country-de\". Finally, as a result of the URI policy, there can not be any other resource with the same value under the same primary key policy." ;
   rdfs:label "Primary key constraint component" ;
   sh:labelTemplate "The property {?predicate} is the primary key and URIs start with {?uriStart}" ;
@@ -456,6 +457,7 @@ In many cases, there may be multiple possible suggestions to fix a problem. For 
 .
 dash:StemConstraintComponent
   rdf:type sh:ConstraintComponent ;
+  dash:staticConstraint "true"^^xsd:boolean ;
   rdfs:comment "A constraint component that can be used to verify that every value node is an IRI and the IRI starts with a given string value."@en ;
   rdfs:label "Stem constraint component"@en ;
   sh:message "Value does not have stem {$stem}" ;
@@ -484,6 +486,7 @@ dash:StringOrLangString
 .
 dash:SubSetOfConstraintComponent
   rdf:type sh:ConstraintComponent ;
+  dash:localConstraint "true"^^xsd:boolean ;
   rdfs:label "Sub set of constraint component" ;
   sh:message "Must be one of the values of {$subSetOf}" ;
   sh:parameter dash:SubSetOfConstraintComponent-subSetOf ;
@@ -821,6 +824,17 @@ dash:isNodeKindLiteral
   sh:prefixes <http://datashapes.org/dash> ;
   sh:returnType xsd:boolean ;
 .
+dash:localConstraint
+  rdf:type rdf:Property ;
+  rdfs:comment """Can be set to true for those constraint components where the validation does not require to visit any other triples than the shape definitions and the direct property values of the focus node mentioned in the property constraints. Examples of this include sh:minCount and sh:hasValue.
+
+Constraint components that are marked as such can be optimized by engines, e.g. they can be evaluated client-side at form submission time, without having to make a round-trip to a server, assuming the client has downloaded a complete snapshot of the resource.
+
+Any component marked with dash:staticConstraint is also a dash:localConstraint.""" ;
+  rdfs:domain sh:ConstraintComponent ;
+  rdfs:label "local constraint" ;
+  rdfs:range xsd:boolean ;
+.
 dash:propertySuggestionGenerator
   rdf:type rdf:Property ;
   rdfs:comment "Links the constraint component with instances of dash:SuggestionGenerator that may be used to produce suggestions for a given validation result that was produced by a property constraint." ;
@@ -831,6 +845,15 @@ dash:propertySuggestionGenerator
 dash:rootClass
   rdf:type rdf:Property ;
   rdfs:label "root class" ;
+.
+dash:staticConstraint
+  rdf:type rdf:Property ;
+  rdfs:comment """Can be set to true for those constraint components where the validation does not require to visit any other triples than the parameters. Examples of this include sh:datatype or sh:nodeKind, where no further triples need to be queried to determine the result.
+
+Constraint components that are marked as such can be optimized by engines, e.g. they can be evaluated client-side at form submission time, without having to make a round-trip to a server.""" ;
+  rdfs:domain sh:ConstraintComponent ;
+  rdfs:label "static constraint" ;
+  rdfs:range xsd:boolean ;
 .
 dash:stem
   rdf:type rdf:Property ;
@@ -926,6 +949,7 @@ sh:ClassConstraintComponent
     ] ;
 .
 sh:ClosedConstraintComponent
+  dash:localConstraint "true"^^xsd:boolean ;
   sh:nodeValidator [
       rdf:type sh:SPARQLSelectValidator ;
       sh:message "Predicate {?path} is not allowed (closed shape)" ;
@@ -957,6 +981,7 @@ sh:ClosedConstraintComponent
     ] ;
 .
 sh:DatatypeConstraintComponent
+  dash:staticConstraint "true"^^xsd:boolean ;
   sh:message "Value does not have datatype {$datatype}" ;
   sh:targetClass sh:Shape ;
   sh:validator [
@@ -969,6 +994,7 @@ sh:DerivedValuesConstraintComponent
   sh:targetClass sh:PropertyShape ;
 .
 sh:DisjointConstraintComponent
+  dash:localConstraint "true"^^xsd:boolean ;
   sh:targetClass sh:Shape ;
   sh:validator [
       rdf:type sh:JSValidator ;
@@ -990,6 +1016,7 @@ sh:DisjointConstraintComponent
     ] ;
 .
 sh:EqualsConstraintComponent
+  dash:localConstraint "true"^^xsd:boolean ;
   sh:message "Must have same values as {$equals}" ;
   sh:propertyValidator [
       rdf:type sh:JSValidator ;
@@ -1030,6 +1057,7 @@ sh:Function
     ] ;
 .
 sh:HasValueConstraintComponent
+  dash:localConstraint "true"^^xsd:boolean ;
   sh:nodeValidator [
       rdf:type sh:JSValidator ;
       sh:jsFunctionName "validateHasValueNode" ;
@@ -1064,6 +1092,7 @@ sh:HasValueConstraintComponent
   sh:targetClass sh:Shape ;
 .
 sh:InConstraintComponent
+  dash:localConstraint "true"^^xsd:boolean ;
   sh:message "Value is not in {$in}" ;
   sh:targetClass sh:Shape ;
   sh:validator dash:isIn ;
@@ -1074,6 +1103,7 @@ sh:InConstraintComponent
     ] ;
 .
 sh:LanguageInConstraintComponent
+  dash:localConstraint "true"^^xsd:boolean ;
   sh:message "Language does not match any of {$languageIn}" ;
   sh:targetClass sh:Shape ;
   sh:validator dash:isLanguageIn ;
@@ -1084,6 +1114,7 @@ sh:LanguageInConstraintComponent
     ] ;
 .
 sh:LessThanConstraintComponent
+  dash:localConstraint "true"^^xsd:boolean ;
   sh:message "Value is not < value of {$lessThan}" ;
   sh:propertyValidator [
       rdf:type sh:JSValidator ;
@@ -1106,6 +1137,7 @@ sh:LessThanConstraintComponent
   sh:targetClass sh:Shape ;
 .
 sh:LessThanOrEqualsConstraintComponent
+  dash:localConstraint "true"^^xsd:boolean ;
   sh:message "Value is not <= value of {$lessThanOrEquals}" ;
   sh:propertyValidator [
       rdf:type sh:JSValidator ;
@@ -1128,6 +1160,7 @@ sh:LessThanOrEqualsConstraintComponent
   sh:targetClass sh:Shape ;
 .
 sh:MaxCountConstraintComponent
+  dash:localConstraint "true"^^xsd:boolean ;
   sh:message "More than {$maxCount} values" ;
   sh:propertyValidator [
       rdf:type sh:JSValidator ;
@@ -1149,6 +1182,7 @@ sh:MaxCountConstraintComponent
   sh:targetClass sh:PropertyShape ;
 .
 sh:MaxExclusiveConstraintComponent
+  dash:staticConstraint "true"^^xsd:boolean ;
   sh:message "Value is not < {$maxExclusive}" ;
   sh:targetClass sh:Shape ;
   sh:validator dash:hasMaxExclusive ;
@@ -1159,6 +1193,7 @@ sh:MaxExclusiveConstraintComponent
     ] ;
 .
 sh:MaxInclusiveConstraintComponent
+  dash:staticConstraint "true"^^xsd:boolean ;
   sh:message "Value is not <= {$maxInclusive}" ;
   sh:targetClass sh:Shape ;
   sh:validator dash:hasMaxInclusive ;
@@ -1169,6 +1204,7 @@ sh:MaxInclusiveConstraintComponent
     ] ;
 .
 sh:MaxLengthConstraintComponent
+  dash:staticConstraint "true"^^xsd:boolean ;
   sh:message "Value has more than {$maxLength} characters" ;
   sh:targetClass sh:Shape ;
   sh:validator dash:hasMaxLength ;
@@ -1179,6 +1215,7 @@ sh:MaxLengthConstraintComponent
     ] ;
 .
 sh:MinCountConstraintComponent
+  dash:localConstraint "true"^^xsd:boolean ;
   sh:message "Less than {$minCount} values" ;
   sh:propertyValidator [
       rdf:type sh:JSValidator ;
@@ -1202,6 +1239,7 @@ sh:MinCountConstraintComponent
   sh:targetClass sh:PropertyShape ;
 .
 sh:MinExclusiveConstraintComponent
+  dash:staticConstraint "true"^^xsd:boolean ;
   sh:message "Value is not > {$minExclusive}" ;
   sh:targetClass sh:Shape ;
   sh:validator dash:hasMinExclusive ;
@@ -1212,6 +1250,7 @@ sh:MinExclusiveConstraintComponent
     ] ;
 .
 sh:MinInclusiveConstraintComponent
+  dash:staticConstraint "true"^^xsd:boolean ;
   sh:message "Value is not >= {$minInclusive}" ;
   sh:targetClass sh:Shape ;
   sh:validator dash:hasMinInclusive ;
@@ -1222,6 +1261,7 @@ sh:MinInclusiveConstraintComponent
     ] ;
 .
 sh:MinLengthConstraintComponent
+  dash:staticConstraint "true"^^xsd:boolean ;
   sh:message "Value has less than {$minLength} characters" ;
   sh:targetClass sh:Shape ;
   sh:validator dash:hasMinLength ;
@@ -1241,6 +1281,7 @@ sh:NodeConstraintComponent
     ] ;
 .
 sh:NodeKindConstraintComponent
+  dash:staticConstraint "true"^^xsd:boolean ;
   sh:message "Value does not have node kind {$nodeKind}" ;
   sh:targetClass sh:Shape ;
   sh:validator dash:hasNodeKind ;
@@ -1268,6 +1309,7 @@ sh:OrConstraintComponent
     ] ;
 .
 sh:PatternConstraintComponent
+  dash:staticConstraint "true"^^xsd:boolean ;
   sh:message "Value does not match pattern \"{$pattern}\"" ;
   sh:targetClass sh:Shape ;
   sh:validator dash:hasPattern ;
@@ -1296,6 +1338,7 @@ sh:QualifiedMinCountConstraintComponent
   sh:targetClass sh:PropertyShape ;
 .
 sh:UniqueLangConstraintComponent
+  dash:localConstraint "true"^^xsd:boolean ;
   sh:message "Language \"{?lang}\" used more than once" ;
   sh:propertyValidator [
       rdf:type sh:JSValidator ;

@@ -17,8 +17,6 @@ class PropertyConstraintExecutor implements ConstraintExecutor {
 	@Override
 	public void executeConstraint(Constraint constraint, ValidationEngine engine, List<RDFNode> focusNodes) {
 		SHPropertyShape propertyShape = SHFactory.asPropertyShape(constraint.getParameterValue());
-		for(RDFNode focusNode : focusNodes) {
-			engine.validateNodeAgainstShape(focusNode.asNode(), propertyShape.asNode());
-		}
+		engine.validateNodesAgainstShape(focusNodes, propertyShape.asNode());
 	}
 }

@@ -466,7 +466,7 @@ sh:alternativePath
 	a rdf:Property ;
 	rdfs:label "alternative path"@en ;
 	rdfs:comment "The (single) value of this property must be a list of path elements, representing the elements of alternative paths."@en ;
-	rdfs:range rdfs:List ;
+	rdfs:range rdf:List ;
 	rdfs:isDefinedBy sh: .
 
 sh:zeroOrMorePath

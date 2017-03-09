@@ -28,10 +28,14 @@ public class SH {
     public final static Resource BlankNodeOrIRI = ResourceFactory.createResource(NS + "BlankNodeOrIRI");
 
     public final static Resource BlankNodeOrLiteral = ResourceFactory.createResource(NS + "BlankNodeOrLiteral");
+
+    public final static Resource ClassConstraintComponent = ResourceFactory.createResource(NS + "ClassConstraintComponent");
     
     public final static Resource Constraint = ResourceFactory.createResource(NS + "Constraint");
 
     public final static Resource ConstraintComponent = ResourceFactory.createResource(NS + "ConstraintComponent");
+
+    public final static Resource DatatypeConstraintComponent = ResourceFactory.createResource(NS + "DatatypeConstraintComponent");
 
     public final static Resource DerivedValuesConstraintComponent = ResourceFactory.createResource(NS + "DerivedValuesConstraintComponent");
 
@@ -47,7 +51,11 @@ public class SH {
 
     public final static Resource MaxCountConstraintComponent = ResourceFactory.createResource(NS + "MaxCountConstraintComponent");
 
+    public final static Resource MinCountConstraintComponent = ResourceFactory.createResource(NS + "MinCountConstraintComponent");
+
     public final static Resource NodeShape = ResourceFactory.createResource(NS + "NodeShape");
+
+    public final static Resource OrConstraintComponent = ResourceFactory.createResource(NS + "OrConstraintComponent");
     
     public final static Resource Parameter = ResourceFactory.createResource(NS + "Parameter");
 

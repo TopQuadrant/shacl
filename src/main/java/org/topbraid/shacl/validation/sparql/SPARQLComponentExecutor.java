@@ -25,7 +25,7 @@ public class SPARQLComponentExecutor extends AbstractSPARQLExecutor {
 	
 	@Override
 	protected String getLabel(Constraint constraint) {
-		return constraint.getComponent().getLocalName() + " (SPARQL Constraint Component)";
+		return constraint.getComponent().getLocalName() + " (SPARQL constraint component executor)";
 	}
 
 

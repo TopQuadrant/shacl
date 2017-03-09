@@ -1069,6 +1069,22 @@ public class JenaUtil {
 	}
 
 
+
+
+	/**
+	 * Calls a given SPARQL function with no arguments.
+	 *
+	 * @param function the URI resource of the function to call
+	 * @param dataset  the Dataset to operate on or null for default
+	 * @return the result of the function call
+	 */
+	public static Node invokeFunction0(Resource function, Dataset dataset) {
+	    final String expression = "<" + function + ">()";
+	    QuerySolutionMap initialBinding = new QuerySolutionMap();
+	    return invokeExpression(expression, initialBinding, dataset);
+	}
+
+
 	/**
 	 * Calls a given SPARQL function with one argument.
 	 *

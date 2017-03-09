@@ -4,11 +4,14 @@ import java.util.List;
 
 import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
 import org.topbraid.shacl.model.SHJSConstraint;
 import org.topbraid.shacl.model.SHJSExecutable;
-import org.topbraid.shacl.validation.ConstraintExecutor;
 import org.topbraid.shacl.validation.Constraint;
+import org.topbraid.shacl.validation.ConstraintExecutor;
 import org.topbraid.shacl.validation.ValidationEngine;
+import org.topbraid.shacl.vocabulary.SHJS;
+import org.topbraid.spin.util.JenaUtil;
 
 /**
  * Executes sh:js constraints.
@@ -39,6 +42,12 @@ public class JSConstraintExecutor extends AbstractJSExecutor implements Constrai
 	@Override
 	protected SHJSExecutable getExecutable(Constraint constraint) {
 		return constraint.getParameterValue().as(SHJSConstraint.class);
+	}
+
+
+	@Override
+	protected String getLabel(Constraint constraint) {
+		return "JavaScript Constraint " + JenaUtil.getStringProperty((Resource)constraint.getParameterValue(), SHJS.jsFunctionName);
 	}
 
 

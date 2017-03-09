@@ -34,6 +34,12 @@ public class JSComponentExecutor extends AbstractJSExecutor {
 	}
 
 
+	@Override
+	protected String getLabel(Constraint constraint) {
+		return constraint.getComponent().getLocalName() + " (JavaScript constraint component executor)";
+	}
+
+
 	protected List<RDFNode> getValueNodes(ValidationEngine validationEngine, Constraint constraint, QuerySolutionMap bindings, RDFNode focusNode) {
 		SHConstraintComponent component = constraint.getComponent();
 		Resource context = constraint.getContext();

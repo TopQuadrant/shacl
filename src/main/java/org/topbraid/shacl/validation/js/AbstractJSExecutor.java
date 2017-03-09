@@ -1,6 +1,7 @@
 package org.topbraid.shacl.validation.js;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +28,8 @@ import org.topbraid.shacl.validation.ValidationEngine;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.shacl.vocabulary.SHJS;
+import org.topbraid.spin.statistics.SPINStatistics;
+import org.topbraid.spin.statistics.SPINStatisticsManager;
 import org.topbraid.spin.util.JenaUtil;
 
 public abstract class AbstractJSExecutor implements ConstraintExecutor {
@@ -60,6 +63,7 @@ public abstract class AbstractJSExecutor implements ConstraintExecutor {
 			functionName = executable.getFunctionName();
 			jsEngine.executeLibraries(executable);
 			
+			long startTime = System.currentTimeMillis();
 			for(RDFNode theFocusNode : focusNodes) {
 				Object resultObj;
 				bindings.add("focusNode", theFocusNode);
@@ -71,6 +75,13 @@ public abstract class AbstractJSExecutor implements ConstraintExecutor {
 					resultObj = jsEngine.invokeFunction(functionName, bindings);
 					handleJSResultObject(resultObj, validationEngine, constraint, theFocusNode, valueNode, executable, bindings);
 				}
+			}
+			if(SPINStatisticsManager.get().isRecording()) {
+				long endTime = System.currentTimeMillis();
+				long duration = endTime - startTime;
+				String label = getLabel(constraint);
+				SPINStatistics stats = new SPINStatistics(label, null, duration, startTime, constraint.getComponent().asNode());
+				SPINStatisticsManager.get().add(Collections.singletonList(stats));
 			}
 		}
 		catch(Exception ex) {
@@ -203,4 +214,7 @@ public abstract class AbstractJSExecutor implements ConstraintExecutor {
 			addDefaultMessages(engine, messageHolder, constraint.getComponent(), result, bindings, ro instanceof Map ? (Map)ro : null);
 		}
 	}
+	
+	
+	protected abstract String getLabel(Constraint constraint);
 }

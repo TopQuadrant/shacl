@@ -34,31 +34,31 @@ public class ConstraintExecutors {
 
 	
 	public ConstraintExecutors() {
-		addSpecialExecutor(SH.PropertyConstraintComponent, new SpecialConstraintExecutorFactory() {
+		addSpecialExecutor(SH.PropertyConstraintComponent, new AbstractSpecialConstraintExecutorFactory() {
 			@Override
 			public ConstraintExecutor create(Constraint constraint) {
 				return new PropertyConstraintExecutor();
 			}
 		});
-		addSpecialExecutor(DASH.ParameterConstraintComponent, new SpecialConstraintExecutorFactory() {
+		addSpecialExecutor(DASH.ParameterConstraintComponent, new AbstractSpecialConstraintExecutorFactory() {
 			@Override
 			public ConstraintExecutor create(Constraint constraint) {
 				return new PropertyConstraintExecutor();
 			}
 		});
-		addSpecialExecutor(SHJS.JSConstraintComponent, new SpecialConstraintExecutorFactory() {
+		addSpecialExecutor(SHJS.JSConstraintComponent, new AbstractSpecialConstraintExecutorFactory() {
 			@Override
 			public ConstraintExecutor create(Constraint constraint) {
 				return new JSConstraintExecutor();
 			}
 		});
-		addSpecialExecutor(SH.SPARQLConstraintComponent, new SpecialConstraintExecutorFactory() {
+		addSpecialExecutor(SH.SPARQLConstraintComponent, new AbstractSpecialConstraintExecutorFactory() {
 			@Override
 			public ConstraintExecutor create(Constraint constraint) {
 				return new SPARQLConstraintExecutor(constraint);
 			}
 		});
-		addSpecialExecutor(SH.DerivedValuesConstraintComponent, new SpecialConstraintExecutorFactory() {
+		addSpecialExecutor(SH.DerivedValuesConstraintComponent, new AbstractSpecialConstraintExecutorFactory() {
 			@Override
 			public ConstraintExecutor create(Constraint constraint) {
 				return new SPARQLDerivedValuesExecutor(constraint);
@@ -75,7 +75,7 @@ public class ConstraintExecutors {
 	}
 	
 	
-	protected void addSpecialExecutor(Resource constraintComponent, SpecialConstraintExecutorFactory executor) {
+	public void addSpecialExecutor(Resource constraintComponent, SpecialConstraintExecutorFactory executor) {
 		specialExecutors.put(constraintComponent, executor);
 	}
 	
@@ -83,7 +83,7 @@ public class ConstraintExecutors {
 	public ConstraintExecutor getExecutor(Constraint constraint, ValidationEngine engine) {
 
 		SpecialConstraintExecutorFactory special = specialExecutors.get(constraint.getComponent());
-		if(special != null) {
+		if(special != null && special.canExecute(constraint, engine)) {
 			return special.create(constraint);
 		}
 		

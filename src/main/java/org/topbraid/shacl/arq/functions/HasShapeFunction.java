@@ -1,6 +1,7 @@
 package org.topbraid.shacl.arq.functions;
 
 import java.net.URI;
+import java.util.Collections;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
@@ -118,14 +119,14 @@ public class HasShapeFunction extends AbstractFunction3 {
 	}
 
 
-	private Model doRun(RDFNode resource, Resource shape, Dataset dataset) {
+	private Model doRun(RDFNode focusNode, Resource shape, Dataset dataset) {
 		URI shapesGraphURI = shapesGraph.get();
 		if(shapesGraphURI == null) {
 			shapesGraphURI = DefaultShapesGraphProvider.get().getDefaultShapesGraphURI(dataset);
 		}
 		Model shapesModel = dataset.getNamedModel(shapesGraphURI.toString());
 		ShapesGraph vsg = new ShapesGraph(shapesModel, null);
-		return ValidationEngineFactory.get().create(dataset, shapesGraphURI, vsg, null).validateNodeAgainstShape(
-				resource.asNode(), shape.asNode()).getModel();
+		return ValidationEngineFactory.get().create(dataset, shapesGraphURI, vsg, null).validateNodesAgainstShape(
+				Collections.singletonList(focusNode), shape.asNode()).getModel();
 	}
 }

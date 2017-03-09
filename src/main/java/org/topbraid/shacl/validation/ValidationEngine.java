@@ -326,15 +326,17 @@ public class ValidationEngine {
 			if(monitor != null) {
 				monitor.beginTask("Validating " + rootShapes.size() + " shapes", rootShapes.size());
 			}
+			int i = 0;
 			for(Shape shape : rootShapes) {
 				if(monitor != null) {
-					monitor.subTask("Shape " + getLabelFunction().apply(shape.getShapeResource()));
+					monitor.subTask("Shape " + (++i) + ": " + getLabelFunction().apply(shape.getShapeResource()));
 				}
+				
 				List<RDFNode> focusNodes = getTargetNodes(shape.getShapeResource());
 				if(!focusNodes.isEmpty()) {
-					for(Constraint constraint : shape.getConstraints()) {
-						for(RDFNode focusNode : focusNodes) {
-							validateNodeAgainstConstraint(focusNode.asNode(), constraint);
+					if(!shapesGraph.isIgnored(shape.getShapeResource().asNode())) {
+						for(Constraint constraint : shape.getConstraints()) {
+							validateNodesAgainstConstraint(focusNodes, constraint);
 						}
 					}
 				}
@@ -371,7 +373,7 @@ public class ValidationEngine {
 				if(monitor != null && monitor.isCanceled()) {
 					throw new InterruptedException();
 				}
-				validateNodeAgainstShape(focusNode, shape.asNode());
+				validateNodesAgainstShape(Collections.singletonList(focusRDFNode), shape.asNode());
 			}
 		}
 		finally {
@@ -388,13 +390,13 @@ public class ValidationEngine {
 	 * @param shape  the sh:Shape to validate against
 	 * @return an instance of sh:ValidationReport in the results Model
 	 */
-	public Resource validateNodeAgainstShape(Node focusNode, Node shape) {
+	public Resource validateNodesAgainstShape(List<RDFNode> focusNodes, Node shape) {
 		if(!shapesGraph.isIgnored(shape)) {
 			boolean nested = SHACLScriptEngineManager.begin();
 			try {
 				Shape vs = shapesGraph.getShape(shape);
 				for(Constraint constraint : vs.getConstraints()) {
-					validateNodeAgainstConstraint(focusNode, constraint);
+					validateNodesAgainstConstraint(focusNodes, constraint);
 				}
 			}
 			finally {
@@ -405,10 +407,9 @@ public class ValidationEngine {
 	}
 	
 	
-	private void validateNodeAgainstConstraint(Node focusNode, Constraint constraint) {
+	private void validateNodesAgainstConstraint(List<RDFNode> focusNodes, Constraint constraint) {
 		ConstraintExecutor executor = getExecutor(constraint);
 		if(executor != null) {
-			List<RDFNode> focusNodes = Collections.singletonList(dataset.getDefaultModel().asRDFNode(focusNode));
 			executor.executeConstraint(constraint, this, focusNodes);
 		}
 		else {
