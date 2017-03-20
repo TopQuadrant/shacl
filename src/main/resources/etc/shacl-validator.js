@@ -214,7 +214,7 @@ Shape.prototype.getTargetNodes = function() {
 
 Shape.prototype.getValueNodes = function(focusNode) {
 	if(this.path) {
-		return $data.query().path(focusNode, this.path, "?object").getNodeArray("?object");
+		return $data.query().path(focusNode, toRDFQueryPath(this.path), "?object").getNodeArray("?object");
 	}
 	else {
 		return [ focusNode ];
@@ -438,20 +438,20 @@ ValidationEngine.prototype.createResultFromObject = function(obj, constraint, fo
 			return true;
 		}
 		var result = this.createResult(constraint, focusNode);
-		if(result.path) {
+		if(obj.path) {
 			this.addResultProperty(result, T("sh:resultPath"), obj.path); // TODO: Make deep copy
 		}
 		else if(constraint.shape.isPropertyShape()) {
 			this.addResultProperty(result, T("sh:resultPath"), constraint.shape.path); // TODO: Make deep copy
 		}
-		if(result.value) {
-			this.addResultProperty(result, T("sh:value"), result.value);
+		if(obj.value) {
+			this.addResultProperty(result, T("sh:value"), obj.value);
 		}
 		else if(valueNode) {
 			this.addResultProperty(result, T("sh:value"), valueNode);
 		}
-		if(result.message) {
-			this.addResultProperty(result, T("sh:resultMessage"), TermFactory.literal(obj, T("xsd:string")));
+		if(obj.message) {
+			this.addResultProperty(result, T("sh:resultMessage"), TermFactory.literal(obj.message, T("xsd:string")));
 		}
 		else {
 			this.createResultMessages(result, constraint);

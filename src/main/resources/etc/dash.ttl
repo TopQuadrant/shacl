@@ -978,6 +978,7 @@ sh:ClosedConstraintComponent
       rdf:type sh:JSValidator ;
       sh:jsFunctionName "validateClosed" ;
       sh:jsLibrary dash:DASHJSLibrary ;
+      sh:message "Predicate is not allowed (closed shape)" ;
     ] ;
 .
 sh:DatatypeConstraintComponent
@@ -1018,6 +1019,24 @@ sh:DisjointConstraintComponent
 sh:EqualsConstraintComponent
   dash:localConstraint "true"^^xsd:boolean ;
   sh:message "Must have same values as {$equals}" ;
+  sh:nodeValidator [
+      rdf:type sh:SPARQLSelectValidator ;
+      sh:prefixes <http://datashapes.org/dash> ;
+      sh:select """
+		SELECT DISTINCT $this ?value
+		WHERE {
+			{
+				FILTER NOT EXISTS { $this $equals $this }
+				BIND ($this AS ?value) .
+			}
+			UNION
+			{
+				$this $equals ?value .
+				FILTER (?value != $this) .
+			}
+		}
+		""" ;
+    ] ;
   sh:propertyValidator [
       rdf:type sh:JSValidator ;
       sh:jsFunctionName "validateEqualsProperty" ;

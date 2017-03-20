@@ -387,7 +387,7 @@ AbstractQuery.prototype.getObject = function(subject, predicate) {
 		this.close();
 		var s;
 		if(typeof subject === 'string') {
-			if(subject.startsWith('?')) {
+			if(subject.indexOf('?') == 0) {
 				s = sol[var2Attr(subject)];
 			}
 			else {
@@ -402,7 +402,7 @@ AbstractQuery.prototype.getObject = function(subject, predicate) {
 		}
 		var p;
 		if(typeof predicate === 'string') {
-			if(predicate.startsWith('?')) {
+			if(predicate.indexOf('?') == 0) {
 				p = sol[var2Attr(predicate)];
 			}
 			else {
@@ -580,7 +580,7 @@ function MatchQuery(input, s, p, o) {
 	this.source = input.source;
 	this.input = input;
 	if(typeof s === 'string') {
-		if(s.startsWith('?')) {
+		if(s.indexOf('?') == 0) {
 			this.sv = var2Attr(s);
 		}
 		else {
@@ -591,7 +591,7 @@ function MatchQuery(input, s, p, o) {
 		this.s = s;
 	}
 	if(typeof p === 'string') {
-		if(p.startsWith('?')) {
+		if(p.indexOf('?') == 0) {
 			this.pv = var2Attr(p);
 		}
 		else {
@@ -602,7 +602,7 @@ function MatchQuery(input, s, p, o) {
 		this.p = p;
 	}
 	if(typeof o === 'string') {
-		if(o.startsWith('?')) {
+		if(o.indexOf('?') == 0) {
 			this.ov = var2Attr(o);
 		}
 		else {
@@ -708,7 +708,7 @@ OrderByQuery.prototype.nextSolution = function() {
 function PathQuery(input, subject, path, object) {
 	this.input = input;
 	this.source = input.source;
-	if(typeof subject === 'string' && subject.startsWith("?")) {
+	if(typeof subject === 'string' && subject.indexOf("?") == 0) {
 		this.subjectAttr = var2Attr(subject);
 	}
 	else {
@@ -723,7 +723,7 @@ function PathQuery(input, subject, path, object) {
 	else {
 		this.path_ = path;
 	}
-	if(typeof object === 'string' && object.startsWith("?")) {
+	if(typeof object === 'string' && object.indexOf("?") == 0) {
 		this.objectAttr = var2Attr(object);
 	}
 	else {
@@ -927,7 +927,7 @@ NodeSet.prototype.toString = function() {
 
 
 function var2Attr(varName) {
-	if(!varName.startsWith("?")) {
+	if(!varName.indexOf("?") == 0) {
 		throw "Variable name must start with ?";
 	}
 	if(varName.length == 1) {

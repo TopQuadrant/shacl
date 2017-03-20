@@ -1,35 +1,34 @@
-# baseURI: http://datashapes.org/sh/tests/core/complex/personshape.test
+# baseURI: http://datashapes.org/sh/tests/core/complex/personexample.test
 # imports: http://datashapes.org/dash
 # prefix: ex
 
 @prefix dash: <http://datashapes.org/dash#> .
-@prefix ex: <http://datashapes.org/sh/tests/core/complex/personshape.test#> .
+@prefix ex: <http://datashapes.org/sh/tests/core/complex/personexample.test#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://datashapes.org/sh/tests/core/complex/personshape.test>
+<http://datashapes.org/sh/tests/core/complex/personexample.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of personshape" ;
+  rdfs:label "Test of personexample" ;
   owl:imports <http://datashapes.org/dash> ;
   owl:versionInfo "Created with TopBraid Composer" ;
 .
 ex:Alice
   rdf:type ex:Person ;
-  ex:child ex:Calvin ;
   ex:ssn "987-65-432A" ;
 .
 ex:Bob
   rdf:type ex:Person ;
-  ex:child ex:Calvin ;
   ex:ssn "123-45-6789" ;
   ex:ssn "124-35-6789" ;
 .
 ex:Calvin
   rdf:type ex:Person ;
-  ex:school ex:TrinityAnglicanSchool ;
+  ex:birthDate "1999-09-09"^^xsd:date ;
+  ex:worksFor ex:UntypedCompany ;
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
@@ -54,47 +53,43 @@ ex:GraphValidationTestCase
       sh:result [
           rdf:type sh:ValidationResult ;
           sh:focusNode ex:Calvin ;
-          sh:resultPath ex:school ;
+          sh:resultPath ex:birthDate ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:ClosedConstraintComponent ;
-          sh:value ex:TrinityAnglicanSchool ;
+          sh:value "1999-09-09"^^xsd:date ;
+        ] ;
+      sh:result [
+          rdf:type sh:ValidationResult ;
+          sh:focusNode ex:Calvin ;
+          sh:resultPath ex:worksFor ;
+          sh:resultSeverity sh:Violation ;
+          sh:sourceConstraintComponent sh:ClassConstraintComponent ;
+          sh:value ex:UntypedCompany ;
         ] ;
     ] ;
 .
-ex:Person
-  rdf:type rdfs:Class ;
-  rdfs:label "Person" ;
-  rdfs:subClassOf rdfs:Resource ;
-.
 ex:PersonShape
   rdf:type sh:NodeShape ;
-  rdfs:label "Person shape" ;
   sh:closed "true"^^xsd:boolean ;
   sh:ignoredProperties (
       rdf:type
     ) ;
   sh:property [
-      sh:path ex:child ;
-      sh:class ex:Person ;
-      sh:description "A person's children." ;
-      sh:name "child" ;
-      sh:nodeKind sh:IRI ;
-    ] ;
-  sh:property [
       sh:path ex:ssn ;
       sh:datatype xsd:string ;
-      sh:description "A person's social security number." ;
       sh:maxCount 1 ;
-      sh:name "ssn" ;
       sh:pattern "^\\d{3}-\\d{2}-\\d{4}$" ;
     ] ;
   sh:property [
+      sh:path ex:worksFor ;
+      sh:class ex:Company ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+  sh:property [
       sh:path [
-          sh:inversePath ex:child ;
+          sh:inversePath ex:worksFor ;
         ] ;
-      sh:description "A person's parent are represented using ex:child walked in the inverse direction." ;
-      sh:maxCount 2 ;
-      sh:name "parent" ;
+      sh:name "employee" ;
     ] ;
   sh:targetClass ex:Person ;
 .

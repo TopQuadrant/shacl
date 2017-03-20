@@ -1,5 +1,6 @@
 package org.topbraid.shacl.validation;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.jena.rdf.model.RDFNode;
@@ -17,6 +18,15 @@ class PropertyConstraintExecutor implements ConstraintExecutor {
 	@Override
 	public void executeConstraint(Constraint constraint, ValidationEngine engine, List<RDFNode> focusNodes) {
 		SHPropertyShape propertyShape = SHFactory.asPropertyShape(constraint.getParameterValue());
-		engine.validateNodesAgainstShape(focusNodes, propertyShape.asNode());
+		if(constraint.getShapeResource().isPropertyShape()) {
+			List<RDFNode> valueNodes = new LinkedList<RDFNode>();
+			for(RDFNode focusNode : focusNodes) {
+				valueNodes.addAll(engine.getValueNodes(constraint, focusNode));
+			}
+			engine.validateNodesAgainstShape(valueNodes, propertyShape.asNode());
+		}
+		else {
+			engine.validateNodesAgainstShape(focusNodes, propertyShape.asNode());
+		}
 	}
 }

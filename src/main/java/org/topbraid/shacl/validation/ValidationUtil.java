@@ -39,7 +39,7 @@ public class ValidationUtil {
 			Model unionModel = SHACLSystemModel.getSHACLModel();
 			MultiUnion unionGraph = new MultiUnion(new Graph[] {
 				unionModel.getGraph(),
-				dataModel.getGraph()
+				shapesModel.getGraph()
 			});
 			shapesModel = ModelFactory.createModelForGraph(unionGraph);
 		}
