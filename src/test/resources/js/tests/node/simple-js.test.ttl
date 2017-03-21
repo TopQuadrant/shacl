@@ -27,7 +27,9 @@ ex:GraphValidationTestCase
           rdf:type sh:ValidationResult ;
           sh:focusNode "A string" ;
           sh:resultSeverity sh:Violation ;
+          sh:sourceConstraint ex:TestShape-js ;
           sh:sourceConstraintComponent sh:JSConstraintComponent ;
+          sh:sourceShape ex:TestShape ;
           sh:value "A string" ;
         ] ;
     ] ;
@@ -43,12 +45,12 @@ ex:SimpleJSLibrary
 .
 ex:TestShape
   rdf:type sh:NodeShape ;
-  rdfs:label "Test shape" ;
-  sh:js [
-      rdf:type sh:JSConstraint ;
-      sh:jsFunctionName "simple" ;
-      sh:jsLibrary ex:SimpleJSLibrary ;
-    ] ;
+  sh:js ex:TestShape-js ;
   sh:targetNode ex:InvalidResource1 ;
   sh:targetNode "A string" ;
+.
+ex:TestShape-js
+  rdf:type sh:JSConstraint ;
+  sh:jsFunctionName "simple" ;
+  sh:jsLibrary ex:SimpleJSLibrary ;
 .

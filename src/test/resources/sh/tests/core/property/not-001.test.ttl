@@ -27,6 +27,7 @@ ex:GraphValidationTestCase
           sh:resultPath ex:property ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:NotConstraintComponent ;
+          sh:sourceShape ex:TestShape-property ;
           sh:value 42 ;
         ] ;
     ] ;
@@ -40,15 +41,16 @@ ex:InvalidResource1
 ex:TestShape
   rdf:type sh:NodeShape ;
   rdfs:label "Test shape" ;
-  sh:property [
-      sh:path ex:property ;
-      sh:not [
-          sh:datatype xsd:integer ;
-        ] ;
-    ] ;
+  sh:property ex:TestShape-property ;
   sh:targetNode ex:InvalidResource1 ;
   sh:targetNode ex:ValidResource1 ;
   sh:targetNode ex:ValidResource2 ;
+.
+ex:TestShape-property
+  sh:path ex:property ;
+  sh:not [
+      sh:datatype xsd:integer ;
+  ] ;
 .
 ex:ValidResource1
   rdf:type rdfs:Resource ;

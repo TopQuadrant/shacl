@@ -27,6 +27,7 @@ ex:GraphValidationTestCase
           sh:resultPath ex:testProperty ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:ClassConstraintComponent ;
+          sh:sourceShape ex:TestShape-testProperty ;
           sh:value ex:InvalidResource1 ;
         ] ;
       sh:result [
@@ -35,6 +36,7 @@ ex:GraphValidationTestCase
           sh:resultPath ex:testProperty ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:ClassConstraintComponent ;
+          sh:sourceShape ex:TestShape-testProperty ;
           sh:value "A string" ;
         ] ;
     ] ;
@@ -59,14 +61,15 @@ ex:SuperClassInstance
 .
 ex:TestShape
   rdf:type sh:NodeShape ;
-  sh:property [
-      sh:path ex:testProperty ;
-      rdfs:label "test property" ;
-      sh:class ex:SuperClass ;
-    ] ;
+  sh:property ex:TestShape-testProperty ;
   sh:targetNode ex:InvalidResource1 ;
   sh:targetNode ex:ValidResource1 ;
   sh:targetNode ex:ValidResource2 ;
+.
+ex:TestShape-testProperty
+  sh:path ex:testProperty ;
+  rdfs:label "test property" ;
+  sh:class ex:SuperClass ;
 .
 ex:ValidResource1
   rdf:type rdfs:Resource ;

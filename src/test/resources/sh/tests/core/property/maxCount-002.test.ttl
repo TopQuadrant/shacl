@@ -27,6 +27,7 @@ ex:GraphValidationTestCase
           sh:resultPath owl:versionInfo ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:MaxCountConstraintComponent ;
+          sh:sourceShape ex:TestShape-versionInfo ;
         ] ;
     ] ;
 .
@@ -38,12 +39,13 @@ ex:InvalidResource
 ex:TestShape
   rdf:type sh:NodeShape ;
   rdfs:label "Test shape" ;
-  sh:property [
-      sh:path owl:versionInfo ;
-      sh:maxCount 0 ;
-    ] ;
+  sh:property ex:TestShape-versionInfo ;
   sh:targetNode ex:InvalidResource ;
   sh:targetNode ex:ValidResource ;
+.
+ex:TestShape-versionInfo
+  sh:path owl:versionInfo ;
+  sh:maxCount 0 ;
 .
 ex:ValidResource
   rdf:type rdfs:Resource ;

@@ -33,17 +33,20 @@ ex:GraphValidationTestCase
           sh:resultPath ex:myProperty ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:MaxCountConstraintComponent ;
+          sh:sourceShape ex:TestShape-myProperty ;
         ] ;
     ] ;
 .
 ex:MyClass
   rdf:type rdfs:Class ;
 .
-ex:MyShape
+ex:TestShape
   rdf:type sh:NodeShape ;
-  sh:property [
-      sh:path ex:myProperty ;
-      sh:maxCount 1 ;
-    ] ;
+  sh:property ex:TestShape-myProperty ;
   sh:targetSubjectsOf ex:myProperty ;
+.
+ex:TestShape-myProperty
+  a sh:PropertyShape ;
+  sh:path ex:myProperty ;
+  sh:maxCount 1 ;
 .

@@ -31,6 +31,7 @@ ex:GraphValidationTestCase
           sh:resultPath ex:property ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent ex:minCardinalityComponent ;
+          sh:sourceShape ex:TestShape-property ;
         ] ;
       sh:result [
           rdf:type sh:ValidationResult ;
@@ -38,6 +39,7 @@ ex:GraphValidationTestCase
           sh:resultPath ex:property ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent ex:minCardinalityComponent ;
+          sh:sourceShape ex:TestShape-property ;
         ] ;
     ] ;
 .
@@ -50,11 +52,12 @@ ex:InvalidInstance1
 .
 ex:TestShape
   rdf:type sh:NodeShape ;
-  sh:property [
-      sh:path ex:property ;
-      ex:minCardinality 2 ;
-    ] ;
+  sh:property ex:TestShape-property ;
   sh:targetClass ex:Class ;
+.
+ex:TestShape-property
+  sh:path ex:property ;
+  ex:minCardinality 2 ;
 .
 ex:ValidInstance2
   rdf:type ex:Class ;

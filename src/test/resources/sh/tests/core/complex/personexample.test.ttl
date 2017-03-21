@@ -41,6 +41,7 @@ ex:GraphValidationTestCase
           sh:resultPath ex:ssn ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:PatternConstraintComponent ;
+          sh:sourceShape _:b1 ;
           sh:value "987-65-432A" ;
         ] ;
       sh:result [
@@ -49,6 +50,7 @@ ex:GraphValidationTestCase
           sh:resultPath ex:ssn ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:MaxCountConstraintComponent ;
+          sh:sourceShape _:b1 ;
         ] ;
       sh:result [
           rdf:type sh:ValidationResult ;
@@ -57,6 +59,7 @@ ex:GraphValidationTestCase
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:ClosedConstraintComponent ;
           sh:value "1999-09-09"^^xsd:date ;
+          sh:sourceShape ex:PersonShape ;
         ] ;
       sh:result [
           rdf:type sh:ValidationResult ;
@@ -64,6 +67,7 @@ ex:GraphValidationTestCase
           sh:resultPath ex:worksFor ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:ClassConstraintComponent ;
+          sh:sourceShape [] ;
           sh:value ex:UntypedCompany ;
         ] ;
     ] ;

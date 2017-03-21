@@ -29,7 +29,9 @@ ex:GraphValidationTestCase
           sh:focusNode ex:InvalidCountry ;
           sh:resultPath ex:germanLabel ;
           sh:resultSeverity sh:Violation ;
+          sh:sourceConstraint ex:LanguageExamplePropertyShape-sparql ;
           sh:sourceConstraintComponent sh:SPARQLConstraintComponent ;
+          sh:sourceShape ex:LanguageExamplePropertyShape ;
           sh:value "Spain"@en ;
         ] ;
     ] ;
@@ -41,19 +43,20 @@ ex:InvalidCountry
 ex:LanguageExamplePropertyShape
   rdf:type sh:PropertyShape ;
   sh:path ex:germanLabel ;
-  sh:sparql [
-      rdf:type sh:SPARQLConstraint ;
-      sh:message "Values are literals with German language tag." ;
-      sh:prefixes ex: ;
-      sh:select """
-			SELECT $this ?value
-			WHERE {
-				$this $PATH ?value .
-				FILTER (!isLiteral(?value) || !langMatches(lang(?value), \"de\"))
-			}
-			""" ;
-    ] ;
+  sh:sparql ex:LanguageExamplePropertyShape-sparql ;
   sh:targetClass ex:Country ;
+.
+ex:LanguageExamplePropertyShape-sparql
+  rdf:type sh:SPARQLConstraint ;
+  sh:message "Values are literals with German language tag." ;
+  sh:prefixes ex: ;
+  sh:select """
+		SELECT $this ?value
+		WHERE {
+			$this $PATH ?value .
+			FILTER (!isLiteral(?value) || !langMatches(lang(?value), \"de\"))
+		}
+		""" ;
 .
 ex:ValidCountry
   rdf:type ex:Country ;

@@ -25,6 +25,7 @@ ex:GraphValidationTestCase
           sh:focusNode rdfs:Resource ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:DatatypeConstraintComponent ;
+          sh:sourceShape ex:TestShape ;
           sh:value rdfs:Resource ;
         ] ;
       sh:result [
@@ -32,6 +33,7 @@ ex:GraphValidationTestCase
           sh:focusNode "String" ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:DatatypeConstraintComponent ;
+          sh:sourceShape ex:TestShape ;
           sh:value "String" ;
         ] ;
     ] ;

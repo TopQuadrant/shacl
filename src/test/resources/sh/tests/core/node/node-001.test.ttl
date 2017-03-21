@@ -25,6 +25,7 @@ ex:GraphValidationTestCase
           sh:focusNode ex:InvalidInstance ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:NodeConstraintComponent ;
+          sh:sourceShape ex:TestClass ;
           sh:value ex:InvalidInstance ;
         ] ;
     ] ;

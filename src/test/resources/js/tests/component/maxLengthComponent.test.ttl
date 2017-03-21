@@ -26,6 +26,7 @@ ex:GraphValidationTestCase
           sh:focusNode "1234567890A" ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent ex:MaxLengthConstraintComponent ;
+          sh:sourceShape ex:TestShape ;
           sh:value "1234567890A" ;
         ] ;
     ] ;

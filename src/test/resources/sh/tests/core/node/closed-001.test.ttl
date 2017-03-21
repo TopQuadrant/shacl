@@ -27,6 +27,7 @@ ex:GraphValidationTestCase
           sh:resultPath rdf:type ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:ClosedConstraintComponent ;
+          sh:sourceShape ex:MyShape ;
           sh:value ex:SomeClass ;
         ] ;
       sh:result [
@@ -35,6 +36,7 @@ ex:GraphValidationTestCase
           sh:resultPath ex:otherProperty ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:ClosedConstraintComponent ;
+          sh:sourceShape ex:MyShape ;
           sh:value 4 ;
         ] ;
     ] ;

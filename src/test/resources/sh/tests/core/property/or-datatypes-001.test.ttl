@@ -27,6 +27,7 @@ ex:GraphValidationTestCase
           sh:resultPath rdfs:comment ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:OrConstraintComponent ;
+          sh:sourceShape ex:TestShape-comment ;
           sh:value owl:Thing ;
         ] ;
       sh:result [
@@ -35,6 +36,7 @@ ex:GraphValidationTestCase
           sh:resultPath rdfs:comment ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:OrConstraintComponent ;
+          sh:sourceShape ex:TestShape-comment ;
           sh:value 42 ;
         ] ;
       sh:result [
@@ -43,6 +45,7 @@ ex:GraphValidationTestCase
           sh:resultPath rdfs:comment ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:OrConstraintComponent ;
+          sh:sourceShape ex:TestShape-comment ;
           sh:value "none"^^xsd:boolean ;
         ] ;
     ] ;
@@ -58,25 +61,26 @@ ex:InvalidResource1
 ex:TestShape
   rdf:type sh:NodeShape ;
   rdfs:label "Test shape" ;
-  sh:property [
-      sh:path rdfs:comment ;
-      sh:or (
-          [
-            sh:datatype xsd:string ;
-          ]
-          [
-            sh:datatype rdf:HTML ;
-          ]
-          [
-            sh:datatype rdf:langString ;
-          ]
-          [
-            sh:datatype xsd:boolean ;
-          ]
-        ) ;
-    ] ;
+  sh:property ex:TestShape-comment ;
   sh:targetNode ex:InvalidResource1 ;
   sh:targetNode ex:ValidResource1 ;
+.
+ex:TestShape-comment
+  sh:path rdfs:comment ;
+  sh:or (
+      [
+        sh:datatype xsd:string ;
+      ]
+      [
+        sh:datatype rdf:HTML ;
+      ]
+      [
+        sh:datatype rdf:langString ;
+      ]
+      [
+        sh:datatype xsd:boolean ;
+      ]
+    ) ;
 .
 ex:ValidResource1
   rdf:type rdfs:Resource ;

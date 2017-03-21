@@ -50,6 +50,7 @@ ex:GraphValidationTestCase
           sh:resultPath ex:digit ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:QualifiedMinCountConstraintComponent ;
+          sh:sourceShape ex:HandShape-digit-minCount1 ;
         ] ;
     ] ;
 .

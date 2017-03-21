@@ -26,6 +26,7 @@ ex:GraphValidationTestCase
           sh:focusNode ex:InvalidRectangle1 ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:OrConstraintComponent ;
+          sh:sourceShape ex:RectangleWithArea ;
           sh:value ex:InvalidRectangle1 ;
         ] ;
       sh:result [
@@ -33,6 +34,7 @@ ex:GraphValidationTestCase
           sh:focusNode ex:InvalidRectangle2 ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:OrConstraintComponent ;
+          sh:sourceShape ex:RectangleWithArea ;
           sh:value ex:InvalidRectangle2 ;
         ] ;
     ] ;

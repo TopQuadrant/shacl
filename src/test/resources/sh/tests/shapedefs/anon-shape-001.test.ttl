@@ -26,6 +26,7 @@ ex:GraphValidationTestCase
           sh:resultPath ex:property ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:MinCountConstraintComponent ;
+          sh:sourceShape [] ;
         ] ;
     ] ;
   dash:validateShapes "true"^^xsd:boolean ;

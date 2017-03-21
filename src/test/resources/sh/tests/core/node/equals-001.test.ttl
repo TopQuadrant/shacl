@@ -26,6 +26,7 @@ ex:GraphValidationTestCase
           sh:focusNode ex:InvalidResource1 ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:EqualsConstraintComponent ;
+          sh:sourceShape ex:TestShape ;
           sh:value ex:SomeValue ;
         ] ;
       sh:result [
@@ -33,6 +34,7 @@ ex:GraphValidationTestCase
           sh:focusNode ex:InvalidResource2 ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:EqualsConstraintComponent ;
+          sh:sourceShape ex:TestShape ;
           sh:value ex:InvalidResource2 ;
         ] ;
     ] ;

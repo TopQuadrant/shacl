@@ -26,6 +26,7 @@ ex:GraphValidationTestCase
           sh:resultPath ex:firstName ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:MinCountConstraintComponent ;
+          sh:sourceShape ex:PersonShape-firstName ;
         ] ;
     ] ;
 .
@@ -40,13 +41,14 @@ ex:Person
 .
 ex:PersonShape
   rdf:type sh:NodeShape ;
-  sh:property [
-      sh:path ex:firstName ;
-      sh:datatype xsd:string ;
-      sh:minCount 1 ;
-    ] ;
+  sh:property ex:PersonShape-firstName ;
   sh:targetClass ex:Person ;
   sh:targetNode ex:ValidResource ;
+.
+ex:PersonShape-firstName
+  sh:path ex:firstName ;
+  sh:datatype xsd:string ;
+  sh:minCount 1 ;
 .
 ex:ValidResource
   rdf:type ex:Person ;

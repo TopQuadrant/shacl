@@ -27,6 +27,7 @@ ex:GraphValidationTestCase
           sh:resultPath ex:property1 ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:LessThanConstraintComponent ;
+          sh:sourceShape ex:TestShape-property1 ;
           sh:value 4 ;
         ] ;
       sh:result [
@@ -35,6 +36,7 @@ ex:GraphValidationTestCase
           sh:resultPath ex:property1 ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:LessThanConstraintComponent ;
+          sh:sourceShape ex:TestShape-property1 ;
           sh:value 6 ;
         ] ;
       sh:result [
@@ -43,6 +45,7 @@ ex:GraphValidationTestCase
           sh:resultPath ex:property1 ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:LessThanConstraintComponent ;
+          sh:sourceShape ex:TestShape-property1 ;
           sh:value 5 ;
         ] ;
     ] ;
@@ -60,17 +63,18 @@ ex:InvalidResource3
   ex:property1 5 ;
   ex:property2 4 ;
 .
-ex:MyShape
+ex:TestShape
   rdf:type sh:NodeShape ;
-  sh:property [
-      sh:path ex:property1 ;
-      sh:lessThan ex:property2 ;
-    ] ;
+  sh:property ex:TestShape-property1 ;
   sh:targetNode ex:InvalidResource1 ;
   sh:targetNode ex:InvalidResource2 ;
   sh:targetNode ex:InvalidResource3 ;
   sh:targetNode ex:ValidResource1 ;
   sh:targetNode ex:ValidResource2 ;
+.
+ex:TestShape-property1
+  sh:path ex:property1 ;
+  sh:lessThan ex:property2 ;
 .
 ex:ValidResource1
   ex:property1 4 ;

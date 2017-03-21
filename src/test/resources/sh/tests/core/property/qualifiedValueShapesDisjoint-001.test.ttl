@@ -53,6 +53,7 @@ ex:GraphValidationTestCase
           sh:resultPath ex:digit ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:QualifiedMinCountConstraintComponent ;
+          sh:sourceShape ex:HandShape-digit1 ;
         ] ;
       sh:result [
           rdf:type sh:ValidationResult ;
@@ -60,6 +61,7 @@ ex:GraphValidationTestCase
           sh:resultPath ex:digit ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:QualifiedMinCountConstraintComponent ;
+          sh:sourceShape ex:HandShape-digit4 ;
         ] ;
     ] ;
 .
@@ -71,25 +73,27 @@ ex:Hand
 .
 ex:HandShape
   rdf:type sh:NodeShape ;
-  sh:property [
-      sh:path ex:digit ;
-      sh:qualifiedMaxCount 1 ;
-      sh:qualifiedMinCount 1 ;
-      sh:qualifiedValueShape [
-          sh:class ex:Thumb ;
-        ] ;
-      sh:qualifiedValueShapesDisjoint true ;
-    ] ;
-  sh:property [
-      sh:path ex:digit ;
-      sh:qualifiedMaxCount 4 ;
-      sh:qualifiedMinCount 4 ;
-      sh:qualifiedValueShape [
-          sh:class ex:Finger ;
-        ] ;
-      sh:qualifiedValueShapesDisjoint true ;
-    ] ;
+  sh:property ex:HandShape-digit1 ;
+  sh:property ex:HandShape-digit4 ;
   sh:targetClass ex:Hand ;
+.
+ex:HandShape-digit1
+  sh:path ex:digit ;
+  sh:qualifiedMaxCount 1 ;
+  sh:qualifiedMinCount 1 ;
+  sh:qualifiedValueShape [
+      sh:class ex:Thumb ;
+    ] ;
+  sh:qualifiedValueShapesDisjoint true ;
+.
+ex:HandShape-digit4
+  sh:path ex:digit ;
+  sh:qualifiedMaxCount 4 ;
+  sh:qualifiedMinCount 4 ;
+  sh:qualifiedValueShape [
+      sh:class ex:Finger ;
+    ] ;
+  sh:qualifiedValueShapesDisjoint true ;
 .
 ex:InvalidHand1
   rdf:type ex:Hand ;

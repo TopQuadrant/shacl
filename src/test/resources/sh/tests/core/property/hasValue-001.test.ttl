@@ -26,6 +26,7 @@ ex:GraphValidationTestCase
           sh:resultPath ex:gender ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:HasValueConstraintComponent ;
+          sh:sourceShape ex:PersonShape-gender ;
         ] ;
     ] ;
 .
@@ -42,13 +43,14 @@ ex:MalePerson
 ex:PersonShape
   rdf:type sh:NodeShape ;
   rdfs:label "Person shape" ;
-  sh:property [
-      sh:path ex:gender ;
-      rdfs:label "gender" ;
-      sh:datatype xsd:string ;
-      sh:hasValue "male" ;
-    ] ;
+  sh:property ex:PersonShape-gender ;
   sh:targetClass ex:MalePerson ;
+.
+ex:PersonShape-gender
+  sh:path ex:gender ;
+  rdfs:label "gender" ;
+  sh:datatype xsd:string ;
+  sh:hasValue "male" ;
 .
 ex:ValidMalePerson1
   rdf:type ex:MalePerson ;

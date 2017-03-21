@@ -27,6 +27,7 @@ ex:GraphValidationTestCase
           sh:resultPath ex:value ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:DatatypeConstraintComponent ;
+          sh:sourceShape ex:TestShape-value ;
           sh:value "A"@en ;
         ] ;
       sh:result [
@@ -35,6 +36,7 @@ ex:GraphValidationTestCase
           sh:resultPath ex:value ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:DatatypeConstraintComponent ;
+          sh:sourceShape ex:TestShape-value ;
           sh:value 42 ;
         ] ;
     ] ;
@@ -45,16 +47,17 @@ ex:InvalidInstance1
 ex:InvalidInstance2
   ex:value 42 ;
 .
-ex:MyShape
+ex:TestShape
   rdf:type sh:NodeShape ;
-  sh:property [
-      sh:path ex:value ;
-      sh:datatype xsd:string ;
-    ] ;
+  sh:property ex:TestShape-value ;
   sh:targetNode ex:InvalidInstance1 ;
   sh:targetNode ex:InvalidInstance2 ;
   sh:targetNode ex:ValidInstance1 ;
   sh:targetNode ex:ValidInstance2 ;
+.
+ex:TestShape-value
+  sh:path ex:value ;
+  sh:datatype xsd:string ;
 .
 ex:ValidInstance1
   ex:value "A" ;

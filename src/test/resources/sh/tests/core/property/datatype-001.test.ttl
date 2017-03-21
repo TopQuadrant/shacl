@@ -27,6 +27,7 @@ ex:GraphValidationTestCase
           sh:resultPath ex:dateProperty ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:DatatypeConstraintComponent ;
+          sh:sourceShape ex:TestShape-dateProperty ;
           sh:value "2011-01-01"^^xsd:dateTime ;
         ] ;
       sh:result [
@@ -35,6 +36,7 @@ ex:GraphValidationTestCase
           sh:resultPath ex:integerProperty ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:DatatypeConstraintComponent ;
+          sh:sourceShape ex:TestShape-integerProperty ;
           sh:value 11.1 ;
         ] ;
     ] ;
@@ -48,16 +50,18 @@ ex:TestShape
   rdf:type rdfs:Class ;
   rdf:type sh:NodeShape ;
   rdfs:label "Test shape" ;
-  sh:property [
-      sh:path ex:dateProperty ;
-      rdfs:label "date property" ;
-      sh:datatype xsd:date ;
-    ] ;
-  sh:property [
-      sh:path ex:integerProperty ;
-      rdfs:label "integer property" ;
-      sh:datatype xsd:integer ;
-    ] ;
+  sh:property ex:TestShape-dateProperty ;
+  sh:property ex:TestShape-integerProperty ;
+.
+ex:TestShape-dateProperty
+  sh:path ex:dateProperty ;
+  rdfs:label "date property" ;
+  sh:datatype xsd:date ;
+.
+ex:TestShape-integerProperty
+  sh:path ex:integerProperty ;
+  rdfs:label "integer property" ;
+  sh:datatype xsd:integer ;
 .
 ex:ValidResource
   rdf:type ex:TestShape ;

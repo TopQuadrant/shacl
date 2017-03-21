@@ -24,6 +24,8 @@
           sh:focusNode ex:InvalidCountry ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:JSConstraintComponent ;
+          sh:sourceShape ex:LanguageExampleShape ;
+          sh:sourceConstraint ex:LanguageExampleShape-js ;
           sh:value "Spain"@en ;
         ] ;
     ] ;
@@ -43,13 +45,14 @@ ex:InvalidCountry
 .
 ex:LanguageExampleShape
   rdf:type sh:NodeShape ;
-  sh:js [
-      rdf:type sh:JSConstraint ;
-      sh:jsFunctionName "germanLabel" ;
-      sh:jsLibrary ex:GermanLabelJSLibrary ;
-      sh:message "Values are literals with German language tag." ;
-    ] ;
+  sh:js ex:LanguageExampleShape-js ;
   sh:targetClass ex:Country ;
+.
+ex:LanguageExampleShape-js  
+  rdf:type sh:JSConstraint ;
+  sh:jsFunctionName "germanLabel" ;
+  sh:jsLibrary ex:GermanLabelJSLibrary ;
+  sh:message "Values are literals with German language tag." ;
 .
 ex:ValidCountry
   rdf:type ex:Country ;

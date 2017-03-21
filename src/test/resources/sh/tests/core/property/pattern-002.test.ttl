@@ -26,6 +26,7 @@ ex:GraphValidationTestCase
           sh:resultPath ex:property ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:PatternConstraintComponent ;
+          sh:sourceShape ex:TestShape-property ;
           sh:value "Maria" ;
         ] ;
     ] ;
@@ -39,13 +40,14 @@ ex:TestShape
   rdf:type rdfs:Class ;
   rdf:type sh:NodeShape ;
   rdfs:label "Test shape" ;
-  sh:property [
-      sh:path ex:property ;
-      rdfs:label "property" ;
-      sh:datatype xsd:string ;
-      sh:flags "i" ;
-      sh:pattern "joh" ;
-    ] ;
+  sh:property ex:TestShape-property ;
+.
+ex:TestShape-property
+  sh:path ex:property ;
+  rdfs:label "property" ;
+  sh:datatype xsd:string ;
+  sh:flags "i" ;
+  sh:pattern "joh" ;
 .
 ex:ValidInstance1
   rdf:type ex:TestShape ;

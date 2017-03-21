@@ -26,6 +26,7 @@ ex:GraphValidationTestCase
           sh:focusNode 7 ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:MinInclusiveConstraintComponent ;
+          sh:sourceShape ex:TestShape ;
           sh:value 7 ;
         ] ;
     ] ;

@@ -26,6 +26,7 @@ ex:GraphValidationTestCase
           sh:focusNode "aldi"^^xsd:integer ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:DatatypeConstraintComponent ;
+          sh:sourceShape ex:TestShape ;
           sh:value "aldi"^^xsd:integer ;
         ] ;
     ] ;

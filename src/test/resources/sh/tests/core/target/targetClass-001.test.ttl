@@ -26,6 +26,7 @@ ex:GraphValidationTestCase
           sh:resultPath ex:myProperty ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:MaxCountConstraintComponent ;
+          sh:sourceShape ex:MyShape-myProperty ;
         ] ;
     ] ;
 .
@@ -39,11 +40,12 @@ ex:MyClass
 .
 ex:MyShape
   rdf:type sh:NodeShape ;
-  sh:property [
-      sh:path ex:myProperty ;
-      sh:maxCount 1 ;
-    ] ;
+  sh:property ex:MyShape-myProperty ;
   sh:targetClass ex:MyClass ;
+.
+ex:MyShape-myProperty
+  sh:path ex:myProperty ;
+  sh:maxCount 1 ;
 .
 ex:ValidInstance1
   rdf:type ex:MyClass ;

@@ -30,6 +30,7 @@ ex:GraphValidationTestCase
           sh:resultPath ex:assignedTo ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:NodeConstraintComponent ;
+          sh:sourceShape ex:Issue-assignedTo ;
           sh:value ex:Anon ;
         ] ;
     ] ;
@@ -39,30 +40,30 @@ ex:Issue
   rdf:type sh:NodeShape ;
   rdfs:label "Issue" ;
   rdfs:subClassOf rdfs:Resource ;
-  sh:property [
-      sh:path ex:assignedTo ;
-      rdfs:label "assigned to" ;
-      sh:node [
-          rdfs:comment "All assignees must have an email and a last name." ;
-          sh:property [
-              sh:path ex:email ;
-              sh:maxCount 1 ;
-              sh:minCount 1 ;
-            ] ;
-          sh:property [
-              sh:path ex:lastName ;
-              sh:maxCount 1 ;
-              sh:minCount 1 ;
-            ] ;
+  sh:property ex:Issue-assignedTo ;
+  sh:property ex:Issue-submittedBy ;
+.
+ex:Issue-assignedTo
+  sh:path ex:assignedTo ;
+  sh:node [
+      rdfs:comment "All assignees must have an email and a last name." ;
+      sh:property [
+          sh:path ex:email ;
+          sh:maxCount 1 ;
+          sh:minCount 1 ;
         ] ;
-      sh:valueClass ex:Person ;
+      sh:property [
+          sh:path ex:lastName ;
+          sh:maxCount 1 ;
+          sh:minCount 1 ;
+        ] ;
     ] ;
-  sh:property [
-      sh:path ex:submittedBy ;
-      rdfs:label "submitted by" ;
-      sh:class ex:Person ;
-      sh:minCount 1 ;
-    ] ;
+  sh:class ex:Person ;
+.
+ex:Issue-submittedBy
+  sh:path ex:submittedBy ;
+  sh:class ex:Person ;
+  sh:minCount 1 ;
 .
 ex:Issue_1
   rdf:type ex:Issue ;

@@ -38,19 +38,22 @@ ex:GraphValidationTestCase
             ) ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:NodeKindConstraintComponent ;
+          sh:sourceShape ex:SP ;
           sh:value "value" ;
         ] ;
     ] ;
 .
 ex:S
   rdf:type sh:NodeShape ;
-  sh:property [
-      sh:maxCount 1 ;
-      sh:nodeKind sh:IRI ;
-      sh:path (
-          ex:p1
-          ex:p2
-        ) ;
-    ] ;
+  sh:property ex:SP ;
   sh:targetNode ex:A ;
+.
+ex:SP
+  a sh:PropertyShape ;
+  sh:maxCount 1 ;
+  sh:nodeKind sh:IRI ;
+  sh:path (
+      ex:p1
+      ex:p2
+    ) ;
 .

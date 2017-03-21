@@ -16,6 +16,21 @@
   owl:imports <http://datashapes.org/dash> ;
   owl:versionInfo "Created with TopBraid Composer" ;
 .
+ex:GraphValidationTestCase
+  rdf:type dash:GraphValidationTestCase ;
+  dash:expectedResult [
+      rdf:type sh:ValidationReport ;
+      sh:conforms "false"^^xsd:boolean ;
+      sh:result [
+          rdf:type sh:ValidationResult ;
+          sh:focusNode ex:InvalidInstance1 ;
+          sh:resultSeverity sh:Violation ;
+          sh:sourceConstraintComponent sh:NotConstraintComponent ;
+          sh:sourceShape ex:NotExampleShape ;
+          sh:value ex:InvalidInstance1 ;
+        ] ;
+    ] ;
+.
 ex:InvalidInstance1
   ex:property "Some value" ;
 .

@@ -26,6 +26,7 @@ ex:GraphValidationTestCase
           sh:resultPath rdfs:label ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:MaxCountConstraintComponent ;
+          sh:sourceShape ex:TestShape-label ;
         ] ;
     ] ;
 .
@@ -36,13 +37,7 @@ ex:InvalidInstance1
 ex:TestShape
   rdf:type sh:NodeShape ;
   rdfs:label "Test shape" ;
-  sh:property [
-      sh:path rdfs:label ;
-      rdfs:comment "Must not have any rdfs:label" ;
-      rdfs:label "label" ;
-      sh:datatype xsd:string ;
-      sh:maxCount 0 ;
-    ] ;
+  sh:property ex:TestShape-label ;
   sh:target [
       rdf:type sh:SPARQLTarget ;
       sh:prefixes <http://datashapes.org/sh/tests/sparql/target/sparqlTarget-001.test> ;
@@ -52,6 +47,13 @@ ex:TestShape
     		?this a owl:Thing .
 		}""" ;
     ] ;
+.
+ex:TestShape-label
+  sh:path rdfs:label ;
+  rdfs:comment "Must not have any rdfs:label" ;
+  rdfs:label "label" ;
+  sh:datatype xsd:string ;
+  sh:maxCount 0 ;
 .
 ex:ValidInstance1
   rdf:type owl:Thing ;

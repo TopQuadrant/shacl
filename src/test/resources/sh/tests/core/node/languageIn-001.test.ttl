@@ -25,6 +25,7 @@ ex:GraphValidationTestCase
           sh:focusNode rdfs:Resource ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:LanguageInConstraintComponent ;
+          sh:sourceShape ex:TestShape ;
           sh:value rdfs:Resource ;
         ] ;
       sh:result [
@@ -32,6 +33,7 @@ ex:GraphValidationTestCase
           sh:focusNode "Deutsch"@de ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:LanguageInConstraintComponent ;
+          sh:sourceShape ex:TestShape ;
           sh:value "Deutsch"@de ;
         ] ;
       sh:result [
@@ -39,6 +41,7 @@ ex:GraphValidationTestCase
           sh:focusNode "Plain String" ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:LanguageInConstraintComponent ;
+          sh:sourceShape ex:TestShape ;
           sh:value "Plain String" ;
         ] ;
     ] ;

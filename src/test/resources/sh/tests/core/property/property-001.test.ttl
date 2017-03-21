@@ -37,6 +37,7 @@ ex:GraphValidationTestCase
           sh:resultPath ex:city ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:ClassConstraintComponent ;
+          sh:sourceShape ex:PersonShape-address-city ;
           sh:value ex:InvalidCity ;
         ] ;
       sh:result [
@@ -45,6 +46,7 @@ ex:GraphValidationTestCase
           sh:resultPath ex:city ;
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:ClassConstraintComponent ;
+          sh:sourceShape ex:PersonShape-address-city ;
           sh:value ex:InvalidCity ;
         ] ;
     ] ;
@@ -72,13 +74,14 @@ ex:PersonShape
   rdfs:label "Person shape" ;
   sh:property [
       sh:path ex:address ;
-      sh:property [
-          sh:path ex:city ;
-          sh:class ex:City ;
-        ] ;
+      sh:property ex:PersonShape-address-city ;
     ] ;
   sh:targetClass ex:Person ;
 .
+ex:PersonShape-address-city
+  sh:path ex:city ;
+  sh:class ex:City ;
+.	
 ex:ProperCity
   rdf:type ex:City ;
   rdfs:label "Proper city" ;
