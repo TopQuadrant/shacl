@@ -3,10 +3,10 @@ package org.topbraid.spin.query;
 import org.apache.jena.query.Syntax ;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateRequest;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UpdateFactoryFilter {
-	static final String LOG_NAME = "QueryLog";
 	private Logger logger;
 	private static UpdateFactoryFilter singleton = new UpdateFactoryFilter();
 	
@@ -19,7 +19,7 @@ public class UpdateFactoryFilter {
 	}
 	
 	private UpdateFactoryFilter() {
-		logger = Logger.getLogger(LOG_NAME);
+		logger = LoggerFactory.getLogger(QueryExecutionFactoryFilter.LOG_NAME);
 	}
 
 	public UpdateRequest create(String str) {

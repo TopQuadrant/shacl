@@ -3,9 +3,14 @@ package org.topbraid.spin.query;
 import org.apache.commons.lang3.time.FastDateFormat ;
 import org.apache.http.client.HttpClient ;
 import org.apache.jena.atlas.lib.DateTimeUtils ;
-import org.apache.jena.query.* ;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdf.model.Model;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class QueryExecutionFactoryFilter {
 	static final String LOG_NAME = "QueryLog";
@@ -25,7 +30,7 @@ public class QueryExecutionFactoryFilter {
 	}
 	
 	private QueryExecutionFactoryFilter() {
-		logger = Logger.getLogger(LOG_NAME);
+		logger = LoggerFactory.getLogger(LOG_NAME);
 	}
 
 	public QueryExecution create(Query query, Model model) {
