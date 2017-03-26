@@ -701,14 +701,12 @@ sh:LessThanOrEqualsConstraintComponent-lessThanOrEquals
 .
 sh:MaxCountConstraintComponent-maxCount
   sh:group tosh:CardinalityConstraintPropertyGroup ;
-  sh:maxCount 1 ;
   sh:order 1 ;
 .
 sh:MaxExclusiveConstraintComponent-maxExclusive
   tosh:editWidget <http://topbraid.org/tosh.ui#UseDeclaredDatatypeEditor> ;
   tosh:useDeclaredDatatype "true"^^xsd:boolean ;
   sh:group tosh:ValueRangeConstraintPropertyGroup ;
-  sh:maxCount 1 ;
   sh:order 3 ;
 .
 sh:MaxInclusiveConstraintComponent
@@ -729,7 +727,6 @@ sh:MaxInclusiveConstraintComponent-maxInclusive
   tosh:editWidget <http://topbraid.org/tosh.ui#UseDeclaredDatatypeEditor> ;
   tosh:useDeclaredDatatype "true"^^xsd:boolean ;
   sh:group tosh:ValueRangeConstraintPropertyGroup ;
-  sh:maxCount 1 ;
   sh:order 2 ;
 .
 sh:MaxLengthConstraintComponent
@@ -752,19 +749,16 @@ WHERE {
 .
 sh:MaxLengthConstraintComponent-maxLength
   sh:group tosh:StringBasedConstraintPropertyGroup ;
-  sh:maxCount 1 ;
   sh:order 4 ;
 .
 sh:MinCountConstraintComponent-minCount
   sh:group tosh:CardinalityConstraintPropertyGroup ;
-  sh:maxCount 1 ;
   sh:order 0 ;
 .
 sh:MinExclusiveConstraintComponent-minExclusive
   tosh:editWidget <http://topbraid.org/tosh.ui#UseDeclaredDatatypeEditor> ;
   tosh:useDeclaredDatatype "true"^^xsd:boolean ;
   sh:group tosh:ValueRangeConstraintPropertyGroup ;
-  sh:maxCount 1 ;
   sh:order 0 ;
 .
 sh:MinInclusiveConstraintComponent
@@ -785,12 +779,10 @@ sh:MinInclusiveConstraintComponent-minInclusive
   tosh:editWidget <http://topbraid.org/tosh.ui#UseDeclaredDatatypeEditor> ;
   tosh:useDeclaredDatatype "true"^^xsd:boolean ;
   sh:group tosh:ValueRangeConstraintPropertyGroup ;
-  sh:maxCount 1 ;
   sh:order 1 ;
 .
 sh:MinLengthConstraintComponent-minLength
   sh:group tosh:StringBasedConstraintPropertyGroup ;
-  sh:maxCount 1 ;
   sh:order 3 ;
 .
 sh:NodeConstraintComponent
@@ -829,7 +821,6 @@ sh:NodeConstraintComponent-node
 sh:NodeKindConstraintComponent-nodeKind
   tosh:editWidget <http://topbraid.org/tosh.ui#NodeKindEditor> ;
   sh:group tosh:ValueTypeConstraintPropertyGroup ;
-  sh:maxCount 1 ;
   sh:name "value kinds" ;
   sh:order 0 ;
 .
@@ -932,7 +923,6 @@ sh:QualifiedMinCountConstraintComponent-qualifiedValueShape
 .
 sh:UniqueLangConstraintComponent-uniqueLang
   sh:group tosh:StringBasedConstraintPropertyGroup ;
-  sh:maxCount 1 ;
   sh:order 8 ;
 .
 sh:XoneConstraintComponent
@@ -970,6 +960,3 @@ sh:XoneConstraintComponent-xone
   sh:group tosh:ComplexConstraintPropertyGroup ;
   sh:order 13 ;
 .
-[
-  sh:group tosh:ComplexConstraintPropertyGroup ;
-].

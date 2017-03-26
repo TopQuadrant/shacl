@@ -1,5 +1,5 @@
 # W3C Shapes Constraint Language (SHACL) Vocabulary
-# Draft last edited 2017-03-02
+# Draft last edited 2017-03-26
 
 @prefix owl:  <http://www.w3.org/2002/07/owl#> .
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -23,28 +23,28 @@ sh:
 sh:Shape
 	a rdfs:Class ;
 	rdfs:label "Shape"@en ;
-	rdfs:comment "The class of SHACL shapes."@en ;
+	rdfs:comment "A shape is a collection of constraints that may be targeted for certain nodes."@en ;
 	rdfs:subClassOf rdfs:Resource ;
 	rdfs:isDefinedBy sh: .
 
 sh:NodeShape
 	a rdfs:Class ;
 	rdfs:label "Node shape"@en ;
-	rdfs:comment "The class of node shapes."@en ;
+	rdfs:comment "A node shape is a shape that specifies constraint that need to be met with respect to focus nodes."@en ;
 	rdfs:subClassOf sh:Shape ;
 	rdfs:isDefinedBy sh: .
 
 sh:PropertyShape
 	a rdfs:Class ;
 	rdfs:label "Property shape"@en ;
-	rdfs:comment "The class of property shapes."@en ;
+	rdfs:comment "A property shape is a shape that specifies constraints on the values of a focus node for a given property or path."@en ;
 	rdfs:subClassOf sh:Shape ;
 	rdfs:isDefinedBy sh: .
 
 sh:deactivated
 	a rdf:Property ;
 	rdfs:label "deactivated"@en ;
-	rdfs:comment "Can be used to deactivate shapes, meaning they will not cause any constraint violations."@en ;
+	rdfs:comment "If set to true for a shape then the shape is deactivated and all nodes conform to it."@en ;
 	rdfs:domain sh:Shape ;
 	rdfs:range xsd:boolean ;
 	rdfs:isDefinedBy sh: .
@@ -52,7 +52,7 @@ sh:deactivated
 sh:target
 	a rdf:Property ;
 	rdfs:label "target"@en ;
-	rdfs:comment "Links a shape to a target, for example instances of sh:SPARQLTarget."@en ;
+	rdfs:comment "Links a shape to a target specified by an extension language, for example instances of sh:SPARQLTarget."@en ;
 	rdfs:domain sh:Shape ;
 	rdfs:range sh:Target ;
 	rdfs:isDefinedBy sh: .
@@ -163,7 +163,7 @@ sh:ValidationReport
 sh:conforms
 	a rdf:Property ;
 	rdfs:label "conforms"@en ;
-	rdfs:comment "Indicates whether all focus nodes conformed to their shapes during validation."@en ;
+	rdfs:comment "True if the validation did not produce any validation results, and false otherwise."@en ;
 	rdfs:domain sh:ValidationReport ;
 	rdfs:range xsd:boolean ;
 	rdfs:isDefinedBy sh: .
@@ -171,7 +171,7 @@ sh:conforms
 sh:result
 	a rdf:Property ;
 	rdfs:label "result"@en ;
-	rdfs:comment "Links a validation report with its validation results."@en ;
+	rdfs:comment "The validation results contained in a validation report."@en ;
 	rdfs:domain sh:ValidationReport ;
 	rdfs:range sh:ValidationResult ;
 	rdfs:isDefinedBy sh: .
@@ -179,7 +179,7 @@ sh:result
 sh:shapesGraphWellFormed
 	a rdf:Property ;
 	rdfs:label "shapes graph well-formed"@en ;
-	rdfs:comment "If set to true then the validation engine was certain that the shapes graph has passed all SHACL syntax requirements during the validation process."@en ;
+	rdfs:comment "If true then the validation engine was certain that the shapes graph has passed all SHACL syntax requirements during the validation process."@en ;
 	rdfs:domain sh:ValidationReport ;
 	rdfs:range xsd:boolean ;
 	rdfs:isDefinedBy sh: .
@@ -241,7 +241,7 @@ sh:focusNode
 sh:resultMessage
 	a rdf:Property ;
 	rdfs:label "result message"@en ;
-	rdfs:comment "A human-readable message explaining the cause of the result."@en ;
+	rdfs:comment "Human-readable messages explaining the cause of the result."@en ;
 	rdfs:domain sh:AbstractResult ;
 	# range: xsd:string or rdf:langString
 	rdfs:isDefinedBy sh: .
@@ -289,7 +289,7 @@ sh:sourceConstraintComponent
 sh:value
 	a rdf:Property ;
 	rdfs:label "value"@en ;
-	rdfs:comment "The RDF node that has caused the result."@en ;
+	rdfs:comment "An RDF node that has caused the result."@en ;
 	rdfs:domain sh:AbstractResult ;
 	rdfs:isDefinedBy sh: .
 
@@ -306,7 +306,7 @@ sh:SPARQLExecutable
 sh:SPARQLAskExecutable
 	a rdfs:Class ;
 	rdfs:label "SPARQL ASK executable"@en ;
-	rdfs:comment "The class of SPARQL executables based on an ASK query."@en ;
+	rdfs:comment "The class of SPARQL executables that are based on an ASK query."@en ;
 	rdfs:subClassOf sh:SPARQLExecutable ;
 	rdfs:isDefinedBy sh: .
 
@@ -321,7 +321,7 @@ sh:ask
 sh:SPARQLConstructExecutable
 	a rdfs:Class ;
 	rdfs:label "SPARQL CONSTRUCT executable"@en ;
-	rdfs:comment "The class of SPARQL executables based on a CONSTRUCT query."@en ;
+	rdfs:comment "The class of SPARQL executables that are based on a CONSTRUCT query."@en ;
 	rdfs:subClassOf sh:SPARQLExecutable ;
 	rdfs:isDefinedBy sh: .
 
@@ -389,7 +389,7 @@ sh:declare
 sh:prefix
 	a rdf:Property ;
 	rdfs:label "prefix"@en ;
-	rdfs:comment "A prefix string."@en ;
+	rdfs:comment "The prefix of a prefix declaration."@en ;
 	rdfs:domain sh:PrefixDeclaration ;
 	rdfs:range xsd:string ;
 	rdfs:isDefinedBy sh: .
@@ -397,7 +397,7 @@ sh:prefix
 sh:namespace
 	a rdf:Property ;
 	rdfs:label "namespace"@en ;
-	rdfs:comment "The namespace associated with a prefix."@en ;
+	rdfs:comment "The namespace associated with a prefix in a prefix declaration."@en ;
 	rdfs:domain sh:PrefixDeclaration ;
 	rdfs:range xsd:anyURI ;
 	rdfs:isDefinedBy sh: .
@@ -423,7 +423,7 @@ sh:Target
 sh:SPARQLTarget
 	a rdfs:Class ;
 	rdfs:label "SPARQL target"@en ;
-	rdfs:comment "The class of targets that are based on a SPARQL SELECT query."@en ;
+	rdfs:comment "The class of targets that are based on SPARQL SELECT queries."@en ;
 	rdfs:subClassOf sh:Target ;
 	rdfs:subClassOf sh:SPARQLSelectExecutable ;
 	rdfs:isDefinedBy sh: .
@@ -439,7 +439,7 @@ sh:TargetType
 sh:SPARQLTargetType
 	a rdfs:Class ;
 	rdfs:label "SPARQL target type"@en ;
-	rdfs:comment "The (meta) class for parameterizable targets that are based on a SPARQL SELECT query."@en ;
+	rdfs:comment "The (meta) class for parameterizable targets that are based on SPARQL SELECT queries."@en ;
 	rdfs:subClassOf sh:TargetType ;
 	rdfs:subClassOf sh:SPARQLSelectExecutable ;
 	rdfs:isDefinedBy sh: .
@@ -544,7 +544,7 @@ sh:ConstraintComponent
 sh:validator
 	a rdf:Property ;
 	rdfs:label "validator"@en ;
-	rdfs:comment "The validator(s) used to evaluate either node or property shapes."@en ;
+	rdfs:comment "The validator(s) used to evaluate constraints of either node or property shapes."@en ;
 	rdfs:domain sh:ConstraintComponent ;
 	rdfs:range sh:Validator ;
 	rdfs:isDefinedBy sh: .
@@ -552,7 +552,7 @@ sh:validator
 sh:nodeValidator
 	a rdf:Property ;
 	rdfs:label "shape validator"@en ;
-	rdfs:comment "The validator(s) used to evaluate a constraint component in the context of a node shape."@en ;
+	rdfs:comment "The validator(s) used to evaluate a constraint in the context of a node shape."@en ;
 	rdfs:domain sh:ConstraintComponent ;
 	rdfs:range sh:Validator ;
 	rdfs:isDefinedBy sh: .
@@ -560,7 +560,7 @@ sh:nodeValidator
 sh:propertyValidator
 	a rdf:Property ;
 	rdfs:label "property validator"@en ;
-	rdfs:comment "The validator(s) used to evaluate a constraint component in the context of a property shape."@en ;
+	rdfs:comment "The validator(s) used to evaluate a constraint in the context of a property shape."@en ;
 	rdfs:domain sh:ConstraintComponent ;
 	rdfs:range sh:Validator ;
 	rdfs:isDefinedBy sh: .
@@ -585,13 +585,6 @@ sh:SPARQLSelectValidator
 	rdfs:label "SPARQL SELECT validator"@en ;
 	rdfs:comment "The class of validators based on SPARQL SELECT queries. The queries are evaluated for each focus node and are supposed to produce bindings for all focus nodes that do not conform."@en ;
 	rdfs:subClassOf sh:Validator ;
-	rdfs:subClassOf sh:SPARQLSelectExecutable ;
-	rdfs:isDefinedBy sh: .
-
-sh:SPARQLConstraint
-	a rdfs:Class ;
-	rdfs:label "SPARQL constraint"@en ;
-	rdfs:comment "The class of constraints based on SPARQL SELECT queries."@en ;
 	rdfs:subClassOf sh:SPARQLSelectExecutable ;
 	rdfs:isDefinedBy sh: .
 
@@ -628,6 +621,7 @@ sh:ClassConstraintComponent
 sh:ClassConstraintComponent-class
 	a sh:Parameter ;
 	sh:path sh:class ;
+	sh:nodeKind sh:IRI ;
 	rdfs:isDefinedBy sh: .
 
 sh:class
@@ -683,6 +677,8 @@ sh:DatatypeConstraintComponent
 sh:DatatypeConstraintComponent-datatype
 	a sh:Parameter ;
 	sh:path sh:datatype ;
+	sh:nodeKind sh:IRI ;
+	sh:maxCount 1 ;
 	rdfs:isDefinedBy sh: .
 
 sh:datatype
@@ -709,7 +705,7 @@ sh:DisjointConstraintComponent-disjoint
 sh:disjoint
 	a rdf:Property ;
 	rdfs:label "disjoint"@en ;
-	rdfs:comment "Specifies a property that must have values that are disjoint from the value nodes."@en ;
+	rdfs:comment "Specifies a property where the set of values must be disjoint with the value nodes."@en ;
 	rdfs:range rdf:Property ;
 	rdfs:isDefinedBy sh: .
 
@@ -764,6 +760,7 @@ sh:InConstraintComponent
 sh:InConstraintComponent-in
 	a sh:Parameter ;
 	sh:path sh:in ;
+	sh:maxCount 1 ;
 	rdfs:isDefinedBy sh: .
 
 sh:in
@@ -784,6 +781,7 @@ sh:LanguageInConstraintComponent
 sh:LanguageInConstraintComponent-languageIn
 	a sh:Parameter ;
 	sh:path sh:languageIn ;
+	sh:maxCount 1 ;
 	rdfs:isDefinedBy sh: .
 
 sh:languageIn
@@ -847,6 +845,7 @@ sh:MaxCountConstraintComponent-maxCount
 	a sh:Parameter ;
 	sh:path sh:maxCount ;
 	sh:datatype xsd:integer ;
+	sh:maxCount 1 ;
 	rdfs:isDefinedBy sh: .
 
 sh:maxCount
@@ -867,6 +866,7 @@ sh:MaxExclusiveConstraintComponent
 sh:MaxExclusiveConstraintComponent-maxExclusive
 	a sh:Parameter ;
 	sh:path sh:maxExclusive ;
+	sh:maxCount 1 ;
 	sh:nodeKind sh:Literal ;
 	rdfs:isDefinedBy sh: .
 
@@ -887,6 +887,7 @@ sh:MaxInclusiveConstraintComponent
 sh:MaxInclusiveConstraintComponent-maxInclusive
 	a sh:Parameter ;
 	sh:path sh:maxInclusive ;
+	sh:maxCount 1 ;
 	sh:nodeKind sh:Literal ;
 	rdfs:isDefinedBy sh: .
 
@@ -908,6 +909,7 @@ sh:MaxLengthConstraintComponent-maxLength
 	a sh:Parameter ;
 	sh:path sh:maxLength ;
 	sh:datatype xsd:integer ;
+	sh:maxCount 1 ;
 	rdfs:isDefinedBy sh: .
 
 sh:maxLength
@@ -929,6 +931,7 @@ sh:MinCountConstraintComponent-minCount
 	a sh:Parameter ;
 	sh:path sh:minCount ;
 	sh:datatype xsd:integer ;
+	sh:maxCount 1 ;
 	rdfs:isDefinedBy sh: .
 
 sh:minCount
@@ -949,6 +952,7 @@ sh:MinExclusiveConstraintComponent
 sh:MinExclusiveConstraintComponent-minExclusive
 	a sh:Parameter ;
 	sh:path sh:minExclusive ;
+	sh:maxCount 1 ;
 	sh:nodeKind sh:Literal ;
 	rdfs:isDefinedBy sh: .
 
@@ -969,6 +973,7 @@ sh:MinInclusiveConstraintComponent
 sh:MinInclusiveConstraintComponent-minInclusive
 	a sh:Parameter ;
 	sh:path sh:minInclusive ;
+	sh:maxCount 1 ;
 	sh:nodeKind sh:Literal ;
 	rdfs:isDefinedBy sh: .
 
@@ -990,6 +995,7 @@ sh:MinLengthConstraintComponent-minLength
 	a sh:Parameter ;
 	sh:path sh:minLength ;
 	sh:datatype xsd:integer ;
+	sh:maxCount 1 ;
 	rdfs:isDefinedBy sh: .
 
 sh:minLength
@@ -1032,6 +1038,7 @@ sh:NodeKindConstraintComponent-nodeKind
 	sh:path sh:nodeKind ;
 	sh:class sh:NodeKind ;
 	sh:in ( sh:BlankNode sh:IRI sh:Literal sh:BlankNodeOrIRI sh:BlankNodeOrLiteral sh:IRIOrLiteral ) ;
+	sh:maxCount 1 ;
 	rdfs:isDefinedBy sh: .
 
 sh:nodeKind
@@ -1234,6 +1241,7 @@ sh:UniqueLangConstraintComponent-uniqueLang
 	a sh:Parameter ;
 	sh:path sh:uniqueLang ;
 	sh:datatype xsd:boolean ;
+	sh:maxCount 1 ;
 	rdfs:isDefinedBy sh: .
 
 sh:uniqueLang
@@ -1286,6 +1294,13 @@ sh:sparql
 	rdfs:range sh:SPARQLConstraint ;
 	rdfs:isDefinedBy sh: .
 
+sh:SPARQLConstraint
+	a rdfs:Class ;
+	rdfs:label "SPARQL constraint"@en ;
+	rdfs:comment "The class of constraints based on SPARQL SELECT queries."@en ;
+	rdfs:subClassOf sh:SPARQLSelectExecutable ;
+	rdfs:isDefinedBy sh: .
+
 
 # Derived Values support ------------------------------------------------------
 
@@ -1327,7 +1342,7 @@ sh:SPARQLValuesDeriver
 sh:defaultValue
 	a rdf:Property ;
 	rdfs:label "default value"@en ;
-	rdfs:comment "Specifies a default value, for example for user interface tools to pre-populate input fields for a property."@en ;
+	rdfs:comment "A default value for a property, for example for user interface tools to pre-populate input fields."@en ;
 	rdfs:domain sh:PropertyShape ;
 	rdfs:isDefinedBy sh: .
 
@@ -1342,7 +1357,7 @@ sh:description
 sh:group
 	a rdf:Property ;
 	rdfs:label "group"@en ;
-	rdfs:comment "Can be used to link to a property group to indicate that the constraint belongs to a group of related property shapes."@en ;
+	rdfs:comment "Can be used to link to a property group to indicate that a property shape belongs to a group of related property shapes."@en ;
 	rdfs:domain sh:PropertyShape ;
 	rdfs:range sh:PropertyGroup ;
 	rdfs:isDefinedBy sh: .
