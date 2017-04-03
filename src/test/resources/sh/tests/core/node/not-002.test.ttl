@@ -12,7 +12,7 @@
 
 <http://datashapes.org/sh/tests/core/node/not-002.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of not-002" ;
+  rdfs:label "Test of sh:not at node shape 002" ;
   owl:imports <http://datashapes.org/dash> ;
   owl:versionInfo "Created with TopBraid Composer" ;
 .

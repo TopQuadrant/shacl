@@ -12,9 +12,8 @@
 
 <http://datashapes.org/sh/tests/core/path/path-inverse-001.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of path-inverse-001" ;
+  rdfs:label "Test of path sh:inversePath 001" ;
   owl:imports <http://datashapes.org/dash> ;
-  owl:versionInfo "Created with TopBraid Composer" ;
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;

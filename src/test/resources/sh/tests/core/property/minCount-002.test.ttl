@@ -12,9 +12,8 @@
 
 <http://datashapes.org/sh/tests/core/property/minCount-002.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of sh:minCount 002" ;
+  rdfs:label "Test of sh:minCount at property shape 001" ;
   owl:imports <http://datashapes.org/dash> ;
-  owl:versionInfo "Created with TopBraid Composer" ;
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;

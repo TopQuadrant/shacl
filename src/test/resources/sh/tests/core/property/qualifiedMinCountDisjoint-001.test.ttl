@@ -12,9 +12,8 @@
 
 <http://datashapes.org/sh/tests/core/property/qualifiedMinCountDisjoint-001.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of qualifiedMinCountDisjoint-001" ;
+  rdfs:label "Test of sh:qualifiedMinCount with disjoint shapes at property shape 001" ;
   owl:imports <http://datashapes.org/dash> ;
-  owl:versionInfo "Created with TopBraid Composer" ;
 .
 ex:Digit
   rdf:type rdfs:Class ;

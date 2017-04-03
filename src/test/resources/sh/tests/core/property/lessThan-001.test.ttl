@@ -12,9 +12,8 @@
 
 <http://datashapes.org/sh/tests/core/property/lessThan-001.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of lessThan-001" ;
+  rdfs:label "Test of sh:lessThan at property shape 001" ;
   owl:imports <http://datashapes.org/dash> ;
-  owl:versionInfo "Created with TopBraid Composer" ;
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;

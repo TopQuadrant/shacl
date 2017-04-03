@@ -12,7 +12,7 @@
 
 <http://datashapes.org/sh/tests/core/property/maxLength-001.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of sh:maxLength 001" ;
+  rdfs:label "Test of sh:maxLength at property shape 001" ;
   owl:imports <http://datashapes.org/dash> ;
   owl:versionInfo "Created with TopBraid Composer" ;
 .

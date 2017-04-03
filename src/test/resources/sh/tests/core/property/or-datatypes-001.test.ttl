@@ -12,9 +12,8 @@
 
 <http://datashapes.org/sh/tests/core/property/or-datatypes-001.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of or-datatypes-001" ;
+  rdfs:label "Test of sh:or of sh:datatypes at property shape 001" ;
   owl:imports <http://datashapes.org/dash> ;
-  owl:versionInfo "Created with TopBraid Composer" ;
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;

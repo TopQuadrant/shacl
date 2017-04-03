@@ -12,7 +12,7 @@
 
 <http://datashapes.org/sh/tests/core/node/hasValue-001.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of hasValue-001" ;
+  rdfs:label "Test of sh:hasValue at node shape 001" ;
   owl:imports <http://datashapes.org/dash> ;
   owl:versionInfo "Created with TopBraid Composer" ;
 .

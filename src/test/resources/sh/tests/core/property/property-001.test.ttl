@@ -12,9 +12,8 @@
 
 <http://datashapes.org/sh/tests/core/property/property-001.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of property-001" ;
+  rdfs:label "Test of sh:property at property shape 001" ;
   owl:imports <http://datashapes.org/dash> ;
-  owl:versionInfo "Created with TopBraid Composer" ;
 .
 ex:Address
   rdf:type rdfs:Class ;

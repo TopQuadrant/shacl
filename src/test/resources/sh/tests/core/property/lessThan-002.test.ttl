@@ -12,7 +12,7 @@
 
 <http://datashapes.org/sh/tests/core/property/lessThan-002.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of lessThan-002" ;
+  rdfs:label "Test of sh:lessThan at property shape 002" ;
   owl:imports <http://datashapes.org/dash> ;
   owl:versionInfo "Created with TopBraid Composer" ;
 .

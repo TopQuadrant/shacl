@@ -12,7 +12,7 @@
 
 <http://datashapes.org/sh/tests/core/property/or-001.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of sh:or in property shape 001" ;
+  rdfs:label "Test of sh:or at property shape 001" ;
   owl:imports <http://datashapes.org/dash> ;
 .
 ex:Address

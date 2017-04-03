@@ -1,5 +1,5 @@
 # W3C Shapes Constraint Language (SHACL) Vocabulary
-# Draft last edited 2017-03-26
+# Draft last edited 2017-04-01
 
 @prefix owl:  <http://www.w3.org/2002/07/owl#> .
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -1036,7 +1036,6 @@ sh:NodeKindConstraintComponent
 sh:NodeKindConstraintComponent-nodeKind
 	a sh:Parameter ;
 	sh:path sh:nodeKind ;
-	sh:class sh:NodeKind ;
 	sh:in ( sh:BlankNode sh:IRI sh:Literal sh:BlankNodeOrIRI sh:BlankNodeOrLiteral sh:IRIOrLiteral ) ;
 	sh:maxCount 1 ;
 	rdfs:isDefinedBy sh: .

@@ -12,8 +12,8 @@
 
 <http://datashapes.org/sh/tests/core/property/in-001.test>
   rdf:type owl:Ontology ;
+  rdfs:label "Test of sh:in at property shape 001" ;
   owl:imports <http://datashapes.org/dash> ;
-  owl:versionInfo "Created with TopBraid Composer" ;
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;

@@ -263,7 +263,7 @@ dash:ListNodeShape
     ) ;
 .
 dash:ListShape
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   rdfs:comment """Defines constraints on what it means for a node to be a well-formed RDF list.
 
 The focus node must either be rdf:nil or not recursive. Furthermore, this shape uses dash:ListNodeShape as a \"helper\" to walk through all members of the whole list (including itself).""" ;
@@ -984,7 +984,7 @@ sh:ClosedConstraintComponent
 sh:DatatypeConstraintComponent
   dash:staticConstraint "true"^^xsd:boolean ;
   sh:message "Value does not have datatype {$datatype}" ;
-  sh:targetClass sh:Shape ;
+  sh:targetClass sh:PropertyShape ;
   sh:validator [
       rdf:type sh:JSValidator ;
       sh:jsFunctionName "validateDatatype" ;
@@ -1153,7 +1153,7 @@ sh:LessThanConstraintComponent
 		}
 		""" ;
     ] ;
-  sh:targetClass sh:Shape ;
+  sh:targetClass sh:PropertyShape ;
 .
 sh:LessThanOrEqualsConstraintComponent
   dash:localConstraint "true"^^xsd:boolean ;
@@ -1176,7 +1176,7 @@ sh:LessThanOrEqualsConstraintComponent
 		}
 """ ;
     ] ;
-  sh:targetClass sh:Shape ;
+  sh:targetClass sh:PropertyShape ;
 .
 sh:MaxCountConstraintComponent
   dash:localConstraint "true"^^xsd:boolean ;

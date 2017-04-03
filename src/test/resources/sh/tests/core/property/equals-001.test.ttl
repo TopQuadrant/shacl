@@ -12,7 +12,7 @@
 
 <http://datashapes.org/sh/tests/core/property/equals-001.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of sh:equals in property shapes" ;
+  rdfs:label "Test of sh:equals at property shape 001" ;
   owl:imports <http://datashapes.org/dash> ;
 .
 ex:GraphValidationTestCase

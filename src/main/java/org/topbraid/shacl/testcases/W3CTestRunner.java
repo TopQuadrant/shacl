@@ -18,7 +18,10 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.sparql.vocabulary.DOAP;
+import org.apache.jena.sparql.vocabulary.EARL;
 import org.apache.jena.util.FileUtils;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
@@ -45,15 +48,45 @@ import org.topbraid.spin.util.JenaUtil;
  */
 public class W3CTestRunner {
 	
+	private final static Resource EARL_AUTHOR = ResourceFactory.createResource("http://knublauch.com");
+	
+	private final static Resource EARL_SUBJECT = ResourceFactory.createResource("http://topquadrant.com/shacl/api");
+	
+	private Model earl;
+	
 	private List<Item> items = new LinkedList<>();
 	
 	
 	public W3CTestRunner(File rootManifest) throws IOException {
+		
+		earl = JenaUtil.createMemoryModel();
+		JenaUtil.initNamespaces(earl.getGraph());
+		earl.setNsPrefix("doap", DOAP.NS);
+		earl.setNsPrefix("earl", EARL.NS);
+		
+		earl.add(EARL_SUBJECT, RDF.type, DOAP.Project);
+		earl.add(EARL_SUBJECT, RDF.type, EARL.Software);
+		earl.add(EARL_SUBJECT, RDF.type, EARL.TestSubject);
+		earl.add(EARL_SUBJECT, DOAP.developer, EARL_AUTHOR);
+		earl.add(EARL_SUBJECT, DOAP.name, "TopBraid SHACL API");
+		
 		collectItems(rootManifest, "urn:root/");
 	}
 	
 	
 	private void collectItems(File manifestFile, String baseURI) throws IOException {
+		
+		String filePath = manifestFile.getAbsolutePath().replaceAll("\\\\", "/");
+		int coreIndex = filePath.lastIndexOf("core/");
+		if(coreIndex > 0) {
+			filePath = filePath.substring(coreIndex);
+		}
+		else {
+			int sindex = filePath.lastIndexOf("sparql/");
+			if(sindex > 0) {
+				filePath = filePath.substring(sindex);
+			}
+		}
 		
 		Model model = JenaUtil.createMemoryModel();
 		model.read(new FileInputStream(manifestFile), baseURI, FileUtils.langTurtle);
@@ -72,10 +105,15 @@ public class W3CTestRunner {
 			}
 			for(Resource entries : JenaUtil.getResourceProperties(manifest, MF.entries)) {
 				for(RDFNode entry : entries.as(RDFList.class).iterator().toList()) {
-					items.add(new Item(entry.asResource()));
+					items.add(new Item(entry.asResource(), filePath));
 				}
 			}
 		}
+	}
+	
+	
+	public Model getEARLModel() {
+		return earl;
 	}
 	
 	
@@ -102,15 +140,49 @@ public class W3CTestRunner {
 		// The sht:Validate in its defining Model
 		Resource entry;
 		
-		Item(Resource entry) {
+		String filePath;
+		
+		
+		Item(Resource entry, String filePath) {
 			this.entry = entry;
+			this.filePath = filePath;
+		}
+		
+		
+		public Resource getEARLResource() {
+			return ResourceFactory.createResource("urn:x-shacl-test:" + entry.getURI().substring("urn:root".length()));
+		}
+		
+		
+		public String getFilePath() {
+			return filePath;
+		}
+		
+		
+		public String getLabel() {
+			return JenaUtil.getStringProperty(entry, RDFS.label);
+		}
+		
+		
+		public Resource getStatus() {
+			return JenaUtil.getResourceProperty(entry, MF.status);
 		}
 		
 		
 		public boolean run(PrintStream out) throws InterruptedException {
+			
+			Resource assertion = earl.createResource(EARL.Assertion);
+			assertion.addProperty(EARL.assertedBy, EARL_AUTHOR);
+			assertion.addProperty(EARL.subject, EARL_SUBJECT);
+			assertion.addProperty(EARL.test, getEARLResource());
+			Resource result = earl.createResource(EARL.TestResult);
+			assertion.addProperty(EARL.result, result);
+			result.addProperty(EARL.mode, EARL.automatic);
+			
 			Resource action = entry.getPropertyResourceValue(MF.action);
 			Resource dataGraph = action.getPropertyResourceValue(SHT.dataGraph);
 			Resource shapesGraphResource = action.getPropertyResourceValue(SHT.shapesGraph);
+			// TODO: Actually resolve, if needed
 			
 			Graph shapesBaseGraph = entry.getModel().getGraph();
 			MultiUnion multiUnion = new MultiUnion(new Graph[] {
@@ -159,15 +231,18 @@ public class W3CTestRunner {
 				}
 				if(expectedModel.getGraph().isIsomorphicWith(actualResults.getGraph())) {
 					out.println("PASSED: " + entry);
+					result.addProperty(EARL.outcome, EARL.passed);
 					return true;
 				}
 				else {
 					out.println("FAILED: " + entry);
+					result.addProperty(EARL.outcome, EARL.failed);
 					return false;
 				}
 			}
 			catch(Exception ex) {
 				out.println("EXCEPTION: " + entry + " " + ex.getMessage());
+				result.addProperty(EARL.outcome, EARL.failed);
 				return false;
 			}
 		}

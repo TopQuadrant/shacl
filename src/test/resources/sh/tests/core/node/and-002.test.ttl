@@ -12,7 +12,7 @@
 
 <http://datashapes.org/sh/tests/core/node/and-002.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of and-002" ;
+  rdfs:label "Test of sh:and at node shape 002" ;
   owl:imports <http://datashapes.org/dash> ;
   owl:versionInfo "Created with TopBraid Composer" ;
 .

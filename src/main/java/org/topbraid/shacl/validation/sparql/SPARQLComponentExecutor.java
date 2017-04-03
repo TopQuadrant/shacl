@@ -61,6 +61,8 @@ public class SPARQLComponentExecutor extends AbstractSPARQLExecutor {
 			sb.append(") .\n");
 		}
 		else {
+			sb.append("SELECT DISTINCT $this ?value");
+
 			// Collect other variables used in sh:messages
 			Set<String> otherVarNames = new HashSet<String>();
 			for(Statement messageS : validator.listProperties(SH.message).toList()) {
@@ -72,8 +74,7 @@ public class SPARQLComponentExecutor extends AbstractSPARQLExecutor {
 				sb.append(" ?" + varName);
 			}
 			
-			// Create body
-			sb.append("SELECT DISTINCT $this ?value\nWHERE {\n");
+			sb.append("\nWHERE {\n");
 			sb.append("    $this $" + SH.PATHVar.getVarName() + " " + valueVar + " .\n");
 		}
 

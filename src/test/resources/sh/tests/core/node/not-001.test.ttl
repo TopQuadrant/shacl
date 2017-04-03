@@ -12,8 +12,8 @@
 
 <http://datashapes.org/sh/tests/core/node/not-001>
   rdf:type owl:Ontology ;
+  rdfs:label "Test of sh:not at node shape 001" ;
   owl:imports <http://datashapes.org/dash> ;
-  owl:versionInfo "Created with TopBraid Composer" ;
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
