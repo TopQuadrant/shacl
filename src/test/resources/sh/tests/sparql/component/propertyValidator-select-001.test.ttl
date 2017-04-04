@@ -1,20 +1,19 @@
-# baseURI: http://datashapes.org/sh/tests/sparql/component/LanguageConstraintComponentUsingSELECT.test
+# baseURI: http://datashapes.org/sh/tests/sparql/component/propertyValidator-select-001.test
 # imports: http://datashapes.org/dash
 # prefix: ex
 
 @prefix dash: <http://datashapes.org/dash#> .
-@prefix ex: <http://datashapes.org/sh/tests/sparql/component/LanguageConstraintComponentUsingSELECT.test#> .
+@prefix ex: <http://datashapes.org/sh/tests/sparql/component/propertyValidator-select-001.test#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://datashapes.org/sh/tests/sparql/component/LanguageConstraintComponentUsingSELECT.test>
+<http://datashapes.org/sh/tests/sparql/component/propertyValidator-select-001.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of LanguageConstraintComponentUsingSELECT" ;
+  rdfs:label "Test of sh:propertyValidator with SELECT 001" ;
   owl:imports <http://datashapes.org/dash> ;
-  owl:versionInfo "Created with TopBraid Composer" ;
 .
 ex:Country
   rdf:type rdfs:Class ;

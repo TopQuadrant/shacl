@@ -64,7 +64,9 @@ public class SHACLPaths {
 			sb.append(FmtUtils.stringForNode(path.asNode(), path.getModel()));
 		}
 		else {
+			sb.append("(");
 			appendPathBlankNode(sb, path, separator);
+			sb.append(")");
 		}
 	}
 	

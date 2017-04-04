@@ -1,23 +1,24 @@
-# baseURI: http://datashapes.org/sh/tests/sparql/property/LanguageExamplePropertyShape.test
+# baseURI: http://datashapes.org/sh/tests/sparql/node/sparql-002.test
 # imports: http://datashapes.org/dash
 # prefix: ex
 
 @prefix dash: <http://datashapes.org/dash#> .
-@prefix ex: <http://datashapes.org/sh/tests/sparql/property/LanguageExamplePropertyShape.test#> .
+@prefix ex: <http://datashapes.org/sh/tests/sparql/node/sparql-002.test#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://datashapes.org/sh/tests/sparql/property/LanguageExamplePropertyShape.test>
+<http://datashapes.org/sh/tests/sparql/node/sparql-002.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of LanguageExamplePropertyShape" ;
+  rdfs:label "Test of sh:sparql at node shape 002" ;
   owl:imports <http://datashapes.org/dash> ;
-  owl:versionInfo "Created with TopBraid Composer" ;
-.
-ex:Country
-  rdf:type rdfs:Class ;
+  sh:declare [
+      rdf:type sh:PrefixDeclaration ;
+      sh:namespace "http://datashapes.org/sh/tests/sparql/node/sparql-002.test#"^^xsd:anyURI ;
+      sh:prefix "ex" ;
+    ] ;
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
@@ -29,9 +30,9 @@ ex:GraphValidationTestCase
           sh:focusNode ex:InvalidCountry ;
           sh:resultPath ex:germanLabel ;
           sh:resultSeverity sh:Violation ;
-          sh:sourceConstraint ex:LanguageExamplePropertyShape-sparql ;
+          sh:sourceConstraint ex:LanguageExampleShape ;
           sh:sourceConstraintComponent sh:SPARQLConstraintComponent ;
-          sh:sourceShape ex:LanguageExamplePropertyShape ;
+          sh:sourceShape ex:LanguageExampleShape ;
           sh:value "Spain"@en ;
         ] ;
     ] ;
@@ -40,23 +41,20 @@ ex:InvalidCountry
   rdf:type ex:Country ;
   ex:germanLabel "Spain"@en ;
 .
-ex:LanguageExamplePropertyShape
-  rdf:type sh:PropertyShape ;
-  sh:path ex:germanLabel ;
-  sh:sparql ex:LanguageExamplePropertyShape-sparql ;
-  sh:targetClass ex:Country ;
-.
-ex:LanguageExamplePropertyShape-sparql
+ex:LanguageExampleShape
+  rdf:type sh:NodeShape ;
   rdf:type sh:SPARQLConstraint ;
   sh:message "Values are literals with German language tag." ;
-  sh:prefixes ex: ;
+  sh:prefixes <http://datashapes.org/sh/tests/sparql/node/sparql-002.test> ;
   sh:select """
-		SELECT $this ?value
-		WHERE {
-			$this $PATH ?value .
-			FILTER (!isLiteral(?value) || !langMatches(lang(?value), \"de\"))
-		}
-		""" ;
+			SELECT $this (ex:germanLabel AS ?path) ?value
+			WHERE {
+				$this ex:germanLabel ?value .
+				FILTER (!isLiteral(?value) || !langMatches(lang(?value), \"de\"))
+			}
+			""" ;
+  sh:sparql ex:LanguageExampleShape ;
+  sh:targetClass ex:Country ;
 .
 ex:ValidCountry
   rdf:type ex:Country ;

@@ -12,7 +12,7 @@
 
 <http://datashapes.org/sh/tests/sparql/node/sparql-001.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of sh:sparql in node shape 001" ;
+  rdfs:label "Test of sh:sparql at node shape 001" ;
   owl:imports <http://datashapes.org/dash> ;
 .
 ex:GraphValidationTestCase
