@@ -334,7 +334,7 @@ public class ValidationEngine {
 				
 				List<RDFNode> focusNodes = getTargetNodes(shape.getShapeResource());
 				if(!focusNodes.isEmpty()) {
-					if(!shapesGraph.isIgnored(shape.getShapeResource().asNode())) {
+					if(!shapesGraph.isIgnored(shape.getShapeResource().asNode()) && !shape.getShapeResource().isDeactivated()) {
 						for(Constraint constraint : shape.getConstraints()) {
 							validateNodesAgainstConstraint(focusNodes, constraint);
 						}
@@ -392,15 +392,17 @@ public class ValidationEngine {
 	 */
 	public Resource validateNodesAgainstShape(List<RDFNode> focusNodes, Node shape) {
 		if(!shapesGraph.isIgnored(shape)) {
-			boolean nested = SHACLScriptEngineManager.begin();
-			try {
-				Shape vs = shapesGraph.getShape(shape);
-				for(Constraint constraint : vs.getConstraints()) {
-					validateNodesAgainstConstraint(focusNodes, constraint);
+			Shape vs = shapesGraph.getShape(shape);
+			if(!vs.getShapeResource().isDeactivated()) {
+				boolean nested = SHACLScriptEngineManager.begin();
+				try {
+					for(Constraint constraint : vs.getConstraints()) {
+						validateNodesAgainstConstraint(focusNodes, constraint);
+					}
 				}
-			}
-			finally {
-				SHACLScriptEngineManager.end(nested);
+				finally {
+					SHACLScriptEngineManager.end(nested);
+				}
 			}
 		}
 		return report;
