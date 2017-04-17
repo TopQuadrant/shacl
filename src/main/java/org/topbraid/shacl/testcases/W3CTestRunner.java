@@ -2,6 +2,7 @@ package org.topbraid.shacl.testcases;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URI;
@@ -26,6 +27,7 @@ import org.apache.jena.util.FileUtils;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.topbraid.shacl.arq.SHACLPaths;
+import org.topbraid.shacl.util.ModelPrinter;
 import org.topbraid.shacl.validation.ShapesGraph;
 import org.topbraid.shacl.validation.ValidationEngine;
 import org.topbraid.shacl.validation.ValidationEngineFactory;
@@ -36,6 +38,7 @@ import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.shacl.vocabulary.SHT;
 import org.topbraid.shacl.vocabulary.TOSH;
 import org.topbraid.spin.arq.ARQFactory;
+import org.topbraid.spin.util.ExceptionUtil;
 import org.topbraid.spin.util.JenaUtil;
 
 /**
@@ -105,7 +108,7 @@ public class W3CTestRunner {
 			}
 			for(Resource entries : JenaUtil.getResourceProperties(manifest, MF.entries)) {
 				for(RDFNode entry : entries.as(RDFList.class).iterator().toList()) {
-					items.add(new Item(entry.asResource(), filePath));
+					items.add(new Item(entry.asResource(), filePath, manifestFile));
 				}
 			}
 		}
@@ -142,10 +145,13 @@ public class W3CTestRunner {
 		
 		String filePath;
 		
+		File manifestFile;
 		
-		Item(Resource entry, String filePath) {
+		
+		Item(Resource entry, String filePath, File manifestFile) {
 			this.entry = entry;
 			this.filePath = filePath;
+			this.manifestFile = manifestFile;
 		}
 		
 		
@@ -180,11 +186,20 @@ public class W3CTestRunner {
 			result.addProperty(EARL.mode, EARL.automatic);
 			
 			Resource action = entry.getPropertyResourceValue(MF.action);
-			Resource dataGraph = action.getPropertyResourceValue(SHT.dataGraph);
 			Resource shapesGraphResource = action.getPropertyResourceValue(SHT.shapesGraph);
-			// TODO: Actually resolve, if needed
-			
 			Graph shapesBaseGraph = entry.getModel().getGraph();
+			if(!(entry.getURI() + ".ttl").equals(shapesGraphResource.getURI())) {
+				int last = shapesGraphResource.getURI().lastIndexOf('/');
+				File shapesFile = new File(manifestFile.getParentFile(), shapesGraphResource.getURI().substring(last + 1));
+				Model shapesModel = JenaUtil.createMemoryModel();
+				try {
+					shapesModel.read(new FileInputStream(shapesFile), "urn:x-dummy", FileUtils.langTurtle);
+					shapesBaseGraph = shapesModel.getGraph();
+				} catch (FileNotFoundException e) {
+					ExceptionUtil.throwUnchecked(e);
+				}
+			}
+			
 			MultiUnion multiUnion = new MultiUnion(new Graph[] {
 				shapesBaseGraph,
 				ARQFactory.getNamedModel(TOSH.BASE_URI).getGraph(),
@@ -194,6 +209,17 @@ public class W3CTestRunner {
 			Model shapesModel = ModelFactory.createModelForGraph(multiUnion);
 			
 			Model dataModel = entry.getModel();
+			Resource dataGraph = action.getPropertyResourceValue(SHT.dataGraph);
+			if(!(entry.getURI() + ".ttl").equals(dataGraph.getURI())) {
+				int last = dataGraph.getURI().lastIndexOf('/');
+				File dataFile = new File(manifestFile.getParentFile(), dataGraph.getURI().substring(last + 1));
+				dataModel = JenaUtil.createMemoryModel();
+				try {
+					dataModel.read(new FileInputStream(dataFile), "urn:x-dummy", FileUtils.langTurtle);
+				} catch (FileNotFoundException e) {
+					ExceptionUtil.throwUnchecked(e);
+				}
+			}
 
 			URI shapesGraphURI = URI.create("urn:x-shacl-shapes-graph:" + UUID.randomUUID().toString());
 			Dataset dataset = ARQFactory.get().getDataset(dataModel);
@@ -237,6 +263,7 @@ public class W3CTestRunner {
 				else {
 					out.println("FAILED: " + entry);
 					result.addProperty(EARL.outcome, EARL.failed);
+					System.out.println("Actual\n" + ModelPrinter.get().print(actualResults));
 					return false;
 				}
 			}

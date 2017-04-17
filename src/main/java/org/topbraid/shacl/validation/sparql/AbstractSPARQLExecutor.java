@@ -163,7 +163,7 @@ public abstract class AbstractSPARQLExecutor implements ConstraintExecutor {
 							selectMessage = ResourceFactory.createTypedLiteral("Validation Failure: Could not validate shape");
 						}
 						
-						Resource result = engine.createResult(resultType, constraint, focusNode);
+						Resource result = engine.createResult(resultType, constraint, thisValue);
 						if(SH.SPARQLConstraintComponent.equals(constraint.getComponent())) {
 							result.addProperty(SH.sourceConstraint, constraint.getParameterValue());
 						}
@@ -175,7 +175,6 @@ public abstract class AbstractSPARQLExecutor implements ConstraintExecutor {
 							addDefaultMessages(engine, messageHolder, constraint.getComponent(), result, bindings, sol);
 						}
 						
-						RDFNode resultFocusNode = thisValue;
 						RDFNode pathValue = sol.get(SH.pathVar.getVarName());
 						if(pathValue != null && pathValue.isURIResource()) {
 							result.addProperty(SH.resultPath, pathValue);
@@ -189,8 +188,9 @@ public abstract class AbstractSPARQLExecutor implements ConstraintExecutor {
 						if(selectValue != null) {
 							result.addProperty(SH.value, selectValue);
 						}
-						
-						result.addProperty(SH.focusNode, resultFocusNode);
+						else if(SH.NodeShape.equals(constraint.getContext())) {
+							result.addProperty(SH.value, focusNode);
+						}
 						
 						if(createDetails) {
 							addDetails(result, nestedResults);
