@@ -164,7 +164,9 @@ public class ValidationEngine {
 			results.addAll(JenaUtil.getAllInstances(targetClass.inModel(dataModel)));
 		}
 		
-		results.addAll(shape.getModel().listObjectsOfProperty(shape, SH.targetNode).toList());
+		for(RDFNode targetNode : shape.getModel().listObjectsOfProperty(shape, SH.targetNode).toList()) {
+			results.add(targetNode.inModel(dataModel));
+		}
 		
 		for(Resource sof : JenaUtil.getResourceProperties(shape, SH.targetSubjectsOf)) {
 			for(Statement s : dataModel.listStatements(null, JenaUtil.asProperty(sof), (RDFNode)null).toList()) {
