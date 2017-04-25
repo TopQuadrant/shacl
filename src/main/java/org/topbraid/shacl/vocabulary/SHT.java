@@ -11,6 +11,8 @@ public class SHT {
 	public static final String NS = BASE_URI + "#";
 	
 	
+	public final static Resource CoreOnly = ResourceFactory.createResource(NS + "CoreOnly");
+	
 	public final static Property dataGraph = ResourceFactory.createProperty(NS + "dataGraph");
 	
 	public final static Resource proposed = ResourceFactory.createResource(NS + "proposed");

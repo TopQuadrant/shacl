@@ -1,7 +1,6 @@
 package org.topbraid.shacl.validation;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,8 +24,10 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
-import org.apache.jena.vocabulary.RDFS;
 import org.topbraid.shacl.arq.SHACLPaths;
+import org.topbraid.shacl.engine.Constraint;
+import org.topbraid.shacl.engine.Shape;
+import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.js.SHACLScriptEngineManager;
 import org.topbraid.shacl.model.SHFactory;
 import org.topbraid.shacl.model.SHParameterizableTarget;
@@ -148,47 +149,6 @@ public class ValidationEngine {
 	public URI getShapesGraphURI() {
 		return shapesGraphURI;
 	}
-	
-	
-	public List<RDFNode> getTargetNodes(Resource shape) {
-		
-		Set<RDFNode> results = new HashSet<RDFNode>();
-		
-		Model dataModel = dataset.getDefaultModel();
-		
-		if(JenaUtil.hasIndirectType(shape, RDFS.Class)) {
-			results.addAll(JenaUtil.getAllInstances(shape.inModel(dataModel)));
-		}
-		
-		for(Resource targetClass : JenaUtil.getResourceProperties(shape, SH.targetClass)) {
-			results.addAll(JenaUtil.getAllInstances(targetClass.inModel(dataModel)));
-		}
-		
-		for(RDFNode targetNode : shape.getModel().listObjectsOfProperty(shape, SH.targetNode).toList()) {
-			results.add(targetNode.inModel(dataModel));
-		}
-		
-		for(Resource sof : JenaUtil.getResourceProperties(shape, SH.targetSubjectsOf)) {
-			for(Statement s : dataModel.listStatements(null, JenaUtil.asProperty(sof), (RDFNode)null).toList()) {
-				results.add(s.getSubject());
-			}
-		}
-		
-		for(Resource sof : JenaUtil.getResourceProperties(shape, SH.targetObjectsOf)) {
-			for(Statement s : dataModel.listStatements(null, JenaUtil.asProperty(sof), (RDFNode)null).toList()) {
-				results.add(s.getObject());
-			}
-		}
-		
-		for(Resource target : JenaUtil.getResourceProperties(shape, SH.target)) {
-			for(RDFNode targetNode : SHACLUtil.getResourcesInTarget(target, dataset)) {
-				results.add(targetNode);
-			}
-		}
-
-		return new ArrayList<RDFNode>(results);
-	}
-
 	
 	
 	/**
@@ -334,7 +294,7 @@ public class ValidationEngine {
 					monitor.subTask("Shape " + (++i) + ": " + getLabelFunction().apply(shape.getShapeResource()));
 				}
 				
-				List<RDFNode> focusNodes = getTargetNodes(shape.getShapeResource());
+				List<RDFNode> focusNodes = SHACLUtil.getTargetNodes(shape.getShapeResource(), dataset);
 				if(!focusNodes.isEmpty()) {
 					if(!shapesGraph.isIgnored(shape.getShapeResource().asNode()) && !shape.getShapeResource().isDeactivated()) {
 						for(Constraint constraint : shape.getConstraints()) {

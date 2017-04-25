@@ -32,6 +32,8 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.shared.PrefixMapping;
+import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.sparql.core.DatasetImpl;
 import org.apache.jena.sparql.expr.ExprEvalException;
 import org.apache.jena.sparql.expr.NodeValue;
@@ -60,6 +62,7 @@ abstract class AbstractEvalFunction extends AbstractFunction implements Function
 		long endTime = System.currentTimeMillis();
 		StringBuffer sb = new StringBuffer();
 		sb.append("spin:eval(");
+		PrefixMapping pm = env.getActiveGraph() != null ? env.getActiveGraph().getPrefixMapping() : new PrefixMappingImpl();
 		sb.append(expr);
 		for(int i = 1; i < nodes.length; i++) {
 			sb.append(", ");
@@ -67,13 +70,13 @@ abstract class AbstractEvalFunction extends AbstractFunction implements Function
 				sb.append("?arg" + (i + 1));
 			}
 			else {
-				sb.append(SSE.str(nodes[i], env.getActiveGraph().getPrefixMapping()));
+				sb.append(SSE.str(nodes[i], pm));
 			}
 		}
 		sb.append(")");
 		if(result != null) {
 			sb.append(" = ");
-			sb.append(FmtUtils.stringForNode(result.asNode(), env.getActiveGraph().getPrefixMapping()));
+			sb.append(FmtUtils.stringForNode(result.asNode(), pm));
 		}
 		SPINStatistics stats = new SPINStatistics(sb.toString(), 
 				"(spin:eval)", endTime - startTime, startTime, SPIN.eval.asNode());

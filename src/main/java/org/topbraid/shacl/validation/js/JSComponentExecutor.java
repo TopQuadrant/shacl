@@ -7,13 +7,12 @@ import java.util.List;
 import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.topbraid.shacl.engine.Constraint;
 import org.topbraid.shacl.model.SHConstraintComponent;
 import org.topbraid.shacl.model.SHJSConstraint;
 import org.topbraid.shacl.model.SHJSExecutable;
-import org.topbraid.shacl.validation.Constraint;
 import org.topbraid.shacl.validation.ValidationEngine;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.shacl.vocabulary.SHJS;
 
 /**
  * Executes constraints based on a JavaScript validator.
@@ -30,7 +29,7 @@ public class JSComponentExecutor extends AbstractJSExecutor {
 	
 	@Override
 	protected SHJSExecutable getExecutable(Constraint constraint) {
-		return constraint.getComponent().getValidator(SHJS.JSValidator, constraint.getContext()).as(SHJSConstraint.class);
+		return constraint.getComponent().getValidator(SH.JSValidator, constraint.getContext()).as(SHJSConstraint.class);
 	}
 
 
@@ -43,7 +42,7 @@ public class JSComponentExecutor extends AbstractJSExecutor {
 	protected List<RDFNode> getValueNodes(ValidationEngine validationEngine, Constraint constraint, QuerySolutionMap bindings, RDFNode focusNode) {
 		SHConstraintComponent component = constraint.getComponent();
 		Resource context = constraint.getContext();
-		Resource validatorResource = component.getValidator(SHJS.JSValidator, context);
+		Resource validatorResource = component.getValidator(SH.JSValidator, context);
 		if(SH.PropertyShape.equals(context)) {
 			if(component.hasProperty(SH.propertyValidator, validatorResource)) {
 				bindings.add("path", constraint.getShapeResource().getRequiredProperty(SH.path).getObject());

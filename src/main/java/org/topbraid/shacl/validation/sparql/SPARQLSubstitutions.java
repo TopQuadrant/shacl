@@ -8,14 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
@@ -30,7 +27,6 @@ import org.apache.jena.vocabulary.RDFS;
 import org.topbraid.shacl.arq.functions.TargetContainsPFunction;
 import org.topbraid.shacl.validation.SHACLException;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.shacl.vocabulary.SHJS;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.system.SPINLabels;
 import org.topbraid.spin.util.JenaUtil;
@@ -84,45 +80,6 @@ public class SPARQLSubstitutions {
 		}
 		else {
 			return ARQFactory.get().createQueryExecution(query, dataset, bindings);
-		}
-	}
-
-	
-	// TODO: Algorithm incorrect, e.g. if { is included as a comment
-	static Query insertTargetClauses(Query query, Resource shape, Dataset dataset, QuerySolution binding) {
-		String str = query.toString();
-		Pattern pattern = Pattern.compile("(?i)WHERE\\s*\\{");
-		Matcher matcher = pattern.matcher(str);
-		if(matcher.find()) {
-			int index = matcher.end();
-			StringBuilder sb = new StringBuilder(str);
-			
-			StringBuffer s = new StringBuffer();
-			s.append("    {{\n        SELECT DISTINCT ?" + SH.thisVar.getName() + " ?" + SH.shapesGraphVar.getName() + " ?" + SH.currentShapeVar.getName());
-
-			// We need to enumerate template call arguments here because Jena would otherwise drop the pre-bound variables
-			Iterator<String> varNames = binding.varNames();
-			while(varNames.hasNext()) {
-				String varName = varNames.next();
-				s.append(" ?" + varName);
-			}
-			
-			s.append("\nWHERE {\n");
-			appendTargets(s, shape, dataset);
-			s.append("        }    }\n");
-			s.append("}");
-			
-			sb.insert(index, s.toString());
-			try {
-				return ARQFactory.get().createQuery(sb.toString());
-			}
-			catch(QueryParseException ex) {
-				System.err.println("Failed to parse query:\n" + sb);
-				throw ex;
-			}
-		}
-		else {
-			throw new IllegalArgumentException("Cannot find first '{' in query string: " + str);
 		}
 	}
 	
@@ -181,7 +138,7 @@ public class SPARQLSubstitutions {
 		List<String> targets = new LinkedList<String>();
 		
 		if(shape.getModel().contains(shape, SH.targetNode, (RDFNode)null)) {
-			targets.add("        GRAPH " + SHJS.SHAPES_VAR + " { $" + SH.currentShapeVar.getName() + " <" + SH.targetNode + "> ?this } .\n");
+			targets.add("        GRAPH " + SH.JS_SHAPES_VAR + " { $" + SH.currentShapeVar.getName() + " <" + SH.targetNode + "> ?this } .\n");
 		}
 		
 		if(JenaUtil.hasIndirectType(shape, RDFS.Class)) {

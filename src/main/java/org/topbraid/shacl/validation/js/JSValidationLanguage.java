@@ -1,23 +1,23 @@
 package org.topbraid.shacl.validation.js;
 
+import org.topbraid.shacl.engine.Constraint;
 import org.topbraid.shacl.validation.ConstraintExecutor;
-import org.topbraid.shacl.validation.ExecutionLanguage;
-import org.topbraid.shacl.validation.Constraint;
+import org.topbraid.shacl.validation.ValidationLanguage;
 import org.topbraid.shacl.validation.ValidationEngine;
-import org.topbraid.shacl.vocabulary.SHJS;
+import org.topbraid.shacl.vocabulary.SH;
 
-public class JSExecutionLanguage implements ExecutionLanguage {
+public class JSValidationLanguage implements ValidationLanguage {
 
-	private final static JSExecutionLanguage singleton = new JSExecutionLanguage();
+	private final static JSValidationLanguage singleton = new JSValidationLanguage();
 	
-	public static JSExecutionLanguage get() {
+	public static JSValidationLanguage get() {
 		return singleton;
 	}
 
 	
 	@Override
 	public boolean canExecute(Constraint constraint, ValidationEngine validationEngine) {
-		return constraint.getComponent().getValidator(SHJS.JSValidator, constraint.getContext()) != null;
+		return constraint.getComponent().getValidator(SH.JSValidator, constraint.getContext()) != null;
 	}
 
 	

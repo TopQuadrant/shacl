@@ -12,8 +12,9 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 import org.topbraid.shacl.arq.SHACLFunctions;
+import org.topbraid.shacl.engine.ShapesGraph;
+import org.topbraid.shacl.engine.filters.ExcludeMetaShapesFilter;
 import org.topbraid.shacl.util.SHACLSystemModel;
-import org.topbraid.shacl.validation.predicates.ExcludeMetaShapesPredicate;
 import org.topbraid.shacl.vocabulary.TOSH;
 import org.topbraid.spin.arq.ARQFactory;
 
@@ -53,7 +54,10 @@ public class ValidationUtil {
 		Dataset dataset = ARQFactory.get().getDataset(dataModel);
 		dataset.addNamedModel(shapesGraphURI.toString(), shapesModel);
 
-		ShapesGraph shapesGraph = new ShapesGraph(shapesModel, validateShapes ? null : new ExcludeMetaShapesPredicate());
+		ShapesGraph shapesGraph = new ShapesGraph(shapesModel);
+		if(!validateShapes) {
+			shapesGraph.setShapeFilter(new ExcludeMetaShapesFilter());
+		}
 		ValidationEngine engine = ValidationEngineFactory.get().create(dataset, shapesGraphURI, shapesGraph, null);
 		try {
 			return engine.validateAll();

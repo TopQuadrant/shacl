@@ -6,14 +6,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.jena.rdf.model.Resource;
+import org.topbraid.shacl.engine.Constraint;
 import org.topbraid.shacl.validation.js.JSConstraintExecutor;
-import org.topbraid.shacl.validation.js.JSExecutionLanguage;
+import org.topbraid.shacl.validation.js.JSValidationLanguage;
 import org.topbraid.shacl.validation.sparql.SPARQLConstraintExecutor;
 import org.topbraid.shacl.validation.sparql.SPARQLDerivedValuesExecutor;
-import org.topbraid.shacl.validation.sparql.SPARQLExecutionLanguage;
+import org.topbraid.shacl.validation.sparql.SPARQLValidationLanguage;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.shacl.vocabulary.SHJS;
 
 /**
  * Singleton managing the available ValidationLanguage instances.
@@ -28,7 +28,7 @@ public class ConstraintExecutors {
 		return singleton;
 	}
 	
-	private List<ExecutionLanguage> languages = new ArrayList<>();
+	private List<ValidationLanguage> languages = new ArrayList<>();
 	
 	private Map<Resource,SpecialConstraintExecutorFactory> specialExecutors = new HashMap<>();
 
@@ -46,7 +46,7 @@ public class ConstraintExecutors {
 				return new PropertyConstraintExecutor();
 			}
 		});
-		addSpecialExecutor(SHJS.JSConstraintComponent, new AbstractSpecialConstraintExecutorFactory() {
+		addSpecialExecutor(SH.JSConstraintComponent, new AbstractSpecialConstraintExecutorFactory() {
 			@Override
 			public ConstraintExecutor create(Constraint constraint) {
 				return new JSConstraintExecutor();
@@ -65,12 +65,12 @@ public class ConstraintExecutors {
 			}
 		});
 		
-		addLanguage(SPARQLExecutionLanguage.get());
-		addLanguage(JSExecutionLanguage.get());
+		addLanguage(SPARQLValidationLanguage.get());
+		addLanguage(JSValidationLanguage.get());
 	}
 	
 	
-	protected void addLanguage(ExecutionLanguage language) {
+	protected void addLanguage(ValidationLanguage language) {
 		languages.add(language);
 	}
 	
@@ -87,7 +87,7 @@ public class ConstraintExecutors {
 			return special.create(constraint);
 		}
 		
-		for(ExecutionLanguage language : languages) {
+		for(ValidationLanguage language : languages) {
 			if(language.canExecute(constraint, engine)) {
 				return language.createExecutor(constraint, engine);
 			}
@@ -108,12 +108,12 @@ public class ConstraintExecutors {
 		languages.remove(0);
 		languages.remove(0);
 		if(value) {
-			languages.add(0, JSExecutionLanguage.get());
-			languages.add(1, SPARQLExecutionLanguage.get());
+			languages.add(0, JSValidationLanguage.get());
+			languages.add(1, SPARQLValidationLanguage.get());
 		}
 		else {
-			languages.add(0, SPARQLExecutionLanguage.get());
-			languages.add(1, JSExecutionLanguage.get());
+			languages.add(0, SPARQLValidationLanguage.get());
+			languages.add(1, JSValidationLanguage.get());
 		}
 	}
 }

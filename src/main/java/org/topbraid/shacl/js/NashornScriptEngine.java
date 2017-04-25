@@ -22,7 +22,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.topbraid.shacl.js.model.JSFactory;
 import org.topbraid.shacl.js.model.TermFactory;
-import org.topbraid.shacl.vocabulary.SHJS;
+import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.ExceptionUtil;
 import org.topbraid.spin.util.JenaUtil;
 
@@ -80,13 +80,13 @@ public class NashornScriptEngine implements JSScriptEngine {
 
 
 	public void executeLibraries(Resource e) throws Exception {
-		for(Resource library : JenaUtil.getResourceProperties(e, SHJS.jsLibrary)) {
+		for(Resource library : JenaUtil.getResourceProperties(e, SH.jsLibrary)) {
 			if(!visitedLibraries.contains(library)) {
 				visitedLibraries.add(library);
 				executeLibraries(library);
 			}
 		}
-		for(Statement s : e.listProperties(SHJS.jsLibraryURL).toList()) {
+		for(Statement s : e.listProperties(SH.jsLibraryURL).toList()) {
 			if(s.getObject().isLiteral()) {
 				String url = s.getString();
 				executeScriptFromURL(url);

@@ -14,6 +14,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.topbraid.shacl.arq.SHACLPaths;
+import org.topbraid.shacl.engine.Constraint;
 import org.topbraid.shacl.js.JSGraph;
 import org.topbraid.shacl.js.JSScriptEngine;
 import org.topbraid.shacl.js.NashornUtil;
@@ -22,12 +23,10 @@ import org.topbraid.shacl.js.model.JSFactory;
 import org.topbraid.shacl.js.model.JSTerm;
 import org.topbraid.shacl.model.SHJSExecutable;
 import org.topbraid.shacl.util.FailureLog;
-import org.topbraid.shacl.validation.Constraint;
 import org.topbraid.shacl.validation.ConstraintExecutor;
 import org.topbraid.shacl.validation.ValidationEngine;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.shacl.vocabulary.SHJS;
 import org.topbraid.spin.statistics.SPINStatistics;
 import org.topbraid.spin.statistics.SPINStatisticsManager;
 import org.topbraid.spin.util.JenaUtil;
@@ -52,8 +51,8 @@ public abstract class AbstractJSExecutor implements ConstraintExecutor {
 		JSGraph dataJSGraph = new JSGraph(dataModel.getGraph(), jsEngine);
 		try {
 			
-			jsEngine.put(SHJS.SHAPES_VAR, shapesJSGraph);
-			jsEngine.put(SHJS.DATA_VAR, dataJSGraph);
+			jsEngine.put(SH.JS_SHAPES_VAR, shapesJSGraph);
+			jsEngine.put(SH.JS_DATA_VAR, dataJSGraph);
 			
 			QuerySolutionMap bindings = new QuerySolutionMap();
 			bindings.add(SH.currentShapeVar.getName(), constraint.getShapeResource());
@@ -88,7 +87,7 @@ public abstract class AbstractJSExecutor implements ConstraintExecutor {
 			ex.printStackTrace();
 			Resource result = validationEngine.createResult(DASH.FailureResult, constraint, null);
 			result.addProperty(SH.resultMessage, "Could not execute JavaScript constraint");
-			if(SHJS.JSConstraintComponent.equals(constraint.getComponent())) {
+			if(SH.JSConstraintComponent.equals(constraint.getComponent())) {
 				result.addProperty(SH.sourceConstraint, constraint.getParameterValue());
 			}
 			FailureLog.get().logFailure("Could not execute JavaScript function \"" + functionName + "\": " + ex);
@@ -142,7 +141,7 @@ public abstract class AbstractJSExecutor implements ConstraintExecutor {
 
 	private Resource createValidationResult(ValidationEngine engine, Constraint constraint, RDFNode focusNode) {
 		Resource result = engine.createResult(SH.ValidationResult, constraint, focusNode);
-		if(SHJS.JSConstraintComponent.equals(constraint.getComponent())) {
+		if(SH.JSConstraintComponent.equals(constraint.getComponent())) {
 			result.addProperty(SH.sourceConstraint, constraint.getParameterValue());
 		}
 		Resource path = JenaUtil.getResourceProperty(constraint.getShapeResource(), SH.path);

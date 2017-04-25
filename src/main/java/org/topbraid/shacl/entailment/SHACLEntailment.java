@@ -3,13 +3,15 @@ package org.topbraid.shacl.entailment;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.topbraid.spin.arq.DatasetWithDifferentDefaultModel;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
+import org.topbraid.shacl.rules.RulesEntailment;
+import org.topbraid.shacl.vocabulary.SH;
+import org.topbraid.spin.arq.DatasetWithDifferentDefaultModel;
+import org.topbraid.spin.progress.ProgressMonitor;
 
 /**
  * Singleton to support sh:entailment.
@@ -19,31 +21,32 @@ import org.apache.jena.rdf.model.ResourceFactory;
  * 
  * @author Holger Knublauch
  */
-public class SPARQLEntailment {
+public class SHACLEntailment {
 	
 	public final static Resource RDFS = ResourceFactory.createResource("http://www.w3.org/ns/entailment/RDFS");
 	
 	public static interface Engine {
 		
-		Model createModelWithEntailment(Model model);
+		Model createModelWithEntailment(Model model, ProgressMonitor monitor) throws InterruptedException;
 	}
 
-	private static SPARQLEntailment singleton = new SPARQLEntailment();
+	private static SHACLEntailment singleton = new SHACLEntailment();
 	
-	public static SPARQLEntailment get() {
+	public static SHACLEntailment get() {
 		return singleton;
 	}
 	
 	private Map<String,Engine> engines = new HashMap<String,Engine>();
 	
 	
-	protected SPARQLEntailment() {
+	protected SHACLEntailment() {
 		setEngine(RDFS.getURI(), new Engine() {
 			@Override
-			public Model createModelWithEntailment(Model model) {
+			public Model createModelWithEntailment(Model model, ProgressMonitor monitor) {
 				return ModelFactory.createRDFSModel(model);
 			}
 		});
+		setEngine(SH.Rules.getURI(), new RulesEntailment());
 	}
 
 	
@@ -57,14 +60,14 @@ public class SPARQLEntailment {
 	}
 	
 	
-	public Dataset withEntailment(Dataset dataset, Resource entailment) {
+	public Dataset withEntailment(Dataset dataset, Resource entailment, ProgressMonitor monitor) throws InterruptedException {
 		if(entailment == null || dataset.getDefaultModel() == null) {
 			return dataset;
 		}
 		else {
 			Engine engine = getEngine(entailment.getURI());
 			if(engine != null) {
-				Model newDefaultModel = engine.createModelWithEntailment(dataset.getDefaultModel());
+				Model newDefaultModel = engine.createModelWithEntailment(dataset.getDefaultModel(), monitor);
 				return new DatasetWithDifferentDefaultModel(newDefaultModel, dataset);
 			}
 			else {

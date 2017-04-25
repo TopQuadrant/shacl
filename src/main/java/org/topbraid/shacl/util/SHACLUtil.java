@@ -56,8 +56,6 @@ public class SHACLUtil {
 		DASH.SuccessResult,
 		SH.ValidationResult
 	};
-
-	public final static String MACROS_FILE_PART = ".macros.";
 	
 	public final static String SHAPES_FILE_PART = ".shapes.";
 	
@@ -524,6 +522,46 @@ public class SHACLUtil {
 		}
 	}
 	
+	
+	public static List<RDFNode> getTargetNodes(Resource shape, Dataset dataset) {
+		
+		Model dataModel = dataset.getDefaultModel();
+
+		Set<RDFNode> results = new HashSet<RDFNode>();
+		
+		if(JenaUtil.hasIndirectType(shape, RDFS.Class)) {
+			results.addAll(JenaUtil.getAllInstances(shape.inModel(dataModel)));
+		}
+		
+		for(Resource targetClass : JenaUtil.getResourceProperties(shape, SH.targetClass)) {
+			results.addAll(JenaUtil.getAllInstances(targetClass.inModel(dataModel)));
+		}
+		
+		for(RDFNode targetNode : shape.getModel().listObjectsOfProperty(shape, SH.targetNode).toList()) {
+			results.add(targetNode.inModel(dataModel));
+		}
+		
+		for(Resource sof : JenaUtil.getResourceProperties(shape, SH.targetSubjectsOf)) {
+			for(Statement s : dataModel.listStatements(null, JenaUtil.asProperty(sof), (RDFNode)null).toList()) {
+				results.add(s.getSubject());
+			}
+		}
+		
+		for(Resource sof : JenaUtil.getResourceProperties(shape, SH.targetObjectsOf)) {
+			for(Statement s : dataModel.listStatements(null, JenaUtil.asProperty(sof), (RDFNode)null).toList()) {
+				results.add(s.getObject());
+			}
+		}
+		
+		for(Resource target : JenaUtil.getResourceProperties(shape, SH.target)) {
+			for(RDFNode targetNode : SHACLUtil.getResourcesInTarget(target, dataset)) {
+				results.add(targetNode);
+			}
+		}
+
+		return new ArrayList<RDFNode>(results);
+	}
+
 	
 	public static List<Resource> getTypes(Resource subject) {
 		List<Resource> types = JenaUtil.getTypes(subject);

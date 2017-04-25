@@ -19,6 +19,8 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.shared.PrefixMapping;
+import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.sparql.engine.binding.BindingHashMap;
 import org.apache.jena.sparql.expr.ExprEvalException;
 import org.apache.jena.sparql.expr.ExprList;
@@ -53,16 +55,17 @@ public class InvokeFunction	extends AbstractFunction {
 		if(SP.NS.equals(functionResource.getNameSpace())) {
 			Statement symbolS = functionResource.getProperty(SPIN.symbol);
 			if(symbolS != null) {
+				PrefixMapping pm = env.getActiveGraph() != null ? env.getActiveGraph().getPrefixMapping() : new PrefixMappingImpl();
 				final String varName = "result";
 				StringBuffer sb = new StringBuffer();
 				sb.append("SELECT ?" + varName + " \n");
 				sb.append("WHERE {\n");
 				sb.append("    BIND (");
-				sb.append(FmtUtils.stringForNode(nodes[1], env.getActiveGraph().getPrefixMapping()));
+				sb.append(FmtUtils.stringForNode(nodes[1], pm));
 				sb.append(" ");
 				sb.append(symbolS.getString());
 				sb.append(" ");
-				sb.append(FmtUtils.stringForNode(nodes[2], env.getActiveGraph().getPrefixMapping()));
+				sb.append(FmtUtils.stringForNode(nodes[2], pm));
 				sb.append(" AS ?" + varName + ") . \n");
 				sb.append("}");
 				

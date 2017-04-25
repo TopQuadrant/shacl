@@ -1,5 +1,7 @@
 package org.topbraid.shacl.validation;
 
+import org.topbraid.shacl.engine.Constraint;
+
 /**
  * Shared interface for SHACL-SPARQL and SHACL-JS validation, or potential other languages.
  * 
@@ -7,7 +9,7 @@ package org.topbraid.shacl.validation;
  * 
  * @author Holger Knublauch
  */
-public interface ExecutionLanguage {
+public interface ValidationLanguage {
 
 	boolean canExecute(Constraint constraint, ValidationEngine engine);
 	

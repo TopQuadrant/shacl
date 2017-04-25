@@ -1,16 +1,16 @@
 package org.topbraid.shacl.validation.sparql;
 
-import org.topbraid.shacl.validation.Constraint;
+import org.topbraid.shacl.engine.Constraint;
 import org.topbraid.shacl.validation.ConstraintExecutor;
-import org.topbraid.shacl.validation.ExecutionLanguage;
+import org.topbraid.shacl.validation.ValidationLanguage;
 import org.topbraid.shacl.validation.ValidationEngine;
 import org.topbraid.shacl.vocabulary.SH;
 
-public class SPARQLExecutionLanguage implements ExecutionLanguage {
+public class SPARQLValidationLanguage implements ValidationLanguage {
 
-	private final static SPARQLExecutionLanguage singleton = new SPARQLExecutionLanguage();
+	private final static SPARQLValidationLanguage singleton = new SPARQLValidationLanguage();
 	
-	public static SPARQLExecutionLanguage get() {
+	public static SPARQLValidationLanguage get() {
 		return singleton;
 	}
 

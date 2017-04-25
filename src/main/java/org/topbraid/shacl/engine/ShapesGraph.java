@@ -1,4 +1,4 @@
-package org.topbraid.shacl.validation;
+package org.topbraid.shacl.engine;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,31 +21,31 @@ import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaUtil;
 
 /**
- * Represents a shapes graph during validation.
+ * Represents a shapes graph as input to an engine (e.g. validation or rule).
  * Basically it's a collection of Shapes.
  * 
  * @author Holger Knublauch
  */
 public class ShapesGraph {
 	
-	private Predicate<SHShape> filter;
+	private Predicate<Constraint> constraintFilter;
 	
 	private Map<Property,SHConstraintComponent> parametersMap;
 	
 	private List<Shape> rootShapes;
 	
+	private Predicate<SHShape> shapeFilter;
+	
 	private Map<Node,Shape> shapesMap = new HashMap<>();
 	
 	private Model shapesModel;
-	
+
 	
 	/**
-	 * Constructs a new VShapesGraph.
+	 * Constructs a new ShapesGraph.
 	 * @param shapesModel  the Model containing the shape definitions
-	 * @param filter  a predicate to filter all shapes by or null to allow all
 	 */
-	public ShapesGraph(Model shapesModel, Predicate<SHShape> filter) {
-		this.filter = filter;
+	public ShapesGraph(Model shapesModel) {
 		this.shapesModel = shapesModel;
 	}
 	
@@ -101,7 +101,7 @@ public class ShapesGraph {
 			this.rootShapes = new LinkedList<Shape>();
 			for(Resource candidate : candidates) {
 				SHShape shape = SHFactory.asShape(candidate);
-				if(filter == null || filter.test(shape)) {
+				if(shapeFilter == null || shapeFilter.test(shape)) {
 					this.rootShapes.add(getShape(shape.asNode()));
 				}
 			}
@@ -118,13 +118,41 @@ public class ShapesGraph {
 		}
 		return shape;
 	}
+	
+	
+	public boolean isIgnoredConstraint(Constraint constraint) {
+		return constraintFilter != null && !constraintFilter.test(constraint);
+	}
 
 
 	public boolean isIgnored(Node shapeNode) {
-		if(filter == null) {
+		if(shapeFilter == null) {
 			return false;
 		}
 		SHShape shape = SHFactory.asShape(shapesModel.asRDFNode(shapeNode));
-		return !filter.test(shape);
+		return !shapeFilter.test(shape);
+	}
+	
+	
+	/**
+	 * Sets a filter Predicate that can be used to ignore certain constraints.
+	 * See for example CoreConstraintFilter.
+	 * Such filters must return true if the Constraint should be used, false to ignore.
+	 * This method should be called immediately after the constructor only.
+	 * @param value  the new constraint filter
+	 */
+	public void setConstraintFilter(Predicate<Constraint> value) {
+		this.constraintFilter = value;
+	}
+	
+	
+	/**
+	 * Sets a filter Predicate that can be used to ignore certain shapes.
+	 * Such filters must return true if the shape should be used, false to ignore.
+	 * This method should be called immediately after the constructor only.
+	 * @param value  the new shape filter
+	 */
+	public void setShapeFilter(Predicate<SHShape> value) {
+		this.shapeFilter = value;
 	}
 }

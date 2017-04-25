@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.jena.rdf.model.RDFNode;
+import org.topbraid.shacl.engine.Constraint;
 import org.topbraid.shacl.model.SHFactory;
 import org.topbraid.shacl.model.SHPropertyShape;
 

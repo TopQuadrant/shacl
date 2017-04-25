@@ -903,6 +903,16 @@ sh:PatternConstraintComponent-pattern
   sh:group tosh:StringBasedConstraintPropertyGroup ;
   sh:maxCount 1 ;
   sh:name "regex pattern" ;
+  sh:sparql [
+      sh:prefixes <http://topbraid.org/tosh> ;
+      sh:select """SELECT $this ?value ?message
+WHERE {
+    $this $PATH ?value .
+	BIND (spif:checkRegexSyntax(?value) AS ?error) .
+	FILTER bound(?error) .
+	BIND (CONCAT(\"Malformed pattern: \", ?error) AS ?message) .
+}""" ;
+    ] ;
 .
 sh:QualifiedMaxCountConstraintComponent-qualifiedMaxCount
   sh:group tosh:ComplexConstraintPropertyGroup ;

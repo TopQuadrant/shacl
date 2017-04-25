@@ -1,5 +1,5 @@
 # W3C Shapes Constraint Language (SHACL) Vocabulary
-# Draft last edited 2017-04-01
+# Draft last edited 2017-04-22
 
 @prefix owl:  <http://www.w3.org/2002/07/owl#> .
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -15,7 +15,8 @@ sh:
 	sh:declare [
 		sh:prefix "sh" ;
 		sh:namespace "http://www.w3.org/ns/shacl#" ;
-	] .
+	] ;
+	sh:suggestedShapesGraph <http://www.w3.org/ns/shacl-shacl#> .
 
 
 # Shapes vocabulary -----------------------------------------------------------
@@ -405,11 +406,27 @@ sh:namespace
 sh:shapesGraph
 	a rdf:Property ;
 	rdfs:label "shapes graph"@en ;
-	rdfs:comment "Suggested shapes graphs that should be used when validating this data graph."@en ;
+	rdfs:comment "Shapes graphs that should be used when validating this data graph."@en ;
 	rdfs:domain owl:Ontology ;
 	rdfs:range owl:Ontology ;
 	rdfs:isDefinedBy sh: .
 
+sh:suggestedShapesGraph
+	a rdf:Property ;
+	rdfs:label "suggested shapes graph"@en ;
+	rdfs:comment "Suggested shapes graphs for this ontology. The values of this property may be used in the absence of specific sh:shapesGraph statements."@en ;
+	rdfs:domain owl:Ontology ;
+	rdfs:range owl:Ontology ;
+	rdfs:isDefinedBy sh: .
+
+sh:entailment
+	a rdf:Property ;
+	rdfs:label "entailment"@en ;
+	rdfs:comment "An entailment regime that indicates what kind of inferencing is required by a shapes graph."@en ;
+	rdfs:domain owl:Ontology ;
+	rdfs:range rdfs:Resource ;
+	rdfs:isDefinedBy sh: .
+		
 
 # Target vocabulary -----------------------------------------------------------
 

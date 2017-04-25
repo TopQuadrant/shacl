@@ -1,4 +1,4 @@
-package org.topbraid.shacl.validation;
+package org.topbraid.shacl.engine;
 
 import java.util.List;
 
@@ -12,9 +12,9 @@ import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaUtil;
 
 /**
- * Represents a constraint during validation.
+ * Represents a constraint as input to an engine (e.g. validation or rule).
  * Here, a constraint is combination of parameters, e.g. a specific value
- * of sh:datatype at a given shape.
+ * of sh:datatype at a given Shape.
  * 
  * @author Holger Knublauch
  */

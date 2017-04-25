@@ -2,7 +2,7 @@ package org.topbraid.shacl.validation.sparql;
 
 import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.rdf.model.Resource;
-import org.topbraid.shacl.validation.Constraint;
+import org.topbraid.shacl.engine.Constraint;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaUtil;
 

@@ -10,8 +10,8 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.expr.ExprNotComparableException;
 import org.apache.jena.sparql.expr.NodeValue;
+import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.js.model.JSTerm;
-import org.topbraid.shacl.validation.ShapesGraph;
 import org.topbraid.shacl.validation.ValidationEngineFactory;
 import org.topbraid.shacl.vocabulary.SH;
 
@@ -40,9 +40,9 @@ public class SHACLObject {
 	
 	public boolean nodeConformsToShape(JSTerm node, JSTerm shape) {
 		Model shapesModel = dataset.getNamedModel(shapesGraphURI.toString());
-		ShapesGraph vsg = new ShapesGraph(shapesModel, null);
+		ShapesGraph shapesGraph = new ShapesGraph(shapesModel);
 		List<RDFNode> focusNodes = Collections.singletonList(dataset.getDefaultModel().asRDFNode(node.getNode()));
-		Resource report = ValidationEngineFactory.get().create(dataset, shapesGraphURI, vsg, null).
+		Resource report = ValidationEngineFactory.get().create(dataset, shapesGraphURI, shapesGraph, null).
 				validateNodesAgainstShape(focusNodes, shape.getNode());
 		return !report.hasProperty(SH.result);
 	}

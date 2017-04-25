@@ -1,4 +1,4 @@
-package org.topbraid.shacl.validation.predicates;
+package org.topbraid.shacl.engine.filters;
 
 import java.util.function.Predicate;
 
@@ -11,7 +11,7 @@ import org.topbraid.spin.util.JenaUtil;
  * 
  * @author Holger Knublauch
  */
-public class ExcludeMetaShapesPredicate implements Predicate<SHShape> {
+public class ExcludeMetaShapesFilter implements Predicate<SHShape> {
 
 	@Override
 	public boolean test(SHShape shape) {

@@ -13,7 +13,6 @@ import org.topbraid.shacl.arq.SHACLJSFunctionDriver;
 import org.topbraid.shacl.arq.SHACLSPARQLFunctionDriver;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.shacl.vocabulary.SHJS;
 import org.topbraid.spin.util.JenaDatatypes;
 import org.topbraid.spin.util.JenaUtil;
 import org.topbraid.spin.vocabulary.SPIN;
@@ -45,7 +44,7 @@ public class SPINFunctionDrivers implements SPINFunctionDriver {
 		register(SPIN.body, new SPINBodyFunctionDriver());
 		register(SH.ask, new SHACLSPARQLFunctionDriver());
 		register(SH.select, new SHACLSPARQLFunctionDriver());
-		register(SHJS.jsLibrary, new SHACLJSFunctionDriver());
+		register(SH.jsLibrary, new SHACLJSFunctionDriver());
 	}
 
 

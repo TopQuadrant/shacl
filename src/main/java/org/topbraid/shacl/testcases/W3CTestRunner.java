@@ -15,7 +15,6 @@ import org.apache.jena.graph.compose.MultiUnion;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
@@ -27,11 +26,12 @@ import org.apache.jena.util.FileUtils;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.topbraid.shacl.arq.SHACLPaths;
+import org.topbraid.shacl.engine.ShapesGraph;
+import org.topbraid.shacl.engine.filters.CoreConstraintFilter;
+import org.topbraid.shacl.engine.filters.ExcludeMetaShapesFilter;
 import org.topbraid.shacl.util.ModelPrinter;
-import org.topbraid.shacl.validation.ShapesGraph;
 import org.topbraid.shacl.validation.ValidationEngine;
 import org.topbraid.shacl.validation.ValidationEngineFactory;
-import org.topbraid.shacl.validation.predicates.ExcludeMetaShapesPredicate;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.MF;
 import org.topbraid.shacl.vocabulary.SH;
@@ -225,7 +225,11 @@ public class W3CTestRunner {
 			Dataset dataset = ARQFactory.get().getDataset(dataModel);
 			dataset.addNamedModel(shapesGraphURI.toString(), shapesModel);
 
-			ShapesGraph shapesGraph = new ShapesGraph(shapesModel, new ExcludeMetaShapesPredicate());
+			ShapesGraph shapesGraph = new ShapesGraph(shapesModel);
+			shapesGraph.setShapeFilter(new ExcludeMetaShapesFilter());
+			if(entry.hasProperty(ResourceFactory.createProperty(MF.NS + "requires"), SHT.CoreOnly)) {
+				shapesGraph.setConstraintFilter(new CoreConstraintFilter());
+			}
 			ValidationEngine engine = ValidationEngineFactory.get().create(dataset, shapesGraphURI, shapesGraph, null);
 			try {
 				Resource actualReport = engine.validateAll();
@@ -233,9 +237,6 @@ public class W3CTestRunner {
 				actualResults.setNsPrefix(SH.PREFIX, SH.NS);
 				actualResults.setNsPrefix("rdf", RDF.getURI());
 				actualResults.setNsPrefix("rdfs", RDFS.getURI());
-				for(Property ignoredProperty : GraphValidationTestCaseType.IGNORED_PROPERTIES) {
-					actualResults.removeAll(null, ignoredProperty, (RDFNode)null);
-				}
 				Model expectedModel = JenaUtil.createDefaultModel();
 				Resource expectedReport = entry.getPropertyResourceValue(MF.result);
 				for(Statement s : expectedReport.listProperties().toList()) {
@@ -255,6 +256,12 @@ public class W3CTestRunner {
 						}
 					}
 				}
+				actualResults.removeAll(null, SH.message, (RDFNode)null);
+				for(Statement s : actualResults.listStatements(null, SH.resultMessage, (RDFNode)null).toList()) {
+					if(!expectedModel.contains(null, SH.resultMessage, s.getObject())) {
+						actualResults.remove(s);
+					}
+				}
 				if(expectedModel.getGraph().isIsomorphicWith(actualResults.getGraph())) {
 					out.println("PASSED: " + entry);
 					result.addProperty(EARL.outcome, EARL.passed);
@@ -263,6 +270,8 @@ public class W3CTestRunner {
 				else {
 					out.println("FAILED: " + entry);
 					result.addProperty(EARL.outcome, EARL.failed);
+					expectedModel.setNsPrefixes(actualResults);
+					System.out.println("Expected\n" + ModelPrinter.get().print(expectedModel));
 					System.out.println("Actual\n" + ModelPrinter.get().print(actualResults));
 					return false;
 				}

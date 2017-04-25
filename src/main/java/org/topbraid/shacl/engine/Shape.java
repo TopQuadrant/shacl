@@ -1,4 +1,4 @@
-package org.topbraid.shacl.validation;
+package org.topbraid.shacl.engine;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -12,8 +12,8 @@ import org.topbraid.shacl.model.SHShape;
 import org.topbraid.spin.system.SPINLabels;
 
 /**
- * Represents a shape that is part of a validation process.
- * A shape consists of a collection of constraints.
+ * Represents a shape as input to an engine (e.g. validation or rule).
+ * A Shape consists of a collection of Constraints.
  * 
  * @author Holger Knublauch
  */
@@ -41,11 +41,17 @@ public class Shape {
 				if(component != null && !handled.contains(component)) {
 					List<SHParameter> params = component.getParameters();
 					if(params.size() == 1) {
-						constraints.add(new Constraint(this, component, params, s.getObject()));
+						Constraint constraint = new Constraint(this, component, params, s.getObject());
+						if(!shapesGraph.isIgnoredConstraint(constraint)) {
+							constraints.add(constraint);
+						}
 					}
 					else if(isComplete(params)) {
-						constraints.add(new Constraint(this, component, params, null));
 						handled.add(component);
+						Constraint constraint = new Constraint(this, component, params, null);
+						if(!shapesGraph.isIgnoredConstraint(constraint)) {
+							constraints.add(constraint);
+						}
 					}
 				}
 			}

@@ -11,6 +11,8 @@ import org.topbraid.spin.statistics.SPINStatisticsManager;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.shared.PrefixMapping;
+import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprEvalException;
@@ -57,7 +59,8 @@ public abstract class AbstractFunction implements Function {
 		if(SPINStatisticsManager.get().isRecording() && SPINStatisticsManager.get().isRecordingNativeFunctions()) {
 			StringBuffer sb = new StringBuffer();
 			sb.append("SPARQL Function ");
-			sb.append(SSE.str(NodeFactory.createURI(uri), env.getActiveGraph().getPrefixMapping()));
+			PrefixMapping pm = env.getActiveGraph() != null ? env.getActiveGraph().getPrefixMapping() : new PrefixMappingImpl();
+			sb.append(SSE.str(NodeFactory.createURI(uri), pm));
 			sb.append("(");
 			for(int i = 0; i < nodes.length; i++) {
 				if(i > 0) {
@@ -67,7 +70,7 @@ public abstract class AbstractFunction implements Function {
 					sb.append("?arg" + (i + 1));
 				}
 				else {
-					sb.append(SSE.str(nodes[i], env.getActiveGraph().getPrefixMapping()));
+					sb.append(SSE.str(nodes[i], pm));
 				}
 			}
 			sb.append(")");
@@ -76,7 +79,7 @@ public abstract class AbstractFunction implements Function {
 			try {
 				result = exec(nodes, env);
 				sb.append(" = ");
-				sb.append(FmtUtils.stringForNode(result.asNode(), env.getActiveGraph().getPrefixMapping()));
+				sb.append(FmtUtils.stringForNode(result.asNode(), pm));
 			}
 			catch(ExprEvalException ex) {
 				sb.append(" : ");

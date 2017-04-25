@@ -4,6 +4,7 @@ import java.net.URI;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Resource;
+import org.topbraid.shacl.engine.ShapesGraph;
 
 /**
  * A singleton that can be used to produce new ValidationEngines.

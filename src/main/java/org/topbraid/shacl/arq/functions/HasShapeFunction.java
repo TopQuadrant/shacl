@@ -14,9 +14,9 @@ import org.apache.jena.sparql.expr.ExprEvalException;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.function.FunctionEnv;
 import org.apache.jena.vocabulary.RDF;
+import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.util.FailureLog;
 import org.topbraid.shacl.validation.DefaultShapesGraphProvider;
-import org.topbraid.shacl.validation.ShapesGraph;
 import org.topbraid.shacl.validation.ValidationEngineFactory;
 import org.topbraid.shacl.validation.sparql.AbstractSPARQLExecutor;
 import org.topbraid.shacl.vocabulary.DASH;
@@ -125,7 +125,7 @@ public class HasShapeFunction extends AbstractFunction3 {
 			shapesGraphURI = DefaultShapesGraphProvider.get().getDefaultShapesGraphURI(dataset);
 		}
 		Model shapesModel = dataset.getNamedModel(shapesGraphURI.toString());
-		ShapesGraph vsg = new ShapesGraph(shapesModel, null);
+		ShapesGraph vsg = new ShapesGraph(shapesModel);
 		return ValidationEngineFactory.get().create(dataset, shapesGraphURI, vsg, null).validateNodesAgainstShape(
 				Collections.singletonList(focusNode), shape.asNode()).getModel();
 	}

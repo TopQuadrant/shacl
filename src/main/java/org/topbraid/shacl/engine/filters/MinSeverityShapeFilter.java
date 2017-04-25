@@ -1,4 +1,4 @@
-package org.topbraid.shacl.validation.predicates;
+package org.topbraid.shacl.engine.filters;
 
 import java.util.function.Predicate;
 
@@ -12,12 +12,12 @@ import org.topbraid.shacl.vocabulary.SH;
  * 
  * @author Holger Knublauch
  */
-public class MinSeverityShapePredicate implements Predicate<SHShape> {
+public class MinSeverityShapeFilter implements Predicate<SHShape> {
 	
 	private Integer minSeverityScore;
 	
 	
-	public MinSeverityShapePredicate(Resource minSeverity) {
+	public MinSeverityShapeFilter(Resource minSeverity) {
 		this.minSeverityScore = getScore(minSeverity);
 	}
 	

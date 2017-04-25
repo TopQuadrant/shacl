@@ -5,7 +5,6 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.vocabulary.RDFS;
 import org.topbraid.shacl.model.SHJSConstraint;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.shacl.vocabulary.SHJS;
 import org.topbraid.spin.util.JenaDatatypes;
 import org.topbraid.spin.util.JenaUtil;
 
@@ -18,7 +17,7 @@ public class SHJSConstraintImpl extends SHResourceImpl implements SHJSConstraint
 	
 	@Override
 	public String getFunctionName() {
-		return JenaUtil.getStringProperty(this, SHJS.jsFunctionName);
+		return JenaUtil.getStringProperty(this, SH.jsFunctionName);
 	}
 
 
