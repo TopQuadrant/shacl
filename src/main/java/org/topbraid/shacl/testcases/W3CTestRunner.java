@@ -80,12 +80,12 @@ public class W3CTestRunner {
 	private void collectItems(File manifestFile, String baseURI) throws IOException {
 		
 		String filePath = manifestFile.getAbsolutePath().replaceAll("\\\\", "/");
-		int coreIndex = filePath.lastIndexOf("core/");
-		if(coreIndex > 0) {
+		int coreIndex = filePath.indexOf("core/");
+		if(coreIndex > 0 && !filePath.contains("sparql/core")) {
 			filePath = filePath.substring(coreIndex);
 		}
 		else {
-			int sindex = filePath.lastIndexOf("sparql/");
+			int sindex = filePath.indexOf("sparql/");
 			if(sindex > 0) {
 				filePath = filePath.substring(sindex);
 			}

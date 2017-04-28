@@ -10,7 +10,6 @@ import org.topbraid.shacl.engine.Constraint;
 import org.topbraid.shacl.validation.js.JSConstraintExecutor;
 import org.topbraid.shacl.validation.js.JSValidationLanguage;
 import org.topbraid.shacl.validation.sparql.SPARQLConstraintExecutor;
-import org.topbraid.shacl.validation.sparql.SPARQLDerivedValuesExecutor;
 import org.topbraid.shacl.validation.sparql.SPARQLValidationLanguage;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
@@ -58,10 +57,10 @@ public class ConstraintExecutors {
 				return new SPARQLConstraintExecutor(constraint);
 			}
 		});
-		addSpecialExecutor(SH.DerivedValuesConstraintComponent, new AbstractSpecialConstraintExecutorFactory() {
+		addSpecialExecutor(SH.ExpressionConstraintComponent, new AbstractSpecialConstraintExecutorFactory() {
 			@Override
 			public ConstraintExecutor create(Constraint constraint) {
-				return new SPARQLDerivedValuesExecutor(constraint);
+				return new ExpressionConstraintExecutor();
 			}
 		});
 		

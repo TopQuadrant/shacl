@@ -29,8 +29,6 @@ public class SH {
 
     public final static Resource BlankNodeOrLiteral = ResourceFactory.createResource(NS + "BlankNodeOrLiteral");
 
-    public final static Resource ClassificationRule = ResourceFactory.createResource(NS + "ClassificationRule");
-
     public final static Resource ClassConstraintComponent = ResourceFactory.createResource(NS + "ClassConstraintComponent");
     
     public final static Resource Constraint = ResourceFactory.createResource(NS + "Constraint");
@@ -39,10 +37,6 @@ public class SH {
 
     public final static Resource DatatypeConstraintComponent = ResourceFactory.createResource(NS + "DatatypeConstraintComponent");
 
-    public final static Resource DerivedValuesConstraintComponent = ResourceFactory.createResource(NS + "DerivedValuesConstraintComponent");
-
-    public final static Resource Function = ResourceFactory.createResource(NS + "Function");
-
     public final static Resource Info = ResourceFactory.createResource(NS + "Info");
 
     public final static Resource IRI = ResourceFactory.createResource(NS + "IRI");
@@ -50,20 +44,6 @@ public class SH {
     public final static Resource IRIOrLiteral = ResourceFactory.createResource(NS + "IRIOrLiteral");
 
     public final static Resource Literal = ResourceFactory.createResource(NS + "Literal");
-
-    public final static Resource JSConstraint = ResourceFactory.createResource(NS + "JSConstraint");
-
-    public final static Resource JSConstraintComponent = ResourceFactory.createResource(NS + "JSConstraintComponent");
-
-    public final static Resource JSExecutable = ResourceFactory.createResource(NS + "JSExecutable");
-
-    public final static Resource JSFunction = ResourceFactory.createResource(NS + "JSFunction");
-
-    public final static Resource JSLibrary = ResourceFactory.createResource(NS + "JSLibrary");
-    
-    public final static Resource JSRule = ResourceFactory.createResource(NS + "JSRule");
-
-    public final static Resource JSValidator = ResourceFactory.createResource(NS + "JSValidator");
 
     public final static Resource MaxCountConstraintComponent = ResourceFactory.createResource(NS + "MaxCountConstraintComponent");
 
@@ -85,8 +65,6 @@ public class SH {
 
     public final static Resource ResultAnnotation = ResourceFactory.createResource(NS + "ResultAnnotation");
 
-    public final static Resource Rules = ResourceFactory.createResource(NS + "Rules");
-
     public final static Resource Shape = ResourceFactory.createResource(NS + "Shape");
     
     public final static Resource SPARQLAskValidator = ResourceFactory.createResource(NS + "SPARQLAskValidator");
@@ -107,8 +85,6 @@ public class SH {
     
     public final static Resource SPARQLValuesDeriver = ResourceFactory.createResource(NS + "SPARQLValuesDeriver");
     
-    public final static Resource Target = ResourceFactory.createResource(NS + "Target");
-    
     public final static Resource ValidationReport = ResourceFactory.createResource(NS + "ValidationReport");
     
     public final static Resource ValidationResult = ResourceFactory.createResource(NS + "ValidationResult");
@@ -128,8 +104,6 @@ public class SH {
 
     public final static Property class_ = ResourceFactory.createProperty(NS + "class");
 
-    public final static Property classification = ResourceFactory.createProperty(NS + "classification");
-
     public final static Property condition = ResourceFactory.createProperty(NS + "condition");
 
     public final static Property conforms = ResourceFactory.createProperty(NS + "conforms");
@@ -146,8 +120,6 @@ public class SH {
 
     public final static Property detail = ResourceFactory.createProperty(NS + "detail");
 
-    public final static Property derivedValues = ResourceFactory.createProperty(NS + "derivedValues");
-
     public final static Property description = ResourceFactory.createProperty(NS + "description");
 
     public final static Property disjoint = ResourceFactory.createProperty(NS + "disjoint");
@@ -163,14 +135,6 @@ public class SH {
     public final static Property in = ResourceFactory.createProperty(NS + "in");
 
     public final static Property inversePath = ResourceFactory.createProperty(NS + "inversePath");
-    
-    public final static Property js = ResourceFactory.createProperty(NS + "js");
-    
-    public final static Property jsFunctionName = ResourceFactory.createProperty(NS + "jsFunctionName");
-
-    public final static Property jsLibrary = ResourceFactory.createProperty(NS + "jsLibrary");
-
-    public final static Property jsLibraryURL = ResourceFactory.createProperty(NS + "jsLibraryURL");
 
     public final static Property labelTemplate = ResourceFactory.createProperty(NS + "labelTemplate");
 
@@ -185,8 +149,6 @@ public class SH {
     public final static Property maxInclusive = ResourceFactory.createProperty(NS + "maxInclusive");
 
     public final static Property maxLength = ResourceFactory.createProperty(NS + "maxLength");
-
-    public final static Property member = ResourceFactory.createProperty(NS + "member");
 
     public final static Property message = ResourceFactory.createProperty(NS + "message");
 
@@ -224,8 +186,6 @@ public class SH {
 
     public final static Property pattern = ResourceFactory.createProperty(NS + "pattern");
 
-    public final static Property predicate = ResourceFactory.createProperty(NS + "predicate");
-
     public final static Property prefix = ResourceFactory.createProperty(NS + "prefix");
 
     public final static Property prefixes = ResourceFactory.createProperty(NS + "prefixes");
@@ -242,12 +202,6 @@ public class SH {
 
     public final static Property resultSeverity = ResourceFactory.createProperty(NS + "resultSeverity");
 
-    public final static Property returnType = ResourceFactory.createProperty(NS + "returnType");
-
-    public final static Property rule = ResourceFactory.createProperty(NS + "rule");
-
-    public final static Property salience = ResourceFactory.createProperty(NS + "salience");
-
     public final static Property select = ResourceFactory.createProperty(NS + "select");
 
     public final static Property severity = ResourceFactory.createProperty(NS + "severity");
@@ -261,8 +215,6 @@ public class SH {
     public final static Property sourceShape = ResourceFactory.createProperty(NS + "sourceShape");
 
     public final static Property sparql = ResourceFactory.createProperty(NS + "sparql");
-    
-    public final static Property target = ResourceFactory.createProperty(NS + "target");
     
     public final static Property targetClass = ResourceFactory.createProperty(NS + "targetClass");
 
@@ -283,6 +235,75 @@ public class SH {
     public final static Property zeroOrMorePath = ResourceFactory.createProperty(NS + "zeroOrMorePath");
 
     public final static Property zeroOrOnePath = ResourceFactory.createProperty(NS + "zeroOrOnePath");
+    
+    
+    // Advanced features - may end up in another namespace
+
+    public final static Resource ExpressionConstraintComponent = ResourceFactory.createResource(NS + "ExpressionConstraintComponent");
+
+    public final static Resource Function = ResourceFactory.createResource(NS + "Function");
+
+    public final static Resource JSConstraint = ResourceFactory.createResource(NS + "JSConstraint");
+
+    public final static Resource JSConstraintComponent = ResourceFactory.createResource(NS + "JSConstraintComponent");
+
+    public final static Resource JSExecutable = ResourceFactory.createResource(NS + "JSExecutable");
+
+    public final static Resource JSFunction = ResourceFactory.createResource(NS + "JSFunction");
+
+    public final static Resource JSLibrary = ResourceFactory.createResource(NS + "JSLibrary");
+    
+    public final static Resource JSRule = ResourceFactory.createResource(NS + "JSRule");
+    
+    public final static Resource JSTarget = ResourceFactory.createResource(NS + "JSTarget");
+    
+    public final static Resource JSTargetType = ResourceFactory.createResource(NS + "JSTargetType");
+
+    public final static Resource JSValidator = ResourceFactory.createResource(NS + "JSValidator");
+
+    public final static Resource Rules = ResourceFactory.createResource(NS + "Rules");
+    
+    public final static Resource SPARQLRule = ResourceFactory.createResource(NS + "SPARQLRule");
+    
+    public final static Resource Target = ResourceFactory.createResource(NS + "Target");
+    
+    public final static Resource this_ = ResourceFactory.createResource(NS + "this");
+    
+    public final static Resource TripleRule = ResourceFactory.createResource(NS + "TripleRule");
+    
+    
+    public final static Property expression = ResourceFactory.createProperty(NS + "expression");
+    
+    public final static Property filterShape = ResourceFactory.createProperty(NS + "filterShape");
+    
+    public final static Property intersection = ResourceFactory.createProperty(NS + "intersection");
+    
+    public final static Property js = ResourceFactory.createProperty(NS + "js");
+    
+    public final static Property jsFunctionName = ResourceFactory.createProperty(NS + "jsFunctionName");
+
+    public final static Property jsLibrary = ResourceFactory.createProperty(NS + "jsLibrary");
+
+    public final static Property jsLibraryURL = ResourceFactory.createProperty(NS + "jsLibraryURL");
+
+    public final static Property member = ResourceFactory.createProperty(NS + "member");
+    
+    public final static Property nodes = ResourceFactory.createProperty(NS + "nodes");
+    
+    public final static Property object = ResourceFactory.createProperty(NS + "object");
+    
+    public final static Property predicate = ResourceFactory.createProperty(NS + "predicate");
+    
+    public final static Property returnType = ResourceFactory.createProperty(NS + "returnType");
+    
+    public final static Property rule = ResourceFactory.createProperty(NS + "rule");
+    
+    public final static Property subject = ResourceFactory.createProperty(NS + "subject");
+    
+    public final static Property target = ResourceFactory.createProperty(NS + "target");
+    
+    public final static Property union = ResourceFactory.createProperty(NS + "union");
+
 
 	
 	public static final Var currentShapeVar = Var.alloc("currentShape");

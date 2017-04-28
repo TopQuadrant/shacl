@@ -1,9 +1,11 @@
 package org.topbraid.shacl.rules;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.jena.rdf.model.Resource;
+import org.topbraid.shacl.vocabulary.SH;
+import org.topbraid.spin.util.JenaUtil;
 
 /**
  * Global registry of known RuleLanguage instances.
@@ -18,28 +20,23 @@ public class RuleLanguages {
 		return singleton;
 	}
 	
-	private List<RuleLanguage> languages = new LinkedList<>();
+	private Map<Resource,RuleLanguage> languages = new HashMap<>();
 	
 	
 	protected RuleLanguages() {
-		addLanguage(new JSRuleLanguage());
-		addLanguage(new SPARQLConstructRuleLanguage());
-		addLanguage(new SPARQLSelectRuleLanguage());
-		addLanguage(new ClassificationRuleLanguage());
+		addLanguage(SH.JSRule, new JSRuleLanguage());
+		addLanguage(SH.SPARQLRule, new SPARQLRuleLanguage());
+		addLanguage(SH.TripleRule, new TripleRuleLanguage());
 	}
 	
 	
-	public void addLanguage(RuleLanguage language) {
-		languages.add(language);
+	public void addLanguage(Resource type, RuleLanguage language) {
+		languages.put(type, language);
 	}
 	
 	
 	public RuleLanguage getRuleLanguage(Resource rule, RuleEngine engine) {
-		for(RuleLanguage language : languages) {
-			if(rule.hasProperty(language.getKeyProperty())) {
-				return language;
-			}
-		}
-		return null;
+		Resource type = JenaUtil.getType(rule);
+		return languages.get(type);
 	}
 }

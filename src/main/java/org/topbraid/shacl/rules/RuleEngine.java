@@ -2,8 +2,10 @@ package org.topbraid.shacl.rules;
 
 import java.net.URI;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
@@ -12,6 +14,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.topbraid.shacl.engine.Shape;
 import org.topbraid.shacl.engine.ShapesGraph;
+import org.topbraid.shacl.expr.NodeExpressionContext;
 import org.topbraid.shacl.util.OrderComparator;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.validation.ValidationEngine;
@@ -27,7 +30,7 @@ import org.topbraid.spin.util.JenaUtil;
  * 
  * @author Holger Knublauch
  */
-public class RuleEngine {
+public class RuleEngine implements NodeExpressionContext {
 	
 	private Dataset dataset;
 	
@@ -35,9 +38,13 @@ public class RuleEngine {
 	
 	private ProgressMonitor monitor;
 	
+	private Map<Rule,List<Resource>> rule2Conditions = new HashMap<>();
+	
 	private ShapesGraph shapesGraph;
 	
 	private URI shapesGraphURI;
+	
+	private Map<Shape,List<Rule>> shape2Rules = new HashMap<>(); 
 
 	
 	protected RuleEngine(Dataset dataset, URI shapesGraphURI, ShapesGraph shapesGraph, Model inferences) {
@@ -70,28 +77,41 @@ public class RuleEngine {
 			return 0;
 		}
 		
-		List<Resource> rules = new LinkedList<Resource>();
-		for(Statement s : shape.getShapeResource().listProperties(SH.rule).toList()) {
-			if(s.getObject().isResource() && !s.getResource().hasProperty(SH.deactivated, JenaDatatypes.TRUE)) {
-				rules.add(s.getResource());
+		List<Rule> rules = shape2Rules.get(shape);
+		if(rules == null) {
+			rules = new LinkedList<>();
+			shape2Rules.put(shape, rules);
+			List<Resource> raws = new LinkedList<Resource>();
+			for(Statement s : shape.getShapeResource().listProperties(SH.rule).toList()) {
+				if(s.getObject().isResource() && !s.getResource().hasProperty(SH.deactivated, JenaDatatypes.TRUE)) {
+					raws.add(s.getResource());
+				}
+			}
+			Collections.sort(raws, OrderComparator.get());
+			for(Resource raw : raws) {
+				RuleLanguage ruleLanguage = RuleLanguages.get().getRuleLanguage(raw, this);
+				if(ruleLanguage == null) {
+					throw new IllegalArgumentException("Unsupporte SHACL rule type for " + raw);
+				}
+				Rule rule = ruleLanguage.createRule(raw, this);
+				rules.add(rule);
+				List<Resource> conditions = JenaUtil.getResourceProperties(raw, SH.condition);
+				rule2Conditions.put(rule, conditions);
 			}
 		}
 		if(rules.isEmpty()) {
 			return 0;
 		}
 		
-		if(rules.size() > 1) {
-			Collections.sort(rules, OrderComparator.get());
-		}
 		
 		List<RDFNode> targetNodes = SHACLUtil.getTargetNodes(shape.getShapeResource(), dataset);
 		int sum = 0;
 		if(!targetNodes.isEmpty()) {
-			for(Resource rule : rules) {
+			for(Rule rule : rules) {
 				if(monitor != null && monitor.isCanceled()) {
 					throw new InterruptedException();
 				}
-				List<Resource> conditions = JenaUtil.getResourceProperties(rule, SH.condition);
+				List<Resource> conditions = rule2Conditions.get(rule);
 				if(!conditions.isEmpty()) {
 					List<RDFNode> filtered = new LinkedList<RDFNode>();
 					for(RDFNode targetNode : targetNodes) {
@@ -101,17 +121,15 @@ public class RuleEngine {
 					}
 					targetNodes = filtered;
 				}
-				RuleLanguage language = RuleLanguages.get().getRuleLanguage(rule, this);
-				if(language != null) {
-					int added = language.execute(rule, this, targetNodes);
-					sum += added;
-				}
+				int added = rule.execute(this, targetNodes);
+				sum += added;
 			}
 		}
 		return sum;
 	}
 	
 	
+	@Override
 	public Dataset getDataset() {
 		return dataset;
 	}
@@ -127,8 +145,19 @@ public class RuleEngine {
 	}
 	
 	
+	public ShapesGraph getShapesGraph() {
+		return shapesGraph;
+	}
+	
+	
 	public Model getShapesModel() {
 		return dataset.getNamedModel(shapesGraphURI.toString());
+	}
+	
+	
+	@Override
+	public URI getShapesGraphURI() {
+		return shapesGraphURI;
 	}
 	
 	

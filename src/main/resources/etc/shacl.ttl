@@ -1,5 +1,5 @@
 # W3C Shapes Constraint Language (SHACL) Vocabulary
-# Draft last edited 2017-04-22
+# Draft last edited 2017-04-28
 
 @prefix owl:  <http://www.w3.org/2002/07/owl#> .
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -48,14 +48,6 @@ sh:deactivated
 	rdfs:comment "If set to true for a shape then the shape is deactivated and all nodes conform to it."@en ;
 	rdfs:domain sh:Shape ;
 	rdfs:range xsd:boolean ;
-	rdfs:isDefinedBy sh: .
-
-sh:target
-	a rdf:Property ;
-	rdfs:label "target"@en ;
-	rdfs:comment "Links a shape to a target specified by an extension language, for example instances of sh:SPARQLTarget."@en ;
-	rdfs:domain sh:Shape ;
-	rdfs:range sh:Target ;
 	rdfs:isDefinedBy sh: .
 
 sh:targetClass 
@@ -268,7 +260,6 @@ sh:sourceConstraint
 	rdfs:label "source constraint"@en ;
 	rdfs:comment "The constraint that was validated when the result was produced."@en ;
 	rdfs:domain sh:AbstractResult ;
-	# rdfs:range sh:SPARQLConstraint ;
 	rdfs:isDefinedBy sh: .
 
 sh:sourceShape
@@ -294,114 +285,8 @@ sh:value
 	rdfs:domain sh:AbstractResult ;
 	rdfs:isDefinedBy sh: .
 
-
-# SPARQL execution support ----------------------------------------------------
-
-sh:SPARQLExecutable
-	a rdfs:Class ;
-	rdfs:label "SPARQL executable"@en ;
-	rdfs:comment "The class of resources that encapsulate a SPARQL query."@en ;
-	rdfs:subClassOf rdfs:Resource ;
-	rdfs:isDefinedBy sh: .
-
-sh:SPARQLAskExecutable
-	a rdfs:Class ;
-	rdfs:label "SPARQL ASK executable"@en ;
-	rdfs:comment "The class of SPARQL executables that are based on an ASK query."@en ;
-	rdfs:subClassOf sh:SPARQLExecutable ;
-	rdfs:isDefinedBy sh: .
-
-sh:ask
-	a rdf:Property ;
-	rdfs:label "ask"@en ;
-	rdfs:comment "The SPARQL ASK query to execute."@en ;
-	rdfs:domain sh:SPARQLAskExecutable ;
-	rdfs:range xsd:string ;
-	rdfs:isDefinedBy sh: .
-
-sh:SPARQLConstructExecutable
-	a rdfs:Class ;
-	rdfs:label "SPARQL CONSTRUCT executable"@en ;
-	rdfs:comment "The class of SPARQL executables that are based on a CONSTRUCT query."@en ;
-	rdfs:subClassOf sh:SPARQLExecutable ;
-	rdfs:isDefinedBy sh: .
-
-sh:construct
-	a rdf:Property ;
-	rdfs:label "construct"@en ;
-	rdfs:comment "The SPARQL CONSTRUCT query to execute."@en ;
-	rdfs:domain sh:SPARQLConstructExecutable ;
-	rdfs:range xsd:string ;
-	rdfs:isDefinedBy sh: .
-
-sh:SPARQLSelectExecutable
-	a rdfs:Class ;
-	rdfs:label "SPARQL SELECT executable"@en ;
-	rdfs:comment "The class of SPARQL executables based on a SELECT query."@en ;
-	rdfs:subClassOf sh:SPARQLExecutable ;
-	rdfs:isDefinedBy sh: .
-
-sh:select
-	a rdf:Property ;
-	rdfs:label "select"@en ;
-	rdfs:comment "The SPARQL SELECT query to execute."@en ;
-	rdfs:range xsd:string ;
-	rdfs:domain sh:SPARQLSelectExecutable ;
-	rdfs:isDefinedBy sh: .
-
-sh:SPARQLUpdateExecutable
-	a rdfs:Class ;
-	rdfs:label "SPARQL UPDATE executable"@en ;
-	rdfs:comment "The class of SPARQL executables based on a SPARQL UPDATE."@en ;
-	rdfs:subClassOf sh:SPARQLExecutable ;
-	rdfs:isDefinedBy sh: .
-
-sh:update
-	a rdf:Property ;
-	rdfs:label "update"@en ;
-	rdfs:comment "The SPARQL UPDATE to execute."@en ;
-	rdfs:domain sh:SPARQLUpdateExecutable ;
-	rdfs:range xsd:string ;
-	rdfs:isDefinedBy sh: .
-
-sh:prefixes
-	a rdf:Property ;
-	rdfs:label "prefixes"@en ;
-	rdfs:comment "The prefixes that shall be applied before parsing the associated SPARQL query."@en ;
-	rdfs:domain sh:SPARQLExecutable ;
-	rdfs:range owl:Ontology ;
-	rdfs:isDefinedBy sh: .
-
-sh:PrefixDeclaration
-	a rdfs:Class ;
-	rdfs:label "Prefix declaration"@en ;
-	rdfs:comment "The class of prefix declarations, consisting of pairs of a prefix with a namespace."@en ;
-	rdfs:subClassOf rdfs:Resource ;
-	rdfs:isDefinedBy sh: .
-
-sh:declare
-	a rdf:Property ;
-	rdfs:label "declare"@en ;
-	rdfs:comment "Links a resource with its namespace prefix declarations."@en ;
-	rdfs:domain owl:Ontology ;
-	rdfs:range sh:PrefixDeclaration ;
-	rdfs:isDefinedBy sh: .
-
-sh:prefix
-	a rdf:Property ;
-	rdfs:label "prefix"@en ;
-	rdfs:comment "The prefix of a prefix declaration."@en ;
-	rdfs:domain sh:PrefixDeclaration ;
-	rdfs:range xsd:string ;
-	rdfs:isDefinedBy sh: .
-
-sh:namespace
-	a rdf:Property ;
-	rdfs:label "namespace"@en ;
-	rdfs:comment "The namespace associated with a prefix in a prefix declaration."@en ;
-	rdfs:domain sh:PrefixDeclaration ;
-	rdfs:range xsd:anyURI ;
-	rdfs:isDefinedBy sh: .
+	
+# Graph properties ------------------------------------------------------------
 
 sh:shapesGraph
 	a rdf:Property ;
@@ -425,40 +310,6 @@ sh:entailment
 	rdfs:comment "An entailment regime that indicates what kind of inferencing is required by a shapes graph."@en ;
 	rdfs:domain owl:Ontology ;
 	rdfs:range rdfs:Resource ;
-	rdfs:isDefinedBy sh: .
-		
-
-# Target vocabulary -----------------------------------------------------------
-
-sh:Target
-	a rdfs:Class ;
-	rdfs:label "Target"@en ;
-	rdfs:comment "The base class of targets such as those based on SPARQL queries."@en ;
-	rdfs:subClassOf rdfs:Resource ;
-	rdfs:isDefinedBy sh: .
-
-sh:SPARQLTarget
-	a rdfs:Class ;
-	rdfs:label "SPARQL target"@en ;
-	rdfs:comment "The class of targets that are based on SPARQL SELECT queries."@en ;
-	rdfs:subClassOf sh:Target ;
-	rdfs:subClassOf sh:SPARQLSelectExecutable ;
-	rdfs:isDefinedBy sh: .
-
-sh:TargetType
-	a rdfs:Class ;
-	rdfs:label "Target type"@en ;
-	rdfs:comment "The (meta) class for parameterizable targets.	Instances of this are instantiated as values of the sh:target property."@en ;
-	rdfs:subClassOf rdfs:Class ;
-	rdfs:subClassOf sh:Parameterizable ;
-	rdfs:isDefinedBy sh: .
-
-sh:SPARQLTargetType
-	a rdfs:Class ;
-	rdfs:label "SPARQL target type"@en ;
-	rdfs:comment "The (meta) class for parameterizable targets that are based on SPARQL SELECT queries."@en ;
-	rdfs:subClassOf sh:TargetType ;
-	rdfs:subClassOf sh:SPARQLSelectExecutable ;
 	rdfs:isDefinedBy sh: .
 
 
@@ -1286,6 +1137,115 @@ sh:xone
 	rdfs:comment "Specifies a list of shapes so that the value nodes must conform to exactly one of the shapes."@en ;
 	rdfs:range rdf:List ;    # members: sh:Shape ;
 	rdfs:isDefinedBy sh: .
+
+
+# General SPARQL execution support --------------------------------------------
+
+sh:SPARQLExecutable
+	a rdfs:Class ;
+	rdfs:label "SPARQL executable"@en ;
+	rdfs:comment "The class of resources that encapsulate a SPARQL query."@en ;
+	rdfs:subClassOf rdfs:Resource ;
+	rdfs:isDefinedBy sh: .
+
+sh:SPARQLAskExecutable
+	a rdfs:Class ;
+	rdfs:label "SPARQL ASK executable"@en ;
+	rdfs:comment "The class of SPARQL executables that are based on an ASK query."@en ;
+	rdfs:subClassOf sh:SPARQLExecutable ;
+	rdfs:isDefinedBy sh: .
+
+sh:ask
+	a rdf:Property ;
+	rdfs:label "ask"@en ;
+	rdfs:comment "The SPARQL ASK query to execute."@en ;
+	rdfs:domain sh:SPARQLAskExecutable ;
+	rdfs:range xsd:string ;
+	rdfs:isDefinedBy sh: .
+
+sh:SPARQLConstructExecutable
+	a rdfs:Class ;
+	rdfs:label "SPARQL CONSTRUCT executable"@en ;
+	rdfs:comment "The class of SPARQL executables that are based on a CONSTRUCT query."@en ;
+	rdfs:subClassOf sh:SPARQLExecutable ;
+	rdfs:isDefinedBy sh: .
+
+sh:construct
+	a rdf:Property ;
+	rdfs:label "construct"@en ;
+	rdfs:comment "The SPARQL CONSTRUCT query to execute."@en ;
+	rdfs:domain sh:SPARQLConstructExecutable ;
+	rdfs:range xsd:string ;
+	rdfs:isDefinedBy sh: .
+
+sh:SPARQLSelectExecutable
+	a rdfs:Class ;
+	rdfs:label "SPARQL SELECT executable"@en ;
+	rdfs:comment "The class of SPARQL executables based on a SELECT query."@en ;
+	rdfs:subClassOf sh:SPARQLExecutable ;
+	rdfs:isDefinedBy sh: .
+
+sh:select
+	a rdf:Property ;
+	rdfs:label "select"@en ;
+	rdfs:comment "The SPARQL SELECT query to execute."@en ;
+	rdfs:range xsd:string ;
+	rdfs:domain sh:SPARQLSelectExecutable ;
+	rdfs:isDefinedBy sh: .
+
+sh:SPARQLUpdateExecutable
+	a rdfs:Class ;
+	rdfs:label "SPARQL UPDATE executable"@en ;
+	rdfs:comment "The class of SPARQL executables based on a SPARQL UPDATE."@en ;
+	rdfs:subClassOf sh:SPARQLExecutable ;
+	rdfs:isDefinedBy sh: .
+
+sh:update
+	a rdf:Property ;
+	rdfs:label "update"@en ;
+	rdfs:comment "The SPARQL UPDATE to execute."@en ;
+	rdfs:domain sh:SPARQLUpdateExecutable ;
+	rdfs:range xsd:string ;
+	rdfs:isDefinedBy sh: .
+
+sh:prefixes
+	a rdf:Property ;
+	rdfs:label "prefixes"@en ;
+	rdfs:comment "The prefixes that shall be applied before parsing the associated SPARQL query."@en ;
+	rdfs:domain sh:SPARQLExecutable ;
+	rdfs:range owl:Ontology ;
+	rdfs:isDefinedBy sh: .
+
+sh:PrefixDeclaration
+	a rdfs:Class ;
+	rdfs:label "Prefix declaration"@en ;
+	rdfs:comment "The class of prefix declarations, consisting of pairs of a prefix with a namespace."@en ;
+	rdfs:subClassOf rdfs:Resource ;
+	rdfs:isDefinedBy sh: .
+
+sh:declare
+	a rdf:Property ;
+	rdfs:label "declare"@en ;
+	rdfs:comment "Links a resource with its namespace prefix declarations."@en ;
+	rdfs:domain owl:Ontology ;
+	rdfs:range sh:PrefixDeclaration ;
+	rdfs:isDefinedBy sh: .
+
+sh:prefix
+	a rdf:Property ;
+	rdfs:label "prefix"@en ;
+	rdfs:comment "The prefix of a prefix declaration."@en ;
+	rdfs:domain sh:PrefixDeclaration ;
+	rdfs:range xsd:string ;
+	rdfs:isDefinedBy sh: .
+
+sh:namespace
+	a rdf:Property ;
+	rdfs:label "namespace"@en ;
+	rdfs:comment "The namespace associated with a prefix in a prefix declaration."@en ;
+	rdfs:domain sh:PrefixDeclaration ;
+	rdfs:range xsd:anyURI ;
+	rdfs:isDefinedBy sh: .
 	
 
 # SPARQL-based Constraints support --------------------------------------------
@@ -1314,41 +1274,6 @@ sh:SPARQLConstraint
 	a rdfs:Class ;
 	rdfs:label "SPARQL constraint"@en ;
 	rdfs:comment "The class of constraints based on SPARQL SELECT queries."@en ;
-	rdfs:subClassOf sh:SPARQLSelectExecutable ;
-	rdfs:isDefinedBy sh: .
-
-
-# Derived Values support ------------------------------------------------------
-
-sh:DerivedValuesConstraintComponent
-	a sh:ConstraintComponent ;
-	rdfs:label "Derived-values constraint component"@en ;
-	rdfs:comment "A constraint component that can be used to state that the set of value nodes must be equivalent to a set of values derived using a given mechanism, such as a SPARQL query."@en ;
-	sh:parameter [
-		sh:path sh:derivedValues ;
-		sh:class sh:ValuesDeriver ;
-	] ;
-	rdfs:isDefinedBy sh: .
-
-sh:derivedValues
-	a rdf:Property ;
-	rdfs:label "derived values"@en ;
-	rdfs:comment "Links a constraint with a sh:ValuesDeriver used to compute the property values."@en ;
-	rdfs:range sh:ValuesDeriver ;
-	rdfs:isDefinedBy sh: .
-
-sh:ValuesDeriver
-	a rdfs:Class ;
-	rdfs:label "Values deriver"@en ;
-	rdfs:comment "The class of objects that can be used to derive values. SHACL itself only defines a single subclass, sh:SPARQLValuesDeriver."@en ;
-	rdfs:subClassOf rdfs:Resource ;
-	rdfs:isDefinedBy sh: .
-
-sh:SPARQLValuesDeriver
-	a rdfs:Class ;
-	rdfs:label "SPARQL values deriver"@en ;
-	rdfs:comment "The class of objects that can be used to derive values based on a SPARQL SELECT query."@en ;
-	rdfs:subClassOf sh:ValuesDeriver ;
 	rdfs:subClassOf sh:SPARQLSelectExecutable ;
 	rdfs:isDefinedBy sh: .
 
@@ -1399,6 +1324,53 @@ sh:PropertyGroup
 	rdfs:label "Property group"@en ;
 	rdfs:comment "Instances of this class represent groups of property shapes that belong together."@en ;
 	rdfs:subClassOf rdfs:Resource ;
+	rdfs:isDefinedBy sh: .
+
+
+# -----------------------------------------------------------------------------
+# SHACL ADVANCED FEATURES -----------------------------------------------------
+# -----------------------------------------------------------------------------
+	
+
+# Advanced Target vocabulary --------------------------------------------------
+
+sh:target
+	a rdf:Property ;
+	rdfs:label "target"@en ;
+	rdfs:comment "Links a shape to a target specified by an extension language, for example instances of sh:SPARQLTarget."@en ;
+	rdfs:domain sh:Shape ;
+	rdfs:range sh:Target ;
+	rdfs:isDefinedBy sh: .
+
+sh:Target
+	a rdfs:Class ;
+	rdfs:label "Target"@en ;
+	rdfs:comment "The base class of targets such as those based on SPARQL queries."@en ;
+	rdfs:subClassOf rdfs:Resource ;
+	rdfs:isDefinedBy sh: .
+
+sh:TargetType
+	a rdfs:Class ;
+	rdfs:label "Target type"@en ;
+	rdfs:comment "The (meta) class for parameterizable targets.	Instances of this are instantiated as values of the sh:target property."@en ;
+	rdfs:subClassOf rdfs:Class ;
+	rdfs:subClassOf sh:Parameterizable ;
+	rdfs:isDefinedBy sh: .
+
+sh:SPARQLTarget
+	a rdfs:Class ;
+	rdfs:label "SPARQL target"@en ;
+	rdfs:comment "The class of targets that are based on SPARQL SELECT queries."@en ;
+	rdfs:subClassOf sh:Target ;
+	rdfs:subClassOf sh:SPARQLSelectExecutable ;
+	rdfs:isDefinedBy sh: .
+
+sh:SPARQLTargetType
+	a rdfs:Class ;
+	rdfs:label "SPARQL target type"@en ;
+	rdfs:comment "The (meta) class for parameterizable targets that are based on SPARQL SELECT queries."@en ;
+	rdfs:subClassOf sh:TargetType ;
+	rdfs:subClassOf sh:SPARQLSelectExecutable ;
 	rdfs:isDefinedBy sh: .
 
 
@@ -1468,3 +1440,225 @@ sh:annotationVarName
 	rdfs:domain sh:ResultAnnotation ;
 	rdfs:range xsd:string ;
 	rdfs:isDefinedBy sh: .
+
+	
+# Node Expressions ------------------------------------------------------------
+
+sh:this
+	a rdfs:Resource ;
+	rdfs:label "this"@en ;
+	rdfs:comment "A node expression that represents the current focus node."@en ;
+	rdfs:isDefinedBy sh: .
+
+sh:filterShape
+	a rdf:Property ;
+	rdfs:label "filter shape"@en ;
+	rdfs:comment "The shape that all input nodes of the expression need to conform to."@en ;
+	rdfs:range sh:Shape ;
+	rdfs:isDefinedBy sh: .
+
+sh:nodes
+	a rdf:Property ;
+	rdfs:label "nodes"@en ;
+	rdfs:comment "The node expression producing the input nodes of a filter shape expression."@en ;
+	rdfs:isDefinedBy sh: .
+
+sh:intersection
+	a rdf:Property ;
+	rdfs:label "intersection"@en ;
+	rdfs:comment "A list of node expressions that shall be intersected."@en ;
+	rdfs:isDefinedBy sh: .
+
+sh:union
+	a rdf:Property ;
+	rdfs:label "union"@en ;
+	rdfs:comment "A list of node expressions that shall be used together."@en ;
+	rdfs:isDefinedBy sh: .
+
+
+# Expression Constraints ------------------------------------------------------
+
+sh:ExpressionConstraintComponent
+	a sh:ConstraintComponent ;
+	rdfs:label "Expression constraint component"@en ;
+	rdfs:comment "A constraint component that can be used to verify that a given node expression produces true for all value nodes."@en ;
+	sh:parameter sh:ExpressionConstraintComponent-expression ;
+	rdfs:isDefinedBy sh: .
+
+sh:ExpressionConstraintComponent-expression
+	a sh:Parameter ;
+	sh:path sh:expression ;
+	rdfs:isDefinedBy sh: .
+
+sh:expression
+	a rdf:Property ;
+	rdfs:label "expression"@en ;
+	rdfs:comment "The node expression that must return true for the value nodes."@en ;
+	rdfs:isDefinedBy sh: .
+
+
+# Rules -----------------------------------------------------------------------
+
+sh:Rule
+	a rdfs:Class ;
+	rdfs:label "Rule"@en ;
+	rdfs:comment "The class of SHACL rules. Never instantiated directly."@en ;
+	rdfs:subClassOf rdfs:Resource ;
+	rdfs:isDefinedBy sh: .
+
+sh:rule
+	a rdf:Property ;
+	rdfs:label "rule"@en ;
+	rdfs:comment "The rules linked to a shape."@en ;
+	rdfs:domain sh:Shape ;
+	rdfs:range sh:Rule ;
+	rdfs:isDefinedBy sh:  .
+
+sh:condition
+	a rdf:Property ;
+	rdfs:label "condition"@en ;
+	rdfs:comment "The shapes that the focus nodes need to conform to before a rule is executed on them."@en ;
+	rdfs:domain sh:Rule ;
+	rdfs:range sh:Shape ;
+	rdfs:isDefinedBy sh: .
+
+sh:TripleRule
+	a rdfs:Class ;
+	rdfs:label "A rule based on triple (subject, predicate, object) pattern."@en ;
+	rdfs:subClassOf sh:Rule ;
+	rdfs:isDefinedBy sh: .
+
+sh:subject
+	a rdf:Property ;
+	rdfs:label "subject"@en ;
+	rdfs:comment "An expression producing the resources that shall be inferred as subjects."@en ;
+	rdfs:domain sh:TripleRule ;
+	rdfs:isDefinedBy sh: .
+
+sh:predicate
+	a rdf:Property ;
+	rdfs:label "predicate"@en ;
+	rdfs:comment "An expression producing the properties that shall be inferred as predicates."@en ;
+	rdfs:domain sh:TripleRule ;
+	rdfs:isDefinedBy sh: .
+
+sh:object
+	a rdf:Property ;
+	rdfs:label "object"@en ;
+	rdfs:comment "An expression producing the nodes that shall be inferred as objects."@en ;
+	rdfs:domain sh:TripleRule ;
+	rdfs:isDefinedBy sh: .
+
+sh:SPARQLRule
+	a rdfs:Class ;
+	rdfs:label "SPARQL CONSTRUCT rule"@en ;
+	rdfs:comment "The class of SHACL rules based on SPARQL CONSTRUCT queries."@en ;
+	rdfs:subClassOf sh:Rule ;
+	rdfs:subClassOf sh:SPARQLConstructExecutable ;
+	rdfs:isDefinedBy sh: .
+
+
+# SHACL-JS --------------------------------------------------------------------
+
+sh:JSExecutable
+	a rdfs:Class ;
+	rdfs:label "JavaScript executable"@en ;
+	rdfs:comment "Abstract base class of resources that declare an executable JavaScript."@en ;
+	rdfs:subClassOf rdfs:Resource ;
+	rdfs:isDefinedBy sh: .
+
+sh:JSTarget
+	a rdfs:Class ;
+	rdfs:label "JavaScript target"@en ;
+	rdfs:comment "The class of targets that are based on JavaScript functions."@en ;
+	rdfs:subClassOf sh:Target ;
+	rdfs:subClassOf sh:JSExecutable ;
+	rdfs:isDefinedBy sh: .
+
+sh:JSTargetType
+	a rdfs:Class ;
+	rdfs:label "JavaScript target type"@en ;
+	rdfs:comment "The (meta) class for parameterizable targets that are based on JavaScript functions."@en ;
+	rdfs:subClassOf sh:TargetType ;
+	rdfs:subClassOf sh:JSExecutable ;
+	rdfs:isDefinedBy sh: .
+
+sh:JSConstraint
+	a rdfs:Class ;
+	rdfs:label "JavaScript-based constraint"@en ;
+	rdfs:comment "The class of constraints backed by a JavaScript function."@en ;
+	rdfs:subClassOf sh:JSExecutable ;
+	rdfs:isDefinedBy sh: .
+	
+sh:JSConstraintComponent
+	a sh:ConstraintComponent ;
+	rdfs:label "JavaScript constraint component"@en ;
+	rdfs:comment "A constraint component with the parameter sh:js linking to a sh:JSConstraint containing a sh:script."@en ;
+  	sh:parameter sh:JSConstraint-js ;
+	rdfs:isDefinedBy sh: .
+ 
+sh:JSConstraint-js
+	a sh:Parameter ;
+	sh:path sh:js ;
+	rdfs:isDefinedBy sh: .
+	
+sh:js
+	a rdf:Property ;
+	rdfs:label "JavaScript constraint"@en ;
+	rdfs:comment "Constraints expressed in JavaScript." ;
+  	rdfs:range sh:JSConstraint ;
+	rdfs:isDefinedBy sh: .
+
+sh:jsFunctionName
+	a rdf:Property ;
+	rdfs:label "JavaScript function name"@en ;
+	rdfs:comment "The name of the JavaScript function to execute."@en ;
+	rdfs:domain sh:JSExecutable ;
+	rdfs:range xsd:string ;
+	rdfs:isDefinedBy sh: .
+
+sh:jsLibrary
+	a rdf:Property ;
+	rdfs:label "JavaScript library"@en ;
+  	rdfs:comment "Declares which JavaScript libraries are needed to execute this."@en ;
+	rdfs:range sh:JSLibrary ;
+	rdfs:isDefinedBy sh: .
+
+sh:jsLibraryURL
+	a rdf:Property ;
+	rdfs:label "JavaScript library URL"@en ;
+	rdfs:comment "Declares the URLs of a JavaScript library. This should be the absolute URL of a JavaScript file. Implementations may redirect those to local files."@en ;
+	rdfs:domain sh:JSLibrary ;
+	rdfs:range xsd:anyURI ;
+	rdfs:isDefinedBy sh: .
+	
+sh:JSFunction
+	a rdfs:Class ;
+  	rdfs:label "JavaScript function"@en ;
+	rdfs:comment "The class of SHACL functions that execute a JavaScript function when called."@en ;
+	rdfs:subClassOf sh:Function ;
+	rdfs:subClassOf sh:JSExecutable ;
+	rdfs:isDefinedBy sh: .
+
+sh:JSLibrary
+	a rdfs:Class ;
+	rdfs:label "JavaScript library"@en ;
+	rdfs:comment "Represents a JavaScript library, typically identified by one or more URLs of files to include."@en ;
+	rdfs:subClassOf rdfs:Resource ;
+	rdfs:isDefinedBy sh: .
+
+sh:JSRule
+	a rdfs:Class ;
+	rdfs:label "JavaScript rule"@en ;
+	rdfs:comment "The class of SHACL rules expressed using JavaScript."@en ;
+	rdfs:subClassOf sh:JSExecutable ;
+	rdfs:subClassOf sh:Rule ;
+	rdfs:isDefinedBy sh: .
+
+sh:JSValidator
+	a rdfs:Class ;
+  	rdfs:label "JavaScript validator"@en ;
+	rdfs:comment "A SHACL validator based on JavaScript. This can be used to declare SHACL constraint components that perform JavaScript-based validation when used."@en ;
+  	rdfs:subClassOf sh:JSExecutable ;
+  	rdfs:subClassOf sh:Validator ;
+  	rdfs:isDefinedBy sh: .

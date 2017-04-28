@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.jena.rdf.model.Resource;
+import org.topbraid.shacl.validation.js.JSTargetPlugin;
 import org.topbraid.shacl.validation.sparql.SPARQLTargetPlugin;
 
 /**
@@ -25,6 +26,7 @@ public class TargetPlugins {
 	
 	TargetPlugins() {
 		addPlugin(new SPARQLTargetPlugin());
+		addPlugin(new JSTargetPlugin());
 	}
 	
 	

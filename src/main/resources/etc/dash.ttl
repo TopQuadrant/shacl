@@ -1,7 +1,6 @@
 # baseURI: http://datashapes.org/dash
 # imports: http://topbraid.org/tosh
 # imports: http://www.w3.org/ns/shacl#
-# imports: http://www.w3.org/ns/shacljs
 # prefix: dash
 
 @prefix dash: <http://datashapes.org/dash#> .
@@ -22,7 +21,6 @@ DASH is also a SHACL library for frequently needed features and design patterns.
   rdfs:label "DASH Data Shapes Library" ;
   owl:imports <http://topbraid.org/tosh> ;
   owl:imports sh: ;
-  owl:imports <http://www.w3.org/ns/shacljs> ;
   sh:declare [
       sh:namespace "http://datashapes.org/dash#"^^xsd:anyURI ;
       sh:prefix "dash" ;

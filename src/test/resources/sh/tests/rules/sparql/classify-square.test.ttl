@@ -1,19 +1,25 @@
-# baseURI: http://datashapes.org/shasf/tests/rules/classification/square.test
+# baseURI: http://datashapes.org/shasf/tests/rules/sparql/classify-square.test
 # imports: http://datashapes.org/dash
 # prefix: ex
 
 @prefix dash: <http://datashapes.org/dash#> .
-@prefix ex: <http://datashapes.org/shasf/tests/rules/classification/square.test#> .
+@prefix ex: <http://datashapes.org/shasf/tests/rules/sparql/classify-square.test#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://datashapes.org/shasf/tests/rules/classification/square.test>
+<http://datashapes.org/shasf/tests/rules/sparql/classify-square.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of sh:classification using squares" ;
+  rdfs:label "Test of classify-square" ;
   owl:imports <http://datashapes.org/dash> ;
+  owl:versionInfo "Created with TopBraid Composer" ;
+  sh:declare [
+      rdf:type sh:PrefixDeclaration ;
+      sh:namespace "http://datashapes.org/shasf/tests/rules/sparql/classify-square.test#"^^xsd:anyURI ;
+      sh:prefix "ex" ;
+    ] ;
 .
 ex:InferencingTestCase
   rdf:type dash:InferencingTestCase ;
@@ -25,6 +31,7 @@ ex:InferencingTestCase
 .
 ex:InvalidRectangle
   rdf:type ex:Rectangle ;
+  ex:height 4 ;
   rdfs:label "Invalid rectangle" ;
 .
 ex:NonSquareRectangle
@@ -52,15 +59,19 @@ ex:Rectangle
       sh:name "width" ;
     ] ;
   sh:rule [
-      rdf:type sh:ClassificationRule ;
-      sh:classification ex:Square ;
-      sh:condition ex:Rectangle ;
+      rdf:type sh:SPARQLRule ;
       sh:condition [
           sh:property [
               sh:path ex:width ;
               sh:equals ex:height ;
             ] ;
         ] ;
+      sh:construct """CONSTRUCT {
+    $this a ex:Square .
+}
+WHERE {
+}""" ;
+      sh:prefixes <http://datashapes.org/shasf/tests/rules/sparql/classify-square.test> ;
     ] ;
 .
 ex:Square

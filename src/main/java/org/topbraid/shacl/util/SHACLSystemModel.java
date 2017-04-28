@@ -35,9 +35,6 @@ public class SHACLSystemModel {
 			InputStream toshTTL = SHACLSystemModel.class.getResourceAsStream("/etc/tosh.ttl");
 			shaclModel.read(toshTTL, SH.BASE_URI, FileUtils.langTurtle);
 			
-			InputStream shacljsTTL = SHACLSystemModel.class.getResourceAsStream("/etc/shacljs.ttl");
-			shaclModel.read(shacljsTTL, SH.BASE_URI, FileUtils.langTurtle);
-			
 			shaclModel.add(SystemTriples.getVocabularyModel());
 			
 			SHACLFunctions.registerFunctions(shaclModel);
