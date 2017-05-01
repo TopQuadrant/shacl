@@ -1315,7 +1315,6 @@ sh:order
 	a rdf:Property ;
 	rdfs:label "order"@en ;
 	rdfs:comment "Specifies the relative order of this compared to its siblings. For example use 0 for the first, 1 for the second."@en ;
-	# domain: sh:PropertyShape or sh:PropertyGroup
 	# range: xsd:decimal or xsd:integer ;
 	rdfs:isDefinedBy sh: .
 
@@ -1360,16 +1359,18 @@ sh:TargetType
 sh:SPARQLTarget
 	a rdfs:Class ;
 	rdfs:label "SPARQL target"@en ;
-	rdfs:comment "The class of targets that are based on SPARQL SELECT queries."@en ;
+	rdfs:comment "The class of targets that are based on SPARQL queries."@en ;
 	rdfs:subClassOf sh:Target ;
+	rdfs:subClassOf sh:SPARQLAskExecutable ;
 	rdfs:subClassOf sh:SPARQLSelectExecutable ;
 	rdfs:isDefinedBy sh: .
 
 sh:SPARQLTargetType
 	a rdfs:Class ;
 	rdfs:label "SPARQL target type"@en ;
-	rdfs:comment "The (meta) class for parameterizable targets that are based on SPARQL SELECT queries."@en ;
+	rdfs:comment "The (meta) class for parameterizable targets that are based on SPARQL queries."@en ;
 	rdfs:subClassOf sh:TargetType ;
+	rdfs:subClassOf sh:SPARQLAskExecutable ;
 	rdfs:subClassOf sh:SPARQLSelectExecutable ;
 	rdfs:isDefinedBy sh: .
 

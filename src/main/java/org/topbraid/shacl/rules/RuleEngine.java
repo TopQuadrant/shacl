@@ -119,10 +119,13 @@ public class RuleEngine implements NodeExpressionContext {
 							filtered.add(targetNode);
 						}
 					}
-					targetNodes = filtered;
+					int added = rule.execute(this, filtered);
+					sum += added;
 				}
-				int added = rule.execute(this, targetNodes);
-				sum += added;
+				else {
+					int added = rule.execute(this, targetNodes);
+					sum += added;
+				}
 			}
 		}
 		return sum;

@@ -171,6 +171,11 @@ public abstract class AbstractSPARQLExecutor implements ConstraintExecutor {
 						if(selectMessage != null) {
 							result.addProperty(SH.resultMessage, selectMessage);
 						}
+						else if(constraint.getShapeResource().hasProperty(SH.message)) {
+							for(Statement s : constraint.getShapeResource().listProperties(SH.message).toList()) {
+								result.addProperty(SH.resultMessage, s.getObject());
+							}
+						}
 						else {
 							addDefaultMessages(engine, messageHolder, constraint.getComponent(), result, bindings, sol);
 						}
