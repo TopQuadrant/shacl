@@ -1,5 +1,5 @@
-function simple(value) {
-	if(value.termType != 'NamedNode') {
+function simple($value) {
+	if(!$value.isURI()) {
 		return "IRIs expected";
 	}
 }

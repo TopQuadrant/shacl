@@ -18,6 +18,6 @@ function stringFunction() {
 	return "Hello";
 }
 
-function withArguments(arg1, arg2) {
-	return TermFactory.namedNode("http://aldi.de/product_" + arg1.value + "_" + arg2.value);
+function withArguments($arg1, $arg2) {
+	return TermFactory.namedNode("http://aldi.de/product_" + $arg1.value + "_" + $arg2.value);
 }

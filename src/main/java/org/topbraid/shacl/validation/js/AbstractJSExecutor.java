@@ -65,7 +65,7 @@ public abstract class AbstractJSExecutor implements ConstraintExecutor {
 			long startTime = System.currentTimeMillis();
 			for(RDFNode theFocusNode : focusNodes) {
 				Object resultObj;
-				bindings.add("focusNode", theFocusNode);
+				bindings.add(SH.thisVar.getVarName(), theFocusNode);
 				
 				List<RDFNode> valueNodes = getValueNodes(validationEngine, constraint, bindings, theFocusNode);
 				

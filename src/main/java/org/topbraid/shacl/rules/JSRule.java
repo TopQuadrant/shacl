@@ -55,7 +55,7 @@ class JSRule implements Rule {
 				engine.put(SH.JS_SHAPES_VAR, shapesJSGraph);
 				
 				QuerySolutionMap bindings = new QuerySolutionMap();
-				bindings.add(SH.focusNode.getLocalName(), focusNode);
+				bindings.add(SH.thisVar.getVarName(), focusNode);
 				Object result = engine.invokeFunction(functionName, bindings);
 				if(NashornUtil.isArray(result)) {
 					for(Object tripleO : NashornUtil.asArray(result)) {

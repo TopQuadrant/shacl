@@ -51,14 +51,14 @@ function validateClosed($value, $closed, $ignoredProperties, $currentShape) {
 	return results;
 }
 
-function validateClosedByTypesNode($focusNode, $closedByTypes) {
+function validateClosedByTypesNode($this, $closedByTypes) {
 	if(!T("true").equals($closedByTypes)) {
 		return;
 	}
 	var results = [];
 	var allowedProperties = new NodeSet();
 	$data.query().
-		match($focusNode, "rdf:type", "?directType").
+		match($this, "rdf:type", "?directType").
 		path("?directType", { zeroOrMore : T("rdfs:subClassOf") }, "?type").
 		forEachNode("?type", function(type) {
 			$shapes.query().
@@ -68,7 +68,7 @@ function validateClosedByTypesNode($focusNode, $closedByTypes) {
 				addAllNodes("?path", allowedProperties);
 		});
 	$data.query().
-		match($focusNode, "?predicate", "?object").
+		match($this, "?predicate", "?object").
 		filter(function(sol) { return !T("rdf:type").equals(sol.predicate) }).
 		filter(function(sol) { return !allowedProperties.contains(sol.predicate) }).
 		forEach(function(sol) {
@@ -89,24 +89,24 @@ function validateDatatype($value, $datatype) {
 	}
 }
 
-function validateDisjoint($focusNode, $value, $disjoint) {
-	return !$data.query().match($focusNode, $disjoint, $value).hasSolution();
+function validateDisjoint($this, $value, $disjoint) {
+	return !$data.query().match($this, $disjoint, $value).hasSolution();
 }
 
-function validateEqualsProperty($focusNode, $path, $equals) {
+function validateEqualsProperty($this, $path, $equals) {
 	var results = [];
 	var path = toRDFQueryPath($path);
-	$data.query().path($focusNode, path, "?value").forEach(
+	$data.query().path($this, path, "?value").forEach(
 		function(solution) {
-			if(!$data.query().match($focusNode, $equals, solution.value).hasSolution()) {
+			if(!$data.query().match($this, $equals, solution.value).hasSolution()) {
 				results.push({
 					value: solution.value
 				});
 			}
 		});
-	$data.query().match($focusNode, $equals, "?value").forEach(
+	$data.query().match($this, $equals, "?value").forEach(
 		function(solution) {
-			if(!$data.query().path($focusNode, path, solution.value).hasSolution()) {
+			if(!$data.query().path($this, path, solution.value).hasSolution()) {
 				results.push({
 					value: solution.value
 				});
@@ -115,12 +115,12 @@ function validateEqualsProperty($focusNode, $path, $equals) {
 	return results;
 }
 
-function validateHasValueNode($focusNode, $hasValue) {
-	return $focusNode.equals($hasValue);
+function validateHasValueNode($this, $hasValue) {
+	return $this.equals($hasValue);
 }
 
-function validateHasValueProperty($focusNode, $path, $hasValue) {
-	var count = $data.query().path($focusNode, toRDFQueryPath($path), $hasValue).getCount();
+function validateHasValueProperty($this, $path, $hasValue) {
+	var count = $data.query().path($this, toRDFQueryPath($path), $hasValue).getCount();
 	return count > 0;
 }
 
@@ -147,11 +147,11 @@ function validateLanguageIn($value, $languageIn) {
 	return false;
 }
 
-function validateLessThanProperty($focusNode, $path, $lessThan) {
+function validateLessThanProperty($this, $path, $lessThan) {
 	var results = [];
 	$data.query().
-		path($focusNode, toRDFQueryPath($path), "?value").
-		match($focusNode, $lessThan, "?otherValue").
+		path($this, toRDFQueryPath($path), "?value").
+		match($this, $lessThan, "?otherValue").
 		forEach(function(sol) {
 					var c = SHACL.compareNodes(sol.value, sol.otherValue);
 					if(c == null || c >= 0) {
@@ -163,11 +163,11 @@ function validateLessThanProperty($focusNode, $path, $lessThan) {
 	return results;
 }
 
-function validateLessThanOrEqualsProperty($focusNode, $path, $lessThanOrEquals) {
+function validateLessThanOrEqualsProperty($this, $path, $lessThanOrEquals) {
 	var results = [];
 	$data.query().
-		path($focusNode, toRDFQueryPath($path), "?value").
-		match($focusNode, $lessThanOrEquals, "?otherValue").
+		path($this, toRDFQueryPath($path), "?value").
+		match($this, $lessThanOrEquals, "?otherValue").
 		forEach(function(sol) {
 					var c = SHACL.compareNodes(sol.value, sol.otherValue);
 					if(c == null || c > 0) {
@@ -179,8 +179,8 @@ function validateLessThanOrEqualsProperty($focusNode, $path, $lessThanOrEquals) 
 	return results;
 }
 
-function validateMaxCountProperty($focusNode, $path, $maxCount) {
-	var count = $data.query().path($focusNode, toRDFQueryPath($path), "?any").getCount();
+function validateMaxCountProperty($this, $path, $maxCount) {
+	var count = $data.query().path($this, toRDFQueryPath($path), "?any").getCount();
 	return count <= Number($maxCount.value);
 }
 
@@ -199,8 +199,8 @@ function validateMaxLength($value, $maxLength) {
 	return $value.value.length <= Number($maxLength.lex);
 }
 
-function validateMinCountProperty($focusNode, $path, $minCount) {
-	var count = $data.query().path($focusNode, toRDFQueryPath($path), "?any").getCount();
+function validateMinCountProperty($this, $path, $minCount) {
+	var count = $data.query().path($this, toRDFQueryPath($path), "?any").getCount();
 	return count >= Number($minCount.value);
 }
 
@@ -241,12 +241,12 @@ function validateNode($value, $node) {
 	return SHACL.nodeConformsToShape($value, $node);
 }
 
-function validateNonRecursiveProperty($focusNode, $path, $nonRecursive) {
+function validateNonRecursiveProperty($this, $path, $nonRecursive) {
 	if(T("true").equals($nonRecursive)) {
-		if($data.query().path($focusNode, toRDFQueryPath($path), $focusNode).hasSolution()) {
+		if($data.query().path($this, toRDFQueryPath($path), $this).hasSolution()) {
 			return {
 				path: $path,
-				value: $focusNode
+				value: $this
 			}
 		}
 	}
@@ -274,31 +274,31 @@ function validatePattern($value, $pattern, $flags) {
 	return re.test($value.value);
 }
 
-function validatePrimaryKeyProperty($focusNode, $path, $uriStart) {
-	if(!$focusNode.isURI()) {
+function validatePrimaryKeyProperty($this, $path, $uriStart) {
+	if(!$this.isURI()) {
 		return "Must be an IRI";
 	}
-	if($data.query().path($focusNode, toRDFQueryPath($path), null).getCount() != 1) {
+	if($data.query().path($this, toRDFQueryPath($path), null).getCount() != 1) {
 		return "Must have exactly one value";
 	}
-	var value = $data.query().path($focusNode, toRDFQueryPath($path), "?value").getNode("?value");
+	var value = $data.query().path($this, toRDFQueryPath($path), "?value").getNode("?value");
 	var uri = $uriStart.lex + encodeURIComponent(value.value);
-	if(!$focusNode.uri.equals(uri)) {
+	if(!$this.uri.equals(uri)) {
 		return "Does not have URI " + uri;
 	}
 }
 
-function validateQualifiedMaxCountProperty($focusNode, $path, $qualifiedValueShape, $qualifiedValueShapesDisjoint, $qualifiedMaxCount, $currentShape) {
-	var c = validateQualifiedHelper($focusNode, $path, $qualifiedValueShape, $qualifiedValueShapesDisjoint, $currentShape);
+function validateQualifiedMaxCountProperty($this, $path, $qualifiedValueShape, $qualifiedValueShapesDisjoint, $qualifiedMaxCount, $currentShape) {
+	var c = validateQualifiedHelper($this, $path, $qualifiedValueShape, $qualifiedValueShapesDisjoint, $currentShape);
 	return c <= Number($qualifiedMaxCount.lex);
 }
 
-function validateQualifiedMinCountProperty($focusNode, $path, $qualifiedValueShape, $qualifiedValueShapesDisjoint, $qualifiedMinCount, $currentShape) {
-	var c = validateQualifiedHelper($focusNode, $path, $qualifiedValueShape, $qualifiedValueShapesDisjoint, $currentShape);
+function validateQualifiedMinCountProperty($this, $path, $qualifiedValueShape, $qualifiedValueShapesDisjoint, $qualifiedMinCount, $currentShape) {
+	var c = validateQualifiedHelper($this, $path, $qualifiedValueShape, $qualifiedValueShapesDisjoint, $currentShape);
 	return c >= Number($qualifiedMinCount.lex);
 }
 
-function validateQualifiedHelper($focusNode, $path, $qualifiedValueShape, $qualifiedValueShapesDisjoint, $currentShape) {
+function validateQualifiedHelper($this, $path, $qualifiedValueShape, $qualifiedValueShapesDisjoint, $currentShape) {
 	var siblingShapes = new NodeSet();
 	if(T("true").equals($qualifiedValueShapesDisjoint)) {
 		$shapes.query().
@@ -309,7 +309,7 @@ function validateQualifiedHelper($focusNode, $path, $qualifiedValueShape, $quali
 			addAllNodes("?siblingShape", siblingShapes);
 	}
 	return $data.query().
-		path($focusNode, toRDFQueryPath($path), "?value").
+		path($this, toRDFQueryPath($path), "?value").
 		filter(function(sol) { 
 			return SHACL.nodeConformsToShape(sol.value, $qualifiedValueShape) &&
 				!validateQualifiedConformsToASibling(sol.value, siblingShapes.toArray()); 
@@ -334,16 +334,16 @@ function validateStem($value, $stem) {
 	return $value.isURI() && $value.uri.startsWith($stem.lex);
 }
 
-function validateSubSetOf($focusNode, $subSetOf, $value) {
-	return $data.query().match($focusNode, $subSetOf, $value).hasSolution();
+function validateSubSetOf($this, $subSetOf, $value) {
+	return $data.query().match($this, $subSetOf, $value).hasSolution();
 }
 
-function validateUniqueLangProperty($focusNode, $uniqueLang, $path) {
+function validateUniqueLangProperty($this, $uniqueLang, $path) {
 	if(!T("true").equals($uniqueLang)) {
 		return;
 	}
 	var map = {};
-	$data.query().path($focusNode, toRDFQueryPath($path), "?value").forEach(function(sol) {
+	$data.query().path($this, toRDFQueryPath($path), "?value").forEach(function(sol) {
 		var lang = sol.value.language;
 		if(lang && lang != "") {
 			var old = map[lang];
