@@ -505,7 +505,10 @@ public class SHACLUtil {
 
 	private static void addDirectShapesAtClassOrShape(Resource clsOrShape, List<SHNodeShape> results) {
 		if(JenaUtil.hasIndirectType(clsOrShape, SH.Shape) && !results.contains(clsOrShape)) {
-			results.add(SHFactory.asNodeShape(clsOrShape));
+			SHNodeShape shape = SHFactory.asNodeShape(clsOrShape);
+			if(!shape.isDeactivated()) {
+				results.add(shape);
+			}
 		}
 		// More correct would be: if(JenaUtil.hasIndirectType(clsOrShape, RDFS.Class)) {
 		{

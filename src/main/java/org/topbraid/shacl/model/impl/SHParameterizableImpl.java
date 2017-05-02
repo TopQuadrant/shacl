@@ -74,35 +74,57 @@ public class SHParameterizableImpl extends SHResourceImpl implements SHParameter
 	@Override
 	public List<SHParameter> getOrderedParameters() {
 		List<SHParameter> results = getParameters();
-		Collections.sort(results, new Comparator<SHParameter>() {
-			@Override
-            public int compare(SHParameter param1, SHParameter param2) {
-				Property p1 = param1.getPredicate();
-				Property p2 = param2.getPredicate();
-				if(p1 != null && p2 != null) {
-					Integer index1 = param1.getOrder();
-					Integer index2 = param2.getOrder();
-					if(index1 != null) {
-						if(index2 != null) {
-							int comp = index1.compareTo(index2);
-							if(comp != 0) {
-								return comp;
-							}
+		boolean orderExists = false;
+		for(SHParameter param : results) {
+			if(param.hasProperty(SH.order)) {
+				orderExists = true;
+				break;
+			}
+		}
+		if(orderExists) {
+			Collections.sort(results, new Comparator<SHParameter>() {
+				@Override
+	            public int compare(SHParameter param1, SHParameter param2) {
+					Property p1 = param1.getPredicate();
+					Property p2 = param2.getPredicate();
+					if(p1 != null && p2 != null) {
+						Integer index1 = param1.getOrder();
+						if(index1 == null) {
+							index1 = 0;
+						}
+						Integer index2 = param2.getOrder();
+						if(index2 == null) {
+							index2 = 0;
+						}
+						int comp = index1.compareTo(index2);
+						if(comp != 0) {
+							return comp;
 						}
 						else {
-							return -1;
+							return p1.getLocalName().compareTo(p2.getLocalName());
 						}
 					}
-					else if(index2 != null) {
-						return 1;
+					else {
+						return 0;
 					}
-					return p1.getLocalName().compareTo(p2.getLocalName());
 				}
-				else {
-					return 0;
+			});
+		}
+		else {
+			Collections.sort(results, new Comparator<SHParameter>() {
+				@Override
+	            public int compare(SHParameter param1, SHParameter param2) {
+					Property p1 = param1.getPredicate();
+					Property p2 = param2.getPredicate();
+					if(p1 != null && p2 != null) {
+						return p1.getLocalName().compareTo(p2.getLocalName());
+					}
+					else {
+						return 0;
+					}
 				}
-			}
-		});
+			});
+		}
 		return results;
 	}
 

@@ -67,37 +67,49 @@ public class SPARQLTargetPlugin implements TargetPlugin {
 
 	@Override
 	public boolean isNodeInTarget(RDFNode focusNode, Dataset dataset, Resource executable, SHParameterizableTarget parameterizableTarget) {
-
-		// If sh:sparql exists only, then we expect run the query with ?this pre-bound
-		String sparql = JenaUtil.getStringProperty(executable, SH.select);
-		String queryString = SPARQLSubstitutions.withPrefixes(sparql, executable);
-		Query query;
-		try {
-			query = ARQFactory.get().createQuery(queryString);
-		}
-		catch(QueryParseException ex) {
-			throw new SHACLException("Invalid SPARQL target (" + ex.getLocalizedMessage() + "):\n" + queryString);
-		}
-
-		QuerySolutionMap bindings = new QuerySolutionMap();
-		bindings.add(SH.thisVar.getVarName(), focusNode);
-		if(parameterizableTarget != null) {
-			parameterizableTarget.addBindings(bindings);
-		}
-		try(QueryExecution qexec = SPARQLSubstitutions.createQueryExecution(query, dataset, bindings)) {
-		    ResultSet rs = qexec.execSelect();
-		    boolean hasNext = rs.hasNext();
-		    return hasNext;
-		}
-
-		/* Alternative: a stupid brute-force algorithm
-		Iterator<Resource> it = getResourcesInTarget(dataset, executable, templateCall).iterator();
-		while(it.hasNext()) {
-			if(focusNode.equals(it.next())) {
-				return true;
+		String ask = JenaUtil.getStringProperty(parameterizableTarget, SH.ask);
+		if(ask != null) {
+			String queryString = SPARQLSubstitutions.withPrefixes(ask, executable);
+			Query query;
+			try {
+				query = ARQFactory.get().createQuery(queryString);
+			}
+			catch(QueryParseException ex) {
+				throw new SHACLException("Invalid SPARQL target (" + ex.getLocalizedMessage() + "):\n" + queryString);
+			}
+	
+			QuerySolutionMap bindings = new QuerySolutionMap();
+			bindings.add(SH.thisVar.getVarName(), focusNode);
+			if(parameterizableTarget != null) {
+				parameterizableTarget.addBindings(bindings);
+			}
+			try(QueryExecution qexec = SPARQLSubstitutions.createQueryExecution(query, dataset, bindings)) {
+			    return qexec.execAsk();
 			}
 		}
-		return false;*/
+		else {
+			// If sh:select exists only, then we expect run the query with ?this pre-bound
+			String sparql = JenaUtil.getStringProperty(executable, SH.select);
+			String queryString = SPARQLSubstitutions.withPrefixes(sparql, executable);
+			Query query;
+			try {
+				query = ARQFactory.get().createQuery(queryString);
+			}
+			catch(QueryParseException ex) {
+				throw new SHACLException("Invalid SPARQL target (" + ex.getLocalizedMessage() + "):\n" + queryString);
+			}
+	
+			QuerySolutionMap bindings = new QuerySolutionMap();
+			bindings.add(SH.thisVar.getVarName(), focusNode);
+			if(parameterizableTarget != null) {
+				parameterizableTarget.addBindings(bindings);
+			}
+			try(QueryExecution qexec = SPARQLSubstitutions.createQueryExecution(query, dataset, bindings)) {
+			    ResultSet rs = qexec.execSelect();
+			    boolean hasNext = rs.hasNext();
+			    return hasNext;
+			}
+		}
 	}
 	
 	

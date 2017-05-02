@@ -52,11 +52,13 @@ public abstract class SHACLARQFunction implements org.apache.jena.sparql.functio
 	
 	protected List<String> paramNames = new ArrayList<String>();
 	
+	private List<Boolean> optional = new ArrayList<Boolean>();
+	
 	private SHFunction shFunction;
 	
 
 	/**
-	 * Constructs a new SHARQFunction based on a given sh:Function.
+	 * Constructs a new SHACLARQFunction based on a given sh:Function.
 	 * The shaclFunction must be associated with the Model containing
 	 * the triples of its definition.
 	 * @param shaclFunction  the SHACL function
@@ -78,6 +80,7 @@ public abstract class SHACLARQFunction implements org.apache.jena.sparql.functio
 					throw new IllegalStateException(param + " of " + parameterizable + " does not have a valid predicate");
 				}
 				paramNames.add(varName);
+				optional.add(param.isOptional());
 			}
 		}
 		finally {
@@ -130,6 +133,9 @@ public abstract class SHACLARQFunction implements org.apache.jena.sparql.functio
 	        		if(cachable) {
 	        			paramsForCache[i] = x.asNode();
 	        		}
+	        	}
+	        	else if(!optional.get(i)) {
+	        		throw new ExprEvalException("Missing SHACL function argument");
 	        	}
 			}
 		}

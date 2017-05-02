@@ -144,8 +144,16 @@ public class SHACLPaths {
 		else {
 			Resource clone = targetModel.createResource();
 			for(Statement s : path.listProperties().toList()) {
-				Resource newObject = clonePath(s.getResource(), targetModel);
-				clone.addProperty(s.getPredicate(), newObject);
+				if(s.getSubject().hasProperty(RDF.first)) {
+					if(RDF.first.equals(s.getPredicate()) || RDF.rest.equals(s.getPredicate())) {
+						Resource newObject = clonePath(s.getResource(), targetModel);
+						clone.addProperty(s.getPredicate(), newObject);
+					}
+				}
+				else {
+					Resource newObject = clonePath(s.getResource(), targetModel);
+					clone.addProperty(s.getPredicate(), newObject);
+				}
 			}
 			return clone;
 		}

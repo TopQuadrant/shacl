@@ -25,9 +25,9 @@ public interface SHParameterizable extends SHResource {
 
 	
 	/**
-	 * Gets an ordered List of all declared Parameters, based on
-	 * the local names of the predicates and sh:index values.
-	 * @return the (possibly empty) List of Parameters
+	 * Gets an ordered List of all declared SHParameters, based on
+	 * sh:order values (if one of them exists), then the local names of the path predicates.
+	 * @return the (possibly empty) List of SHParameters
 	 */
 	List<SHParameter> getOrderedParameters();
 
