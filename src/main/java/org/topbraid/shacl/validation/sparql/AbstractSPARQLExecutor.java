@@ -124,6 +124,11 @@ public abstract class AbstractSPARQLExecutor implements ConstraintExecutor {
 	protected abstract String getLabel(Constraint constraint);
 	
 	
+	protected Query getQuery() {
+		return query;
+	}
+	
+	
 	protected abstract String getSPARQL(Constraint constraint);
 	
 

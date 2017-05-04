@@ -277,9 +277,16 @@ public class W3CTestRunner {
 				}
 			}
 			catch(Exception ex) {
-				out.println("EXCEPTION: " + entry + " " + ex.getMessage());
-				result.addProperty(EARL.outcome, EARL.failed);
-				return false;
+				if(entry.hasProperty(MF.result, SHT.Failure)) {
+					out.println("PASSED: " + entry);
+					result.addProperty(EARL.outcome, EARL.passed);
+					return true;
+				}
+				else {
+					out.println("EXCEPTION: " + entry + " " + ex.getMessage());
+					result.addProperty(EARL.outcome, EARL.failed);
+					return false;
+				}
 			}
 		}
 	}

@@ -1,19 +1,41 @@
 package org.topbraid.shacl.validation.sparql;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.topbraid.shacl.engine.Constraint;
+import org.topbraid.shacl.model.SHParameter;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaUtil;
 
 public class SPARQLComponentExecutor extends AbstractSPARQLExecutor {
 	
+	private boolean wasAsk;
+	
 	public SPARQLComponentExecutor(Constraint constraint) {
 		super(constraint);
+		
+		if(!SH.NS.equals(constraint.getComponent().getNameSpace())) {
+			Set<String> preBoundVars = new HashSet<>();
+			for(SHParameter param : constraint.getComponent().getParameters()) {
+				preBoundVars.add(param.getVarName());
+			}
+			preBoundVars.add(SH.thisVar.getVarName());
+			preBoundVars.add(SH.shapesGraphVar.getVarName());
+			preBoundVars.add(SH.currentShapeVar.getVarName());
+			if(wasAsk) {
+				preBoundVars.add(SH.valueVar.getVarName());
+			}
+			List<String> errors = SPARQLSyntaxChecker.checkQuery(getQuery(), preBoundVars);
+			if(!errors.isEmpty()) {
+				throw new IllegalArgumentException(errors.size() + 
+						" violations of SPARQL Syntax rules (Appendix A): " + errors + ". Query: " + getQuery());
+			}
+		}
 	}
 
 	
@@ -49,6 +71,9 @@ public class SPARQLComponentExecutor extends AbstractSPARQLExecutor {
 
 
 	private String createSPARQLFromAskValidator(Constraint constraint, Resource validator) {
+		
+		this.wasAsk = true;
+		
 		String valueVar = "?value";
 		while(constraint.getComponent().getParametersMap().containsKey(valueVar)) {
 			valueVar += "_";

@@ -1,6 +1,8 @@
 package org.topbraid.shacl.validation.sparql;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.rdf.model.RDFNode;
@@ -21,6 +23,15 @@ public class SPARQLConstraintExecutor extends AbstractSPARQLExecutor {
 	
 	public SPARQLConstraintExecutor(Constraint constraint) {
 		super(constraint);
+		
+		Set<String> preBoundVars = new HashSet<>();
+		preBoundVars.add(SH.thisVar.getVarName());
+		preBoundVars.add(SH.shapesGraphVar.getVarName());
+		preBoundVars.add(SH.currentShapeVar.getVarName());
+		List<String> errors = SPARQLSyntaxChecker.checkQuery(getQuery(), preBoundVars);
+		if(!errors.isEmpty()) {
+			throw new IllegalArgumentException(errors.size() + " violations of SPARQL Syntax rules (Appendix A): " + errors + ". Query: " + getQuery());
+		}
 	}
 
 	

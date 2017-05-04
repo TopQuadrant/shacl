@@ -15,6 +15,8 @@ public class SHT {
 	
 	public final static Property dataGraph = ResourceFactory.createProperty(NS + "dataGraph");
 	
+	public final static Resource Failure = ResourceFactory.createResource(NS + "Failure");
+	
 	public final static Resource proposed = ResourceFactory.createResource(NS + "proposed");
 	
 	public final static Property shapesGraph = ResourceFactory.createProperty(NS + "shapesGraph");
