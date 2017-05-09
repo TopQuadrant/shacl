@@ -163,6 +163,11 @@ validation.validate(
     examples.amf1.dataFormat,
     examples.amf1.shapes,
     examples.amf1.shapesFormat,
-    function () {
+    function (e, result) {
         console.log("AND BACK AGAIN");
+        if (e) {
+            console.log("ERROR: " + e);
+        } else {
+            console.log(JSON.stringify(result, null, 2));
+        }
     });

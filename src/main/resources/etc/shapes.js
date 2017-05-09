@@ -2,6 +2,7 @@
  * Created by antoniogarrote on 08/05/2017.
  */
 $rdf = require("rdflib");
+var jsonld = require("jsonld");
 require("./rdfquery");
 
 TermFactory.impl = $rdf;
@@ -190,46 +191,48 @@ nodeLabel = function(node, store) {
     }
 }
 
-function showValidationResults() {
+function showValidationResults(cb) {
     if (validationError) {
         console.log("(Failure)");
         console.log("VALIDATION FAILURE: " + validationError);
+        throw(validationError);
     }
     else {
-        console.log("(Valid)");
-        console.log("Found " + results.length + " results");
-        var str = "";
-        for (var i = 0; i < results.length; i++) {
-            str += results[i].str;
-            str += "\n] .\n";
-        }
-        console.log(str);
 
-        if (sequence) {
-            for (var i = 0; i < sequence.length; i++) {
-                var s = sequence[i];
-                var text = "";
-                text += s.f.funcName + "(";
-                for (var a = 0; a < s.args.length; a++) {
-                    if (a > 0) {
-                        text += ", ";
-                    }
-                    var arg = s.args[a];
-                    if (!arg) {
-                        text += "null";
-                    }
-                    else {
-                        text += nodeLabel(arg, dataStore);
-                    }
-                }
-                text += ")";
-                console.log(text);
-                if (s.count) {
-                    var span = " -> " + s.count + " violations";
-                    console.log(span);
-                }
+        var resultGraph = $rdf.graph();
+        var reportNode = TermFactory.blankNode("report");
+        resultGraph.add(reportNode, T("rdf:type"), T("sh:ValidationReport"));
+        resultGraph.add(reportNode, T("sh:conforms"), T(""+(validationEngine.results.length ==0)));
+        var nodes = {};
+
+        for (var i = 0; i < validationEngine.results.length; i++) {
+            var result = validationEngine.results[i];
+            if (nodes[result[0].toString()] == null) {
+                nodes[result[0].toString()] = true;
+                resultGraph.add(reportNode, T("sh:result"), result[0]);
             }
+            console.log(result[0] + " " + result[1] + " " + result[2] + " .");
+            console.log(result[2].constructor.name);
+            console.log(result[2]);
+            resultGraph.add(result[0], result[1], result[2]);
         }
+
+        // Unsupported bug in JSON parser bug workaround
+        var oldToString = resultGraph.toString;
+        resultGraph.toString = function() {
+            var text = oldToString.call(resultGraph);
+            text = text.replace(/^\{/,"").replace(/\}$/,"");
+            return text;
+        };
+        //////////////////
+
+        jsonld.fromRDF(resultGraph.toNT(), {}, function (err, doc) {
+            if (err != null) {
+                cb(err);
+            } else {
+                jsonld.flatten(doc, cb);
+            }
+        });
     }
 }
 
@@ -254,13 +257,14 @@ function parseShapesGraph(text, mediaType, andThen) {
 function updateDataGraph(text, mediaType, cb) {
     var startTime = new Date().getTime();
     parseDataGraph(text, mediaType, function () {
-        var midTime = new Date().getTime();
+        // var midTime = new Date().getTime();
         updateValidationEngine();
-        var endTime = new Date().getTime();
-        showStatus("Parsing took " + (midTime - startTime) + " ms. Validating the data took " + (endTime - midTime) + " ms.");
-        showValidationResults();
-        if (cb) {
-            cb();
+        // var endTime = new Date().getTime();
+        // showStatus("Parsing took " + (midTime - startTime) + " ms. Validating the data took " + (endTime - midTime) + " ms.");
+        try {
+            showValidationResults(cb);
+        } catch(e) {
+            cb(e, null);
         }
     });
 }
@@ -269,15 +273,16 @@ function updateDataGraph(text, mediaType, cb) {
 function updateShapesGraph(shapes, mediaType, cb) {
     var startTime = new Date().getTime();
     parseShapesGraph(shapes, mediaType, function () {
-        var midTime = new Date().getTime();
+        // var midTime = new Date().getTime();
         shapesGraph = new ShapesGraph();
-        var midTime2 = new Date().getTime();
+        // var midTime2 = new Date().getTime();
         updateValidationEngine();
-        var endTime = new Date().getTime();
-        showStatus("Parsing took " + (midTime - startTime) + " ms. Preparing the shapes took " + (midTime2 - midTime) + " ms. Validation the data took " + (endTime - midTime2) + " ms.");
-        showValidationResults();
-        if (cb) {
-            cb();
+        // var endTime = new Date().getTime();
+        // showStatus("Parsing took " + (midTime - startTime) + " ms. Preparing the shapes took " + (midTime2 - midTime) + " ms. Validation the data took " + (endTime - midTime2) + " ms.");
+        try {
+            showValidationResults(cb);
+        } catch(e) {
+            cb(e, null);
         }
     });
 }
@@ -292,7 +297,7 @@ function createRDFListNode(store, items, index) {
         return bnode;
     }
 }
-
+/*
 ValidationEngine.prototype.addResultProperty = function(result, predicate, object) {
     result.str += "\n\t";
     if(T("rdf:type").equals(predicate)) {
@@ -330,6 +335,15 @@ ValidationEngine.prototype.createResultObject = function() {
     return result;
 }
 
+
+var oldCreateResult = ValidationEngine.prototype.createResultObject;
+ValidationEngine.prototype.createResultObject = function(constraint, focusNode, valueNode) {
+    var result = oldCreateResult(constraint, focusNode, valueNode);
+    results.push(result);
+    return result;
+};
+*/
+
 ValidationFunction.prototype.doExecute = function(args) {
     if(sequence) {
         var s = {f : this, args : args, depth : SHACL.depth };
@@ -349,10 +363,29 @@ ValidationFunction.prototype.doExecute = function(args) {
 }
 
 module.exports.validate = function(data, dataMediaType, shapes, shapesMediaType, cb) {
-    updateDataGraph(data, dataMediaType, function () {
-        updateShapesGraph(shapes, shapesMediaType, function () {
-            console.log("DONE!");
-            cb();
-        });
+    updateDataGraph(data, dataMediaType, function (e) {
+        if (e != null) {
+            cb(e, null);
+        } else {
+            updateShapesGraph(shapes, shapesMediaType, function(e, resultString) {
+                if (e) {
+                    cb(e, null);
+                } else {
+                    try {
+                        console.log(resultString);
+                        /*
+                        var store = $rdf.graph();
+                        $rdf.parse(resultString, store, "urn:dummy", "text/n3");
+                        $rdf.serialize(null, store, "urn:dummy", "application/ld+json", function(err, jsonld) {
+                            cb(null, jsonld);
+                        })
+                        */
+                        cb(null, resultString);
+                    } catch(e) {
+                        cb(e, null);
+                    }
+                }
+            });
+        }
     });
 };

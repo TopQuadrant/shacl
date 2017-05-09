@@ -486,7 +486,7 @@ ValidationEngine.prototype.createResultMessages = function (result, constraint) 
     for (var i = 0; i < ms.length; i++) {
         var m = ms[i];
         var str = this.withSubstitutions(m, constraint);
-        this.addResultProperty(result, T("sh:resultMessage"), TermFactory.literal(str, m.language || T("xsd:string")));
+        this.addResultProperty(result, T("sh:resultMessage"), str);
     }
 }
 
