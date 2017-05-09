@@ -1,0 +1,59 @@
+[
+  {
+    "@context":  {
+      "raml-doc": "http://raml.org/vocabularies/document#",
+      "raml-http": "http://raml.org/vocabularies/http#",
+      "raml-shapes": "http://raml.org/vocabularies/shapes#",
+      "hydra": "http://www.w3.org/ns/hydra/core#",
+      "shacl": "http://www.w3.org/ns/shacl#",
+      "schema-org": "http://schema.org/",
+      "xsd": "http://www.w3.org/2001/XMLSchema#"
+    },
+    "@id": "https://mulesoft-labs.github.io/amf-playground/raml/world-music-api/api.raml#/definitions/Entry/items/0",
+    "@type": [
+      "shacl:NodeShape",
+      "shacl:Shape"
+    ],
+    "shacl:targetObjectsOf": {"@id": "raml-shapes:toValidate"},
+    "shacl:property": [
+      {
+        "@id": "https://mulesoft-labs.github.io/amf-playground/raml/world-music-api/api.raml#/definitions/Entry/items/0/property/title",
+        "@type": [
+          "shacl:PropertyShape",
+          "shacl:Shape"
+        ],
+        "raml-shapes:propertyLabel": "title",
+        "shacl:dataType": {
+          "@id": "xsd:string"
+        },
+        "shacl:maxCount": 1,
+        "shacl:minCount": 0,
+        "shacl:path": {
+          "@id": "http://raml.org/vocabularies/shapes/anon#title"
+        }
+      },
+      {
+        "@id": "https://mulesoft-labs.github.io/amf-playground/raml/world-music-api/api.raml#/definitions/Entry/items/0/property/artist",
+        "@type": [
+          "shacl:PropertyShape",
+          "shacl:Shape"
+        ],
+        "raml-shapes:propertyLabel": "artist",
+        "shacl:dataType": {
+          "@id": "xsd:string"
+        },
+        "shacl:maxCount": 1,
+        "shacl:minCount": 0,
+        "shacl:path": {
+          "@id": "http://raml.org/vocabularies/shapes/anon#artist"
+        }
+      }
+    ]
+  },
+  {
+    "http://raml.org/vocabularies/shapes#toValidate": {
+      "http://raml.org/vocabularies/shapes/anon#title": ["hey","ho"],
+      "http://raml.org/vocabularies/shapes/anon#artist": "Antonio Carlos Brasileiro de Almeida Jobim"
+    }
+  }
+]
