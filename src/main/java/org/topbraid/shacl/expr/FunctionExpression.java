@@ -22,7 +22,7 @@ import org.apache.jena.sparql.util.ExprUtils;
 import org.apache.jena.sparql.util.NodeFactoryExtra;
 import org.topbraid.spin.system.SPINLabels;
 
-public class FunctionExpression implements NodeExpression {
+public class FunctionExpression extends ComplexNodeExpression {
 	
 	private List<NodeExpression> args;
 	
@@ -48,8 +48,54 @@ public class FunctionExpression implements NodeExpression {
 		sb.append(")");
 		this.expr = ExprUtils.parse(sb.toString());
 	}
+	
+	
+	public String appendBindings(AppendContext context) {
+		String varName = null;
+		for(int i = 0; i < args.size(); i++) {
+			NodeExpression arg = args.get(i);
+			if(arg instanceof ComplexNodeExpression) {
+				if(varName == null) {
+					varName = context.getNextVarName();
+				}
+				((ComplexNodeExpression)arg).appendLabel(context, varName + (i + 1));
+			}
+		}
+		return varName;
+	}
+
+
+	private void appendCall(AppendContext context, String varName) {
+		context.append(SPINLabels.get().getLabel(function));
+		context.append("(");
+		for(int i = 0; i < args.size(); i++) {
+			NodeExpression arg = args.get(i);
+			if(i > 0) {
+				context.append(", ");
+			}
+			if(arg instanceof ComplexNodeExpression) {
+				context.append("?" + varName + (i + 1));
+			}
+			else {
+				context.append(arg.toString());
+			}
+		}
+		context.append(")");
+	}
 
 	
+	@Override
+	public void appendLabel(AppendContext context, String targetVarName) {
+		String varName = appendBindings(context);
+		context.indent();
+		context.append("BIND(");
+		appendCall(context, varName);
+		context.append(" AS ?");
+		context.append(targetVarName);
+		context.append(") .\n");
+	}
+
+
 	@Override
 	public List<RDFNode> eval(RDFNode focusNode, NodeExpressionContext context) {
 		List<RDFNode> results = new LinkedList<>();
@@ -76,8 +122,8 @@ public class FunctionExpression implements NodeExpression {
 			BindingHashMap binding = new BindingHashMap();
 			for(int i = 0; i < args.size(); i++) {
 				List<RDFNode> a = as.get(i);
-				int m = y % a.size();
 				if(!a.isEmpty()) {
+					int m = y % a.size();
 					binding.add(Var.alloc("a" + i), a.get(m).asNode());
 					y /= a.size();
 				}
@@ -100,21 +146,5 @@ public class FunctionExpression implements NodeExpression {
 			}
 		}
 		return results;
-	}
-
-	
-	@Override
-	public String toString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append(SPINLabels.get().getLabel(function));
-		sb.append("(");
-		for(int i = 0; i < args.size(); i++) {
-			if(i > 0) {
-				sb.append(", ");
-			}
-			sb.append(args.get(i).toString());
-		}
-		sb.append(")");
-		return sb.toString();
 	}
 }

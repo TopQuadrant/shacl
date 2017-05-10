@@ -2,18 +2,19 @@ package org.topbraid.shacl.rules;
 
 import java.util.List;
 
-import org.apache.jena.rdf.model.Model;
+import org.apache.jena.graph.Triple;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
-import org.topbraid.shacl.engine.ShapesGraph;
+import org.topbraid.shacl.expr.AppendContext;
+import org.topbraid.shacl.expr.ComplexNodeExpression;
 import org.topbraid.shacl.expr.NodeExpression;
 import org.topbraid.shacl.expr.NodeExpressionFactory;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaUtil;
 
-class TripleRule implements Rule {
+class TripleRule extends Rule {
 	
 	private NodeExpression object;
 	
@@ -22,26 +23,25 @@ class TripleRule implements Rule {
 	private NodeExpression subject;
 
 	
-	TripleRule(Resource resource, ShapesGraph shapesGraph) {
-		this.object = createNodeExpression(resource, SH.object, shapesGraph);
-		this.predicate = createNodeExpression(resource, SH.predicate, shapesGraph);
-		this.subject = createNodeExpression(resource, SH.subject, shapesGraph);
+	TripleRule(Resource resource) {
+		super(resource);
+		this.object = createNodeExpression(resource, SH.object);
+		this.predicate = createNodeExpression(resource, SH.predicate);
+		this.subject = createNodeExpression(resource, SH.subject);
 	}
 	
 	
-	private NodeExpression createNodeExpression(Resource resource, Property predicate, ShapesGraph shapesGraph) {
+	private NodeExpression createNodeExpression(Resource resource, Property predicate) {
 		Statement s = resource.getProperty(predicate);
 		if(s == null) {
 			throw new IllegalArgumentException("Triple rule without " + predicate.getLocalName());
 		}
-		return NodeExpressionFactory.get().create(s.getObject(), shapesGraph);
+		return NodeExpressionFactory.get().create(s.getObject());
 	}
 
 
 	@Override
-	public int execute(RuleEngine ruleEngine, List<RDFNode> focusNodes) {
-		int added = 0;
-		Model inf = ruleEngine.getInferencesModel();
+	public void execute(RuleEngine ruleEngine, List<RDFNode> focusNodes) {
 		for(RDFNode focusNode : focusNodes) {
 			List<RDFNode> subjects = subject.eval(focusNode, ruleEngine);
 			List<RDFNode> predicates = predicate.eval(focusNode, ruleEngine);
@@ -53,17 +53,58 @@ class TripleRule implements Rule {
 						if(predicateR.isURIResource()) {
 							Property predicate = JenaUtil.asProperty((Resource)predicateR);
 							for(RDFNode object : objects) {
-								Statement s = inf.createStatement((Resource)subject, predicate, object);
-								if(!inf.contains(s)) {
-									added++;
-									inf.add(s);
-								}
+								ruleEngine.infer(Triple.create(subject.asNode(), predicate.asNode(), object.asNode()));
 							}
 						}
 					}
 				}
 			}
 		}
-		return added;
+	}
+	
+	
+	public String toString() {
+		String label = getLabel();
+		if(label == null) {
+			StringBuffer sb = new StringBuffer();
+			AppendContext context = new AppendContext(sb);
+			sb.append("\nCONSTRUCT {\n");
+			sb.append("    ");
+			if(subject instanceof ComplexNodeExpression) {
+				sb.append("?subject");
+			}
+			else {
+				sb.append(subject);
+			}
+			sb.append(" ");
+			if(predicate instanceof ComplexNodeExpression) {
+				sb.append("?predicate");
+			}
+			else {
+				sb.append(predicate);
+			}
+			sb.append(" ");
+			if(object instanceof ComplexNodeExpression) {
+				sb.append("?object");
+			}
+			else {
+				sb.append(object);
+			}
+			sb.append(" .\n}\nWHERE {\n");
+			context.increaseIndent();
+			if(subject instanceof ComplexNodeExpression) {
+				((ComplexNodeExpression)subject).appendLabel(context, "subject");
+			}
+			if(predicate instanceof ComplexNodeExpression) {
+				((ComplexNodeExpression)predicate).appendLabel(context, "predicate");
+			}
+			if(object instanceof ComplexNodeExpression) {
+				((ComplexNodeExpression)object).appendLabel(context, "object");
+			}
+			context.decreaseIndent();
+			sb.append("}");
+			label = sb.toString();
+		}
+		return getLabelStart("Triple") + label;
 	}
 }

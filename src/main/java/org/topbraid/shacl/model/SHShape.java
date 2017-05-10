@@ -19,6 +19,13 @@ public interface SHShape extends SHResource {
 	
 	
 	/**
+	 * Gets the rules attached to this shape via sh:rule.
+	 * @return the rules
+	 */
+	Iterable<SHRule> getRules();
+	
+	
+	/**
 	 * Returns the sh:severity of this shape, defaulting to sh:Violation.
 	 * @return
 	 */

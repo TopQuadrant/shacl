@@ -43,7 +43,7 @@ public class SHACLSPARQLARQFunction extends SHACLARQFunction {
 	
 
 	/**
-	 * Constructs a new SHACLARQFunction based on a given sh:ConstraintComponent
+	 * Constructs a new SHACLSPARQLARQFunction based on a given sh:ConstraintComponent
 	 * and a given validator (which must be a value of sh:nodeValidator, sh:propertyValidator etc.
 	 * @param component  the constraint component (defining the sh:parameters)
 	 * @param askValidator  the sh:SPARQLAskValidator resource
@@ -70,7 +70,7 @@ public class SHACLSPARQLARQFunction extends SHACLARQFunction {
 	
 
 	/**
-	 * Constructs a new SHACLARQFunction based on a given sh:Function.
+	 * Constructs a new SHACLSPARQLARQFunction based on a given sh:Function.
 	 * The shaclFunction must be associated with the Model containing
 	 * the triples of its definition.
 	 * @param shaclFunction  the SHACL function

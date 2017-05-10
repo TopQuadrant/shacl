@@ -281,6 +281,63 @@ AbstractQuery.prototype.addAllNodes = function(varName, set) {
 }
 
 /**
+ * Produces an array of triple objects where each triple object has properties
+ * subject, predicate and object derived from the provided template values.
+ * Each of these templates can be either a variable name (starting with '?'),
+ * an RDF term string (such as "rdfs:label") or a JavaScript node object.
+ * @param subject  the subject node
+ * @param predicate  the predicate node
+ * @param object  the object node
+ */
+AbstractQuery.prototype.construct = function(subject, predicate, object) {
+	var results = [];
+	for(var sol = this.nextSolution(); sol; sol = this.nextSolution()) {
+		var s = null;
+		if(typeof subject === 'string') {
+			if(subject.indexOf('?') == 0) {
+				s = sol[var2Attr(subject)];
+			}
+			else {
+				s = T(subject);
+			}
+		} 
+		else {
+			s = subject;
+		}
+		var p = null;
+		if(typeof predicate === 'string') {
+			if(predicate.indexOf('?') == 0) {
+				p = sol[var2Attr(predicate)];
+			}
+			else {
+				p = T(predicate);
+			}
+		} 
+		else {
+			p = predicate;
+		}
+
+		var o = null;
+		if(typeof object === 'string') {
+			if(object.indexOf('?') == 0) {
+				o = sol[var2Attr(object)];
+			}
+			else {
+				o = T(object);
+			}
+		} 
+		else {
+			o = object;
+		}
+
+		if(s && p && o) {
+			results.push({ subject: s, predicate: p, object: o});
+		}
+	}
+	return results;
+}
+
+/**
  * Executes a given function for each solution.
  * @param callback  a function that takes a solution as argument
  */

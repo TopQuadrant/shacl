@@ -27,6 +27,7 @@ public class SHACLJSARQFunction extends SHACLARQFunction {
 	public SHACLJSARQFunction(SHJSFunction shaclFunction) {
 		super(shaclFunction);
 		this.functionName = shaclFunction.getFunctionName();
+		addParameters(shaclFunction);
 	}
 
 	

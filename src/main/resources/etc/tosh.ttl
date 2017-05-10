@@ -481,17 +481,17 @@ tosh:valuesWithShapeCount
   rdfs:comment "Counts the number of values from a given subject (?arg1) / predicate (?arg2) combination that do not produce any error-level constraint violations for a given shape (?arg3) in a given shapes graph (?arg4). The function produces an error if one of the shapes validated to a fatal error." ;
   rdfs:label "values with shape count" ;
   sh:parameter [
-      sh:path sh:arg1 ;
+      sh:path dash:arg1 ;
       sh:class rdfs:Resource ;
       sh:description "The subject to count the values of." ;
     ] ;
   sh:parameter [
-      sh:path sh:arg2 ;
+      sh:path dash:arg2 ;
       sh:class rdf:Property ;
       sh:description "The property to count the values of." ;
     ] ;
   sh:parameter [
-      sh:path sh:arg3 ;
+      sh:path dash:arg3 ;
       sh:class sh:Shape ;
       sh:description "The shape to validate." ;
     ] ;

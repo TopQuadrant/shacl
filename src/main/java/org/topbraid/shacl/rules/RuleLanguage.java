@@ -4,5 +4,5 @@ import org.apache.jena.rdf.model.Resource;
 
 public interface RuleLanguage {
 
-	Rule createRule(Resource resource, RuleEngine ruleEngine);
+	Rule createRule(Resource resource);
 }

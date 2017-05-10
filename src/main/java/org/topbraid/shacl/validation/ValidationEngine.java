@@ -19,6 +19,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.sparql.path.Path;
 import org.apache.jena.vocabulary.RDF;
 import org.topbraid.shacl.arq.SHACLPaths;
 import org.topbraid.shacl.engine.Constraint;
@@ -218,7 +219,13 @@ public class ValidationEngine implements NodeExpressionContext {
 		}
 		else {
 			List<RDFNode> results = new LinkedList<RDFNode>();
-			SHACLPaths.addValueNodes(focusNode, path, results);
+			Path jenaPath = constraint.getShape().getJenaPath();
+			if(jenaPath != null) {
+				SHACLPaths.addValueNodes(focusNode, jenaPath, results);
+			}
+			else {
+				SHACLPaths.addValueNodes(focusNode, path, results);
+			}
 			return results;
 		}
 	}

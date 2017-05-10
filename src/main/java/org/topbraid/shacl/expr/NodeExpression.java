@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.apache.jena.rdf.model.RDFNode;
 
-public interface NodeExpression {
+public abstract class NodeExpression {
 
 	// Note: the result List must not contain duplicates
-	List<RDFNode> eval(RDFNode focusNode, NodeExpressionContext context);
+	public abstract List<RDFNode> eval(RDFNode focusNode, NodeExpressionContext context);
 }

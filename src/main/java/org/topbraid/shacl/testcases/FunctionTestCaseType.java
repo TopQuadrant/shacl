@@ -46,6 +46,8 @@ public class FunctionTestCaseType implements TestCaseType {
 			FunctionRegistry oldFR = FunctionRegistry.get();
 			SPINThreadFunctionRegistry threadFR = new SPINThreadFunctionRegistry(oldFR);
 			FunctionRegistry.set(ARQ.getContext(), threadFR);
+			
+			// TODO: These should run twice, for both values of SHACLFunctionDriver.setJSPreferred
 
 			SPINThreadFunctions old = SPINThreadFunctionRegistry.register(testCase.getModel());
 			String expression = JenaUtil.getStringProperty(testCase, DASH.expression);

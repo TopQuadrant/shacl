@@ -8,7 +8,6 @@ public class RulesEntailment implements SHACLEntailment.Engine {
 
 	@Override
 	public Model createModelWithEntailment(Model model, ProgressMonitor monitor) throws InterruptedException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("Not implemented yet");
 	}
 }

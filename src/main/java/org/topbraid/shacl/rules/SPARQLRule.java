@@ -14,12 +14,13 @@ import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.util.JenaUtil;
 
-class SPARQLRule implements Rule {
+public class SPARQLRule extends Rule {
 	
 	private Query query;
 	
 	
-	SPARQLRule(Resource rule) {
+	public SPARQLRule(Resource rule) {
+		super(rule);
 		String rawString = JenaUtil.getStringProperty(rule, SH.construct);
 		String queryString = SPARQLSubstitutions.withPrefixes(rawString, rule);
 		query = ARQFactory.get().createQuery(queryString);
@@ -30,24 +31,36 @@ class SPARQLRule implements Rule {
 	
 	
 	@Override
-	public int execute(RuleEngine engine, List<RDFNode> focusNodes) {
-		int sum = 0;
-		Model inf = engine.getInferencesModel();
+	public void execute(RuleEngine ruleEngine, List<RDFNode> focusNodes) {
 		for(RDFNode focusNode : focusNodes) {
 			QuerySolutionMap bindings = new QuerySolutionMap();
 			bindings.add(SH.thisVar.getVarName(), focusNode);
-			try(QueryExecution qexec = ARQFactory.get().createQueryExecution(query, engine.getDataset(), bindings)) {
+			try(QueryExecution qexec = ARQFactory.get().createQueryExecution(query, ruleEngine.getDataset(), bindings)) {
 				Model constructed = qexec.execConstruct();
-				int added = 0;
 				for(Statement s : constructed.listStatements().toList()) {
-					if(!inf.contains(s)) {
-						added++;
-						inf.add(s);
-					}
+					ruleEngine.infer(s.asTriple());
 				}
-				sum += added;
 			}
 		}
-		return sum;
+	}
+	
+	
+	public Query getQuery() {
+		return query;
+	}
+	
+	
+	public String toString() {
+		String label = getLabel();
+		if(label == null) {
+			Statement s = getResource().getProperty(SH.construct);
+			if(s != null && s.getObject().isLiteral()) {
+				label = "\n" + s.getString();
+			}
+			else {
+				label = "(Missing SPARQL query)";
+			}
+		}
+		return getLabelStart("SPARQL") + label;
 	}
 }

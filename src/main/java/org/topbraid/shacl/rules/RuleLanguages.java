@@ -35,7 +35,7 @@ public class RuleLanguages {
 	}
 	
 	
-	public RuleLanguage getRuleLanguage(Resource rule, RuleEngine engine) {
+	public RuleLanguage getRuleLanguage(Resource rule) {
 		Resource type = JenaUtil.getType(rule);
 		return languages.get(type);
 	}

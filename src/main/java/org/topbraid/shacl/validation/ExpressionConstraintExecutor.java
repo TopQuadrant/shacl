@@ -16,7 +16,7 @@ public class ExpressionConstraintExecutor implements ConstraintExecutor {
 	@Override
 	public void executeConstraint(Constraint constraint, ValidationEngine engine, List<RDFNode> focusNodes) {
 		// TODO: optimize, currently produces a new NodeExpression each time
-		NodeExpression expr = NodeExpressionFactory.get().create(constraint.getParameterValue(), engine.getShapesGraph());
+		NodeExpression expr = NodeExpressionFactory.get().create(constraint.getParameterValue());
 		for(RDFNode focusNode : focusNodes) {
 			for(RDFNode valueNode : engine.getValueNodes(constraint, focusNode)) {
 				List<RDFNode> results = expr.eval(valueNode, engine);

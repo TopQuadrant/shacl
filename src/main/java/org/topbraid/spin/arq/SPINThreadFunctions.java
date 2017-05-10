@@ -3,14 +3,13 @@ package org.topbraid.spin.arq;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.sparql.function.FunctionFactory;
+import org.apache.jena.sparql.pfunction.PropertyFunctionFactory;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.model.Function;
 import org.topbraid.spin.util.JenaUtil;
 import org.topbraid.spin.vocabulary.SPIN;
-
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.sparql.function.FunctionFactory;
-import org.apache.jena.sparql.pfunction.PropertyFunctionFactory;
 
 /**
  * A helper object that can be used to register SPARQL functions
@@ -62,8 +61,14 @@ public class SPINThreadFunctions {
 
 	private FunctionFactory getFunctionFactoryFromModel(String uri) {
 		Function spinFunction = model.getResource(uri).as(Function.class);
-		if(JenaUtil.hasIndirectType(spinFunction, SPIN.Function) ||
-				JenaUtil.hasIndirectType(spinFunction, SH.Function)) {
+		if(JenaUtil.hasIndirectType(spinFunction, SPIN.Function)) {
+			FunctionFactory arqFunction = SPINFunctionDrivers.get().create(spinFunction);
+			if(arqFunction != null) {
+				functionsCache.put(uri, arqFunction);
+				return arqFunction;
+			}
+		}
+		else if(JenaUtil.hasIndirectType(spinFunction, SH.Function)) {
 			FunctionFactory arqFunction = SPINFunctionDrivers.get().create(spinFunction);
 			if(arqFunction != null) {
 				functionsCache.put(uri, arqFunction);

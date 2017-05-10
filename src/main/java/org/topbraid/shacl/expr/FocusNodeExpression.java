@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.apache.jena.rdf.model.RDFNode;
 
-public class FocusNodeExpression implements NodeExpression {
+public class FocusNodeExpression extends AtomicNodeExpression {
 
 	@Override
 	public List<RDFNode> eval(RDFNode focusNode, NodeExpressionContext context) {

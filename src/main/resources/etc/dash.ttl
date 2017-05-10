@@ -157,21 +157,18 @@ dash:DefaultValueTypeRule
 .
 dash:FailureResult
   rdf:type rdfs:Class ;
-  rdf:type sh:Shape ;
   rdfs:comment "A result representing a validation failure such as an unsupported recursion." ;
   rdfs:label "Failure result" ;
   rdfs:subClassOf sh:AbstractResult ;
 .
 dash:FailureTestCaseResult
   rdf:type rdfs:Class ;
-  rdf:type sh:Shape ;
   rdfs:comment "Represents a failure of a test case." ;
   rdfs:label "Failure test case result" ;
   rdfs:subClassOf dash:TestCaseResult ;
 .
 dash:FunctionTestCase
   rdf:type rdfs:Class ;
-  rdf:type sh:Shape ;
   rdfs:comment "A test case that verifies that a given SPARQL expression produces a given, expected result." ;
   rdfs:label "Function test case" ;
   rdfs:subClassOf dash:TestCase ;
@@ -191,20 +188,18 @@ dash:FunctionTestCase
 .
 dash:GraphUpdate
   rdf:type rdfs:Class ;
-  rdf:type sh:Shape ;
   rdfs:label "Graph update" ;
   rdfs:subClassOf dash:Suggestion ;
 .
 dash:GraphValidationTestCase
   rdf:type rdfs:Class ;
-  rdf:type sh:Shape ;
   rdfs:comment "A test case that performs SHACL constraint validation on the whole graph and compares the results with the expected validation results stored with the test case. By default this excludes meta-validation (i.e. the validation of the shape definitions themselves). If that's desired, set dash:validateShapes to true." ;
   rdfs:label "Graph validation test case" ;
   rdfs:subClassOf dash:ValidationTestCase ;
 .
 dash:InferencingTestCase
   rdf:type rdfs:Class ;
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   rdfs:comment "A test case to verify whether an inferencing engine is producing identical results to those stored as expected results." ;
   rdfs:label "Inferencing test case" ;
   rdfs:subClassOf dash:TestCase ;
@@ -393,7 +388,7 @@ dash:PrimaryKeyConstraintComponent-uriStart
 .
 dash:QueryTestCase
   rdf:type rdfs:Class ;
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   rdfs:comment "A test case running a given SPARQL SELECT query and comparing its results with those stored as JSON Result Set in the expected result property." ;
   rdfs:label "Query test case" ;
   rdfs:subClassOf dash:TestCase ;
@@ -541,7 +536,6 @@ dash:TestCase
 .
 dash:TestCaseResult
   rdf:type rdfs:Class ;
-  rdf:type sh:Shape ;
   rdfs:comment "Base class for results produced by running test cases." ;
   rdfs:label "Test case result" ;
   rdfs:subClassOf sh:AbstractResult ;
@@ -565,7 +559,6 @@ dash:TestCaseResult
 .
 dash:TestEnvironment
   rdf:type rdfs:Class ;
-  rdf:type sh:Shape ;
   dash:abstract "true"^^xsd:boolean ;
   rdfs:comment "Abstract base class for test environments, holding information on how to set up a test case." ;
   rdfs:label "Test environment" ;
@@ -573,7 +566,7 @@ dash:TestEnvironment
 .
 dash:ValidationTestCase
   rdf:type rdfs:Class ;
-  rdf:type sh:Shape ;
+  rdf:type sh:NodeShape ;
   dash:abstract "true"^^xsd:boolean ;
   rdfs:comment "Abstract superclass for test cases concerning SHACL constraint validation. Future versions may add new kinds of validatin test cases, e.g. to validate a single resource only." ;
   rdfs:label "Validation test case" ;
@@ -727,6 +720,12 @@ dash:hasStem
   rdfs:label "has stem" ;
   sh:ask "ASK { FILTER (isIRI($value) && STRSTARTS(str($value), $stem)) }" ;
   sh:prefixes <http://datashapes.org/dash> ;
+.
+dash:height
+  rdf:type rdf:Property ;
+  rdfs:comment "The height." ;
+  rdfs:label "height" ;
+  rdfs:range xsd:integer ;
 .
 dash:isDeactivated
   rdf:type sh:SPARQLFunction ;
@@ -891,6 +890,27 @@ dash:testModifiesEnvironment
   rdfs:label "test modifies environment" ;
   rdfs:range xsd:boolean ;
 .
+dash:toString
+  rdf:type sh:JSFunction ;
+  rdf:type sh:SPARQLFunction ;
+  dash:cachable "true"^^xsd:boolean ;
+  rdfs:comment "Returns a literal with datatype xsd:string that has the input value as its string. If the input value is an (URI) resource then its URI will be used." ;
+  rdfs:label "to string" ;
+  sh:jsFunctionName "dash_toString" ;
+  sh:jsLibrary dash:DASHJSLibrary ;
+  sh:labelTemplate "Convert {$arg} to xsd:string" ;
+  sh:parameter [
+      sh:path dash:arg ;
+      sh:description "The input value." ;
+      sh:name "arg" ;
+      sh:nodeKind sh:IRIOrLiteral ;
+    ] ;
+  sh:prefixes <http://datashapes.org/dash> ;
+  sh:returnType xsd:string ;
+  sh:select """SELECT (xsd:string($arg) AS ?result)
+WHERE {
+}""" ;
+.
 dash:validateShapes
   rdf:type rdf:Property ;
   rdfs:comment "True to also validate the shapes itself (i.e. parameter declarations)." ;
@@ -924,6 +944,24 @@ dash:valueCount
     		$subject $predicate ?object .
 		}
 """ ;
+.
+dash:width
+  rdf:type rdf:Property ;
+  rdfs:comment "The width." ;
+  rdfs:label "width" ;
+  rdfs:range xsd:integer ;
+.
+dash:x
+  rdf:type rdf:Property ;
+  rdfs:comment "The x position." ;
+  rdfs:label "x" ;
+  rdfs:range xsd:integer ;
+.
+dash:y
+  rdf:type rdf:Property ;
+  rdfs:comment "The y position." ;
+  rdfs:label "y" ;
+  rdfs:range xsd:integer ;
 .
 owl:Class
   rdf:type rdfs:Class ;
@@ -1369,7 +1407,7 @@ sh:UniqueLangConstraintComponent
 		SELECT DISTINCT $this ?lang
 		WHERE {
 			{
-				FILTER ($uniqueLang) .
+				FILTER sameTerm($uniqueLang, true) .
 			}
 			$this $PATH ?value .
 			BIND (lang(?value) AS ?lang) .

@@ -1,6 +1,8 @@
 // Functions implementing the validators of SHACL-JS
 // Also include validators for the constraint components of the DASH namespace
 
+// Also included: implementations of the standard DASH functions
+
 // There is no validator for sh:property as this is expected to be
 // natively implemented by the surrounding engine.
 
@@ -378,6 +380,24 @@ function validateXone($value, $xone) {
 	return count == 1;
 }
 
+
+// DASH functions -------------------------------------------------------------
+
+// dash:toString
+function dash_toString($arg) {
+	if($arg.isLiteral()) {
+		return NodeFactory.literal($arg.lex, T("xsd:string"));
+	}
+	else if($arg.isURI()) {
+		return NodeFactory.literal($arg.uri, T("xsd:string"));
+	}
+	else {
+		return null;
+	}
+}
+
+
+// Utilities ------------------------------------------------------------------
 
 function toRDFQueryPath(shPath) {
 	if(shPath.isURI()) {

@@ -8,7 +8,6 @@ import javax.script.ScriptException;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.QuerySolutionMap;
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
@@ -23,25 +22,23 @@ import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.ExceptionUtil;
 import org.topbraid.spin.util.JenaUtil;
 
-class JSRule implements Rule {
+class JSRule extends Rule {
 	
-	private Resource rule;
 	
 	JSRule(Resource rule) {
-		this.rule = rule;
+		super(rule);
 	}
 	
 
 	@Override
-	public int execute(RuleEngine ruleEngine, List<RDFNode> focusNodes) {
-		
+	public void execute(RuleEngine ruleEngine, List<RDFNode> focusNodes) {
+
+		Resource rule = getResource();
 		String functionName = JenaUtil.getStringProperty(rule, SH.jsFunctionName);
 		if(functionName == null) {
 			throw new IllegalArgumentException("Missing JavaScript function name at rule " + rule);
 		}
 		
-		Model inferences = ruleEngine.getInferencesModel();
-		int sum = 0;
 		for(RDFNode focusNode : focusNodes) {
 			boolean nested = SHACLScriptEngineManager.begin();
 			JSScriptEngine engine = SHACLScriptEngineManager.getCurrentEngine();
@@ -64,11 +61,7 @@ class JSRule implements Rule {
 							Node subject = JSFactory.getNode(nodes[0]);
 							Node predicate = JSFactory.getNode(nodes[1]);
 							Node object = JSFactory.getNode(nodes[2]);
-							Statement s = inferences.asStatement(Triple.create(subject, predicate, object));
-							if(!inferences.contains(s)) {
-								sum++;
-								inferences.add(s);
-							}
+							ruleEngine.infer(Triple.create(subject, predicate, object));
 						}
 						else {
 							@SuppressWarnings("rawtypes")
@@ -76,11 +69,7 @@ class JSRule implements Rule {
 							Node subject = JSFactory.getNode(triple.get("subject"));
 							Node predicate = JSFactory.getNode(triple.get("predicate"));
 							Node object = JSFactory.getNode(triple.get("object"));
-							Statement s = inferences.asStatement(Triple.create(subject, predicate, object));
-							if(!inferences.contains(s)) {
-								sum++;
-								inferences.add(s);
-							}
+							ruleEngine.infer(Triple.create(subject, predicate, object));
 						}
 					}
 				}
@@ -97,6 +86,20 @@ class JSRule implements Rule {
 				SHACLScriptEngineManager.end(nested);
 			}
 		}
-		return sum;
+	}
+	
+	
+	public String toString() {
+		String label = getLabel();
+		if(label == null) {
+			Statement s = getResource().getProperty(SH.jsFunctionName);
+			if(s != null && s.getObject().isLiteral()) {
+				label = s.getString();
+			}
+			else {
+				label = "(Missing JavaScript function name)";
+			}
+		}
+		return getLabelStart("JavaScript") + label;
 	}
 }

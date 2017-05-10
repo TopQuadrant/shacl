@@ -5,10 +5,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.sparql.path.Path;
+import org.topbraid.shacl.arq.SHACLPaths;
 import org.topbraid.shacl.model.SHConstraintComponent;
 import org.topbraid.shacl.model.SHParameter;
 import org.topbraid.shacl.model.SHShape;
+import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.system.SPINLabels;
 
 /**
@@ -20,6 +24,8 @@ import org.topbraid.spin.system.SPINLabels;
 public class Shape {
 	
 	private List<Constraint> constraints;
+	
+	private Path jenaPath;
 
 	private SHShape shape;
 	
@@ -29,6 +35,10 @@ public class Shape {
 	public Shape(ShapesGraph shapesGraph, SHShape shape) {
 		this.shape = shape;
 		this.shapesGraph = shapesGraph;
+		Resource path = shape.getPath();
+		if(path != null && path.isAnon()) {
+			jenaPath = (Path) SHACLPaths.getJenaPath(SHACLPaths.getPathString(path), path.getModel());
+		}
 	}
 	
 	
@@ -57,6 +67,22 @@ public class Shape {
 			}
 		}
 		return constraints;
+	}
+	
+	
+	public Path getJenaPath() {
+		return jenaPath;
+	}
+	
+	
+	public Double getOrder() {
+		Statement s = shape.getProperty(SH.order);
+		if(s != null && s.getObject().isLiteral()) {
+			return s.getLiteral().getDouble();
+		}
+		else {
+			return 0.0;
+		}
 	}
 	
 	

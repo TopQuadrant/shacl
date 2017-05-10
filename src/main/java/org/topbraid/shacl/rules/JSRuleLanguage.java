@@ -5,7 +5,7 @@ import org.apache.jena.rdf.model.Resource;
 public class JSRuleLanguage implements RuleLanguage {
 
 	@Override
-	public Rule createRule(Resource resource, RuleEngine ruleEngine) {
+	public Rule createRule(Resource resource) {
 		return new JSRule(resource);
 	}
 }

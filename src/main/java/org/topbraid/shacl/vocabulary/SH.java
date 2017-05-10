@@ -65,6 +65,8 @@ public class SH {
 
     public final static Resource ResultAnnotation = ResourceFactory.createResource(NS + "ResultAnnotation");
 
+    public final static Resource Rule = ResourceFactory.createResource(NS + "Rule");
+
     public final static Resource Shape = ResourceFactory.createResource(NS + "Shape");
     
     public final static Resource SPARQLAskValidator = ResourceFactory.createResource(NS + "SPARQLAskValidator");

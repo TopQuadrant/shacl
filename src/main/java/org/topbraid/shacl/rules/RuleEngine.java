@@ -1,12 +1,17 @@
 package org.topbraid.shacl.rules;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
@@ -21,12 +26,13 @@ import org.topbraid.shacl.validation.ValidationEngine;
 import org.topbraid.shacl.validation.ValidationEngineFactory;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.progress.ProgressMonitor;
+import org.topbraid.spin.system.SPINLabels;
 import org.topbraid.spin.util.JenaDatatypes;
 import org.topbraid.spin.util.JenaUtil;
 
 /**
  * A SHACL Rules engine with a pluggable architecture for different execution languages
- * including SPARQL and JavaScript.
+ * including Triple rules, SPARQL rules and JavaScript rules.
  * 
  * @author Holger Knublauch
  */
@@ -37,6 +43,8 @@ public class RuleEngine implements NodeExpressionContext {
 	private Model inferences;
 	
 	private ProgressMonitor monitor;
+	
+	private Set<Triple> pending = new HashSet<>();
 	
 	private Map<Rule,List<Resource>> rule2Conditions = new HashMap<>();
 	
@@ -55,28 +63,94 @@ public class RuleEngine implements NodeExpressionContext {
 	}
 	
 	
-	public int executeAll() throws InterruptedException {
-		int sum = 0;
-		int s = 0;
-		do {
-			s = 0;
-			for(Shape shape : shapesGraph.getRootShapes()) {
-				int added = executeShape(shape);
-				s += added;
+	public void executeAll() throws InterruptedException {
+		List<Shape> ruleShapes = new ArrayList<Shape>();
+		for(Shape shape : shapesGraph.getRootShapes()) {
+			if(shape.getShapeResource().hasProperty(SH.rule)) {
+				ruleShapes.add(shape);
 			}
-			sum += s;
 		}
-		while(s > 0);
-		return sum;
+		if(ruleShapes.isEmpty()) {
+			return;
+		}
+		
+		Collections.sort(ruleShapes, new Comparator<Shape>() {
+			@Override
+			public int compare(Shape shape1, Shape shape2) {
+				return shape1.getOrder().compareTo(shape2.getOrder());
+			}
+		});
+		
+		String baseMessage = null;
+		if(monitor != null) {
+			int rules = 0;
+			for(Shape shape : ruleShapes) {
+				rules += getShapeRules(shape).size();
+			}
+			baseMessage = "Executing " + rules + " SHACL rules from " + ruleShapes.size() + " shapes";
+			monitor.beginTask(baseMessage, rules);
+		}
+		
+		Double oldOrder = ruleShapes.get(0).getOrder();
+		for(Shape shape : ruleShapes) {
+			if(!oldOrder.equals(shape.getOrder())) {
+				oldOrder = shape.getOrder();
+				flushPending();
+			}
+			executeShape(shape, baseMessage);
+		}
+		flushPending();
 	}
 	
 	
-	public int executeShape(Shape shape) throws InterruptedException {
+	public void executeShape(Shape shape, String baseMessage) throws InterruptedException {
 		
 		if(shape.getShapeResource().isDeactivated()) {
-			return 0;
+			return;
 		}
 		
+		List<Rule> rules = getShapeRules(shape);
+		if(rules.isEmpty()) {
+			return;
+		}
+		
+		List<RDFNode> targetNodes = SHACLUtil.getTargetNodes(shape.getShapeResource(), dataset);
+		if(!targetNodes.isEmpty()) {
+			Double oldOrder = rules.get(0).getOrder();
+			for(Rule rule : rules) {
+				if(monitor != null) {
+					if(monitor.isCanceled()) {
+						throw new InterruptedException();
+					}
+					monitor.setTaskName(baseMessage + " (at " + SPINLabels.get().getLabel(shape.getShapeResource()) + " with " + targetNodes.size() + " target nodes)");
+					monitor.subTask(rule.toString().replace("\n", " "));
+				}
+				if(!oldOrder.equals(rule.getOrder())) {
+					oldOrder = rule.getOrder();
+					flushPending();
+				}
+				List<Resource> conditions = rule2Conditions.get(rule);
+				if(!conditions.isEmpty()) {
+					List<RDFNode> filtered = new LinkedList<RDFNode>();
+					for(RDFNode targetNode : targetNodes) {
+						if(nodeConformsToAllShapes(targetNode, conditions)) {
+							filtered.add(targetNode);
+						}
+					}
+					rule.execute(this, filtered);
+				}
+				else {
+					rule.execute(this, targetNodes);
+				}
+				if(monitor != null) {
+					monitor.worked(1);
+				}
+			}
+		}
+	}
+
+
+	private List<Rule> getShapeRules(Shape shape) {
 		List<Rule> rules = shape2Rules.get(shape);
 		if(rules == null) {
 			rules = new LinkedList<>();
@@ -89,46 +163,30 @@ public class RuleEngine implements NodeExpressionContext {
 			}
 			Collections.sort(raws, OrderComparator.get());
 			for(Resource raw : raws) {
-				RuleLanguage ruleLanguage = RuleLanguages.get().getRuleLanguage(raw, this);
+				RuleLanguage ruleLanguage = RuleLanguages.get().getRuleLanguage(raw);
 				if(ruleLanguage == null) {
-					throw new IllegalArgumentException("Unsupporte SHACL rule type for " + raw);
+					throw new IllegalArgumentException("Unsupported SHACL rule type for " + raw);
 				}
-				Rule rule = ruleLanguage.createRule(raw, this);
+				Rule rule = ruleLanguage.createRule(raw);
 				rules.add(rule);
 				List<Resource> conditions = JenaUtil.getResourceProperties(raw, SH.condition);
 				rule2Conditions.put(rule, conditions);
 			}
 		}
-		if(rules.isEmpty()) {
-			return 0;
-		}
-		
-		
-		List<RDFNode> targetNodes = SHACLUtil.getTargetNodes(shape.getShapeResource(), dataset);
-		int sum = 0;
-		if(!targetNodes.isEmpty()) {
-			for(Rule rule : rules) {
-				if(monitor != null && monitor.isCanceled()) {
-					throw new InterruptedException();
-				}
-				List<Resource> conditions = rule2Conditions.get(rule);
-				if(!conditions.isEmpty()) {
-					List<RDFNode> filtered = new LinkedList<RDFNode>();
-					for(RDFNode targetNode : targetNodes) {
-						if(nodeConformsToAllShapes(targetNode, conditions)) {
-							filtered.add(targetNode);
-						}
-					}
-					int added = rule.execute(this, filtered);
-					sum += added;
-				}
-				else {
-					int added = rule.execute(this, targetNodes);
-					sum += added;
-				}
+		return rules;
+	}
+	
+	
+	private int flushPending() {
+		int added = 0;
+		for(Triple triple : pending) {
+			if(!inferences.getGraph().contains(triple)) {
+				inferences.add(inferences.asStatement(triple));
+				added++;
 			}
 		}
-		return sum;
+		pending.clear();
+		return added;
 	}
 	
 	
@@ -161,6 +219,11 @@ public class RuleEngine implements NodeExpressionContext {
 	@Override
 	public URI getShapesGraphURI() {
 		return shapesGraphURI;
+	}
+	
+	
+	public void infer(Triple triple) {
+		pending.add(triple);
 	}
 	
 	

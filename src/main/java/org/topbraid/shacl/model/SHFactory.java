@@ -23,6 +23,7 @@ import org.topbraid.shacl.model.impl.SHParameterizableInstanceImpl;
 import org.topbraid.shacl.model.impl.SHParameterizableTargetImpl;
 import org.topbraid.shacl.model.impl.SHPropertyShapeImpl;
 import org.topbraid.shacl.model.impl.SHResultImpl;
+import org.topbraid.shacl.model.impl.SHRuleImpl;
 import org.topbraid.shacl.model.impl.SHSPARQLConstraintImpl;
 import org.topbraid.shacl.model.impl.SHSPARQLFunctionImpl;
 import org.topbraid.shacl.model.impl.SHSPARQLTargetImpl;
@@ -50,6 +51,7 @@ public class SHFactory {
     	p.add(SHParameterizableTarget.class, new SimpleImplementation(SH.Target.asNode(), SHParameterizableTargetImpl.class));
     	p.add(SHPropertyShape.class, new SimpleImplementation(SH.PropertyShape.asNode(), SHPropertyShapeImpl.class));
     	p.add(SHResult.class, new SimpleImplementation(SH.AbstractResult.asNode(), SHResultImpl.class));
+    	p.add(SHRule.class, new SimpleImplementation(SH.Rule.asNode(), SHRuleImpl.class));
     	p.add(SHNodeShape.class, new SimpleImplementation(SH.NodeShape.asNode(), SHNodeShapeImpl.class));
 		p.add(SHSPARQLConstraint.class, new SimpleImplementation(SH.SPARQLConstraint.asNode(), SHSPARQLConstraintImpl.class));
 		p.add(SHSPARQLFunction.class, new SimpleImplementation(SH.SPARQLFunction.asNode(), SHSPARQLFunctionImpl.class));

@@ -100,6 +100,10 @@ public class DASH {
     public final static Property testModifiesEnvironment = ResourceFactory.createProperty(NS + "testModifiesEnvironment");
     
     public final static Property validateShapes = ResourceFactory.createProperty(NS + "validateShapes");
+    
+    public final static Property x = ResourceFactory.createProperty(NS + "x");
+    
+    public final static Property y = ResourceFactory.createProperty(NS + "y");
 
 
     public static String getURI() {

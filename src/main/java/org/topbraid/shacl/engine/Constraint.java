@@ -78,6 +78,11 @@ public class Constraint {
 	}
 	
 	
+	public Shape getShape() {
+		return shape;
+	}
+	
+	
 	public SHShape getShapeResource() {
 		return shape.getShapeResource();
 	}

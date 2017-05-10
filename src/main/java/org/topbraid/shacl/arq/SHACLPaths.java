@@ -2,8 +2,11 @@ package org.topbraid.shacl.arq;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
+import org.apache.jena.graph.Node;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryParseException;
@@ -26,10 +29,12 @@ import org.apache.jena.sparql.path.P_ZeroOrMore1;
 import org.apache.jena.sparql.path.P_ZeroOrMoreN;
 import org.apache.jena.sparql.path.P_ZeroOrOne;
 import org.apache.jena.sparql.path.Path;
+import org.apache.jena.sparql.path.eval.PathEval;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementGroup;
 import org.apache.jena.sparql.syntax.ElementPathBlock;
 import org.apache.jena.sparql.syntax.ElementTriplesBlock;
+import org.apache.jena.sparql.util.Context;
 import org.apache.jena.sparql.util.FmtUtils;
 import org.apache.jena.vocabulary.RDF;
 import org.topbraid.shacl.vocabulary.SH;
@@ -46,8 +51,21 @@ public class SHACLPaths {
 	private final static String ALTERNATIVE_PATH_SEPARATOR = "|";
 	
 	private final static String SEQUENCE_PATH_SEPARATOR = "/";
-
-
+	
+	
+	public static void addValueNodes(RDFNode focusNode, Path path, Collection<RDFNode> results) {
+		Set<Node> seen = new HashSet<>();
+		Iterator<Node> it = PathEval.eval(focusNode.getModel().getGraph(), focusNode.asNode(), path, Context.emptyContext);
+		while(it.hasNext()) {
+			Node node = it.next();
+			if(!seen.contains(node)) {
+				seen.add(node);
+				results.add(focusNode.getModel().asRDFNode(node));
+			}
+		}
+	}
+	
+	
 	public static void addValueNodes(RDFNode focusNode, Resource path, Collection<RDFNode> results) {
 		if(path.isURIResource()) {
 			if(focusNode instanceof Resource) {

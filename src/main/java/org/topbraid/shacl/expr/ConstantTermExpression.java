@@ -4,9 +4,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.sparql.util.ExprUtils;
+import org.apache.jena.sparql.util.FmtUtils;
 
-public class ConstantTermExpression implements NodeExpression {
+public class ConstantTermExpression extends AtomicNodeExpression {
 	
 	private List<RDFNode> result;
 	
@@ -17,7 +17,7 @@ public class ConstantTermExpression implements NodeExpression {
 		this.term = term;
 	}
 
-	
+
 	@Override
 	public List<RDFNode> eval(RDFNode focusNode, NodeExpressionContext context) {
 		return result;
@@ -26,6 +26,6 @@ public class ConstantTermExpression implements NodeExpression {
 	
 	@Override
 	public String toString() {
-		return ExprUtils.fmtSPARQL(ExprUtils.nodeToExpr(term.asNode()));
+		return FmtUtils.stringForRDFNode(term);
 	}
 }
