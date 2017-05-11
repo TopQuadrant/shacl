@@ -25,6 +25,7 @@ import org.topbraid.shacl.arq.SHACLPaths;
 import org.topbraid.shacl.engine.Constraint;
 import org.topbraid.shacl.engine.Shape;
 import org.topbraid.shacl.engine.ShapesGraph;
+import org.topbraid.shacl.entailment.SHACLEntailment;
 import org.topbraid.shacl.expr.NodeExpressionContext;
 import org.topbraid.shacl.js.SHACLScriptEngineManager;
 import org.topbraid.shacl.model.SHFactory;
@@ -86,6 +87,28 @@ public class ValidationEngine implements NodeExpressionContext {
 		}
 		else {
 			this.report = report;
+		}
+	}
+	
+	
+	/**
+	 * Ensures that the data graph includes any entailed triples inferred by the regime
+	 * specified using sh:entailment in the shapes graph.
+	 * Should be called prior to validation.
+	 * Throws an Exception if unsupported entailments are found.
+	 * If multiple sh:entailments are present then their order is undefined but they all get applied.
+	 */
+	public void applyEntailments() throws InterruptedException {
+		Model shapesModel = dataset.getNamedModel(shapesGraphURI.toString());
+		for(Statement s : shapesModel.listStatements(null, SH.entailment, (RDFNode)null).toList()) {
+			if(s.getObject().isURIResource()) {
+				if(SHACLEntailment.get().getEngine(s.getResource().getURI()) != null) {
+					this.dataset = SHACLEntailment.get().withEntailment(dataset, shapesGraphURI, shapesGraph, s.getResource(), monitor);
+				}
+				else {
+					throw new UnsupportedOperationException("Unsupported entailment regime " + s.getResource());
+				}
+			}
 		}
 	}
 	

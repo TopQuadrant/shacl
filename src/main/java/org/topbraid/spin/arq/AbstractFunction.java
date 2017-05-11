@@ -6,9 +6,6 @@ package org.topbraid.spin.arq;
 
 import java.util.Collections;
 
-import org.topbraid.spin.statistics.SPINStatistics;
-import org.topbraid.spin.statistics.SPINStatisticsManager;
-
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.shared.PrefixMapping;
@@ -22,6 +19,8 @@ import org.apache.jena.sparql.function.Function;
 import org.apache.jena.sparql.function.FunctionEnv;
 import org.apache.jena.sparql.sse.SSE;
 import org.apache.jena.sparql.util.FmtUtils;
+import org.topbraid.spin.statistics.SPINStatistics;
+import org.topbraid.spin.statistics.SPINStatisticsManager;
 
 
 /**

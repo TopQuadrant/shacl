@@ -140,11 +140,6 @@ public abstract class SHACLARQFunction implements org.apache.jena.sparql.functio
 			}
 		}
 		
-		// TODO: Reactivate
-		//if(SPINArgumentChecker.get() != null) {
-		//	SPINArgumentChecker.get().check(shaclFunction, bindings);
-		//}
-		
 		Dataset dataset = DatasetImpl.wrap(env.getDataset());
 		
 		if(SPINStatisticsManager.get().isRecording() && SPINStatisticsManager.get().isRecordingSPINFunctions()) {

@@ -20,6 +20,7 @@ import org.topbraid.shacl.engine.filters.ExcludeMetaShapesFilter;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.validation.SHACLSuggestionGenerator;
 import org.topbraid.shacl.validation.SHACLSuggestionGeneratorFactory;
+import org.topbraid.shacl.validation.ValidationEngine;
 import org.topbraid.shacl.validation.ValidationEngineFactory;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
@@ -84,7 +85,9 @@ public class GraphValidationTestCaseType implements TestCaseType {
 			if(!getResource().hasProperty(DASH.validateShapes, JenaDatatypes.TRUE)) {
 				shapesGraph.setShapeFilter(new ExcludeMetaShapesFilter());
 			}
-			Resource actualReport = ValidationEngineFactory.get().create(dataset, shapesGraphURI, shapesGraph, null).validateAll();
+			ValidationEngine validationEngine = ValidationEngineFactory.get().create(dataset, shapesGraphURI, shapesGraph, null);
+			validationEngine.applyEntailments();
+			Resource actualReport = validationEngine.validateAll();
 			Model actualResults = actualReport.getModel();
 			if(getResource().hasProperty(DASH.includeSuggestions, JenaDatatypes.TRUE)) {
 				Model shapesModel = dataset.getNamedModel(shapesGraphURI.toString());

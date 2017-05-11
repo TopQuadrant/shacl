@@ -28,6 +28,7 @@ public class ValidationUtil {
 	/**
 	 * Validates a given data Model against all shapes from a given shapes Model.
 	 * If the shapesModel does not include the system graph triples then these will be added.
+	 * Entailment regimes are applied prior to validation.
 	 * @param dataModel  the data Model
 	 * @param shapesModel  the shapes Model
 	 * @param validateShapes  true to also validate any shapes in the data Model (false is faster)
@@ -60,6 +61,7 @@ public class ValidationUtil {
 		}
 		ValidationEngine engine = ValidationEngineFactory.get().create(dataset, shapesGraphURI, shapesGraph, null);
 		try {
+			engine.applyEntailments();
 			return engine.validateAll();
 		}
 		catch(InterruptedException ex) {
