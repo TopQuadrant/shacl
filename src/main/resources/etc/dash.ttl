@@ -56,10 +56,13 @@ dash:AllObjects
   rdfs:label "All objects" ;
 .
 dash:AllObjectsTarget
+  rdf:type sh:JSTargetType ;
   rdf:type sh:SPARQLTargetType ;
   rdfs:comment "A target containing all objects in the data graph as focus nodes." ;
   rdfs:label "All objects target" ;
   rdfs:subClassOf sh:Target ;
+  sh:jsFunctionName "dash_allObjects" ;
+  sh:jsLibrary dash:DASHJSLibrary ;
   sh:labelTemplate "All objects" ;
   sh:prefixes <http://datashapes.org/dash> ;
   sh:select """SELECT DISTINCT ?this
@@ -73,10 +76,13 @@ dash:AllSubjects
   rdfs:label "All subjects" ;
 .
 dash:AllSubjectsTarget
+  rdf:type sh:JSTargetType ;
   rdf:type sh:SPARQLTargetType ;
   rdfs:comment "A target containing all subjects in the data graph as focus nodes." ;
   rdfs:label "All subjects target" ;
   rdfs:subClassOf sh:Target ;
+  sh:jsFunctionName "dash_allSubjects" ;
+  sh:jsLibrary dash:DASHJSLibrary ;
   sh:labelTemplate "All subjects" ;
   sh:prefixes <http://datashapes.org/dash> ;
   sh:select """SELECT DISTINCT ?this
@@ -625,6 +631,13 @@ dash:deletedTriple
   rdfs:label "deleted triple" ;
   rdfs:range rdf:Statement ;
 .
+dash:fixed
+  rdf:type rdf:Property ;
+  rdfs:comment "Can be used to mark that certain validation results have already been fixed." ;
+  rdfs:domain sh:ValidationResult ;
+  rdfs:label "fixed" ;
+  rdfs:range xsd:boolean ;
+.
 dash:hasClass
   rdf:type sh:SPARQLAskValidator ;
   rdfs:label "has class" ;
@@ -875,6 +888,12 @@ dash:suggestionGenerator
   rdfs:domain sh:SPARQLConstraint ;
   rdfs:label "suggestion generator" ;
   rdfs:range dash:SuggestionGenerator ;
+.
+dash:suggestionGroup
+  rdf:type rdf:Property ;
+  rdfs:comment "Can be used to link a suggestion with the group identifier to which it belongs. By default this is a link to the dash:SuggestionGenerator, but in principle this could be any value." ;
+  rdfs:domain dash:Suggestion ;
+  rdfs:label "suggestion" ;
 .
 dash:testEnvironment
   rdf:type rdf:Property ;

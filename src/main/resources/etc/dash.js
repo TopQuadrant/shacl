@@ -397,6 +397,19 @@ function dash_toString($arg) {
 }
 
 
+// DASH targets ---------------------------------------------------------------
+
+// dash:AllObjectsTarget
+function dash_allObjects() {
+	return $data.query().match(null, null, "?object").getNodeSet("?object").toArray();
+}
+
+//dash:AllSubjectsTarget
+function dash_allSubjects() {
+	return $data.query().match("?subject", null, null).getNodeSet("?subject").toArray();
+}
+
+
 // Utilities ------------------------------------------------------------------
 
 function toRDFQueryPath(shPath) {

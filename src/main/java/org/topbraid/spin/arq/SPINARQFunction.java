@@ -7,19 +7,10 @@ package org.topbraid.spin.arq;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.jena.atlas.io.IndentedWriter;
-import org.topbraid.spin.model.Argument;
-import org.topbraid.spin.model.Function;
-import org.topbraid.spin.model.Query;
-import org.topbraid.spin.statistics.SPINStatistics;
-import org.topbraid.spin.statistics.SPINStatisticsManager;
-import org.topbraid.spin.system.SPINArgumentChecker;
-import org.topbraid.spin.util.JenaDatatypes;
-import org.topbraid.spin.util.JenaUtil;
-import org.topbraid.spin.vocabulary.SPIN;
-
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
@@ -44,6 +35,16 @@ import org.apache.jena.sparql.serializer.SerializationContext;
 import org.apache.jena.sparql.sse.SSE;
 import org.apache.jena.sparql.util.ExprUtils;
 import org.apache.jena.sparql.util.FmtUtils;
+import org.topbraid.shacl.arq.OptionalArgsFunction;
+import org.topbraid.spin.model.Argument;
+import org.topbraid.spin.model.Function;
+import org.topbraid.spin.model.Query;
+import org.topbraid.spin.statistics.SPINStatistics;
+import org.topbraid.spin.statistics.SPINStatisticsManager;
+import org.topbraid.spin.system.SPINArgumentChecker;
+import org.topbraid.spin.util.JenaDatatypes;
+import org.topbraid.spin.util.JenaUtil;
+import org.topbraid.spin.vocabulary.SPIN;
 
 
 /**
@@ -52,7 +53,7 @@ import org.apache.jena.sparql.util.FmtUtils;
  * 
  * @author Holger Knublauch
  */
-public class SPINARQFunction implements org.apache.jena.sparql.function.Function, SPINFunctionFactory {
+public class SPINARQFunction implements org.apache.jena.sparql.function.Function, OptionalArgsFunction, SPINFunctionFactory {
 	
 	private org.apache.jena.query.Query arqQuery;
 	
@@ -61,6 +62,8 @@ public class SPINARQFunction implements org.apache.jena.sparql.function.Function
 	private List<Node> argNodes = new ArrayList<Node>();
 	
 	private boolean cachable;
+	
+	private List<Boolean> optional = new LinkedList<Boolean>();
 	
 	private String queryString;
 	
@@ -95,6 +98,7 @@ public class SPINARQFunction implements org.apache.jena.sparql.function.Function
 					}
 					argNames.add(varName);
 					argNodes.add(arg.getPredicate().asNode());
+					optional.add(arg.isOptional());
 				}
 			}
 			finally {
@@ -288,5 +292,11 @@ public class SPINARQFunction implements org.apache.jena.sparql.function.Function
 	
 	public Function getSPINFunction() {
 		return spinFunction;
+	}
+
+
+	@Override
+	public boolean isOptionalArg(int index) {
+		return optional.get(index);
 	}
 }

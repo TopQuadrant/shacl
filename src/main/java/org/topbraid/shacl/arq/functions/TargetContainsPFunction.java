@@ -3,8 +3,6 @@ package org.topbraid.shacl.arq.functions;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.topbraid.shacl.util.SHACLUtil;
-
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
@@ -19,20 +17,18 @@ import org.apache.jena.sparql.engine.iterator.QueryIterExtendByVar;
 import org.apache.jena.sparql.expr.ExprEvalException;
 import org.apache.jena.sparql.pfunction.PropFuncArg;
 import org.apache.jena.sparql.pfunction.PropertyFunctionBase;
+import org.topbraid.shacl.util.SHACLUtil;
 
 /**
- * The property function http://topbraid.org/shacl/tbsh#targetContains.
+ * The property function tosh:targetContains.
  * Binds the variable on the right hand side with all focus nodes produced by the
  * SHACL target on the left hand side.
  * 
- * 		(?myTarget ?shapesGraph) tbsh:targetContains ?focusNode .
+ * 		(?myTarget ?shapesGraph) tosh:targetContains ?focusNode .
  * 
  * @author Holger Knublauch
  */
 public class TargetContainsPFunction extends PropertyFunctionBase {
-	
-	public final static String URI = "http://topbraid.org/shacl/tbsh#targetContains";
-
 	
 	@Override
 	public QueryIterator exec(Binding binding, PropFuncArg argSubject,
@@ -42,7 +38,7 @@ public class TargetContainsPFunction extends PropertyFunctionBase {
 		argObject = Substitute.substitute(argObject, binding);
 		
 		if(!argObject.getArg().isVariable()) {
-			throw new ExprEvalException("Right hand side of " + URI + " must be a variable");
+			throw new ExprEvalException("Right hand side of tosh:targetContains must be a variable");
 		}
 		
 		Node targetNode = argSubject.getArgList().get(0);

@@ -9,7 +9,9 @@ import org.apache.jena.sparql.pfunction.PropertyFunctionRegistry;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.topbraid.shacl.arq.functions.CheckRegexSyntaxFunction;
+import org.topbraid.shacl.arq.functions.EvalExprPFunction;
 import org.topbraid.shacl.arq.functions.HasShapeFunction;
+import org.topbraid.shacl.arq.functions.IsInTargetOfFunction;
 import org.topbraid.shacl.arq.functions.IsValidForDatatypeFunction;
 import org.topbraid.shacl.arq.functions.TargetContainsPFunction;
 import org.topbraid.shacl.model.impl.SHConstraintComponentImpl;
@@ -58,9 +60,11 @@ public class SHFactory {
 		p.add(SHSPARQLTarget.class, new SimpleImplementation(SH.SPARQLTarget.asNode(), SHSPARQLTargetImpl.class));
 
 		FunctionRegistry.get().put(TOSH.hasShape.getURI(), HasShapeFunction.class);
+		FunctionRegistry.get().put(TOSH.isInTargetOf.getURI(), IsInTargetOfFunction.class);
 		FunctionRegistry.get().put("http://spinrdf.org/spif#checkRegexSyntax", CheckRegexSyntaxFunction.class);
 		FunctionRegistry.get().put("http://spinrdf.org/spif#isValidForDatatype", IsValidForDatatypeFunction.class);
-		PropertyFunctionRegistry.get().put(TargetContainsPFunction.URI, TargetContainsPFunction.class);
+		PropertyFunctionRegistry.get().put(TOSH.evalExpr.getURI(), EvalExprPFunction.class);
+		PropertyFunctionRegistry.get().put(TOSH.targetContains.getURI(), TargetContainsPFunction.class);
     }
 	
 	
@@ -124,6 +128,11 @@ public class SHFactory {
 	
 	public static SHParameterizableTarget asParameterizableTarget(RDFNode node) {
 		return node.as(SHParameterizableTarget.class);
+	}
+	
+	
+	public static boolean isJSTarget(RDFNode node) {
+		return node instanceof Resource && JenaUtil.hasIndirectType((Resource)node, SH.JSTarget);
 	}
 
 	

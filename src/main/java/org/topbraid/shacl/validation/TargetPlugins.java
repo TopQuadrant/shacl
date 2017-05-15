@@ -25,8 +25,7 @@ public class TargetPlugins {
 	private final List<TargetPlugin> plugins = new LinkedList<>();
 	
 	TargetPlugins() {
-		addPlugin(new SPARQLTargetPlugin());
-		addPlugin(new JSTargetPlugin());
+		init();
 	}
 	
 	
@@ -42,5 +41,23 @@ public class TargetPlugins {
 			}
 		}
 		return null;
+	}
+	
+	
+	private void init() {
+		addPlugin(new SPARQLTargetPlugin());
+		addPlugin(new JSTargetPlugin());
+	}
+	
+	
+	public void setJSPreferred(boolean value) {
+		plugins.clear();
+		if(value) {
+			addPlugin(new JSTargetPlugin());
+			addPlugin(new SPARQLTargetPlugin());
+		}
+		else {
+			init();
+		}
 	}
 }

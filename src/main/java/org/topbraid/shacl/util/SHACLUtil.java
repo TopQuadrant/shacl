@@ -419,12 +419,12 @@ public class SHACLUtil {
 		Resource type = JenaUtil.getType(target);
 		Resource executable;
 		SHParameterizableTarget parameterizableTarget = null;
-		if(SHFactory.isSPARQLTarget(target)) {
-			executable = target;
-		}
-		else {
+		if(SHFactory.isParameterizableInstance(target)) {
 			executable = type;
 			parameterizableTarget = SHFactory.asParameterizableTarget(target);
+		}
+		else {
+			executable = target;
 		}
 		TargetPlugin plugin = TargetPlugins.get().getLanguageForTarget(executable);
 		if(plugin != null) {
@@ -682,6 +682,23 @@ public class SHACLUtil {
 		}
 		else {
 			return model;
+		}
+	}
+
+
+	public static boolean isInTarget(RDFNode focusNode, Dataset dataset, Resource target) {
+		SHParameterizableTarget parameterizableTarget = null;
+		Resource executable = target;
+		if(SHFactory.isParameterizableInstance(target)) {
+			parameterizableTarget = SHFactory.asParameterizableTarget(target);
+			executable = parameterizableTarget.getParameterizable();
+		}
+		TargetPlugin plugin = TargetPlugins.get().getLanguageForTarget(executable);
+		if(plugin != null) {
+			return plugin.isNodeInTarget(focusNode, dataset, executable, parameterizableTarget);
+		}
+		else {
+			return false;
 		}
 	}
 }

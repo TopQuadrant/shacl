@@ -46,7 +46,7 @@ import org.topbraid.spin.util.JenaUtil;
  * 
  * @author Holger Knublauch
  */
-public abstract class SHACLARQFunction implements org.apache.jena.sparql.function.Function, SPINFunctionFactory {
+public abstract class SHACLARQFunction implements org.apache.jena.sparql.function.Function, OptionalArgsFunction, SPINFunctionFactory {
 	
 	private boolean cachable;
 	
@@ -221,5 +221,11 @@ public abstract class SHACLARQFunction implements org.apache.jena.sparql.functio
 	 */
 	public String[] getParamNames() {
 		return paramNames.toArray(new String[0]);
+	}
+
+
+	@Override
+	public boolean isOptionalArg(int index) {
+		return optional.get(index);
 	}
 }

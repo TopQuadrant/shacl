@@ -90,6 +90,8 @@ public class DASH {
     public final static Property suggestion = ResourceFactory.createProperty(NS + "suggestion");
     
     public final static Property suggestionGenerator = ResourceFactory.createProperty(NS + "suggestionGenerator");
+    
+    public final static Property suggestionGroup = ResourceFactory.createProperty(NS + "suggestionGroup");
 
     public final static Property testCase = ResourceFactory.createProperty(NS + "testCase");
 

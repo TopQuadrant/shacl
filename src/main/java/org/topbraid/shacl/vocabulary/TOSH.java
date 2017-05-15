@@ -18,7 +18,13 @@ public class TOSH {
     public final static String PREFIX = "tosh";
 
     
+    public final static Resource evalExpr = ResourceFactory.createResource(NS + "evalExpr");
+    
     public final static Resource hasShape = ResourceFactory.createResource(NS + "hasShape");
+    
+    public final static Resource isInTargetOf = ResourceFactory.createResource(NS + "isInTargetOf");
+    
+    public final static Resource targetContains = ResourceFactory.createResource(NS + "targetContains");
 
     public final static Resource JSLibrary = ResourceFactory.createResource(NS + "JSLibrary");
     

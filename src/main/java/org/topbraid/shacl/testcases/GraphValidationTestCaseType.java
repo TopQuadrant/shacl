@@ -32,7 +32,8 @@ public class GraphValidationTestCaseType implements TestCaseType {
 
 	public final static List<Property> IGNORED_PROPERTIES = Arrays.asList(new Property[] {
 		SH.message, // For TopBraid's suggestions
-		SH.resultMessage
+		SH.resultMessage,
+		DASH.suggestionGroup
 	});
 	
 	

@@ -12,6 +12,7 @@ import org.apache.jena.rdf.model.Statement;
 import org.topbraid.shacl.validation.sparql.SPARQLSubstitutions;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.ARQFactory;
+import org.topbraid.spin.progress.ProgressMonitor;
 import org.topbraid.spin.util.JenaUtil;
 
 public class SPARQLRule extends Rule {
@@ -32,7 +33,13 @@ public class SPARQLRule extends Rule {
 	
 	@Override
 	public void execute(RuleEngine ruleEngine, List<RDFNode> focusNodes) {
+		ProgressMonitor monitor = ruleEngine.getProgressMonitor();
 		for(RDFNode focusNode : focusNodes) {
+			
+			if(monitor != null && monitor.isCanceled()) {
+				return;
+			}
+
 			QuerySolutionMap bindings = new QuerySolutionMap();
 			bindings.add(SH.thisVar.getVarName(), focusNode);
 			try(QueryExecution qexec = ARQFactory.get().createQueryExecution(query, ruleEngine.getDataset(), bindings)) {

@@ -16,10 +16,14 @@ import org.apache.jena.sparql.engine.binding.BindingHashMap;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprEvalException;
 import org.apache.jena.sparql.expr.NodeValue;
+import org.apache.jena.sparql.function.Function;
 import org.apache.jena.sparql.function.FunctionEnv;
+import org.apache.jena.sparql.function.FunctionFactory;
+import org.apache.jena.sparql.function.FunctionRegistry;
 import org.apache.jena.sparql.util.Context;
 import org.apache.jena.sparql.util.ExprUtils;
 import org.apache.jena.sparql.util.NodeFactoryExtra;
+import org.topbraid.shacl.arq.OptionalArgsFunction;
 import org.topbraid.spin.system.SPINLabels;
 
 public class FunctionExpression extends ComplexNodeExpression {
@@ -103,12 +107,23 @@ public class FunctionExpression extends ComplexNodeExpression {
 		Context cxt = ARQ.getContext().copy();
 		cxt.set(ARQConstants.sysCurrentTime, NodeFactoryExtra.nowAsDateTime());
 
+		OptionalArgsFunction opt = null;
+		FunctionFactory ff = FunctionRegistry.get().get(function.getURI());
+		if(ff != null) {
+			Function arq = ff.create(function.getURI());
+			if(arq instanceof OptionalArgsFunction) {
+				opt = (OptionalArgsFunction) arq;
+			}
+		}
 		int total = 1;
 		List<List<RDFNode>> as = new LinkedList<>();
-		for(NodeExpression expr : args) {
+		for(int i = 0; i < args.size(); i++) {
+			NodeExpression expr = args.get(i);
 			List<RDFNode> a = expr.eval(focusNode, context);
 			if(a.isEmpty()) {
-				// TODO: check optional values
+				if(opt == null || !opt.isOptionalArg(i)) {
+					return results;
+				}
 			}
 			else {
 				total *= a.size();

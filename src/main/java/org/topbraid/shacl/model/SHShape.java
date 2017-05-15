@@ -1,5 +1,6 @@
 package org.topbraid.shacl.model;
 
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 
 public interface SHShape extends SHResource {
@@ -30,6 +31,15 @@ public interface SHShape extends SHResource {
 	 * @return
 	 */
 	Resource getSeverity();
+	
+	
+	/**
+	 * Checks if a given node is in the target of this shape.
+	 * @param node  the node to test
+	 * @return true if node is in target
+	 */
+	boolean hasTargetNode(RDFNode node);
+	
 	
 	/**
 	 * Checks if this shape has been deactivated.

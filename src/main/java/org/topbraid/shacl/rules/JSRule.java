@@ -19,6 +19,7 @@ import org.topbraid.shacl.js.SHACLScriptEngineManager;
 import org.topbraid.shacl.js.model.JSFactory;
 import org.topbraid.shacl.model.SHJSExecutable;
 import org.topbraid.shacl.vocabulary.SH;
+import org.topbraid.spin.progress.ProgressMonitor;
 import org.topbraid.spin.util.ExceptionUtil;
 import org.topbraid.spin.util.JenaUtil;
 
@@ -39,7 +40,13 @@ class JSRule extends Rule {
 			throw new IllegalArgumentException("Missing JavaScript function name at rule " + rule);
 		}
 		
+		ProgressMonitor monitor = ruleEngine.getProgressMonitor();
 		for(RDFNode focusNode : focusNodes) {
+			
+			if(monitor != null && monitor.isCanceled()) {
+				return;
+			}
+			
 			boolean nested = SHACLScriptEngineManager.begin();
 			JSScriptEngine engine = SHACLScriptEngineManager.getCurrentEngine();
 	

@@ -414,6 +414,23 @@ tosh:hasShape
     ] ;
   sh:returnType xsd:boolean ;
 .
+tosh:isInTargetOf
+  rdf:type sh:Function ;
+  rdfs:comment "Checks whether a given node is in the target of a given shape." ;
+  rdfs:label "is in target of" ;
+  sh:parameter [
+      sh:path tosh:node ;
+      sh:description "The node to check." ;
+      sh:name "node" ;
+    ] ;
+  sh:parameter [
+      sh:path tosh:shape ;
+      sh:class sh:Shape ;
+      sh:description "The shape that the node is supposed to be in the target of." ;
+      sh:name "shape" ;
+    ] ;
+  sh:returnType xsd:boolean ;
+.
 tosh:open
   rdf:type rdf:Property ;
   rdfs:comment "If set to true, then the corresponding form section will be open by default. This only has an effect if sh:openable is set to true as well." ;

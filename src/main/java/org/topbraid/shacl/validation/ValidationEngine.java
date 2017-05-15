@@ -28,8 +28,6 @@ import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.entailment.SHACLEntailment;
 import org.topbraid.shacl.expr.NodeExpressionContext;
 import org.topbraid.shacl.js.SHACLScriptEngineManager;
-import org.topbraid.shacl.model.SHFactory;
-import org.topbraid.shacl.model.SHParameterizableTarget;
 import org.topbraid.shacl.util.FailureLog;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.validation.sparql.SPARQLSubstitutions;
@@ -226,7 +224,7 @@ public class ValidationEngine implements NodeExpressionContext {
 		
 		// sh:target
 		for(Statement s : shapesModel.listStatements(null, SH.target, (RDFNode)null).toList()) {
-			if(isInTarget(focusNode, dataset, s.getResource())) {
+			if(SHACLUtil.isInTarget(focusNode, dataset, s.getResource())) {
 				shapes.add(s.getSubject());
 			}
 		}
@@ -250,23 +248,6 @@ public class ValidationEngine implements NodeExpressionContext {
 				SHACLPaths.addValueNodes(focusNode, path, results);
 			}
 			return results;
-		}
-	}
-	
-	
-	private boolean isInTarget(RDFNode focusNode, Dataset dataset, Resource target) {
-		SHParameterizableTarget parameterizableTarget = null;
-		Resource executable = target;
-		if(SHFactory.isParameterizableInstance(target)) {
-			parameterizableTarget = SHFactory.asParameterizableTarget(target);
-			executable = parameterizableTarget.getParameterizable();
-		}
-		TargetPlugin plugin = TargetPlugins.get().getLanguageForTarget(executable);
-		if(plugin != null) {
-			return plugin.isNodeInTarget(focusNode, dataset, executable, parameterizableTarget);
-		}
-		else {
-			return false;
 		}
 	}
 	

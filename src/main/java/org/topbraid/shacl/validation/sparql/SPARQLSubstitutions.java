@@ -24,17 +24,15 @@ import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDFS;
-import org.topbraid.shacl.arq.functions.TargetContainsPFunction;
 import org.topbraid.shacl.validation.SHACLException;
 import org.topbraid.shacl.vocabulary.SH;
+import org.topbraid.shacl.vocabulary.TOSH;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.system.SPINLabels;
 import org.topbraid.spin.util.JenaUtil;
 
 /**
- * Collects various dodgy helper algorithms currently used by the SPARQL execution language.
- * 
- * TODO: These should likely operate on clones of the Query syntax tree instead of query strings.
+ * Collects various helper algorithms currently used by the SPARQL execution language.
  *
  * @author Holger Knublauch
  */
@@ -185,7 +183,7 @@ public class SPARQLSubstitutions {
 	private static String createTargets(Resource shape) {
 		String targetVar = "?trgt_" + (int)(Math.random() * 10000);
 		return  "        GRAPH $" + SH.shapesGraphVar.getName() + " { $" + SH.currentShapeVar.getName() + " <" + SH.target + "> " + targetVar + "} .\n" +
-				"        (" + targetVar + " $" + SH.shapesGraphVar.getName() + ") <" + TargetContainsPFunction.URI + "> ?this .\n";
+				"        (" + targetVar + " $" + SH.shapesGraphVar.getName() + ") <" + TOSH.targetContains + "> ?this .\n";
 	}
 	
 	

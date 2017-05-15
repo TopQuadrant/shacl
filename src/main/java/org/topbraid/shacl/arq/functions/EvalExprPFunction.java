@@ -1,0 +1,88 @@
+package org.topbraid.shacl.arq.functions;
+
+import java.net.URI;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.apache.jena.graph.Node;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.sparql.core.Substitute;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.engine.ExecutionContext;
+import org.apache.jena.sparql.engine.QueryIterator;
+import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.engine.iterator.QueryIterExtendByVar;
+import org.apache.jena.sparql.expr.ExprEvalException;
+import org.apache.jena.sparql.pfunction.PropFuncArg;
+import org.apache.jena.sparql.pfunction.PropertyFunctionBase;
+import org.topbraid.shacl.engine.ShapesGraph;
+import org.topbraid.shacl.expr.NodeExpression;
+import org.topbraid.shacl.expr.NodeExpressionContext;
+import org.topbraid.shacl.expr.NodeExpressionFactory;
+import org.topbraid.spin.arq.ARQFactory;
+
+/**
+ * The property function tosh:evalExpr.
+ * Binds the variable on the right hand side with all nodes produced by evaluating
+ * the given node expression against the given focus node
+ * 
+ * 		(?expr ?focusNode) tosh:evalExpr ?result .
+ * 
+ * @author Holger Knublauch
+ */
+public class EvalExprPFunction extends PropertyFunctionBase {
+	
+	@Override
+	public QueryIterator exec(Binding binding, PropFuncArg argSubject,
+			Node predicate, PropFuncArg argObject, ExecutionContext execCxt) {
+
+		argSubject = Substitute.substitute(argSubject, binding);
+		argObject = Substitute.substitute(argObject, binding);
+		
+		if(!argObject.getArg().isVariable()) {
+			throw new ExprEvalException("Right hand side of tosh:exprEval must be a variable");
+		}
+		
+		Node exprNode = argSubject.getArgList().get(0);
+		Node focusNode = argSubject.getArgList().get(1);
+		
+		Model model = ModelFactory.createModelForGraph(execCxt.getActiveGraph());
+		Dataset dataset = ARQFactory.get().getDataset(model);
+		URI shapesGraphURI = URI.create("urn:x-topbraid:dummyShapesGraph");
+		dataset.addNamedModel(shapesGraphURI.toString(), model);
+		
+		ShapesGraph[] shapesGraph = new ShapesGraph[1];
+		
+		NodeExpression n = NodeExpressionFactory.get().create(model.asRDFNode(exprNode));
+		List<RDFNode> results = n.eval(model.asRDFNode(focusNode), new NodeExpressionContext() {
+			
+			@Override
+			public URI getShapesGraphURI() {
+				return shapesGraphURI;
+			}
+			
+			@Override
+			public ShapesGraph getShapesGraph() {
+				if(shapesGraph[0] == null) {
+					shapesGraph[0] = new ShapesGraph(model);
+				}
+				return shapesGraph[0];
+			}
+			
+			@Override
+			public Dataset getDataset() {
+				return dataset;
+			}
+		});
+		
+		List<Node> nodes = new LinkedList<>();
+		for(RDFNode rdfNode : results) {
+			nodes.add(rdfNode.asNode());
+		}
+
+		return new QueryIterExtendByVar(binding, (Var) argObject.getArg(), nodes.iterator(), execCxt);
+	}
+}

@@ -26,6 +26,8 @@ import org.topbraid.shacl.validation.ValidationEngine;
 import org.topbraid.shacl.validation.ValidationEngineFactory;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.progress.ProgressMonitor;
+import org.topbraid.spin.statistics.SPINStatistics;
+import org.topbraid.spin.statistics.SPINStatisticsManager;
 import org.topbraid.spin.system.SPINLabels;
 import org.topbraid.spin.util.JenaDatatypes;
 import org.topbraid.spin.util.JenaUtil;
@@ -137,15 +139,37 @@ public class RuleEngine implements NodeExpressionContext {
 							filtered.add(targetNode);
 						}
 					}
-					rule.execute(this, filtered);
+					executeRule(rule, filtered);
 				}
 				else {
-					rule.execute(this, targetNodes);
+					executeRule(rule, targetNodes);
 				}
 				if(monitor != null) {
 					monitor.worked(1);
 				}
 			}
+		}
+	}
+	
+	
+	private void executeRule(Rule rule, List<RDFNode> focusNodes) {
+		JenaUtil.setGraphReadOptimization(true);
+		try {
+			if(SPINStatisticsManager.get().isRecording()) {
+				long startTime = System.currentTimeMillis();
+				rule.execute(this, focusNodes);
+				long endTime = System.currentTimeMillis();
+				long duration = (endTime - startTime);
+				String queryText = rule.toString();
+				SPINStatisticsManager.get().add(Collections.singletonList(
+						new SPINStatistics(queryText, queryText, duration, startTime, rule.getResource().asNode())));
+			}
+			else {
+				rule.execute(this, focusNodes);
+			}
+		}
+		finally {
+			JenaUtil.setGraphReadOptimization(false);
 		}
 	}
 
