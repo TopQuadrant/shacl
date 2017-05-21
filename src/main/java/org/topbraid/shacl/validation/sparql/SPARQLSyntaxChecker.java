@@ -1,5 +1,6 @@
 package org.topbraid.shacl.validation.sparql;
 
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -23,6 +24,7 @@ import org.apache.jena.sparql.syntax.ElementService;
 import org.apache.jena.sparql.syntax.ElementSubQuery;
 import org.apache.jena.sparql.syntax.ElementVisitor;
 import org.apache.jena.sparql.syntax.ElementVisitorBase;
+import org.apache.jena.sparql.syntax.PatternVars;
 import org.apache.jena.sparql.syntax.RecursiveElementVisitor;
 import org.topbraid.shacl.vocabulary.SH;
 
@@ -79,11 +81,24 @@ public class SPARQLSyntaxChecker {
 
 			@Override
 			public void startElement(ElementSubQuery el) {
-				if(!el.getQuery().isQueryResultStar()) {
+				if(el.getQuery().isQueryResultStar()) {
+					Set<Var> queryVars = new LinkedHashSet<>() ;
+					PatternVars.vars(queryVars, el.getQuery().getQueryPattern()) ;
+					for(String varName : preBoundVars) {
+						if(!SH.currentShapeVar.getVarName().equals(varName) && !SH.shapesGraphVar.getVarName().equals(varName)) {
+							if(!queryVars.contains(Var.alloc(varName))) {
+								results.add("Sub-query must return all potentially pre-bound variables including $" + varName);
+							}
+						}
+					}
+				}
+				else {
 					VarExprList project = el.getQuery().getProject();
 					for(String varName : preBoundVars) {
-						if(!project.contains(Var.alloc(varName))) {
-							results.add("Sub-query must return all potentially pre-bound variables including " + varName);
+						if(!SH.currentShapeVar.getVarName().equals(varName) && !SH.shapesGraphVar.getVarName().equals(varName)) {
+							if(!project.contains(Var.alloc(varName))) {
+								results.add("Sub-query must return all potentially pre-bound variables including $" + varName);
+							}
 						}
 					}
 				}

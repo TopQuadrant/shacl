@@ -598,6 +598,13 @@ dash:addedTriple
   rdfs:label "added triple" ;
   rdfs:range rdf:Statement ;
 .
+dash:cachable
+  rdf:type rdf:Property ;
+  rdfs:comment "If set to true then the results of the SHACL function can be cached in between invocations with the same arguments. In other words, they are stateless and do not depend on triples in any graph, or the current time stamp etc." ;
+  rdfs:domain sh:Function ;
+  rdfs:label "cachable" ;
+  rdfs:range xsd:boolean ;
+.
 dash:closedByTypes
   rdf:type rdf:Property ;
   rdfs:label "closed by types" ;
@@ -619,7 +626,6 @@ dash:defaultValueType
 		the values of which are assumed to be instances of <code>sh:PropertyShape</code>
 		even if they are untyped (blank) nodes.
 		"""^^rdf:HTML ;
-  rdfs:domain rdf:Property ;
   rdfs:label "default value type" ;
   rdfs:range rdfs:Class ;
   owl:versionInfo "Note this property may get removed in future versions. It is a left-over from a previous design in SHACL." ;
@@ -630,6 +636,12 @@ dash:deletedTriple
   rdfs:domain dash:GraphUpdate ;
   rdfs:label "deleted triple" ;
   rdfs:range rdf:Statement ;
+.
+dash:expectedResult
+  rdf:type rdf:Property ;
+  rdfs:comment "The expected result(s) of a test case. The value range of this property is different for each kind of test cases." ;
+  rdfs:domain dash:TestCase ;
+  rdfs:label "expected result" ;
 .
 dash:fixed
   rdf:type rdf:Property ;
@@ -743,6 +755,7 @@ dash:height
 dash:isDeactivated
   rdf:type sh:SPARQLFunction ;
   rdfs:comment "Checks whether a given shape or constraint has been marked as \"deactivated\" using sh:deactivated." ;
+  rdfs:label "is deactivated" ;
   sh:ask """ASK {
     ?constraintOrShape sh:deactivated true .
 }""" ;
@@ -756,6 +769,7 @@ dash:isDeactivated
 .
 dash:isIn
   rdf:type sh:SPARQLAskValidator ;
+  rdfs:label "is in" ;
   sh:ask """
 		ASK {
 			GRAPH $shapesGraph {
@@ -1447,9 +1461,6 @@ sh:XoneConstraintComponent
       sh:jsFunctionName "validateXone" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
-.
-sh:derivedValues
-  dash:defaultValueType sh:SPARQLValuesDeriver ;
 .
 sh:node
   dash:defaultValueType sh:NodeShape ;

@@ -45,8 +45,8 @@ sh:PropertyShape
 sh:deactivated
 	a rdf:Property ;
 	rdfs:label "deactivated"@en ;
-	rdfs:comment "If set to true for a shape then the shape is deactivated and all nodes conform to it."@en ;
-	rdfs:domain sh:Shape ;
+	rdfs:comment "If set to true then all nodes conform to this."@en ;
+	# rdfs:domain sh:Shape or sh:SPARQLConstraint
 	rdfs:range xsd:boolean ;
 	rdfs:isDefinedBy sh: .
 

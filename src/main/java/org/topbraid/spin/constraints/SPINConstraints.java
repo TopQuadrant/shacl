@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
@@ -365,6 +366,11 @@ public class SPINConstraints {
 	}
 
 	
+	public static List<ConstraintViolation> check(Model model, Property predicate, List<SPINStatistics> stats, ProgressMonitor monitor) {
+		return check(model, predicate, stats, null, monitor);
+	}
+
+	
 	/**
 	 * Checks all instances in a given Model against all spin:constraints and
 	 * returns a List of constraint violations. 
@@ -376,9 +382,9 @@ public class SPINConstraints {
 	 * @param monitor  an optional ProgressMonitor
 	 * @return a List of ConstraintViolations
 	 */
-	public static List<ConstraintViolation> check(Model model, Property predicate, List<SPINStatistics> stats, ProgressMonitor monitor) {
+	public static List<ConstraintViolation> check(Model model, Property predicate, List<SPINStatistics> stats, Predicate<Resource> filter, ProgressMonitor monitor) {
 		List<ConstraintViolation> results = new LinkedList<ConstraintViolation>();
-		run(model, predicate, results, stats, monitor);
+		run(model, predicate, results, stats, filter, monitor);
 		return results;
 	}
 	
@@ -530,7 +536,7 @@ public class SPINConstraints {
 	}
 
 	
-	private static void run(Model model, Property predicate, List<ConstraintViolation> results, List<SPINStatistics> stats, ProgressMonitor monitor) {
+	private static void run(Model model, Property predicate, List<ConstraintViolation> results, List<SPINStatistics> stats, Predicate<Resource> filter, ProgressMonitor monitor) {
 		
 		if(predicate == null) {
 			predicate = SPIN.constraint;
@@ -547,7 +553,7 @@ public class SPINConstraints {
 		if(monitor != null) {
 			monitor.setTaskName("Preparing SPIN Constraints");
 		}
-		Map<Resource,List<CommandWrapper>> class2Query = SPINQueryFinder.getClass2QueryMap(model, model, predicate, true, true);
+		Map<Resource,List<CommandWrapper>> class2Query = SPINQueryFinder.getClass2QueryMap(model, model, predicate, true, true, filter);
 
 		if(monitor != null) {
 			int totalWork = 0;

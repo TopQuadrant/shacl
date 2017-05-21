@@ -153,6 +153,22 @@ public class LocalRangeAtClassNativeFunction extends AbstractFunction2 {
 	private static Node walk(Node property, Node type, Graph graph, Set<Node> classes) {
 		
 		classes.add(type);
+		
+		if(SHACLUtil.exists(graph)) {
+			
+			for(SHNodeShape shape : SHACLUtil.getDirectShapesAtClassOrShape((Resource)ModelFactory.createModelForGraph(graph).asRDFNode(type))) {
+				
+				Node paramResult = walkPropertyConstraint(graph, shape.asNode(), property, SH.parameter.asNode());
+				if(paramResult != null) {
+					return paramResult;
+				}
+				
+				Node propertyResult = walkPropertyConstraint(graph, shape.asNode(), property, SH.property.asNode());
+				if(propertyResult != null) {
+					return propertyResult;
+				}
+			}
+		}		
 
 		List<Node> superClasses = new LinkedList<Node>();
 		{
@@ -189,22 +205,6 @@ public class LocalRangeAtClassNativeFunction extends AbstractFunction2 {
 			}
 		}		
 		
-		if(SHACLUtil.exists(graph)) {
-			
-			for(SHNodeShape shape : SHACLUtil.getDirectShapesAtClassOrShape((Resource)ModelFactory.createModelForGraph(graph).asRDFNode(type))) {
-				
-				Node paramResult = walkPropertyConstraint(graph, shape.asNode(), property, SH.parameter.asNode());
-				if(paramResult != null) {
-					return paramResult;
-				}
-				
-				Node propertyResult = walkPropertyConstraint(graph, shape.asNode(), property, SH.property.asNode());
-				if(propertyResult != null) {
-					return propertyResult;
-				}
-			}
-		}		
-		
 		for(Node superClass : superClasses) {
 			if(!classes.contains(superClass)) {
 				Node result = walk(property, superClass, graph, classes);
@@ -222,7 +222,7 @@ public class LocalRangeAtClassNativeFunction extends AbstractFunction2 {
 		ExtendedIterator<Triple> it = graph.find(shape, systemPredicate, Node.ANY);
 		while(it.hasNext()) {
 			Node constraint = it.next().getObject();
-			if(constraint.isBlank() || constraint.isURI()) {
+			if(!constraint.isLiteral()) {
 				if(graph.contains(constraint, SH.path.asNode(), predicate)) {
 					Node valueType = getObject(constraint, SH.class_.asNode(), graph);
 					if(valueType != null) {
@@ -233,6 +233,25 @@ public class LocalRangeAtClassNativeFunction extends AbstractFunction2 {
 					if(datatype != null) {
 						it.close();
 						return datatype;
+					}
+					ExtendedIterator<Triple> ors = graph.find(constraint, SH.or.asNode(), Node.ANY);
+					while(ors.hasNext()) {
+						Node or = ors.next().getObject();
+						Node first = getObject(or, RDF.first.asNode(), graph);
+						if(!first.isLiteral()) {
+							Node cls = getObject(first, SH.class_.asNode(), graph);
+							if(cls != null) {
+								it.close();
+								ors.close();
+								return cls;
+							}
+							datatype = getObject(first, SH.datatype.asNode(), graph);
+							if(datatype != null) {
+								it.close();
+								ors.close();
+								return datatype;
+							}
+						}
 					}
 				}
 			}

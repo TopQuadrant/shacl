@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.rdf.model.Model;
@@ -154,7 +155,12 @@ public class SPINQueryFinder {
 		}
 		return wrapper;
 	}
-
+	
+	
+	public static Map<Resource, List<CommandWrapper>> getClass2QueryMap(Model model, Model queryModel, Property predicate, boolean withClass, boolean allowAsk) {
+		return getClass2QueryMap(model, queryModel, predicate, withClass, allowAsk, null);
+	}
+	
 	
 	/**
 	 * Gets a Map of QueryWrappers with their associated classes. 
@@ -164,13 +170,18 @@ public class SPINQueryFinder {
 	 * @param withClass  true to also include a SPARQL clause to bind ?this
 	 *                   (something along the lines of ?this a ?THIS_CLASS) 
 	 * @param allowAsk  also return ASK queries
+	 * @param filter  an optional Predicate that must return true for any matching resource
 	 * @return the result Map, possibly empty but not null
 	 */
-	public static Map<Resource, List<CommandWrapper>> getClass2QueryMap(Model model, Model queryModel, Property predicate, boolean withClass, boolean allowAsk) {
+	public static Map<Resource, List<CommandWrapper>> getClass2QueryMap(Model model, Model queryModel, Property predicate, boolean withClass, boolean allowAsk, Predicate<Resource> filter) {
 		predicate = model.getProperty(predicate.getURI());
 		Map<Resource,List<CommandWrapper>> class2Query = new HashMap<Resource,List<CommandWrapper>>();
 		for(Statement s : JenaUtil.listAllProperties(null, predicate).toList()) {
-			add(class2Query, s, model, withClass, allowAsk);
+			if(s.getObject().isResource()) {
+				if(filter == null || filter.test(s.getResource())) {
+					add(class2Query, s, model, withClass, allowAsk);
+				}
+			}
 		}
 		return class2Query;
 	}

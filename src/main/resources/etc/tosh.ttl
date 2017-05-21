@@ -332,6 +332,7 @@ tosh:ValueRangeConstraintPropertyGroup
 .
 tosh:ValueTypeConstraintPropertyGroup
   rdf:type sh:PropertyGroup ;
+  tosh:editGroupDescription "Hint: Use \"or\" under Complex Constraints to represent choices between multiple value types." ;
   rdfs:comment "A property group for constraint parameters that restrict the value types of values." ;
   rdfs:label "Value Type" ;
   sh:order 3 ;
@@ -379,7 +380,16 @@ tosh:countShapesWithMatchResult
 		}
 		""" ;
 .
+tosh:editGroupDescription
+  rdf:type rdf:Property ;
+  rdfs:comment "A description of the property group when in \"edit\" mode." ;
+  rdfs:domain sh:PropertyGroup ;
+  rdfs:label "edit group description" ;
+  rdfs:range xsd:string ;
+.
 tosh:editWidget
+  rdf:type rdf:Property ;
+  rdfs:label "edit widget" ;
   rdfs:range swa:ObjectEditorClass ;
 .
 tosh:hasDatatype
@@ -446,6 +456,8 @@ tosh:openable
   rdfs:range xsd:boolean ;
 .
 tosh:searchWidget
+  rdf:type rdf:Property ;
+  rdfs:label "search widget" ;
   rdfs:range swa:ObjectFacetClass ;
 .
 tosh:shaclExists
@@ -532,7 +544,16 @@ tosh:valuesWithShapeCount
 		}
 		""" ;
 .
+tosh:viewGroupDescription
+  rdf:type rdf:Property ;
+  rdfs:comment "A description of the property group when in \"view\" mode." ;
+  rdfs:domain sh:PropertyGroup ;
+  rdfs:label "view group description" ;
+  rdfs:range xsd:string ;
+.
 tosh:viewWidget
+  rdf:type rdf:Property ;
+  rdfs:label "view widget" ;
   rdfs:range swa:ObjectViewerClass ;
 .
 rdf:
