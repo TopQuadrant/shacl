@@ -19,8 +19,8 @@
 	</organization>
 	<licenses>
 		<license>
-			<name>Apache License 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+			<name>AGPL 3.0</name>
+			<url>https://opensource.org/licenses/AGPL-3.0</url>
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
