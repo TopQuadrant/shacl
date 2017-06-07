@@ -6,6 +6,7 @@ import java.util.Set;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.core.DatasetImpl;
 import org.apache.jena.sparql.core.Substitute;
@@ -18,6 +19,7 @@ import org.apache.jena.sparql.expr.ExprEvalException;
 import org.apache.jena.sparql.pfunction.PropFuncArg;
 import org.apache.jena.sparql.pfunction.PropertyFunctionBase;
 import org.topbraid.shacl.util.SHACLUtil;
+import org.topbraid.spin.arq.DatasetWithDifferentDefaultModel;
 
 /**
  * The property function tosh:targetContains.
@@ -44,7 +46,8 @@ public class TargetContainsPFunction extends PropertyFunctionBase {
 		Node targetNode = argSubject.getArgList().get(0);
 		Node shapesGraphNode = argSubject.getArgList().get(1);
 		
-		Dataset dataset = DatasetImpl.wrap(execCxt.getDataset());
+		Model currentModel = ModelFactory.createModelForGraph(execCxt.getActiveGraph());
+		Dataset dataset = new DatasetWithDifferentDefaultModel(currentModel, DatasetImpl.wrap(execCxt.getDataset()));
 
 		Model model = dataset.getNamedModel(shapesGraphNode.getURI());
 		Resource target = (Resource) model.asRDFNode(targetNode);

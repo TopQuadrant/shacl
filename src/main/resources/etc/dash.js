@@ -82,6 +82,13 @@ function validateClosedByTypesNode($this, $closedByTypes) {
 	return results;
 }
 
+function validateCoExistsWith($this, $path, $coExistsWith) {
+	var path = toRDFQueryPath($path);
+	var has1 = $data.query().path($this, path, null).getCount() > 0;
+	var has2 = $data.query().match($this, $coExistsWith, null).getCount() > 0;
+	return has1 == has2;
+}
+
 function validateDatatype($value, $datatype) {
 	if($value.isLiteral()) {
 		return $datatype.equals($value.datatype) && isValidForDatatype($value.lex, $datatype);
@@ -124,6 +131,13 @@ function validateHasValueNode($this, $hasValue) {
 function validateHasValueProperty($this, $path, $hasValue) {
 	var count = $data.query().path($this, toRDFQueryPath($path), $hasValue).getCount();
 	return count > 0;
+}
+
+function validateHasValueWithClass($this, $path, $hasValueWithClass) {
+	return $data.query().
+			path($this, toRDFQueryPath($path), "?value").
+			filter(function(sol) { return new RDFQueryUtil($data).isInstanceOf(sol.value, $hasValueWithClass) }).
+			hasSolution();
 }
 
 function validateIn($value, $in) {
@@ -404,7 +418,7 @@ function dash_allObjects() {
 	return $data.query().match(null, null, "?object").getNodeSet("?object").toArray();
 }
 
-//dash:AllSubjectsTarget
+// dash:AllSubjectsTarget
 function dash_allSubjects() {
 	return $data.query().match("?subject", null, null).getNodeSet("?subject").toArray();
 }

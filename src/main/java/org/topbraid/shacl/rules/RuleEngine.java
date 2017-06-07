@@ -57,7 +57,7 @@ public class RuleEngine implements NodeExpressionContext {
 	private Map<Shape,List<Rule>> shape2Rules = new HashMap<>(); 
 
 	
-	protected RuleEngine(Dataset dataset, URI shapesGraphURI, ShapesGraph shapesGraph, Model inferences) {
+	public RuleEngine(Dataset dataset, URI shapesGraphURI, ShapesGraph shapesGraph, Model inferences) {
 		this.dataset = dataset;
 		this.inferences = inferences;
 		this.shapesGraph = shapesGraph;
@@ -139,10 +139,10 @@ public class RuleEngine implements NodeExpressionContext {
 							filtered.add(targetNode);
 						}
 					}
-					executeRule(rule, filtered);
+					executeRule(rule, filtered, shape);
 				}
 				else {
-					executeRule(rule, targetNodes);
+					executeRule(rule, targetNodes, shape);
 				}
 				if(monitor != null) {
 					monitor.worked(1);
@@ -152,12 +152,12 @@ public class RuleEngine implements NodeExpressionContext {
 	}
 	
 	
-	private void executeRule(Rule rule, List<RDFNode> focusNodes) {
+	private void executeRule(Rule rule, List<RDFNode> focusNodes, Shape shape) {
 		JenaUtil.setGraphReadOptimization(true);
 		try {
 			if(SPINStatisticsManager.get().isRecording()) {
 				long startTime = System.currentTimeMillis();
-				rule.execute(this, focusNodes);
+				rule.execute(this, focusNodes, shape);
 				long endTime = System.currentTimeMillis();
 				long duration = (endTime - startTime);
 				String queryText = rule.toString();
@@ -165,7 +165,7 @@ public class RuleEngine implements NodeExpressionContext {
 						new SPINStatistics(queryText, queryText, duration, startTime, rule.getResource().asNode())));
 			}
 			else {
-				rule.execute(this, focusNodes);
+				rule.execute(this, focusNodes, shape);
 			}
 		}
 		finally {
@@ -246,7 +246,7 @@ public class RuleEngine implements NodeExpressionContext {
 	}
 	
 	
-	public void infer(Triple triple) {
+	public void infer(Triple triple, Rule rule, Shape shape) {
 		pending.add(triple);
 	}
 	

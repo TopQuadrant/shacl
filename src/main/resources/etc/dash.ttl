@@ -119,13 +119,47 @@ WHERE {
 }""" ;
     ] ;
   sh:parameter dash:ClosedByTypesConstraintComponent-closedByTypes ;
-  sh:targetClass sh:Shape ;
+  sh:targetClass sh:NodeShape ;
 .
 dash:ClosedByTypesConstraintComponent-closedByTypes
   rdf:type sh:Parameter ;
   sh:path dash:closedByTypes ;
   sh:datatype xsd:boolean ;
   sh:description "True to indicate that the focus nodes are closed by their types. A constraint violation is reported for each property value of the focus node where the property is not among those that are explicitly declared via sh:property/sh:path in any of the rdf:types of the focus node (and their superclasses). The property rdf:type is always permitted." ;
+.
+dash:CoExistsWithConstraintComponent
+  rdf:type sh:ConstraintComponent ;
+  dash:localConstraint "true"^^xsd:boolean ;
+  rdfs:comment "A constraint component that can be used to express a constraint on property shapes so that if the property path has any value then the given property must also have a value, and vice versa." ;
+  rdfs:label "Co-exists-with constraint component" ;
+  sh:message "Values must co-exist with values of {$coExistsWith}" ;
+  sh:parameter [
+      sh:path dash:coExistsWith ;
+      sh:class rdf:Property ;
+      sh:group tosh:PropertyPairConstraintPropertyGroup ;
+      sh:nodeKind sh:IRI ;
+      sh:order "10"^^xsd:decimal ;
+    ] ;
+  sh:propertyValidator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "validateCoExistsWith" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
+  sh:propertyValidator [
+      rdf:type sh:SPARQLSelectValidator ;
+      sh:prefixes <http://datashapes.org/dash> ;
+      sh:select """SELECT $this
+WHERE {
+	{
+    	FILTER (EXISTS { $this $PATH ?any } && NOT EXISTS { $this $coExistsWith ?any })
+	}
+	UNION
+	{
+    	FILTER (NOT EXISTS { $this $PATH ?any } && EXISTS { $this $coExistsWith ?any })
+	}
+}""" ;
+    ] ;
+  sh:targetClass sh:PropertyShape ;
 .
 dash:DASHJSLibrary
   rdf:type sh:JSLibrary ;
@@ -202,6 +236,38 @@ dash:GraphValidationTestCase
   rdfs:comment "A test case that performs SHACL constraint validation on the whole graph and compares the results with the expected validation results stored with the test case. By default this excludes meta-validation (i.e. the validation of the shape definitions themselves). If that's desired, set dash:validateShapes to true." ;
   rdfs:label "Graph validation test case" ;
   rdfs:subClassOf dash:ValidationTestCase ;
+.
+dash:HasValueWithClassConstraintComponent
+  rdf:type sh:ConstraintComponent ;
+  rdfs:comment "A constraint component that can be used to express a constraint on property shapes so that one of the values of the property path must be an instance of a given class." ;
+  rdfs:label "Has value with class constraint component" ;
+  sh:message "At least one of the values must have class {$hasValueWithClass}" ;
+  sh:parameter dash:HasValueWithClassConstraintComponent-hasValueWithClass ;
+  sh:propertyValidator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "validateHasValueWithClass" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
+  sh:propertyValidator [
+      rdf:type sh:SPARQLSelectValidator ;
+      sh:prefixes <http://datashapes.org/dash> ;
+      sh:select """SELECT $this
+WHERE {
+	FILTER NOT EXISTS {
+    	$this $PATH ?value .
+		?value a ?type .
+		?type rdfs:subClassOf* ?hasValueWithClass .
+	}
+}""" ;
+    ] ;
+  sh:targetClass sh:PropertyShape ;
+.
+dash:HasValueWithClassConstraintComponent-hasValueWithClass
+  rdf:type sh:Parameter ;
+  sh:path dash:hasValueWithClass ;
+  sh:class rdfs:Class ;
+  sh:group tosh:OtherConstraintPropertyGroup ;
+  sh:nodeKind sh:IRI ;
 .
 dash:InferencingTestCase
   rdf:type rdfs:Class ;
@@ -486,6 +552,7 @@ dash:StringOrLangString
 dash:SubSetOfConstraintComponent
   rdf:type sh:ConstraintComponent ;
   dash:localConstraint "true"^^xsd:boolean ;
+  rdfs:comment "A constraint component that can be used to state that the set of value nodes must be a subset of the value of a given property." ;
   rdfs:label "Sub set of constraint component" ;
   sh:message "Must be one of the values of {$subSetOf}" ;
   sh:parameter dash:SubSetOfConstraintComponent-subSetOf ;
@@ -608,6 +675,12 @@ dash:cachable
 dash:closedByTypes
   rdf:type rdf:Property ;
   rdfs:label "closed by types" ;
+.
+dash:coExistsWith
+  rdf:type rdf:Property ;
+  rdfs:comment "Specifies a property that must have a value whenever the property path has a value, and must have no value whenever the property path has no value." ;
+  rdfs:label "co-exists with" ;
+  rdfs:range rdf:Property ;
 .
 dash:composite
   rdf:type rdf:Property ;
@@ -745,6 +818,12 @@ dash:hasStem
   rdfs:label "has stem" ;
   sh:ask "ASK { FILTER (isIRI($value) && STRSTARTS(str($value), $stem)) }" ;
   sh:prefixes <http://datashapes.org/dash> ;
+.
+dash:hasValueWithClass
+  rdf:type rdf:Property ;
+  rdfs:comment "Specifies a constraint that at least one of the value nodes must be an instance of a given class." ;
+  rdfs:label "has value with class" ;
+  rdfs:range rdfs:Class ;
 .
 dash:height
   rdf:type rdf:Property ;
@@ -1042,7 +1121,7 @@ sh:ClosedConstraintComponent
 		}
 """ ;
     ] ;
-  sh:targetClass sh:Shape ;
+  sh:targetClass sh:NodeShape ;
   sh:validator [
       rdf:type sh:JSValidator ;
       sh:jsFunctionName "validateClosed" ;

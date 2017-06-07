@@ -12,6 +12,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.sparql.expr.ExprEvalException;
+import org.topbraid.shacl.engine.Shape;
 import org.topbraid.shacl.js.JSGraph;
 import org.topbraid.shacl.js.JSScriptEngine;
 import org.topbraid.shacl.js.NashornUtil;
@@ -32,7 +33,7 @@ class JSRule extends Rule {
 	
 
 	@Override
-	public void execute(RuleEngine ruleEngine, List<RDFNode> focusNodes) {
+	public void execute(RuleEngine ruleEngine, List<RDFNode> focusNodes, Shape shape) {
 
 		Resource rule = getResource();
 		String functionName = JenaUtil.getStringProperty(rule, SH.jsFunctionName);
@@ -68,7 +69,7 @@ class JSRule extends Rule {
 							Node subject = JSFactory.getNode(nodes[0]);
 							Node predicate = JSFactory.getNode(nodes[1]);
 							Node object = JSFactory.getNode(nodes[2]);
-							ruleEngine.infer(Triple.create(subject, predicate, object));
+							ruleEngine.infer(Triple.create(subject, predicate, object), this, shape);
 						}
 						else {
 							@SuppressWarnings("rawtypes")
@@ -76,7 +77,7 @@ class JSRule extends Rule {
 							Node subject = JSFactory.getNode(triple.get("subject"));
 							Node predicate = JSFactory.getNode(triple.get("predicate"));
 							Node object = JSFactory.getNode(triple.get("object"));
-							ruleEngine.infer(Triple.create(subject, predicate, object));
+							ruleEngine.infer(Triple.create(subject, predicate, object), this, shape);
 						}
 					}
 				}

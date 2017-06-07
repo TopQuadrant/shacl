@@ -6,6 +6,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDFS;
+import org.topbraid.shacl.engine.Shape;
 import org.topbraid.shacl.vocabulary.SH;
 
 /**
@@ -34,7 +35,7 @@ public abstract class Rule {
 	 * @param ruleEngine  the RuleEngine to operate on
 	 * @param focusNodes  the list of focus nodes for this execution
 	 */
-	public abstract void execute(RuleEngine ruleEngine, List<RDFNode> focusNodes);
+	public abstract void execute(RuleEngine ruleEngine, List<RDFNode> focusNodes, Shape shape);
 	
 	
 	public String getLabel() {

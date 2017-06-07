@@ -42,6 +42,8 @@ public class DASH {
 
     public final static Resource JSTestCase = ResourceFactory.createResource(NS + "JSTestCase");
 
+    public final static Resource ListShape = ResourceFactory.createResource(NS + "ListShape");
+
     public final static Resource QueryTestCase = ResourceFactory.createResource(NS + "QueryTestCase");
 
     public final static Resource ParameterConstraintComponent = ResourceFactory.createResource(NS + "ParameterConstraintComponent");

@@ -21,4 +21,7 @@ public interface OptimizedMultiUnion {
 	
 	
 	void resetOptimizations();
+	
+	
+	void setBaseGraphURI(String uri);
 }

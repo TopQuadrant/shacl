@@ -726,6 +726,16 @@ sh:LanguageInConstraintComponent
 sh:LanguageInConstraintComponent-languageIn
   sh:group tosh:StringBasedConstraintPropertyGroup ;
   sh:order "9"^^xsd:decimal ;
+  sh:property [
+      sh:path (
+          [
+            sh:zeroOrMorePath rdf:rest ;
+          ]
+          rdf:first
+        ) ;
+      sh:datatype xsd:string ;
+      sh:minLength 1 ;
+    ] ;
 .
 sh:LessThanConstraintComponent-lessThan
   sh:deactivated "true"^^xsd:boolean ;

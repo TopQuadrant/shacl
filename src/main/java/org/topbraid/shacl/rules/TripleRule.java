@@ -12,6 +12,7 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.topbraid.shacl.engine.Shape;
 import org.topbraid.shacl.expr.AppendContext;
 import org.topbraid.shacl.expr.ComplexNodeExpression;
 import org.topbraid.shacl.expr.NodeExpression;
@@ -50,9 +51,9 @@ class TripleRule extends Rule {
 
 
 	@Override
-	public void execute(RuleEngine ruleEngine, List<RDFNode> focusNodes) {
+	public void execute(RuleEngine ruleEngine, List<RDFNode> focusNodes, Shape shape) {
 		if(SPARQL_MODE) {
-			executeSPARQL(ruleEngine, focusNodes);
+			executeSPARQL(ruleEngine, focusNodes, shape);
 		}
 		else {
 			ProgressMonitor monitor = ruleEngine.getProgressMonitor();
@@ -72,7 +73,7 @@ class TripleRule extends Rule {
 							if(predicateR.isURIResource()) {
 								Property predicate = JenaUtil.asProperty((Resource)predicateR);
 								for(RDFNode object : objects) {
-									ruleEngine.infer(Triple.create(subject.asNode(), predicate.asNode(), object.asNode()));
+									ruleEngine.infer(Triple.create(subject.asNode(), predicate.asNode(), object.asNode()), this, shape);
 								}
 							}
 						}
@@ -83,7 +84,7 @@ class TripleRule extends Rule {
 	}
 	
 	
-	private void executeSPARQL(RuleEngine ruleEngine, List<RDFNode> focusNodes) {
+	private void executeSPARQL(RuleEngine ruleEngine, List<RDFNode> focusNodes, Shape shape) {
 		String queryString = getSPARQL();
 		Query query = ARQFactory.get().createQuery(ruleEngine.getDataset().getDefaultModel(), queryString);
 		QuerySolutionMap binding = new QuerySolutionMap();
@@ -92,7 +93,7 @@ class TripleRule extends Rule {
 			QueryExecution qexec = ARQFactory.get().createQueryExecution(query, ruleEngine.getDataset(), binding);
 			Model c = qexec.execConstruct();
 			for(Triple triple : c.getGraph().find(Node.ANY, Node.ANY, Node.ANY).toList()) {
-				ruleEngine.infer(triple);
+				ruleEngine.infer(triple, this, shape);
 			}
 		}
 	}

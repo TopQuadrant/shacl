@@ -20,6 +20,7 @@ import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.XSD;
 import org.topbraid.shacl.model.SHNodeShape;
 import org.topbraid.shacl.util.SHACLUtil;
+import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.AbstractFunction2;
 import org.topbraid.spin.vocabulary.SPIN;
@@ -252,6 +253,9 @@ public class LocalRangeAtClassNativeFunction extends AbstractFunction2 {
 								return datatype;
 							}
 						}
+					}
+					if(graph.contains(constraint, SH.node.asNode(), DASH.ListShape.asNode())) {
+						return RDF.List.asNode();
 					}
 				}
 			}
