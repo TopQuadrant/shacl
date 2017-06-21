@@ -133,6 +133,9 @@ ValidationEngine.prototype.createResultMessages = function (result, constraint) 
     }
 };
 
+/**
+ * Validates the data graph against the shapes graph
+ */
 ValidationEngine.prototype.validateAll = function () {
     var shapes = this.shapesGraph.getShapesWithTarget();
     for (var i = 0; i < shapes.length; i++) {
