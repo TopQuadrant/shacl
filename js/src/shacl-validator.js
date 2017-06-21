@@ -55,7 +55,7 @@ var SHACL = {
 
 // class Constraint
 
-function Constraint(shape, component, paramValue) {
+var Constraint = function(shape, component, paramValue) {
     this.shape = shape;
     this.component = component;
     this.paramValue = paramValue;
@@ -70,15 +70,15 @@ function Constraint(shape, component, paramValue) {
         }
     }
     this.parameterValues = parameterValues;
-}
+};
 
 Constraint.prototype.getParameterValue = function (paramName) {
     return this.parameterValues[paramName];
-}
+};
 
 // class ValidationFunction
 
-var globalObject = global;
+var globalObject = typeof(window) != null ? window : global;
 
 var ValidationFunction = function (functionName, parameters) {
 
@@ -112,13 +112,13 @@ var ValidationFunction = function (functionName, parameters) {
             }
         }
     }
-}
+};
 
 ValidationFunction.functionRegistry = {};
 
 ValidationFunction.prototype.doExecute = function (args) {
     return this.func.apply(globalObject, args);
-}
+};
 
 ValidationFunction.prototype.execute = function (focusNode, valueNode, constraint) {
     console.log("VALIDATING " + this.funcName);
@@ -153,13 +153,13 @@ ValidationFunction.prototype.execute = function (focusNode, valueNode, constrain
         }
     }
     return this.doExecute(args);
-}
+};
 
 
 
 // class ConstraintComponent
 
-function ConstraintComponent(node) {
+var ConstraintComponent = function(node) {
     this.node = node;
     var parameters = [];
     var parameterNodes = [];
@@ -191,7 +191,7 @@ function ConstraintComponent(node) {
         this.propertyValidationFunction = this.findValidationFunction(T("sh:validator"));
         this.propertyValidationFunctionGeneric = true;
     }
-}
+};
 
 ConstraintComponent.prototype.findValidationFunction = function (predicate) {
     var functionName = $shapes.query().
@@ -205,11 +205,11 @@ ConstraintComponent.prototype.findValidationFunction = function (predicate) {
     else {
         return null;
     }
-}
+};
 
 ConstraintComponent.prototype.getParameters = function () {
     return this.parameters;
-}
+};
 
 ConstraintComponent.prototype.isComplete = function (shapeNode) {
     for (var i = 0; i < this.parameters.length; i++) {
@@ -221,16 +221,16 @@ ConstraintComponent.prototype.isComplete = function (shapeNode) {
         }
     }
     return true;
-}
+};
 
 ConstraintComponent.prototype.isOptional = function (parameterURI) {
     return this.optionals[parameterURI];
-}
+};
 
 
 // class Shape
 
-function Shape(shapesGraph, shapeNode) {
+var Shape = function(shapesGraph, shapeNode) {
 
     this.severity = $shapes.query().match(shapeNode, "sh:severity", "?severity").getNode("?severity");
     if (!this.severity) {
@@ -258,7 +258,7 @@ function Shape(shapesGraph, shapeNode) {
             }
         }
     });
-}
+};
 
 Shape.prototype.getConstraints = function () {
     return this.constraints;

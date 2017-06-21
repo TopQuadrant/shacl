@@ -1,4 +1,4 @@
-var rdfquery = require("../rdfquery");
+var rdfquery = require("./rdfquery");
 var T = rdfquery.T;
 
 var nodeLabel = function (node, store) {
