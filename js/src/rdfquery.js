@@ -48,81 +48,81 @@ Equivalent SPARQL:
 		} LIMIT 1
 */
 
-if (!this["TermFactory"]) {
-    // In some environments such as Nashorn this may already have a value
-    // In TopBraid this is redirecting to native Jena calls
-    TermFactory = {
 
-        impl: null,   // This needs to be connected to an API such as $rdf
+// In some environments such as Nashorn this may already have a value
+// In TopBraid this is redirecting to native Jena calls
+var TermFactory = {
 
-        // Globally registered prefixes for TTL short cuts
-        namespaces: {},
+    impl: require("rdflib"),   // This needs to be connected to an API such as $rdf
 
-        /**
-         * Registers a new namespace prefix for global TTL short cuts (qnames).
-         * @param prefix  the prefix to add
-         * @param namespace  the namespace to add for the prefix
-         */
-        registerNamespace: function (prefix, namespace) {
-            if (this.namespaces.prefix) {
-                throw "Prefix " + prefix + " already registered"
-            }
-            this.namespaces[prefix] = namespace;
-        },
+    // Globally registered prefixes for TTL short cuts
+    namespaces: {},
 
-        /**
-         * Produces an RDF* term from a TTL string representation.
-         * Also uses the registered prefixes.
-         * @param str  a string, e.g. "owl:Thing" or "true" or '"Hello"@en'.
-         * @return an RDF term
-         */
-        term: function (str) {
-            // TODO: this implementation currently only supports booleans and qnames - better overload to rdflib.js
-            if ("true" === str || "false" === str) {
-                return this.literal(str, T("xsd:boolean"))
-            }
-            var col = str.indexOf(":")
-            if (col < 0) {
-                throw "Expected qname with a ':', but found: " + str;
-            }
-            var ns = this.namespaces[str.substring(0, col)];
-            if (!ns) {
-                throw "Unregistered prefix " + str.substring(0, col) + " of node " + str;
-            }
-            return this.namedNode(ns + str.substring(col + 1));
-        },
-
-        /**
-         * Produces a new blank node.
-         * @param id  an optional ID for the node
-         */
-        blankNode: function (id) {
-            return this.impl.blankNode(id);
-        },
-
-        /**
-         * Produces a new literal.  For example .literal("42", T("xsd:integer")).
-         * @param lex  the lexical form, e.g. "42"
-         * @param langOrDatatype  either a language string or a URI node with the datatype
-         */
-        literal: function (lex, langOrDatatype) {
-            return this.impl.literal(lex, langOrDatatype)
-        },
-
-        // This function is basically left for Task Force compatibility, but the preferred function is uri()
-        namedNode: function (uri) {
-            return this.impl.namedNode(uri)
-        },
-
-        /**
-         * Produces a new URI node.
-         * @param uri  the URI of the node
-         */
-        uri: function (uri) {
-            return namedNode(uri);
+    /**
+     * Registers a new namespace prefix for global TTL short cuts (qnames).
+     * @param prefix  the prefix to add
+     * @param namespace  the namespace to add for the prefix
+     */
+    registerNamespace: function (prefix, namespace) {
+        if (this.namespaces.prefix) {
+            throw "Prefix " + prefix + " already registered"
         }
+        this.namespaces[prefix] = namespace;
+    },
+
+    /**
+     * Produces an RDF* term from a TTL string representation.
+     * Also uses the registered prefixes.
+     * @param str  a string, e.g. "owl:Thing" or "true" or '"Hello"@en'.
+     * @return an RDF term
+     */
+    term: function (str) {
+        // TODO: this implementation currently only supports booleans and qnames - better overload to rdflib.js
+        if ("true" === str || "false" === str) {
+            return this.literal(str, T("xsd:boolean"))
+        }
+        var col = str.indexOf(":")
+        if (col < 0) {
+            throw "Expected qname with a ':', but found: " + str;
+        }
+        var ns = this.namespaces[str.substring(0, col)];
+        if (!ns) {
+            throw "Unregistered prefix " + str.substring(0, col) + " of node " + str;
+        }
+        return this.namedNode(ns + str.substring(col + 1));
+    },
+
+    /**
+     * Produces a new blank node.
+     * @param id  an optional ID for the node
+     */
+    blankNode: function (id) {
+        return this.impl.blankNode(id);
+    },
+
+    /**
+     * Produces a new literal.  For example .literal("42", T("xsd:integer")).
+     * @param lex  the lexical form, e.g. "42"
+     * @param langOrDatatype  either a language string or a URI node with the datatype
+     */
+    literal: function (lex, langOrDatatype) {
+        return this.impl.literal(lex, langOrDatatype)
+    },
+
+    // This function is basically left for Task Force compatibility, but the preferred function is uri()
+    namedNode: function (uri) {
+        return this.impl.namedNode(uri)
+    },
+
+    /**
+     * Produces a new URI node.
+     * @param uri  the URI of the node
+     */
+    uri: function (uri) {
+        return namedNode(uri);
     }
-}
+};
+
 
 // Install NodeFactory as an alias - unsure which name is best long term:
 // The official name in RDF is "term", while "node" is more commonly understood.
@@ -130,15 +130,15 @@ if (!this["TermFactory"]) {
 var NodeFactory = TermFactory;
 
 
-NodeFactory.registerNamespace("dc", "http://purl.org/dc/elements/1.1/")
-NodeFactory.registerNamespace("dcterms", "http://purl.org/dc/terms/")
-NodeFactory.registerNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#")
-NodeFactory.registerNamespace("rdfs", "http://www.w3.org/2000/01/rdf-schema#")
-NodeFactory.registerNamespace("schema", "http://schema.org/")
-NodeFactory.registerNamespace("sh", "http://www.w3.org/ns/shacl#")
-NodeFactory.registerNamespace("skos", "http://www.w3.org/2004/02/skos/core#")
-NodeFactory.registerNamespace("owl", "http://www.w3.org/2002/07/owl#")
-NodeFactory.registerNamespace("xsd", "http://www.w3.org/2001/XMLSchema#")
+NodeFactory.registerNamespace("dc", "http://purl.org/dc/elements/1.1/");
+NodeFactory.registerNamespace("dcterms", "http://purl.org/dc/terms/");
+NodeFactory.registerNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+NodeFactory.registerNamespace("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
+NodeFactory.registerNamespace("schema", "http://schema.org/");
+NodeFactory.registerNamespace("sh", "http://www.w3.org/ns/shacl#");
+NodeFactory.registerNamespace("skos", "http://www.w3.org/2004/02/skos/core#");
+NodeFactory.registerNamespace("owl", "http://www.w3.org/2002/07/owl#");
+NodeFactory.registerNamespace("xsd", "http://www.w3.org/2001/XMLSchema#");
 // RAML Shapes extensions
 NodeFactory.registerNamespace("shapes", "http://raml.org/vocabularies/shapes#");
 
@@ -152,7 +152,7 @@ NodeFactory.registerNamespace("shapes", "http://raml.org/vocabularies/shapes#");
  * @param str  the string representation, e.g. "owl:Thing"
  * @returns
  */
-T = function (str) {
+var T = function (str) {
     return NodeFactory.term(str)
 }
 
@@ -869,7 +869,7 @@ StartQuery.prototype.nextSolution = function () {
 
 // Helper functions
 
-createSolution = function(base) {
+createSolution = function (base) {
     var result = {};
     for (var attr in base) {
         if (base.hasOwnProperty(attr)) {
@@ -880,7 +880,7 @@ createSolution = function(base) {
 }
 
 
-compareTerms = function(t1, t2) {
+compareTerms = function (t1, t2) {
     if (!t1) {
         return !t2 ? 0 : 1;
     }
@@ -917,7 +917,7 @@ compareTerms = function(t1, t2) {
     }
 }
 
-getLocalName = function(uri) {
+getLocalName = function (uri) {
     // TODO: This is not the 100% correct local name algorithm
     var index = uri.lastIndexOf("#");
     if (index < 0) {
@@ -933,7 +933,7 @@ getLocalName = function(uri) {
 // class NodeSet
 // (a super-primitive implementation for now!)
 
-NodeSet = function () {
+var NodeSet = function () {
     this.values = [];
 }
 
@@ -1058,3 +1058,130 @@ function walkPath(graph, subject, path, set, visited) {
         }
     }
 }
+
+var RDFQueryUtil = function ($source) {
+    this.source = $source;
+}
+
+RDFQueryUtil.prototype.getInstancesOf = function ($class) {
+    var set = new NodeSet();
+    var classes = this.getSubClassesOf($class);
+    classes.add($class);
+    var car = classes.toArray();
+    for (var i = 0; i < car.length; i++) {
+        set.addAll(RDFQuery(this.source).match("?instance", "rdf:type", car[i]).getNodeArray("?instance"));
+    }
+    return set;
+}
+
+RDFQueryUtil.prototype.getObject = function ($subject, $predicate) {
+    if (!$subject) {
+        throw "Missing subject";
+    }
+    if (!$predicate) {
+        throw "Missing predicate";
+    }
+    return RDFQuery(this.source).match($subject, $predicate, "?object").getNode("?object");
+}
+
+RDFQueryUtil.prototype.getSubClassesOf = function ($class) {
+    var set = new NodeSet();
+    this.walkSubjects(set, $class, T("rdfs:subClassOf"));
+    return set;
+}
+
+RDFQueryUtil.prototype.isInstanceOf = function ($instance, $class) {
+    var classes = this.getSubClassesOf($class);
+    var types = $data.query().match($instance, "rdf:type", "?type");
+    for (var n = types.nextSolution(); n; n = types.nextSolution()) {
+        if (n.type.equals($class) || classes.contains(n.type)) {
+            types.close();
+            return true;
+        }
+    }
+    return false;
+}
+
+RDFQueryUtil.prototype.rdfListToArray = function ($rdfList) {
+    if ($rdfList.elements != null) {
+        return $rdfList.elements;
+    } else {
+        var array = [];
+        while (!T("rdf:nil").equals($rdfList)) {
+            array.push(this.getObject($rdfList, T("rdf:first")));
+            $rdfList = this.getObject($rdfList, T("rdf:rest"));
+        }
+        return array;
+    }
+}
+
+RDFQueryUtil.prototype.walkObjects = function ($results, $subject, $predicate) {
+    var it = this.source.find($subject, $predicate, null);
+    for (var n = it.next(); n; n = it.next()) {
+        if (!$results.contains(n.object)) {
+            $results.add(n.object);
+            this.walkObjects($results, n.object, $predicate);
+        }
+    }
+}
+
+RDFQueryUtil.prototype.walkSubjects = function ($results, $object, $predicate) {
+    var it = this.source.find(null, $predicate, $object);
+    for (var n = it.next(); n; n = it.next()) {
+        if (!$results.contains(n.subject)) {
+            $results.add(n.subject);
+            this.walkSubjects($results, n.subject, $predicate);
+        }
+    }
+}
+
+var toRDFQueryPath = function (shPath) {
+    if (shPath.isURI()) {
+        return shPath;
+    }
+    else if (shPath.isBlankNode()) {
+        var util = new RDFQueryUtil($shapes);
+        if ($shapes.query().getObject(shPath, "rdf:first")) {
+            var paths = util.rdfListToArray(shPath);
+            var result = [];
+            for (var i = 0; i < paths.length; i++) {
+                result.push(toRDFQueryPath(paths[i]));
+            }
+            return result;
+        }
+        var alternativePath = $shapes.query().getObject(shPath, "sh:alternativePath");
+        if (alternativePath) {
+            var paths = util.rdfListToArray(alternativePath);
+            var result = [];
+            for (var i = 0; i < paths.length; i++) {
+                result.push(toRDFQueryPath(paths[i]));
+            }
+            return { or: result };
+        }
+        var zeroOrMorePath = $shapes.query().getObject(shPath, "sh:zeroOrMorePath");
+        if (zeroOrMorePath) {
+            return { zeroOrMore: toRDFQueryPath(zeroOrMorePath) };
+        }
+        var oneOrMorePath = $shapes.query().getObject(shPath, "sh:oneOrMorePath");
+        if (oneOrMorePath) {
+            return { oneOrMore: toRDFQueryPath(oneOrMorePath) };
+        }
+        var zeroOrOnePath = $shapes.query().getObject(shPath, "sh:zeroOrOnePath");
+        if (zeroOrOnePath) {
+            return { zeroOrOne: toRDFQueryPath(zeroOrOnePath) };
+        }
+        var inversePath = $shapes.query().getObject(shPath, "sh:inversePath");
+        if (inversePath) {
+            return { inverse: toRDFQueryPath(inversePath) };
+        }
+    }
+    throw "Unsupported SHACL path " + shPath;
+    // TODO: implement conforming to AbstractQuery.path syntax
+    return shPath;
+}
+
+module.exports.TermFactory = TermFactory;
+module.exports.NodeSet = NodeSet;
+module.exports.RDFQueryUtil = RDFQueryUtil;
+module.exports.toRDFQueryPath = toRDFQueryPath;
+module.exports.T = T;
