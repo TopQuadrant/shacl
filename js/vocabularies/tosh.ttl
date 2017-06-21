@@ -1,0 +1,972 @@
+# baseURI: http://topbraid.org/tosh
+# imports: http://datashapes.org/dash
+# prefix: tosh
+
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix swa: <http://topbraid.org/swa#> .
+@prefix tosh: <http://topbraid.org/tosh#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+dash:
+  tosh:systemNamespace "true"^^xsd:boolean ;
+.
+dash:ClosedByTypesConstraintComponent-closedByTypes
+  sh:group tosh:OtherConstraintPropertyGroup ;
+.
+dash:NonRecursiveConstraintComponent
+  dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
+  sh:property [
+      sh:path dash:nonRecursive ;
+      sh:group tosh:RelationshipPropertyGroup ;
+    ] ;
+.
+dash:RootClassConstraintComponent
+  dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
+.
+dash:StemConstraintComponent-stem
+  sh:group tosh:StringBasedConstraintPropertyGroup ;
+.
+<http://spinrdf.org/sp#>
+  tosh:systemNamespace "true"^^xsd:boolean ;
+.
+<http://spinrdf.org/spin#>
+  tosh:systemNamespace "true"^^xsd:boolean ;
+.
+<http://spinrdf.org/spl#>
+  tosh:systemNamespace "true"^^xsd:boolean ;
+.
+<http://topbraid.org/tosh>
+  rdf:type owl:Ontology ;
+  rdfs:comment """A collection of SHACL features that are used whenever SHACL graphs are used within TopBraid Suite products. This includes things like suggested PropertyGroups and Shapes that control the layout of forms. Some of these may be of general use outside of TopBraid too.
+
+This namespace also includes the function tosh:hasShape, which can be used to implement some advanced constraint components using SPARQL only.""" ;
+  rdfs:label "TopBraid Data Shapes Library" ;
+  owl:imports <http://datashapes.org/dash> ;
+  sh:declare [
+      rdf:type sh:PrefixDeclaration ;
+      sh:namespace "http://jena.hpl.hp.com/ARQ/function#"^^xsd:anyURI ;
+      sh:prefix "afn" ;
+    ] ;
+  sh:declare [
+      rdf:type sh:PrefixDeclaration ;
+      sh:namespace "http://spinrdf.org/spif#"^^xsd:anyURI ;
+      sh:prefix "spif" ;
+    ] ;
+  sh:declare [
+      rdf:type sh:PrefixDeclaration ;
+      sh:namespace "http://topbraid.org/tosh#"^^xsd:anyURI ;
+      sh:prefix "tosh" ;
+    ] ;
+.
+tosh:
+  tosh:systemNamespace "true"^^xsd:boolean ;
+.
+tosh:AboutPropertyGroup
+  rdf:type sh:PropertyGroup ;
+  rdfs:label "This Shape" ;
+  sh:order 0 ;
+.
+tosh:CardinalityConstraintPropertyGroup
+  rdf:type sh:PropertyGroup ;
+  rdfs:label "Cardinality" ;
+  sh:order 2 ;
+.
+tosh:ComplexConstraintPropertyGroup
+  rdf:type sh:PropertyGroup ;
+  tosh:openable "true"^^xsd:boolean ;
+  rdfs:label "Complex Constraints" ;
+  sh:order 9 ;
+.
+tosh:ConstraintMetadataPropertyGroup
+  rdf:type sh:PropertyGroup ;
+  rdfs:label "Constraint Metadata" ;
+.
+tosh:DeleteTripleSuggestionGenerator
+  rdf:type dash:SPARQLUpdateSuggestionGenerator ;
+  rdfs:label "Delete triple suggestion generator" ;
+  sh:message "Delete the invalid statement" ;
+  sh:update """DELETE {
+	$focusNode $predicate $value .
+}
+WHERE {
+}""" ;
+.
+tosh:DisplayPropertyGroup
+  rdf:type sh:PropertyGroup ;
+  rdfs:comment "A group for properties that are primarily for display purposes (names, ordering etc)." ;
+  rdfs:label "Display" ;
+  sh:order 1 ;
+.
+tosh:MemberShapeConstraintComponent
+  rdf:type sh:ConstraintComponent ;
+  rdfs:comment "Can be used to specify constraints on the members of a given list, assuming that the given sh:property has rdf:Lists as values. A violation is reported for each member of the list that does not comply with the constraints specified by the given shape." ;
+  rdfs:label "Member shape constraint component" ;
+  sh:parameter tosh:MemberShapeConstraintComponent-memberShape ;
+  sh:propertyValidator [
+      rdf:type sh:SPARQLSelectValidator ;
+      sh:message "List member {?member} does not have the shape {$memberShape}" ;
+      sh:prefixes <http://topbraid.org/tosh> ;
+      sh:select """
+		SELECT DISTINCT $this ?value ?failure ?member
+		WHERE {
+			$this $PATH ?value .
+			?value rdf:rest*/rdf:first ?member .
+			BIND (tosh:hasShape(?member, $memberShape) AS ?hasShape) .
+			BIND (!bound(?hasShape) AS ?failure) .
+			FILTER (?failure || !?hasShape) .
+		}
+""" ;
+    ] ;
+  sh:targetClass sh:PropertyShape ;
+.
+tosh:MemberShapeConstraintComponent-memberShape
+  rdf:type sh:Parameter ;
+  sh:path tosh:memberShape ;
+  sh:class sh:Shape ;
+  sh:description "The shape that the list members must have." ;
+  sh:name "member shape" ;
+.
+tosh:OtherConstraintPropertyGroup
+  rdf:type sh:PropertyGroup ;
+  tosh:openable "true"^^xsd:boolean ;
+  rdfs:label "Other Constraints" ;
+  sh:order 10 ;
+.
+tosh:PropertyPairConstraintPropertyGroup
+  rdf:type sh:PropertyGroup ;
+  tosh:openable "true"^^xsd:boolean ;
+  rdfs:label "Property Pairs" ;
+  sh:order 6 ;
+.
+tosh:PropertyShapeShape
+  rdf:type sh:NodeShape ;
+  rdfs:label "Property shape shape" ;
+  sh:property [
+      sh:path tosh:editWidget ;
+      tosh:editWidget <http://topbraid.org/swaeditor#WidgetDropDownEditor> ;
+      tosh:viewWidget swa:ResourceInUIGraphViewer ;
+      sh:description "The swa:ObjectEditorClass that shall be used to edit values of this predicate." ;
+      sh:group tosh:DisplayPropertyGroup ;
+      sh:maxCount 1 ;
+      sh:name "edit widget" ;
+      sh:nodeKind sh:IRI ;
+      sh:order 21 ;
+    ] ;
+  sh:property [
+      sh:path tosh:searchWidget ;
+      tosh:editWidget <http://topbraid.org/swaeditor#WidgetDropDownEditor> ;
+      tosh:viewWidget swa:ResourceInUIGraphViewer ;
+      sh:description "The swa:ObjectFacetClass that shall be used to search for values of this predicate." ;
+      sh:group tosh:DisplayPropertyGroup ;
+      sh:maxCount 1 ;
+      sh:name "search widget" ;
+      sh:nodeKind sh:IRI ;
+      sh:order 22 ;
+    ] ;
+  sh:property [
+      sh:path tosh:viewWidget ;
+      tosh:editWidget <http://topbraid.org/swaeditor#WidgetDropDownEditor> ;
+      tosh:viewWidget swa:ResourceInUIGraphViewer ;
+      sh:description "The swa:ObjectViewerClass that shall be used to view values of this predicate." ;
+      sh:group tosh:DisplayPropertyGroup ;
+      sh:maxCount 1 ;
+      sh:name "view widget" ;
+      sh:nodeKind sh:IRI ;
+      sh:order 20 ;
+    ] ;
+  sh:property [
+      sh:path sh:defaultValue ;
+      tosh:editWidget <http://topbraid.org/tosh.ui#UseDeclaredDatatypeEditor> ;
+      tosh:useDeclaredDatatype "true"^^xsd:boolean ;
+      sh:description "The default value to be used for this property at new instances." ;
+      sh:group tosh:ValueTypeConstraintPropertyGroup ;
+    ] ;
+  sh:property [
+      sh:path sh:description ;
+      tosh:editWidget swa:TextAreaEditor ;
+      sh:description "A human-readable description of the role of the property in the constraint." ;
+      sh:group tosh:DisplayPropertyGroup ;
+      sh:name "description" ;
+      sh:order 2 ;
+    ] ;
+  sh:property [
+      sh:path sh:group ;
+      sh:description "The sh:PropertyGroup that the property belongs to." ;
+      sh:group tosh:DisplayPropertyGroup ;
+      sh:maxCount 1 ;
+      sh:name "group" ;
+      sh:order 10 ;
+    ] ;
+  sh:property [
+      sh:path sh:name ;
+      tosh:editWidget swa:TextFieldEditorWithLang ;
+      sh:description "The display name of the property." ;
+      sh:group tosh:DisplayPropertyGroup ;
+      sh:name "name" ;
+      sh:order 1 ;
+    ] ;
+  sh:property [
+      sh:path sh:order ;
+      sh:description "The relative position of the property among its peers, e.g. a property with order 5 shows up before one with order 6." ;
+      sh:group tosh:DisplayPropertyGroup ;
+      sh:maxCount 1 ;
+      sh:name "order" ;
+      sh:order 11 ;
+    ] ;
+  sh:property [
+      sh:path sh:path ;
+      sh:group tosh:AboutPropertyGroup ;
+      sh:maxCount 1 ;
+      sh:name "on property" ;
+      sh:order 0 ;
+    ] ;
+  sh:targetClass sh:PropertyShape ;
+.
+tosh:RelationshipPropertyGroup
+  rdf:type sh:PropertyGroup ;
+  tosh:openable "true"^^xsd:boolean ;
+  rdfs:label "Relationship" ;
+  sh:order 8 ;
+.
+tosh:ShapeShape
+  rdf:type sh:NodeShape ;
+  rdfs:label "Shape of shapes" ;
+  sh:property tosh:ShapeShape-deactivated ;
+  sh:property tosh:ShapeShape-severity ;
+  sh:targetClass sh:Shape ;
+.
+tosh:ShapeShape-deactivated
+  rdf:type sh:PropertyShape ;
+  sh:path sh:deactivated ;
+  sh:description "Can be used to deactivate the whole constraint." ;
+  sh:group tosh:AboutPropertyGroup ;
+  sh:maxCount 1 ;
+  sh:name "deactivated" ;
+  sh:order "1"^^xsd:decimal ;
+.
+tosh:ShapeShape-severity
+  rdf:type sh:PropertyShape ;
+  sh:path sh:severity ;
+  tosh:editWidget swa:InstancesSelectEditor ;
+  sh:class sh:Severity ;
+  sh:description "The severity to be used for validation results produced by the associated constraint." ;
+  sh:group tosh:AboutPropertyGroup ;
+  sh:maxCount 1 ;
+  sh:name "severity" ;
+  sh:order "2"^^xsd:decimal ;
+.
+tosh:StringBasedConstraintPropertyGroup
+  rdf:type sh:PropertyGroup ;
+  tosh:openable "true"^^xsd:boolean ;
+  rdfs:label "String Constraints" ;
+  sh:order 7 ;
+.
+tosh:SystemNamespaceShape
+  rdf:type sh:NodeShape ;
+  rdfs:comment "A shape that detects whether the focus node is a URI that has a namespace from one of the system namespaces - RDF, RDFS, OWL etc. The list of actual system namespaces is represented via tosh:systemNamespace true triples." ;
+  rdfs:label "System namespace shape" ;
+  sh:sparql [
+      rdf:type sh:SPARQLConstraint ;
+      sh:message "Not a IRI from a system namespace" ;
+      sh:prefixes <http://topbraid.org/tosh> ;
+      sh:select """SELECT $this
+WHERE {
+    FILTER (!isIRI($this) ||
+			(isIRI($this) && EXISTS {
+				BIND (IRI(afn:namespace($this)) AS ?ns) .
+				FILTER NOT EXISTS { ?ns tosh:systemNamespace true } .
+			} )) .
+}""" ;
+    ] ;
+.
+tosh:UseDeclaredDatatypeConstraintComponent
+  rdf:type sh:ConstraintComponent ;
+  dash:propertySuggestionGenerator [
+      rdf:type dash:SPARQLUpdateSuggestionGenerator ;
+      sh:message "Change datatype of the invalid value to the specified sh:datatype" ;
+      sh:update """DELETE {
+	$subject $predicate $object .
+}
+INSERT {
+	$subject $predicate ?newObject .
+}
+WHERE {
+	$subject sh:datatype ?datatype .
+	BIND (spif:cast(?object, ?datatype) AS ?newObject) .
+}""" ;
+    ] ;
+  rdfs:comment "Constrains the value nodes to be either non-literals or literals that have the same datatype as the declared sh:datatype for the given constraint node. This is used, among others, in properties such as sh:hasValue and sh:minExclusive." ;
+  rdfs:label "Use declared datatype constraint component" ;
+  sh:parameter [
+      sh:path tosh:useDeclaredDatatype ;
+      sh:datatype xsd:boolean ;
+      sh:description "True to state that the datatype of literal values must be the same as the declared sh:datatype." ;
+      sh:name "use declared datatype" ;
+    ] ;
+  sh:propertyValidator [
+      rdf:type sh:SPARQLSelectValidator ;
+      sh:message "Datatype must match the declared datatype {?datatype}" ;
+      sh:prefixes <http://topbraid.org/tosh> ;
+      sh:select """
+		SELECT DISTINCT $this ?value ?datatype
+		WHERE {
+			{
+				FILTER ($useDeclaredDatatype)
+			}
+			$this sh:datatype ?datatype .
+			$this $PATH ?value .
+			FILTER (isLiteral(?value) && datatype(?value) != ?datatype) .
+		}""" ;
+    ] ;
+  sh:targetClass sh:PropertyShape ;
+.
+tosh:ValueRangeConstraintPropertyGroup
+  rdf:type sh:PropertyGroup ;
+  tosh:openable "true"^^xsd:boolean ;
+  rdfs:label "Value Range" ;
+  sh:order 5 ;
+.
+tosh:ValueTypeConstraintPropertyGroup
+  rdf:type sh:PropertyGroup ;
+  rdfs:comment "A property group for constraint parameters that restrict the value types of values." ;
+  rdfs:label "Value Type" ;
+  sh:order 3 ;
+.
+tosh:countShapesWithMatchResult
+  rdf:type sh:SPARQLFunction ;
+  rdfs:comment "Counts the number of shapes from a given rdf:List (?arg2) defined in a given shapes graph (?arg3) where tosh:hasShape returns the provided match value (true or false, ?arg4) for a given focus node (?arg1). The function produces a failure if one of the shapes validated to a failure." ;
+  rdfs:label "count shapes with match result" ;
+  sh:parameter [
+      sh:path sh:expectedValue ;
+      sh:datatype xsd:boolean ;
+      sh:description "The expected value of tosh:hasShape to count." ;
+      sh:order 3 ;
+    ] ;
+  sh:parameter [
+      sh:path sh:focusNode ;
+      sh:class rdfs:Resource ;
+      sh:description "The focus node." ;
+      sh:order 0 ;
+    ] ;
+  sh:parameter [
+      sh:path sh:shapes ;
+      sh:class rdf:List ;
+      sh:description "The list of shapes to walk through." ;
+      sh:order 1 ;
+    ] ;
+  sh:parameter [
+      sh:path sh:shapesGraph ;
+      sh:class rdfs:Resource ;
+      sh:description "The shapes graph." ;
+      sh:order 2 ;
+    ] ;
+  sh:prefixes <http://topbraid.org/tosh> ;
+  sh:returnType xsd:integer ;
+  sh:select """
+		# The SUM will fail with an error if one of the operands is not a number
+		# (this mechanism is used to propagate errors from tosh:hasShape calls)
+		SELECT (SUM(?s) AS ?result)
+		WHERE {
+			GRAPH $shapesGraph {
+				$shapes rdf:rest*/rdf:first ?shape .
+			}
+			BIND (tosh:hasShape($focusNode, ?shape, true) AS ?hasShape) .
+			BIND (IF(bound(?hasShape), IF(?hasShape = $expectedValue, 1, 0), 'error') AS ?s) .
+		}
+		""" ;
+.
+tosh:editWidget
+  rdfs:range swa:ObjectEditorClass ;
+.
+tosh:hasDatatype
+  rdf:type sh:SPARQLAskValidator ;
+  rdfs:comment "Checks whether a given node ($value) is a literal with a given datatype ($datatype), and that the literal is well-formed." ;
+  rdfs:label "has datatype" ;
+  sh:ask """
+		ASK {
+			FILTER (datatype($value) = $datatype && spif:isValidForDatatype($value, $datatype)) .
+		}
+		""" ;
+  sh:prefixes <http://topbraid.org/tosh> ;
+.
+tosh:hasShape
+  rdf:type sh:Function ;
+  rdfs:comment """A built-in function of the TopBraid SHACL implementation.
+		Can be used to validate a given (focus) node against a given shape,
+		returning <code>true</code> if the node is valid.
+		
+		If executed within a SHACL validation engine, this uses the shapes graph that was provided when the engine started.
+		If executed in other contexts, e.g. in a stand-alone SPARQL query, the function attempts to use the URI of the current
+		default graph as the shapes graph. This may not always be supported. If called from within an SWP engine, the
+		shapes graph is the current query graph."""^^rdf:HTML ;
+  rdfs:label "has shape" ;
+  sh:parameter [
+      sh:path tosh:node ;
+      sh:description "The node to validate." ;
+    ] ;
+  sh:parameter [
+      sh:path tosh:shape ;
+      sh:description "The shape that the node is supposed to have." ;
+    ] ;
+  sh:returnType xsd:boolean ;
+.
+tosh:open
+  rdf:type rdf:Property ;
+  rdfs:comment "If set to true, then the corresponding form section will be open by default. This only has an effect if sh:openable is set to true as well." ;
+  rdfs:domain sh:PropertyGroup ;
+  rdfs:label "open" ;
+  rdfs:range xsd:boolean ;
+.
+tosh:openable
+  rdf:type rdf:Property ;
+  rdfs:comment "If set to true, then the corresponding form section shall be openable/closable (and show up closed)." ;
+  rdfs:domain sh:PropertyGroup ;
+  rdfs:label "openable" ;
+  rdfs:range xsd:boolean ;
+.
+tosh:searchWidget
+  rdfs:range swa:ObjectFacetClass ;
+.
+tosh:shaclExists
+  rdf:type sh:Function ;
+  rdfs:comment "Checks whether the current query graph has SHACL activated, i.e. imports the triples typically found in the SHACL namespace. This is currently relying on an approximation, only certain triples, and is natively implemented for TopBraid. Future versions may expose the actual logic as a SPARQL query." ;
+  rdfs:label "SHACL exists" ;
+  sh:returnType xsd:boolean ;
+.
+tosh:systemNamespace
+  rdf:type rdf:Property ;
+  rdfs:comment "Can be used to mark namespace resources (subjects) to count as \"system namespace\" that should be filtered by tosh:SystemNamespaceShape. Search for the usage of this predicate for examples. Anyone can add their own namespaces to their graphs." ;
+  rdfs:label "system namespace" ;
+  rdfs:range xsd:boolean ;
+.
+tosh:validatorForContext
+  rdf:type sh:SPARQLFunction ;
+  rdfs:comment "Gets a suitable validator for a given context, following the resolution rules from the spec." ;
+  rdfs:label "validator for context" ;
+  sh:parameter [
+      sh:path tosh:component ;
+      sh:class sh:ConstraintComponent ;
+      sh:description "The constraint component." ;
+      sh:name "component" ;
+    ] ;
+  sh:parameter [
+      sh:path tosh:context ;
+      sh:class rdfs:Class ;
+      sh:description "The context, e.g. sh:PropertyShape." ;
+      sh:name "context" ;
+    ] ;
+  sh:prefixes <http://topbraid.org/tosh> ;
+  sh:returnType sh:Validator ;
+  sh:select """
+  		SELECT ?validator
+		WHERE {
+			{
+				BIND (IF($context = sh:PropertyShape, sh:propertyValidator, sh:nodeValidator) AS ?predicate) .
+			}
+			OPTIONAL {
+				$component ?predicate ?specialized .
+			}
+			OPTIONAL {
+				$component sh:validator ?default .
+			}
+			BIND (COALESCE(?specialized, ?default) AS ?validator) .
+		}""" ;
+.
+tosh:valuesWithShapeCount
+  rdf:type sh:SPARQLFunction ;
+  rdfs:comment "Counts the number of values from a given subject (?arg1) / predicate (?arg2) combination that do not produce any error-level constraint violations for a given shape (?arg3) in a given shapes graph (?arg4). The function produces an error if one of the shapes validated to a fatal error." ;
+  rdfs:label "values with shape count" ;
+  sh:parameter [
+      sh:path sh:arg1 ;
+      sh:class rdfs:Resource ;
+      sh:description "The subject to count the values of." ;
+    ] ;
+  sh:parameter [
+      sh:path sh:arg2 ;
+      sh:class rdf:Property ;
+      sh:description "The property to count the values of." ;
+    ] ;
+  sh:parameter [
+      sh:path sh:arg3 ;
+      sh:class sh:Shape ;
+      sh:description "The shape to validate." ;
+    ] ;
+  sh:prefixes <http://topbraid.org/tosh> ;
+  sh:returnType xsd:integer ;
+  sh:select """
+		# The SUM will fail with an error if one of the operands is not a number
+		# (this mechanism is used to propagate errors from tosh:hasShape calls)
+		SELECT (SUM(?s) AS ?result)
+		WHERE {
+			{
+				FILTER NOT EXISTS { $arg1 $arg2 ?value }
+				BIND (0 AS ?s)
+			}
+			UNION {
+				FILTER EXISTS { $arg1 $arg2 ?value }
+				$arg1 $arg2 ?value .
+				BIND (tosh:hasShape(?value, $arg3, true) AS ?hasShape) .
+				BIND (IF(bound(?hasShape), IF(?hasShape, 1, 0), 'error') AS ?s) .
+			}
+		}
+		""" ;
+.
+tosh:viewWidget
+  rdfs:range swa:ObjectViewerClass ;
+.
+rdf:
+  tosh:systemNamespace "true"^^xsd:boolean ;
+.
+rdfs:
+  tosh:systemNamespace "true"^^xsd:boolean ;
+.
+xsd:
+  tosh:systemNamespace "true"^^xsd:boolean ;
+.
+owl:
+  tosh:systemNamespace "true"^^xsd:boolean ;
+.
+sh:
+  tosh:systemNamespace "true"^^xsd:boolean ;
+.
+sh:AndConstraintComponent
+  sh:nodeValidator [
+      rdf:type sh:SPARQLSelectValidator ;
+      sh:prefixes <http://topbraid.org/tosh> ;
+      sh:select """
+		SELECT $this ?failure ($this AS ?value)
+		WHERE {
+			BIND (tosh:countShapesWithMatchResult($this, $and, $shapesGraph, false) AS ?count)
+			BIND (!bound(?count) AS ?failure) .
+			FILTER IF(?failure, true, ?count > 0) .
+		}
+""" ;
+    ] ;
+  sh:propertyValidator [
+      rdf:type sh:SPARQLSelectValidator ;
+      sh:prefixes <http://topbraid.org/tosh> ;
+      sh:select """
+		SELECT DISTINCT $this ?value ?failure
+		WHERE {
+			$this $PATH ?value .
+			BIND (tosh:countShapesWithMatchResult(?value, $and, $shapesGraph, false) AS ?count)
+			BIND (!bound(?count) AS ?failure) .
+			FILTER IF(?failure, true, ?count > 0) .
+		}
+""" ;
+    ] ;
+.
+sh:AndConstraintComponent-and
+  tosh:editWidget swa:SourceCodeEditor ;
+  tosh:viewWidget swa:SourceCodeViewer ;
+  sh:group tosh:ComplexConstraintPropertyGroup ;
+  sh:order 11 ;
+.
+sh:ClassConstraintComponent
+  dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
+.
+sh:ClassConstraintComponent-class
+  sh:group tosh:ValueTypeConstraintPropertyGroup ;
+  sh:order 2 ;
+.
+sh:ClosedConstraintComponent-closed
+  sh:group tosh:OtherConstraintPropertyGroup ;
+  sh:order "0"^^xsd:decimal ;
+.
+sh:ClosedConstraintComponent-ignoredProperties
+  sh:group tosh:OtherConstraintPropertyGroup ;
+  sh:order "1"^^xsd:decimal ;
+.
+sh:DatatypeConstraintComponent
+  dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
+  dash:propertySuggestionGenerator [
+      rdf:type dash:SPARQLUpdateSuggestionGenerator ;
+      sh:message "Change the datatype of the invalid value to {$datatype}" ;
+      sh:order -2 ;
+      sh:update """DELETE {
+    $focusNode $predicate $value .
+}
+INSERT {
+    $focusNode $predicate ?newValue .
+}
+WHERE {
+    BIND (spif:invoke($datatype, str($value)) AS ?newValue) .
+	FILTER bound(?newValue) .
+}""" ;
+    ] ;
+  dash:propertySuggestionGenerator [
+      rdf:type dash:SPARQLUpdateSuggestionGenerator ;
+      sh:message "Convert the invalid date/time value into a date value" ;
+      sh:order -1 ;
+      sh:update """DELETE {
+    $subject $predicate $object
+}
+INSERT {
+    $subject $predicate ?newObject .
+}
+WHERE {
+	{
+		FILTER (datatype($object) = xsd:dateTime && $datatype = xsd:date) .
+	}
+    BIND (xsd:date(substr(str($object), 1, 10)) AS ?newObject) .
+	FILTER bound(?newObject) .
+}""" ;
+    ] ;
+  sh:validator tosh:hasDatatype ;
+.
+sh:DatatypeConstraintComponent-datatype
+  tosh:editWidget <http://topbraid.org/tosh.ui#DatatypeEditor> ;
+  sh:class rdfs:Datatype ;
+  sh:group tosh:ValueTypeConstraintPropertyGroup ;
+  sh:maxCount 1 ;
+  sh:order 1 ;
+.
+sh:DisjointConstraintComponent-disjoint
+  sh:deactivated "true"^^xsd:boolean ;
+  sh:group tosh:PropertyPairConstraintPropertyGroup ;
+  sh:order 1 ;
+.
+sh:EqualsConstraintComponent-equals
+  sh:deactivated "true"^^xsd:boolean ;
+  sh:group tosh:PropertyPairConstraintPropertyGroup ;
+  sh:order 0 ;
+.
+sh:HasValueConstraintComponent
+  dash:propertySuggestionGenerator [
+      rdf:type dash:SPARQLUpdateSuggestionGenerator ;
+      sh:message "Add {$hasValue} to the existing values" ;
+      sh:update """INSERT {
+	$focusNode $predicate $hasValue .
+}
+WHERE {
+}""" ;
+    ] ;
+  sh:property [
+      sh:path sh:hasValue ;
+      tosh:editWidget <http://topbraid.org/tosh.ui#UseDeclaredDatatypeEditor> ;
+      tosh:useDeclaredDatatype "true"^^xsd:boolean ;
+    ] ;
+.
+sh:HasValueConstraintComponent-hasValue
+  sh:group tosh:OtherConstraintPropertyGroup ;
+.
+sh:InConstraintComponent
+  dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
+  dash:propertySuggestionGenerator [
+      rdf:type dash:SPARQLUpdateSuggestionGenerator ;
+      sh:message "Replace invalid value with {$newObject}" ;
+      sh:order 2 ;
+      sh:prefixes <http://topbraid.org/tosh> ;
+      sh:select """SELECT ?newObject
+WHERE {
+	$in <http://jena.hpl.hp.com/ARQ/list#index> (?index ?newObject ) .
+}
+ORDER BY ?index""" ;
+      sh:update """DELETE {
+	$focusNode $predicate $value .
+}
+INSERT {
+	$focusNode $predicate $newObject .
+}
+WHERE {
+}""" ;
+    ] ;
+.
+sh:InConstraintComponent-in
+  sh:group tosh:OtherConstraintPropertyGroup ;
+.
+sh:JSConstraint-js
+  sh:group tosh:ComplexConstraintPropertyGroup ;
+.
+sh:LanguageInConstraintComponent
+  dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
+.
+sh:LanguageInConstraintComponent-languageIn
+  sh:group tosh:StringBasedConstraintPropertyGroup ;
+  sh:order "9"^^xsd:decimal ;
+.
+sh:LessThanConstraintComponent-lessThan
+  sh:deactivated "true"^^xsd:boolean ;
+  sh:group tosh:PropertyPairConstraintPropertyGroup ;
+  sh:order 2 ;
+.
+sh:LessThanOrEqualsConstraintComponent-lessThanOrEquals
+  sh:deactivated "true"^^xsd:boolean ;
+  sh:group tosh:PropertyPairConstraintPropertyGroup ;
+  sh:order 3 ;
+.
+sh:MaxCountConstraintComponent-maxCount
+  sh:group tosh:CardinalityConstraintPropertyGroup ;
+  sh:order 1 ;
+.
+sh:MaxExclusiveConstraintComponent-maxExclusive
+  tosh:editWidget <http://topbraid.org/tosh.ui#UseDeclaredDatatypeEditor> ;
+  tosh:useDeclaredDatatype "true"^^xsd:boolean ;
+  sh:group tosh:ValueRangeConstraintPropertyGroup ;
+  sh:order 3 ;
+.
+sh:MaxInclusiveConstraintComponent
+  dash:propertySuggestionGenerator [
+      rdf:type dash:SPARQLUpdateSuggestionGenerator ;
+      sh:message "Replace the invalid value with {$maxInclusive}" ;
+      sh:update """DELETE {
+	$subject $predicate $object .
+}
+INSERT {
+	$subject $predicate $maxInclusive .
+}
+WHERE {
+}""" ;
+    ] ;
+.
+sh:MaxInclusiveConstraintComponent-maxInclusive
+  tosh:editWidget <http://topbraid.org/tosh.ui#UseDeclaredDatatypeEditor> ;
+  tosh:useDeclaredDatatype "true"^^xsd:boolean ;
+  sh:group tosh:ValueRangeConstraintPropertyGroup ;
+  sh:order 2 ;
+.
+sh:MaxLengthConstraintComponent
+  dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
+  dash:propertySuggestionGenerator [
+      rdf:type dash:SPARQLUpdateSuggestionGenerator ;
+      sh:message "Prune string to only {$maxLength} characters" ;
+      sh:order 1 ;
+      sh:update """DELETE {
+    $focusNode $predicate $value .
+}
+INSERT {
+    $focusNode $predicate $newValue .
+}
+WHERE {
+    FILTER (isLiteral($value) && datatype($value) = xsd:string) .
+	BIND (SUBSTR($value, 1, $maxLength) AS ?newValue) .
+}""" ;
+    ] ;
+.
+sh:MaxLengthConstraintComponent-maxLength
+  sh:group tosh:StringBasedConstraintPropertyGroup ;
+  sh:order 4 ;
+.
+sh:MinCountConstraintComponent-minCount
+  sh:group tosh:CardinalityConstraintPropertyGroup ;
+  sh:order 0 ;
+.
+sh:MinExclusiveConstraintComponent-minExclusive
+  tosh:editWidget <http://topbraid.org/tosh.ui#UseDeclaredDatatypeEditor> ;
+  tosh:useDeclaredDatatype "true"^^xsd:boolean ;
+  sh:group tosh:ValueRangeConstraintPropertyGroup ;
+  sh:order 0 ;
+.
+sh:MinInclusiveConstraintComponent
+  dash:propertySuggestionGenerator [
+      rdf:type dash:SPARQLUpdateSuggestionGenerator ;
+      sh:message "Replace the invalid value with {$minInclusive}" ;
+      sh:update """DELETE {
+	$subject $predicate $object .
+}
+INSERT {
+	$subject $predicate $minInclusive .
+}
+WHERE {
+}""" ;
+    ] ;
+.
+sh:MinInclusiveConstraintComponent-minInclusive
+  tosh:editWidget <http://topbraid.org/tosh.ui#UseDeclaredDatatypeEditor> ;
+  tosh:useDeclaredDatatype "true"^^xsd:boolean ;
+  sh:group tosh:ValueRangeConstraintPropertyGroup ;
+  sh:order 1 ;
+.
+sh:MinLengthConstraintComponent-minLength
+  sh:group tosh:StringBasedConstraintPropertyGroup ;
+  sh:order 3 ;
+.
+sh:NodeConstraintComponent
+  sh:nodeValidator [
+      rdf:type sh:SPARQLSelectValidator ;
+      sh:prefixes <http://topbraid.org/tosh> ;
+      sh:select """
+		SELECT $this ($this AS $value) ?failure
+		WHERE {
+			BIND (tosh:hasShape($this, $node) AS ?hasShape) .
+			BIND (!bound(?hasShape) AS ?failure) .
+			FILTER (?failure || !?hasShape) .
+		}
+		""" ;
+    ] ;
+  sh:propertyValidator [
+      rdf:type sh:SPARQLSelectValidator ;
+      sh:prefixes <http://topbraid.org/tosh> ;
+      sh:select """
+		SELECT DISTINCT $this ?value ?failure
+		WHERE {
+			$this $PATH ?value .
+			BIND (tosh:hasShape(?value, $node) AS ?hasShape) .
+			BIND (!bound(?hasShape) AS ?failure) .
+			FILTER (?failure || !?hasShape) .
+		}
+		""" ;
+    ] ;
+.
+sh:NodeConstraintComponent-node
+  tosh:editWidget swa:SourceCodeEditor ;
+  tosh:viewWidget swa:SourceCodeViewer ;
+  sh:group tosh:ComplexConstraintPropertyGroup ;
+  sh:order 0 ;
+.
+sh:NodeKindConstraintComponent-nodeKind
+  tosh:editWidget <http://topbraid.org/tosh.ui#NodeKindEditor> ;
+  sh:group tosh:ValueTypeConstraintPropertyGroup ;
+  sh:name "value kinds" ;
+  sh:order 0 ;
+.
+sh:NotConstraintComponent
+  sh:nodeValidator [
+      rdf:type sh:SPARQLSelectValidator ;
+      sh:prefixes <http://topbraid.org/tosh> ;
+      sh:select """
+		SELECT $this ($this AS ?value) ?failure
+		WHERE {
+			BIND (tosh:hasShape($this, $not) AS ?hasShape) .
+			BIND (!bound(?hasShape) AS ?failure) .
+			FILTER (?failure || ?hasShape) .
+		}
+		""" ;
+    ] ;
+  sh:propertyValidator [
+      rdf:type sh:SPARQLSelectValidator ;
+      sh:prefixes <http://topbraid.org/tosh> ;
+      sh:select """
+		SELECT DISTINCT $this ?value ?failure
+		WHERE {
+			$this $PATH ?value .
+			BIND (tosh:hasShape(?value, $not) AS ?hasShape) .
+			BIND (!bound(?hasShape) AS ?failure) .
+			FILTER (?failure || ?hasShape) .
+		}
+		""" ;
+    ] ;
+.
+sh:NotConstraintComponent-not
+  tosh:editWidget swa:SourceCodeEditor ;
+  tosh:viewWidget swa:SourceCodeViewer ;
+  sh:group tosh:ComplexConstraintPropertyGroup ;
+  sh:order 10 ;
+.
+sh:OrConstraintComponent
+  sh:nodeValidator [
+      rdf:type sh:SPARQLSelectValidator ;
+      sh:message "Focus node has none of the shapes from the 'or' list" ;
+      sh:prefixes <http://topbraid.org/tosh> ;
+      sh:select """
+		SELECT $this ?failure ($this AS ?value)
+		WHERE {
+			BIND (tosh:countShapesWithMatchResult($this, $or, $shapesGraph, true) AS ?count)
+			BIND (!bound(?count) AS ?failure) .
+			FILTER IF(?failure, true, ?count = 0) .
+		}
+""" ;
+    ] ;
+  sh:propertyValidator [
+      rdf:type sh:SPARQLSelectValidator ;
+      sh:message "Value has none of the shapes from the 'or' list" ;
+      sh:prefixes <http://topbraid.org/tosh> ;
+      sh:select """
+		SELECT DISTINCT $this ?value ?failure
+		WHERE { 
+			$this $PATH ?value .
+			BIND (tosh:countShapesWithMatchResult(?value, $or, $shapesGraph, true) AS ?count)
+			BIND (!bound(?count) AS ?failure) .
+			FILTER IF(?failure, true, ?count = 0) .
+		}
+""" ;
+    ] ;
+.
+sh:OrConstraintComponent-or
+  tosh:editWidget swa:SourceCodeEditor ;
+  tosh:viewWidget swa:SourceCodeViewer ;
+  sh:group tosh:ComplexConstraintPropertyGroup ;
+  sh:order 12 ;
+.
+sh:PatternConstraintComponent-flags
+  tosh:editWidget <http://topbraid.org/tosh.ui#FlagsEditor> ;
+  sh:group tosh:StringBasedConstraintPropertyGroup ;
+  sh:maxCount 1 ;
+  sh:name "regex flags" ;
+.
+sh:PatternConstraintComponent-pattern
+  tosh:editWidget swa:PlainTextFieldEditor ;
+  sh:group tosh:StringBasedConstraintPropertyGroup ;
+  sh:maxCount 1 ;
+  sh:name "regex pattern" ;
+  sh:sparql [
+      sh:prefixes <http://topbraid.org/tosh> ;
+      sh:select """SELECT $this ?value ?message
+WHERE {
+    $this $PATH ?value .
+	BIND (spif:checkRegexSyntax(?value) AS ?error) .
+	FILTER bound(?error) .
+	BIND (CONCAT(\"Malformed pattern: \", ?error) AS ?message) .
+}""" ;
+    ] ;
+.
+sh:QualifiedMaxCountConstraintComponent-qualifiedMaxCount
+  sh:group tosh:ComplexConstraintPropertyGroup ;
+  sh:maxCount 1 ;
+  sh:order 3 ;
+.
+sh:QualifiedMinCountConstraintComponent-qualifiedMinCount
+  sh:group tosh:ComplexConstraintPropertyGroup ;
+  sh:maxCount 1 ;
+  sh:order 2 ;
+.
+sh:QualifiedMinCountConstraintComponent-qualifiedValueShape
+  tosh:editWidget swa:SourceCodeEditor ;
+  tosh:viewWidget swa:SourceCodeViewer ;
+  sh:group tosh:ComplexConstraintPropertyGroup ;
+  sh:maxCount 1 ;
+  sh:order 1 ;
+.
+sh:UniqueLangConstraintComponent-uniqueLang
+  sh:group tosh:StringBasedConstraintPropertyGroup ;
+  sh:order 8 ;
+.
+sh:XoneConstraintComponent
+  sh:nodeValidator [
+      rdf:type sh:SPARQLSelectValidator ;
+      sh:message "Focus node has {?count} of the shapes from the 'exactly one' list" ;
+      sh:prefixes <http://topbraid.org/tosh> ;
+      sh:select """
+		SELECT $this ?failure ?count ($this AS ?value)
+		WHERE {
+			BIND (tosh:countShapesWithMatchResult($this, $xone, $shapesGraph, true) AS ?count)
+			BIND (!bound(?count) AS ?failure) .
+			FILTER IF(?failure, true, ?count != 1) .
+		}
+""" ;
+    ] ;
+  sh:propertyValidator [
+      rdf:type sh:SPARQLSelectValidator ;
+      sh:message "Value node has {?count} of the shapes from the 'exactly one' list" ;
+      sh:prefixes <http://topbraid.org/tosh> ;
+      sh:select """
+		SELECT DISTINCT $this ?value ?failure ?count
+		WHERE { 
+			$this $PATH ?value .
+			BIND (tosh:countShapesWithMatchResult(?value, $xone, $shapesGraph, true) AS ?count)
+			BIND (!bound(?count) AS ?failure) .
+			FILTER IF(?failure, true, ?count != 1) .
+		}
+""" ;
+    ] ;
+.
+sh:XoneConstraintComponent-xone
+  tosh:editWidget swa:SourceCodeEditor ;
+  tosh:viewWidget swa:SourceCodeViewer ;
+  sh:group tosh:ComplexConstraintPropertyGroup ;
+  sh:order 13 ;
+.
