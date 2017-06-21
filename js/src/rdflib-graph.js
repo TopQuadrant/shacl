@@ -1,5 +1,6 @@
 $rdf = require("rdflib");
-var T = require("./rdfquery").T;
+var rdfquery = require("./rdfquery");
+var T = rdfquery.T;
 
 // Monkey Patching rdflib, Literals, BlankNodes and NamedNodes
 var exLiteral = $rdf.literal("a", "de");
@@ -29,7 +30,7 @@ RDFLibGraph.prototype.find = function (s, p, o) {
 };
 
 RDFLibGraph.prototype.query = function () {
-    return RDFQuery(this);
+    return rdfquery.RDFQuery(this);
 };
 
 

@@ -81,7 +81,7 @@ var TermFactory = {
         if ("true" === str || "false" === str) {
             return this.literal(str, T("xsd:boolean"))
         }
-        var col = str.indexOf(":")
+        var col = str.indexOf(":");
         if (col < 0) {
             throw "Expected qname with a ':', but found: " + str;
         }
@@ -119,7 +119,7 @@ var TermFactory = {
      * @param uri  the URI of the node
      */
     uri: function (uri) {
-        return namedNode(uri);
+        return TermFactory.namedNode(uri);
     }
 };
 
@@ -154,7 +154,7 @@ NodeFactory.registerNamespace("shapes", "http://raml.org/vocabularies/shapes#");
  */
 var T = function (str) {
     return NodeFactory.term(str)
-}
+};
 
 
 /**
@@ -166,15 +166,15 @@ var T = function (str) {
  * @param initialSolution  the initial solutions or null for none
  * @returns a query object
  */
-RDFQuery = function (graph, initialSolution) {
+var RDFQuery = function (graph, initialSolution) {
     return new StartQuery(graph, initialSolution ? initialSolution : []);
-}
+};
 
 
 // class AbstractQuery
 
-AbstractQuery = function () {
-}
+var AbstractQuery = function () {
+};
 
 // ----------------------------------------------------------------------------
 // Query constructor functions, can be chained together
@@ -189,7 +189,7 @@ AbstractQuery = function () {
  */
 AbstractQuery.prototype.bind = function (varName, bindFunction) {
     return new BindQuery(this, varName, bindFunction);
-}
+};
 
 /**
  * Creates a new query that filters the solutions produced by this.
@@ -198,7 +198,7 @@ AbstractQuery.prototype.bind = function (varName, bindFunction) {
  */
 AbstractQuery.prototype.filter = function (filterFunction) {
     return new FilterQuery(this, filterFunction);
-}
+};
 
 /**
  * Creates a new query that only allows the first n solutions through.
@@ -206,7 +206,7 @@ AbstractQuery.prototype.filter = function (filterFunction) {
  */
 AbstractQuery.prototype.limit = function (limit) {
     return new LimitQuery(this, limit);
-}
+};
 
 /**
  * Creates a new query doing a triple match.
@@ -220,7 +220,7 @@ AbstractQuery.prototype.limit = function (limit) {
  */
 AbstractQuery.prototype.match = function (s, p, o) {
     return new MatchQuery(this, s, p, o);
-}
+};
 
 /**
  * Creates a new query that sorts all input solutions by the bindings
@@ -229,7 +229,7 @@ AbstractQuery.prototype.match = function (s, p, o) {
  */
 AbstractQuery.prototype.orderBy = function (varName) {
     return new OrderByQuery(this, varName);
-}
+};
 
 /**
  * Creates a new query doing a match where the predicate may be a RDF Path object.
@@ -254,7 +254,7 @@ AbstractQuery.prototype.path = function (s, path, o) {
     else {
         return new PathQuery(this, s, path, o);
     }
-}
+};
 
 // TODO: add other SPARQL-like query types
 //       - .distinct()
@@ -280,7 +280,7 @@ AbstractQuery.prototype.addAllNodes = function (varName, set) {
             set.add(node);
         }
     }
-}
+};
 
 /**
  * Produces an array of triple objects where each triple object has properties
@@ -347,7 +347,7 @@ AbstractQuery.prototype.forEach = function (callback) {
     for (var n = this.nextSolution(); n; n = this.nextSolution()) {
         callback(n);
     }
-}
+};
 
 /**
  * Executes a given function for each node in a solution set.
@@ -362,7 +362,7 @@ AbstractQuery.prototype.forEachNode = function (varName, callback) {
             callback(node);
         }
     }
-}
+};
 
 /**
  * Turns all result solutions into an array.
@@ -374,7 +374,7 @@ AbstractQuery.prototype.getArray = function () {
         results.push(n);
     }
     return results;
-}
+};
 
 /**
  * Gets the number of (remaining) solutions.
@@ -382,7 +382,7 @@ AbstractQuery.prototype.getArray = function () {
  */
 AbstractQuery.prototype.getCount = function () {
     return this.getArray().length; // Quick and dirty implementation
-}
+};
 
 /**
  * Gets the next solution and, if that exists, returns the binding for a
@@ -399,7 +399,7 @@ AbstractQuery.prototype.getNode = function (varName) {
     else {
         return null;
     }
-}
+};
 
 /**
  * Turns all results into an array of bindings for a given variable.
@@ -427,7 +427,7 @@ AbstractQuery.prototype.getNodeSet = function (varName) {
         results.add(n[attr]);
     }
     return results;
-}
+};
 
 /**
  * Queries the underlying graph for the object of a subject/predicate combination,
@@ -446,7 +446,7 @@ AbstractQuery.prototype.getObject = function (subject, predicate) {
         this.close();
         var s;
         if (typeof subject === 'string') {
-            if (subject.indexOf('?') == 0) {
+            if (subject.indexOf('?') === 0) {
                 s = sol[var2Attr(subject)];
             }
             else {
@@ -461,7 +461,7 @@ AbstractQuery.prototype.getObject = function (subject, predicate) {
         }
         var p;
         if (typeof predicate === 'string') {
-            if (predicate.indexOf('?') == 0) {
+            if (predicate.indexOf('?') === 0) {
                 p = sol[var2Attr(predicate)];
             }
             else {
@@ -483,7 +483,7 @@ AbstractQuery.prototype.getObject = function (subject, predicate) {
         }
     }
     return null;
-}
+};
 
 /**
  * Tests if there is any solution and closes the query.
@@ -497,7 +497,7 @@ AbstractQuery.prototype.hasSolution = function () {
     else {
         return false;
     }
-}
+};
 
 
 // ----------------------------------------------------------------------------
@@ -511,11 +511,11 @@ AbstractQuery.prototype.hasSolution = function () {
  * @param node  the node to compare with
  * @returns true if the solution's variable equals the node
  */
-exprEquals = function (varName, node) {
+var exprEquals = function (varName, node) {
     return function (sol) {
         return node.equals(sol[var2Attr(varName)]);
     }
-}
+};
 
 /**
  * Creates a function that takes a solution and compares a given node with
@@ -524,11 +524,11 @@ exprEquals = function (varName, node) {
  * @param node  the node to compare with
  * @returns true if the solution's variable does not equal the node
  */
-exprNotEquals = function (varName, node) {
+var exprNotEquals = function (varName, node) {
     return function (sol) {
         return !node.equals(sol[var2Attr(varName)]);
     }
-}
+};
 
 
 // ----------------------------------------------------------------------------
@@ -541,18 +541,18 @@ exprNotEquals = function (varName, node) {
 // the value is computed by a given function based on the current solution.
 // It is illegal to use a variable that already has a value from the input.
 
-BindQuery = function (input, varName, bindFunction) {
+var BindQuery = function (input, varName, bindFunction) {
     this.attr = var2Attr(varName);
     this.source = input.source;
     this.input = input;
     this.bindFunction = bindFunction;
-}
+};
 
 BindQuery.prototype = Object.create(AbstractQuery.prototype);
 
 BindQuery.prototype.close = function () {
     this.input.close();
-}
+};
 
 // Pulls the next result from the input Query and passes it into
 // the given bind function to add a new node
@@ -568,24 +568,24 @@ BindQuery.prototype.nextSolution = function () {
         }
         return result;
     }
-}
+};
 
 
 // class FilterQuery
 // Filters the incoming solutions, only letting through those where
 // filterFunction(solution) returns true
 
-FilterQuery = function (input, filterFunction) {
+var FilterQuery = function (input, filterFunction) {
     this.source = input.source;
     this.input = input;
     this.filterFunction = filterFunction;
-}
+};
 
 FilterQuery.prototype = Object.create(AbstractQuery.prototype);
 
 FilterQuery.prototype.close = function () {
     this.input.close();
-}
+};
 
 // Pulls the next result from the input Query and passes it into
 // the given filter function
@@ -599,23 +599,23 @@ FilterQuery.prototype.nextSolution = function () {
             return result;
         }
     }
-}
+};
 
 
 // class LimitQuery
 // Only allows the first n values of the input query through
 
-LimitQuery = function (input, limit) {
+var LimitQuery = function (input, limit) {
     this.source = input.source;
     this.input = input;
     this.limit = limit;
-}
+};
 
 LimitQuery.prototype = Object.create(AbstractQuery.prototype);
 
 LimitQuery.prototype.close = function () {
     this.input.close();
-}
+};
 
 // Pulls the next result from the input Query unless the number
 // of previous calls has exceeded the given limit
@@ -628,18 +628,18 @@ LimitQuery.prototype.nextSolution = function () {
         this.input.close();
         return null;
     }
-}
+};
 
 
 // class MatchQuery
 // Joins the solutions from the input Query with triple matches against
 // the current input graph.
 
-MatchQuery = function (input, s, p, o) {
+var MatchQuery = function (input, s, p, o) {
     this.source = input.source;
     this.input = input;
     if (typeof s === 'string') {
-        if (s.indexOf('?') == 0) {
+        if (s.indexOf('?') === 0) {
             this.sv = var2Attr(s);
         }
         else {
@@ -650,7 +650,7 @@ MatchQuery = function (input, s, p, o) {
         this.s = s;
     }
     if (typeof p === 'string') {
-        if (p.indexOf('?') == 0) {
+        if (p.indexOf('?') === 0) {
             this.pv = var2Attr(p);
         }
         else {
@@ -661,7 +661,7 @@ MatchQuery = function (input, s, p, o) {
         this.p = p;
     }
     if (typeof o === 'string') {
-        if (o.indexOf('?') == 0) {
+        if (o.indexOf('?') === 0) {
             this.ov = var2Attr(o);
         }
         else {
@@ -671,7 +671,7 @@ MatchQuery = function (input, s, p, o) {
     else {
         this.o = o;
     }
-}
+};
 
 MatchQuery.prototype = Object.create(AbstractQuery.prototype);
 
@@ -680,7 +680,7 @@ MatchQuery.prototype.close = function () {
     if (this.ownIterator) {
         this.ownIterator.close();
     }
-}
+};
 
 // This pulls the first solution from the input Query and uses it to
 // create an "ownIterator" which applies the input solution to those
@@ -724,23 +724,23 @@ MatchQuery.prototype.nextSolution = function () {
     else {
         return null;
     }
-}
+};
 
 
 // class OrderByQuery
 // Sorts all solutions from the input stream by a given variable
 
-OrderByQuery = function (input, varName) {
+var OrderByQuery = function (input, varName) {
     this.input = input;
     this.source = input.source;
     this.attrName = var2Attr(varName);
-}
+};
 
 OrderByQuery.prototype = Object.create(AbstractQuery.prototype);
 
 OrderByQuery.prototype.close = function () {
     this.input.close();
-}
+};
 
 OrderByQuery.prototype.nextSolution = function () {
     if (!this.solutions) {
@@ -757,17 +757,17 @@ OrderByQuery.prototype.nextSolution = function () {
     else {
         return null;
     }
-}
+};
 
 
 // class PathQuery
 // Expects subject and path to be bound and produces all bindings
 // for the object variable or matches that by evaluating the given path
 
-PathQuery = function (input, subject, path, object) {
+var PathQuery = function (input, subject, path, object) {
     this.input = input;
     this.source = input.source;
-    if (typeof subject === 'string' && subject.indexOf("?") == 0) {
+    if (typeof subject === 'string' && subject.indexOf("?") === 0) {
         this.subjectAttr = var2Attr(subject);
     }
     else {
@@ -782,19 +782,19 @@ PathQuery = function (input, subject, path, object) {
     else {
         this.path_ = path;
     }
-    if (typeof object === 'string' && object.indexOf("?") == 0) {
+    if (typeof object === 'string' && object.indexOf("?") === 0) {
         this.objectAttr = var2Attr(object);
     }
     else {
         this.object = object;
     }
-}
+};
 
 PathQuery.prototype = Object.create(AbstractQuery.prototype);
 
 PathQuery.prototype.close = function () {
     this.input.close();
-}
+};
 
 PathQuery.prototype.nextSolution = function () {
 
@@ -805,7 +805,7 @@ PathQuery.prototype.nextSolution = function () {
         if (this.objectAttr) {
             result[this.objectAttr] = n;
         }
-        if (this.pathIndex == r.length) {
+        if (this.pathIndex === r.length) {
             delete this.pathResults; // Mark as exhausted
         }
         return result;
@@ -822,7 +822,7 @@ PathQuery.prototype.nextSolution = function () {
         var pathResultsSet = new NodeSet();
         addPathValues(this.source, sm, this.path_, pathResultsSet);
         this.pathResults = pathResultsSet.toArray();
-        if (this.pathResults.length == 0) {
+        if (this.pathResults.length === 0) {
             delete this.pathResults;
         }
         else if (om) {
@@ -839,21 +839,20 @@ PathQuery.prototype.nextSolution = function () {
     else {
         return null;
     }
-}
+};
 
 
 // class StartQuery
 // This simply produces a single result: the initial solution
 
-StartQuery = function (source, initialSolution) {
+var StartQuery = function (source, initialSolution) {
     this.source = source;
     this.solution = initialSolution;
-}
+};
 
 StartQuery.prototype = Object.create(AbstractQuery.prototype);
 
-StartQuery.prototype.close = function () {
-}
+StartQuery.prototype.close = function () {};
 
 StartQuery.prototype.nextSolution = function () {
     if (this.solution) {
@@ -864,12 +863,12 @@ StartQuery.prototype.nextSolution = function () {
     else {
         return null;
     }
-}
+};
 
 
 // Helper functions
 
-createSolution = function (base) {
+var createSolution = function (base) {
     var result = {};
     for (var attr in base) {
         if (base.hasOwnProperty(attr)) {
@@ -877,10 +876,10 @@ createSolution = function (base) {
         }
     }
     return result;
-}
+};
 
 
-compareTerms = function (t1, t2) {
+var compareTerms = function (t1, t2) {
     if (!t1) {
         return !t2 ? 0 : 1;
     }
@@ -888,19 +887,19 @@ compareTerms = function (t1, t2) {
         return -1;
     }
     var bt = t1.termType.localeCompare(t2.termType);
-    if (bt != 0) {
+    if (bt !== 0) {
         return bt;
     }
     else {
         // TODO: Does not handle numeric or date comparison
         var bv = t1.value.localeCompare(t2.value);
-        if (bv != 0) {
+        if (bv !== 0) {
             return bv;
         }
         else {
             if (t1.isLiteral()) {
                 var bd = t1.datatype.uri.localeCompare(t2.datatype.uri);
-                if (bd != 0) {
+                if (bd !== 0) {
                     return bd;
                 }
                 else if (T("rdf:langString").equals(t1.datatype)) {
@@ -915,9 +914,9 @@ compareTerms = function (t1, t2) {
             }
         }
     }
-}
+};
 
-getLocalName = function (uri) {
+var getLocalName = function (uri) {
     // TODO: This is not the 100% correct local name algorithm
     var index = uri.lastIndexOf("#");
     if (index < 0) {
@@ -927,7 +926,7 @@ getLocalName = function (uri) {
         throw "Cannot get local name of " + uri;
     }
     return uri.substring(index + 1);
-}
+};
 
 
 // class NodeSet
@@ -935,19 +934,19 @@ getLocalName = function (uri) {
 
 var NodeSet = function () {
     this.values = [];
-}
+};
 
 NodeSet.prototype.add = function (node) {
     if (!this.contains(node)) {
         this.values.push(node);
     }
-}
+};
 
 NodeSet.prototype.addAll = function (nodes) {
     for (var i = 0; i < nodes.length; i++) {
         this.add(nodes[i]);
     }
-}
+};
 
 NodeSet.prototype.contains = function (node) {
     for (var i = 0; i < this.values.length; i++) {
@@ -956,21 +955,21 @@ NodeSet.prototype.contains = function (node) {
         }
     }
     return false;
-}
+};
 
 NodeSet.prototype.forEach = function (callback) {
     for (var i = 0; i < this.values.length; i++) {
         callback(this.values[i]);
     }
-}
+};
 
 NodeSet.prototype.size = function () {
     return this.values.length;
-}
+};
 
 NodeSet.prototype.toArray = function () {
     return this.values;
-}
+};
 
 NodeSet.prototype.toString = function () {
     var str = "NodeSet(" + this.size() + "): [";
@@ -982,18 +981,18 @@ NodeSet.prototype.toString = function () {
         str += arr[i];
     }
     return str + "]";
-}
+};
 
 
-function var2Attr(varName) {
-    if (!varName.indexOf("?") == 0) {
+var var2Attr = function(varName) {
+    if (!varName.indexOf("?") === 0) {
         throw "Variable name must start with ?";
     }
-    if (varName.length == 1) {
+    if (varName.length === 1) {
         throw "Variable name too short";
     }
     return varName.substring(1);
-}
+};
 
 
 
@@ -1001,7 +1000,7 @@ function var2Attr(varName) {
 // Adds all matches for a given subject and path combination into a given NodeSet.
 // This should really be doing lazy evaluation and only up to the point
 // where the match object is found.
-function addPathValues(graph, subject, path, set) {
+var addPathValues = function(graph, subject, path, set) {
     if (path.uri) {
         set.addAll(RDFQuery(graph).match(subject, path, "?object").getNodeArray("?object"));
     }
@@ -1044,9 +1043,9 @@ function addPathValues(graph, subject, path, set) {
     else {
         throw "Unsupported path object: " + path;
     }
-}
+};
 
-function walkPath(graph, subject, path, set, visited) {
+var walkPath = function(graph, subject, path, set, visited) {
     visited.add(subject);
     var s = new NodeSet();
     addPathValues(graph, subject, path, s);
@@ -1057,11 +1056,11 @@ function walkPath(graph, subject, path, set, visited) {
             walkPath(graph, a[i], path, set, visited);
         }
     }
-}
+};
 
 var RDFQueryUtil = function ($source) {
     this.source = $source;
-}
+};
 
 RDFQueryUtil.prototype.getInstancesOf = function ($class) {
     var set = new NodeSet();
@@ -1072,7 +1071,7 @@ RDFQueryUtil.prototype.getInstancesOf = function ($class) {
         set.addAll(RDFQuery(this.source).match("?instance", "rdf:type", car[i]).getNodeArray("?instance"));
     }
     return set;
-}
+};
 
 RDFQueryUtil.prototype.getObject = function ($subject, $predicate) {
     if (!$subject) {
@@ -1082,13 +1081,13 @@ RDFQueryUtil.prototype.getObject = function ($subject, $predicate) {
         throw "Missing predicate";
     }
     return RDFQuery(this.source).match($subject, $predicate, "?object").getNode("?object");
-}
+};
 
 RDFQueryUtil.prototype.getSubClassesOf = function ($class) {
     var set = new NodeSet();
     this.walkSubjects(set, $class, T("rdfs:subClassOf"));
     return set;
-}
+};
 
 RDFQueryUtil.prototype.isInstanceOf = function ($instance, $class) {
     var classes = this.getSubClassesOf($class);
@@ -1100,7 +1099,7 @@ RDFQueryUtil.prototype.isInstanceOf = function ($instance, $class) {
         }
     }
     return false;
-}
+};
 
 RDFQueryUtil.prototype.rdfListToArray = function ($rdfList) {
     if ($rdfList.elements != null) {
@@ -1113,7 +1112,7 @@ RDFQueryUtil.prototype.rdfListToArray = function ($rdfList) {
         }
         return array;
     }
-}
+};
 
 RDFQueryUtil.prototype.walkObjects = function ($results, $subject, $predicate) {
     var it = this.source.find($subject, $predicate, null);
@@ -1123,7 +1122,7 @@ RDFQueryUtil.prototype.walkObjects = function ($results, $subject, $predicate) {
             this.walkObjects($results, n.object, $predicate);
         }
     }
-}
+};
 
 RDFQueryUtil.prototype.walkSubjects = function ($results, $object, $predicate) {
     var it = this.source.find(null, $predicate, $object);
@@ -1133,7 +1132,7 @@ RDFQueryUtil.prototype.walkSubjects = function ($results, $object, $predicate) {
             this.walkSubjects($results, n.subject, $predicate);
         }
     }
-}
+};
 
 var toRDFQueryPath = function (shPath) {
     if (shPath.isURI()) {
@@ -1178,10 +1177,12 @@ var toRDFQueryPath = function (shPath) {
     throw "Unsupported SHACL path " + shPath;
     // TODO: implement conforming to AbstractQuery.path syntax
     return shPath;
-}
+};
 
 module.exports.TermFactory = TermFactory;
+module.exports.RDFQuery = RDFQuery;
 module.exports.NodeSet = NodeSet;
 module.exports.RDFQueryUtil = RDFQueryUtil;
 module.exports.toRDFQueryPath = toRDFQueryPath;
 module.exports.T = T;
+module.exports.getLocalName = getLocalName;
