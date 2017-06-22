@@ -30,10 +30,14 @@
 // (Note I am not particularly a JavaScript guru so the modularization of this
 // script may be improved to hide private members from public API etc).
 
+var common = require("./common");
+var $shapes = common.$shapes;
+var $data = common.$data;
+
 /*
 Example:
 
-	var result = $data.query().
+	var result = $data().query().
 		match("owl:Class", "rdfs:label", "?label").
 		match("?otherClass", "rdfs:label", "?label").
 		filter(function(sol) { return !T("owl:Class").equals(sol.otherClass) }).
@@ -1091,7 +1095,7 @@ RDFQueryUtil.prototype.getSubClassesOf = function ($class) {
 
 RDFQueryUtil.prototype.isInstanceOf = function ($instance, $class) {
     var classes = this.getSubClassesOf($class);
-    var types = $data.query().match($instance, "rdf:type", "?type");
+    var types = $data().query().match($instance, "rdf:type", "?type");
     for (var n = types.nextSolution(); n; n = types.nextSolution()) {
         if (n.type.equals($class) || classes.contains(n.type)) {
             types.close();
@@ -1139,8 +1143,8 @@ var toRDFQueryPath = function (shPath) {
         return shPath;
     }
     else if (shPath.isBlankNode()) {
-        var util = new RDFQueryUtil($shapes);
-        if ($shapes.query().getObject(shPath, "rdf:first")) {
+        var util = new RDFQueryUtil($shapes());
+        if ($shapes().query().getObject(shPath, "rdf:first")) {
             var paths = util.rdfListToArray(shPath);
             var result = [];
             for (var i = 0; i < paths.length; i++) {
@@ -1148,7 +1152,7 @@ var toRDFQueryPath = function (shPath) {
             }
             return result;
         }
-        var alternativePath = $shapes.query().getObject(shPath, "sh:alternativePath");
+        var alternativePath = $shapes().query().getObject(shPath, "sh:alternativePath");
         if (alternativePath) {
             var paths = util.rdfListToArray(alternativePath);
             var result = [];
@@ -1157,19 +1161,19 @@ var toRDFQueryPath = function (shPath) {
             }
             return { or: result };
         }
-        var zeroOrMorePath = $shapes.query().getObject(shPath, "sh:zeroOrMorePath");
+        var zeroOrMorePath = $shapes().query().getObject(shPath, "sh:zeroOrMorePath");
         if (zeroOrMorePath) {
             return { zeroOrMore: toRDFQueryPath(zeroOrMorePath) };
         }
-        var oneOrMorePath = $shapes.query().getObject(shPath, "sh:oneOrMorePath");
+        var oneOrMorePath = $shapes().query().getObject(shPath, "sh:oneOrMorePath");
         if (oneOrMorePath) {
             return { oneOrMore: toRDFQueryPath(oneOrMorePath) };
         }
-        var zeroOrOnePath = $shapes.query().getObject(shPath, "sh:zeroOrOnePath");
+        var zeroOrOnePath = $shapes().query().getObject(shPath, "sh:zeroOrOnePath");
         if (zeroOrOnePath) {
             return { zeroOrOne: toRDFQueryPath(zeroOrOnePath) };
         }
-        var inversePath = $shapes.query().getObject(shPath, "sh:inversePath");
+        var inversePath = $shapes().query().getObject(shPath, "sh:inversePath");
         if (inversePath) {
             return { inverse: toRDFQueryPath(inversePath) };
         }

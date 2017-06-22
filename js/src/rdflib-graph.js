@@ -1,4 +1,4 @@
-$rdf = require("rdflib");
+var $rdf = require("rdflib");
 var rdfquery = require("./rdfquery");
 var T = rdfquery.T;
 
@@ -21,7 +21,7 @@ Object.getPrototypeOf(exNamedNode).isURI = function () { return true };
 
 
 
-RDFLibGraph = function (store) {
+var RDFLibGraph = function (store) {
     this.store = store;
 };
 
@@ -35,7 +35,7 @@ RDFLibGraph.prototype.query = function () {
 
 
 
-RDFLibGraphIterator = function (store, s, p, o) {
+var RDFLibGraphIterator = function (store, s, p, o) {
     this.index = 0;
     this.ss = store.statementsMatching(s, p, o);
 };

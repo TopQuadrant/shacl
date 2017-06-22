@@ -18,12 +18,16 @@
 // to be created once per application.
 //
 // The validation process is started by creating a ValidationEngine that relies on
-// a given ShapesGraph and operates on the current $data.
+// a given ShapesGraph and operates on the current $data().
 // It basically walks through all Shapes that have target nodes and runs the validators
 // for each Constraint of the shape, producing results along the way.
 
 var rdfquery = require("./rdfquery");
 var T = rdfquery.T;
+
+var common = require("./common");
+var $shapes = common.$shapes;
+var $data = common.$data;
 
 
 rdfquery.TermFactory.registerNamespace("dash", "http://datashapes.org/dash#");
@@ -63,7 +67,7 @@ var Constraint = function(shape, component, paramValue) {
     var params = component.getParameters();
     for (var i = 0; i < params.length; i++) {
         var param = params[i];
-        var value = paramValue ? paramValue : rdfquery.RDFQuery($shapes).match(shape.shapeNode, param, "?value").getNode("?value");
+        var value = paramValue ? paramValue : rdfquery.RDFQuery($shapes()).match(shape.shapeNode, param, "?value").getNode("?value");
         if (value) {
             var localName = rdfquery.getLocalName(param.uri);
             parameterValues[localName] = value;
@@ -165,12 +169,12 @@ var ConstraintComponent = function(node) {
     var parameterNodes = [];
     var requiredParameters = [];
     var optionals = {};
-    $shapes.query().
+    $shapes().query().
         match(node, "sh:parameter", "?parameter").
         match("?parameter", "sh:path", "?path").forEach(function (sol) {
             parameters.push(sol.path);
             parameterNodes.push(sol.parameter);
-            if ($shapes.query().match(sol.parameter, "sh:optional", "true").hasSolution()) {
+            if ($shapes().query().match(sol.parameter, "sh:optional", "true").hasSolution()) {
                 optionals[sol.path.uri] = true;
             }
             else {
@@ -194,7 +198,7 @@ var ConstraintComponent = function(node) {
 };
 
 ConstraintComponent.prototype.findValidationFunction = function (predicate) {
-    var functionName = $shapes.query().
+    var functionName = $shapes().query().
         match(this.node, predicate, "?validator").
         match("?validator", "rdf:type", "sh:JSValidator").
         match("?validator", "sh:jsFunctionName", "?functionName").
@@ -215,7 +219,7 @@ ConstraintComponent.prototype.isComplete = function (shapeNode) {
     for (var i = 0; i < this.parameters.length; i++) {
         var parameter = this.parameters[i];
         if (!this.isOptional(parameter.uri)) {
-            if (!rdfquery.RDFQuery($shapes).match(shapeNode, parameter, null).hasSolution()) {
+            if (!rdfquery.RDFQuery($shapes()).match(shapeNode, parameter, null).hasSolution()) {
                 return false;
             }
         }
@@ -232,20 +236,20 @@ ConstraintComponent.prototype.isOptional = function (parameterURI) {
 
 var Shape = function(shapesGraph, shapeNode) {
 
-    this.severity = $shapes.query().match(shapeNode, "sh:severity", "?severity").getNode("?severity");
+    this.severity = $shapes().query().match(shapeNode, "sh:severity", "?severity").getNode("?severity");
     if (!this.severity) {
         this.severity = T("sh:Violation");
     }
 
-    this.deactivated = $shapes.query().match(shapeNode, "sh:deactivated", "true").hasSolution();
-    this.path = $shapes.query().match(shapeNode, "sh:path", "?path").getNode("?path");
+    this.deactivated = $shapes().query().match(shapeNode, "sh:deactivated", "true").hasSolution();
+    this.path = $shapes().query().match(shapeNode, "sh:path", "?path").getNode("?path");
     this.shapeNode = shapeNode;
     this.shapesGraph = shapesGraph;
     this.constraints = [];
 
     var handled = new rdfquery.NodeSet();
     var self = this;
-    rdfquery.RDFQuery($shapes).match(shapeNode, "?predicate", "?object").forEach(function (sol) {
+    rdfquery.RDFQuery($shapes()).match(shapeNode, "?predicate", "?object").forEach(function (sol) {
         var component = shapesGraph.getComponentWithParameter(sol.predicate);
         if (component && !handled.contains(component.node)) {
             var params = component.getParameters();
@@ -266,31 +270,31 @@ Shape.prototype.getConstraints = function () {
 
 Shape.prototype.getTargetNodes = function () {
     var results = new rdfquery.NodeSet();
-    var dataUtil = new rdfquery.RDFQueryUtil($data);
-    var shapesUtil = new rdfquery.RDFQueryUtil($shapes);
+    var dataUtil = new rdfquery.RDFQueryUtil($data());
+    var shapesUtil = new rdfquery.RDFQueryUtil($shapes());
 
     if (shapesUtil.isInstanceOf(this.shapeNode, T("rdfs:Class"))) {
         results.addAll(dataUtil.getInstancesOf(this.shapeNode).toArray());
     }
 
-    $shapes.query().
+    $shapes().query().
         match(this.shapeNode, "sh:targetClass", "?targetClass").forEachNode("?targetClass", function (targetClass) {
             results.addAll(dataUtil.getInstancesOf(targetClass).toArray());
         });
 
-    results.addAll($shapes.query().
+    results.addAll($shapes().query().
         match(this.shapeNode, "sh:targetNode", "?targetNode").getNodeArray("?targetNode"));
 
-    $shapes.query().
+    $shapes().query().
         match(this.shapeNode, "sh:targetSubjectsOf", "?subjectsOf").
         forEachNode("?subjectsOf", function (predicate) {
-            results.addAll(rdfquery.RDFQuery($data).match("?subject", predicate, null).getNodeArray("?subject"));
+            results.addAll(rdfquery.RDFQuery($data()).match("?subject", predicate, null).getNodeArray("?subject"));
         });
 
-    $shapes.query().
+    $shapes().query().
         match(this.shapeNode, "sh:targetObjectsOf", "?objectsOf").
         forEachNode("?objectsOf", function (predicate) {
-            results.addAll(rdfquery.RDFQuery($data).match(null, predicate, "?object").getNodeArray("?object"));
+            results.addAll(rdfquery.RDFQuery($data()).match(null, predicate, "?object").getNodeArray("?object"));
         });
 
     return results.toArray();
@@ -299,7 +303,7 @@ Shape.prototype.getTargetNodes = function () {
 
 Shape.prototype.getValueNodes = function (focusNode) {
     if (this.path) {
-        return $data.query().path(focusNode, rdfquery.toRDFQueryPath(this.path), "?object").getNodeArray("?object");
+        return $data().query().path(focusNode, rdfquery.toRDFQueryPath(this.path), "?object").getNodeArray("?object");
     }
     else {
         return [focusNode];
@@ -317,7 +321,7 @@ var ShapesGraph = function () {
 
     // Collect all defined constraint components
     var components = [];
-    new rdfquery.RDFQueryUtil($shapes).getInstancesOf(T("sh:ConstraintComponent")).forEach(function (node) {
+    new rdfquery.RDFQueryUtil($shapes()).getInstancesOf(T("sh:ConstraintComponent")).forEach(function (node) {
         if (!T("dash:ParameterConstraintComponent").equals(node)) {
             components.push(new ConstraintComponent(node));
         }
@@ -358,7 +362,7 @@ ShapesGraph.prototype.getShapeNodesWithConstraints = function () {
         for (var i = 0; i < this.components.length; i++) {
             var params = this.components[i].requiredParameters;
             for (var j = 0; j < params.length; j++) {
-                rdfquery.RDFQuery($shapes).match("?shape", params[j], null).addAllNodes("?shape", set);
+                rdfquery.RDFQuery($shapes()).match("?shape", params[j], null).addAllNodes("?shape", set);
             }
         }
         this.shapeNodesWithConstraints = set.toArray();
@@ -371,15 +375,15 @@ ShapesGraph.prototype.getShapesWithTarget = function () {
     if (!this.targetShapes) {
         this.targetShapes = [];
         var cs = this.getShapeNodesWithConstraints();
-        var util = new rdfquery.RDFQueryUtil($shapes);
+        var util = new rdfquery.RDFQueryUtil($shapes());
         for (var i = 0; i < cs.length; i++) {
             var shapeNode = cs[i];
             if (util.isInstanceOf(shapeNode, T("rdfs:Class")) ||
-                rdfquery.RDFQuery($shapes).match(shapeNode, "sh:targetClass", null).hasSolution() ||
-                rdfquery.RDFQuery($shapes).match(shapeNode, "sh:targetNode", null).hasSolution() ||
-                rdfquery.RDFQuery($shapes).match(shapeNode, "sh:targetSubjectsOf", null).hasSolution() ||
-                rdfquery.RDFQuery($shapes).match(shapeNode, "sh:targetObjectsOf", null).hasSolution() ||
-                rdfquery.RDFQuery($shapes).match(shapeNode, "sh:target", null).hasSolution()) {
+                rdfquery.RDFQuery($shapes()).match(shapeNode, "sh:targetClass", null).hasSolution() ||
+                rdfquery.RDFQuery($shapes()).match(shapeNode, "sh:targetNode", null).hasSolution() ||
+                rdfquery.RDFQuery($shapes()).match(shapeNode, "sh:targetSubjectsOf", null).hasSolution() ||
+                rdfquery.RDFQuery($shapes()).match(shapeNode, "sh:targetObjectsOf", null).hasSolution() ||
+                rdfquery.RDFQuery($shapes()).match(shapeNode, "sh:target", null).hasSolution()) {
                 this.targetShapes.push(this.getShape(shapeNode));
             }
         }

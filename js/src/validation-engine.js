@@ -1,5 +1,6 @@
 var rdfquery = require("./rdfquery");
 var T = rdfquery.T;
+var $shapes = require("./common").$shapes;
 
 var nodeLabel = function (node, store) {
     if (node.isURI()) {
@@ -108,7 +109,7 @@ ValidationEngine.prototype.createResultFromObject = function (obj, constraint, f
  * Creates a result message from the result and the message pattern in the constraint
  */
 ValidationEngine.prototype.createResultMessages = function (result, constraint) {
-    var ms = $shapes.query()
+    var ms = $shapes().query()
         .match(constraint.shape.shapeNode, "sh:message", "?message")
         .getNodeArray("?message");
     if (ms.length === 0) {
@@ -116,13 +117,13 @@ ValidationEngine.prototype.createResultMessages = function (result, constraint) 
             constraint.component.propertyValidationFunctionGeneric :
             constraint.component.nodeValidationFunctionGeneric;
         var predicate = generic ? T("sh:validator") : (constraint.shape.isPropertyShape() ? T("sh:propertyValidator") : T("sh:nodeValidator"));
-        ms = $shapes.query()
+        ms = $shapes().query()
             .match(constraint.component.node, predicate, "?validator")
             .match("?validator", "sh:message", "?message")
             .getNodeArray("?message");
     }
     if (ms.length === 0) {
-        ms = $shapes.query()
+        ms = $shapes().query()
             .match(constraint.component.node, "sh:message", "?message")
             .getNodeArray("?message");
     }

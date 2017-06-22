@@ -8,6 +8,10 @@ var rdfquery = require("./rdfquery");
 var T = rdfquery.T;
 var validator = require("./shacl-validator");
 
+var common = require("./common");
+var $shapes = common.$shapes;
+var $data = common.$data;
+
 var XSDIntegerTypes = new rdfquery.NodeSet();
 XSDIntegerTypes.add(T("xsd:integer"));
 
@@ -17,7 +21,7 @@ XSDDecimalTypes.add(T("xsd:decimal"));
 XSDDecimalTypes.add(T("xsd:float"));
 
 var validateAnd = function ($value, $and) {
-    var shapes = new rdfquery.RDFQueryUtil($shapes).rdfListToArray($and);
+    var shapes = new rdfquery.RDFQueryUtil($shapes()).rdfListToArray($and);
     for (var i = 0; i < shapes.length; i++) {
         if (!validator.SHACL.nodeConformsToShape($value, shapes[i])) {
             return false;
@@ -27,23 +31,23 @@ var validateAnd = function ($value, $and) {
 };
 
 var validateClass = function ($value, $class) {
-    return new rdfquery.RDFQueryUtil($data).isInstanceOf($value, $class);
+    return new rdfquery.RDFQueryUtil($data()).isInstanceOf($value, $class);
 };
 
 var validateClosed = function ($value, $closed, $ignoredProperties, $currentShape) {
     if (!T("true").equals($closed)) {
         return;
     }
-    var allowed = $shapes.query().
+    var allowed = $shapes().query().
         match($currentShape, "sh:property", "?propertyShape").
         match("?propertyShape", "sh:path", "?path").
         filter(function (solution) { return solution.path.isURI() }).
         getNodeSet("?path");
     if ($ignoredProperties) {
-        allowed.addAll(new rdfquery.RDFQueryUtil($shapes).rdfListToArray($ignoredProperties));
+        allowed.addAll(new rdfquery.RDFQueryUtil($shapes()).rdfListToArray($ignoredProperties));
     }
     var results = [];
-    $data.query().
+    $data().query().
         match($value, "?predicate", "?object").
         filter(function (sol) { return !allowed.contains(sol.predicate) }).
         forEach(function (sol) {
@@ -61,17 +65,17 @@ var validateClosedByTypesNode = function ($this, $closedByTypes) {
     }
     var results = [];
     var allowedProperties = new rdfquery.NodeSet();
-    $data.query().
+    $data().query().
         match($this, "rdf:type", "?directType").
         path("?directType", { zeroOrMore: T("rdfs:subClassOf") }, "?type").
         forEachNode("?type", function (type) {
-            $shapes.query().
+            $shapes().query().
                 match(type, "sh:property", "?pshape").
                 match("?pshape", "sh:path", "?path").
                 filter(function (sol) { return sol.path.isURI() }).
                 addAllNodes("?path", allowedProperties);
         });
-    $data.query().
+    $data().query().
         match($this, "?predicate", "?object").
         filter(function (sol) { return !T("rdf:type").equals(sol.predicate) }).
         filter(function (sol) { return !allowedProperties.contains(sol.predicate) }).
@@ -94,23 +98,23 @@ var validateDatatype = function ($value, $datatype) {
 };
 
 var validateDisjoint = function ($this, $value, $disjoint) {
-    return !$data.query().match($this, $disjoint, $value).hasSolution();
+    return !$data().query().match($this, $disjoint, $value).hasSolution();
 };
 
 var validateEqualsProperty = function ($this, $path, $equals) {
     var results = [];
     var path = rdfquery.toRDFQueryPath($path);
-    $data.query().path($this, path, "?value").forEach(
+    $data().query().path($this, path, "?value").forEach(
         function (solution) {
-            if (!$data.query().match($this, $equals, solution.value).hasSolution()) {
+            if (!$data().query().match($this, $equals, solution.value).hasSolution()) {
                 results.push({
                     value: solution.value
                 });
             }
         });
-    $data.query().match($this, $equals, "?value").forEach(
+    $data().query().match($this, $equals, "?value").forEach(
         function (solution) {
-            if (!$data.query().path($this, path, solution.value).hasSolution()) {
+            if (!$data().query().path($this, path, solution.value).hasSolution()) {
                 results.push({
                     value: solution.value
                 });
@@ -124,13 +128,13 @@ var validateHasValueNode = function ($this, $hasValue) {
 };
 
 var validateHasValueProperty = function ($this, $path, $hasValue) {
-    var count = $data.query().path($this, rdfquery.toRDFQueryPath($path), $hasValue).getCount();
+    var count = $data().query().path($this, rdfquery.toRDFQueryPath($path), $hasValue).getCount();
     return count > 0;
 };
 
 var validateIn = function ($value, $in) {
     var set = new rdfquery.NodeSet();
-    set.addAll(new rdfquery.RDFQueryUtil($shapes).rdfListToArray($in));
+    set.addAll(new rdfquery.RDFQueryUtil($shapes()).rdfListToArray($in));
     return set.contains($value);
 }
 
@@ -142,7 +146,7 @@ var validateLanguageIn = function ($value, $languageIn) {
     if (!lang || lang === "") {
         return false;
     }
-    var ls = new rdfquery.RDFQueryUtil($shapes).rdfListToArray($languageIn);
+    var ls = new rdfquery.RDFQueryUtil($shapes()).rdfListToArray($languageIn);
     for (var i = 0; i < ls.length; i++) {
         if (lang.startsWith(ls[i].lex)) {
             return true;
@@ -153,7 +157,7 @@ var validateLanguageIn = function ($value, $languageIn) {
 
 var validateLessThanProperty = function ($this, $path, $lessThan) {
     var results = [];
-    $data.query().
+    $data().query().
         path($this, rdfquery.toRDFQueryPath($path), "?value").
         match($this, $lessThan, "?otherValue").
         forEach(function (sol) {
@@ -169,7 +173,7 @@ var validateLessThanProperty = function ($this, $path, $lessThan) {
 
 var validateLessThanOrEqualsProperty = function ($this, $path, $lessThanOrEquals) {
     var results = [];
-    $data.query().
+    $data().query().
         path($this, rdfquery.toRDFQueryPath($path), "?value").
         match($this, $lessThanOrEquals, "?otherValue").
         forEach(function (sol) {
@@ -184,7 +188,7 @@ var validateLessThanOrEqualsProperty = function ($this, $path, $lessThanOrEquals
 }
 
 var validateMaxCountProperty = function ($this, $path, $maxCount) {
-    var count = $data.query().path($this, rdfquery.toRDFQueryPath($path), "?any").getCount();
+    var count = $data().query().path($this, rdfquery.toRDFQueryPath($path), "?any").getCount();
     return count <= Number($maxCount.value);
 }
 
@@ -204,7 +208,7 @@ var validateMaxLength = function ($value, $maxLength) {
 }
 
 var validateMinCountProperty = function ($this, $path, $minCount) {
-    var count = $data.query().path($this, rdfquery.toRDFQueryPath($path), "?any").getCount();
+    var count = $data().query().path($this, rdfquery.toRDFQueryPath($path), "?any").getCount();
     return count >= Number($minCount.value);
 }
 
@@ -248,7 +252,7 @@ var validateNode = function ($value, $node) {
 
 var validateNonRecursiveProperty = function ($this, $path, $nonRecursive) {
     if (T("true").equals($nonRecursive)) {
-        if ($data.query().path($this, rdfquery.toRDFQueryPath($path), $this).hasSolution()) {
+        if ($data().query().path($this, rdfquery.toRDFQueryPath($path), $this).hasSolution()) {
             return {
                 path: $path,
                 value: $this
@@ -262,7 +266,7 @@ var validateNot = function ($value, $not) {
 }
 
 var validateOr = function ($value, $or) {
-    var shapes = new rdfquery.RDFQueryUtil($shapes).rdfListToArray($or);
+    var shapes = new rdfquery.RDFQueryUtil($shapes()).rdfListToArray($or);
     for (var i = 0; i < shapes.length; i++) {
         if (validator.SHACL.nodeConformsToShape($value, shapes[i])) {
             return true;
@@ -283,10 +287,10 @@ var validatePrimaryKeyProperty = function ($this, $path, $uriStart) {
     if (!$this.isURI()) {
         return "Must be an IRI";
     }
-    if ($data.query().path($this, rdfquery.toRDFQueryPath($path), null).getCount() != 1) {
+    if ($data().query().path($this, rdfquery.toRDFQueryPath($path), null).getCount() != 1) {
         return "Must have exactly one value";
     }
-    var value = $data.query().path($this, rdfquery.toRDFQueryPath($path), "?value").getNode("?value");
+    var value = $data().query().path($this, rdfquery.toRDFQueryPath($path), "?value").getNode("?value");
     var uri = $uriStart.lex + encodeURIComponent(value.value);
     if (!$this.uri.equals(uri)) {
         return "Does not have URI " + uri;
@@ -306,14 +310,14 @@ var validateQualifiedMinCountProperty = function ($this, $path, $qualifiedValueS
 var validateQualifiedHelper = function ($this, $path, $qualifiedValueShape, $qualifiedValueShapesDisjoint, $currentShape) {
     var siblingShapes = new rdfquery.NodeSet();
     if (T("true").equals($qualifiedValueShapesDisjoint)) {
-        $shapes.query().
+        $shapes().query().
             match("?parentShape", "sh:property", $currentShape).
             match("?parentShape", "sh:property", "?sibling").
             match("?sibling", "sh:qualifiedValueShape", "?siblingShape").
             filter(exprNotEquals("?siblingShape", $qualifiedValueShape)).
             addAllNodes("?siblingShape", siblingShapes);
     }
-    return $data.query().
+    return $data().query().
         path($this, rdfquery.toRDFQueryPath($path), "?value").
         filter(function (sol) {
             return validator.SHACL.nodeConformsToShape(sol.value, $qualifiedValueShape) &&
@@ -332,7 +336,7 @@ var validateQualifiedConformsToASibling = function (value, siblingShapes) {
 }
 
 var validateRootClass = function ($value, $rootClass) {
-    return $data.query().path($value, { zeroOrMore: T("rdfs:subClassOf") }, $rootClass).hasSolution();
+    return $data().query().path($value, { zeroOrMore: T("rdfs:subClassOf") }, $rootClass).hasSolution();
 }
 
 var validateStem = function ($value, $stem) {
@@ -340,7 +344,7 @@ var validateStem = function ($value, $stem) {
 }
 
 var validateSubSetOf = function ($this, $subSetOf, $value) {
-    return $data.query().match($this, $subSetOf, $value).hasSolution();
+    return $data().query().match($this, $subSetOf, $value).hasSolution();
 }
 
 var validateUniqueLangProperty = function ($this, $uniqueLang, $path) {
@@ -348,7 +352,7 @@ var validateUniqueLangProperty = function ($this, $uniqueLang, $path) {
         return;
     }
     var map = {};
-    $data.query().path($this, rdfquery.toRDFQueryPath($path), "?value").forEach(function (sol) {
+    $data().query().path($this, rdfquery.toRDFQueryPath($path), "?value").forEach(function (sol) {
         var lang = sol.value.language;
         if (lang && lang != "") {
             var old = map[lang];
@@ -373,7 +377,7 @@ var validateUniqueLangProperty = function ($this, $uniqueLang, $path) {
 }
 
 var validateXone = function ($value, $xone) {
-    var shapes = new rdfquery.RDFQueryUtil($shapes).rdfListToArray($xone);
+    var shapes = new rdfquery.RDFQueryUtil($shapes()).rdfListToArray($xone);
     var count = 0;
     for (var i = 0; i < shapes.length; i++) {
         if (validator.SHACL.nodeConformsToShape($value, shapes[i])) {
