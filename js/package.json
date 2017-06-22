@@ -1,0 +1,17 @@
+{
+  "name": "shacl",
+  "version": "0.0.2",
+  "description": "RAML Shapes Validator",
+  "main": "shapes.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "rdflib": "^0.15.0"
+  },
+  "devDependencies": {
+    "nodeunit": "^0.11.1"
+  }
+}
