@@ -237,6 +237,26 @@ examples.peopleJSON.shapes = examples.peopleTTL.shapes;
 
 exports.test1 = function(test) {
     validation.validate(
+        examples.example1.data,
+        examples.example1.dataFormat,
+        examples.example1.shapes,
+        examples.example1.shapesFormat,
+        function (e, report) {
+            test.ok(!report.conforms());
+            var results =  report.results();
+            test.ok(results.length === 1);
+            test.ok(results[0].message() === "Less than 1 values");
+            test.ok(results[0].path() === "http://raml.org/vocabularies/shapes/anon#surname");
+            test.ok(results[0].focusNode() !== null);
+            test.ok(results[0].severity() === "Violation");
+            test.ok(results[0].sourceConstraintComponent() === "http://www.w3.org/ns/shacl#MinCountConstraintComponent");
+            test.ok(results[0].sourceShape() === "http://raml.org/vocabularies/data#AnonShape/property/surname");
+            test.done();
+        });
+};
+
+exports.test2 = function(test) {
+    validation.validate(
         examples.example2.data,
         examples.example2.dataFormat,
         examples.example2.shapes,
