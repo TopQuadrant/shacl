@@ -2,6 +2,9 @@ var $rdf = require("rdflib");
 var rdfquery = require("./rdfquery");
 var T = rdfquery.T;
 
+var errorHandler = require("debug")("rdflib-graph::error");
+
+
 // Monkey Patching rdflib, Literals, BlankNodes and NamedNodes
 var exLiteral = $rdf.literal("a", "de");
 Object.defineProperty(Object.getPrototypeOf(exLiteral), "lex", { get: function () { return this.value } });
@@ -81,14 +84,10 @@ function postProcessGraph(store, graphURI, newStore) {
     }
 }
 
-var defaultHandleError = function (ex) {
-    console.log("ERROR " + ex);
-    console.log(ex);
-};
 
 var loadGraph = function(str, store, graphURI, mimeType, andThen, handleError) {
     var newStore = $rdf.graph();
-    handleError = handleError || defaultHandleError;
+    handleError = handleError || errorHandler;
     if (mimeType === "application/ld+json") {
         var error = false;
         $rdf.parse(str, newStore, graphURI, mimeType, function (err, kb) {

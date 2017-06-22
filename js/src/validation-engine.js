@@ -155,7 +155,6 @@ ValidationEngine.prototype.validateAll = function () {
  * Returns true if any violation has been found
  */
 ValidationEngine.prototype.validateNodeAgainstShape = function (focusNode, shape) {
-    console.log("VALIDATING AGAINST SHAPE");
     if (shape.deactivated) {
         return false;
     }
@@ -170,7 +169,6 @@ ValidationEngine.prototype.validateNodeAgainstShape = function (focusNode, shape
 };
 
 ValidationEngine.prototype.validateNodeAgainstConstraint = function (focusNode, valueNodes, constraint) {
-    console.log("VALIDATING AGAINST CONSTRAINT");
     if (T("sh:PropertyConstraintComponent").equals(constraint.component.node)) {
         for (var i = 0; i < valueNodes.length; i++) {
             if (this.validateNodeAgainstShape(valueNodes[i], this.shapesGraph.getShape(constraint.paramValue))) {

@@ -6,14 +6,11 @@ var jsonld = require("jsonld");
 var rdfquery = require("./src/rdfquery");
 var T = rdfquery.T;
 var validator = require("./src/shacl-validator");
+var ValidationFunction = require("./src/validation-function");
 var ValidationEngine = require("./src/validation-engine");
 var ValidationReport = require("./src/validation-report");
 var debug = require("debug")("index");
 var error = require("debug")("index::error");
-
-// invoking this just for the side effects.
-// It will trigger the registration of DASH functions
-require("./src/dash");
 
 var $rdf = require("rdflib");
 var rdflibgraph = require("./src/rdflib-graph");
@@ -24,6 +21,12 @@ var common = require("./src/common");
 var $shapes = common.$shapes;
 $shapes(new RDFLibGraph(shapesStore));
 var $data = common.$data;
+
+// invoking this just for the side effects.
+// It will trigger the registration of DASH functions
+var registerDASH = require("./src/dash").registerDASH;
+// registering DASH
+registerDASH(ValidationFunction.functionRegistry, common);
 
 /********************************/
 /* Vocabularies                 */
