@@ -5,8 +5,7 @@
 var jsonld = require("jsonld");
 var rdfquery = require("./src/rdfquery");
 var T = rdfquery.T;
-var validator = require("./src/shacl-validator");
-var ValidationFunction = require("./src/validation-function");
+var ShapesGraph = require("./src/shapes-graph");
 var ValidationEngine = require("./src/validation-engine");
 var ValidationReport = require("./src/validation-report");
 var debug = require("debug")("index");
@@ -15,28 +14,20 @@ var error = require("debug")("index::error");
 var $rdf = require("rdflib");
 var rdflibgraph = require("./src/rdflib-graph");
 var RDFLibGraph = rdflibgraph.RDFLibGraph;
-var shapesStore = $rdf.graph();
 
-var common = require("./src/common");
-var $shapes = common.$shapes;
-$shapes(new RDFLibGraph(shapesStore));
-var $data = common.$data;
 
-// invoking this just for the side effects.
-// It will trigger the registration of DASH functions
-var registerDASH = require("./src/dash").registerDASH;
-// registering DASH
-registerDASH(ValidationFunction.functionRegistry, common);
 
 /********************************/
 /* Vocabularies                 */
 /********************************/
 var vocabs = require("./src/vocabularies");
 var shapesGraphURI = "urn:x-shacl:shapesGraph";
+var dataGraphURI = "urn:x-shacl:dataGraph";
 var shaclFile = vocabs.shacl;
 var dashFile = vocabs.dash;
 /********************************/
 /********************************/
+
 
 // List utility
 
@@ -52,21 +43,37 @@ var createRDFListNode = function(store, items, index) {
     }
 };
 
+
+/**
+ * SHACL Validator.
+ * Main interface with the library
+ */
+var SHACLValidator = function() {
+    this.functionRegistry = {};
+    // invoking this just for the side effects.
+    // It will trigger the registration of DASH functions
+    require("./src/dash").registerDASH(this);
+
+    this.results = null;
+    this.dataStore = $rdf.graph();
+    this.rdfData = new RDFLibGraph(this.dataStore);
+    this.rdfShapes = new RDFLibGraph($rdf.graph());
+    this.validationEngine = null;
+    this.validationError = null;
+    this.sequence = null;
+    this.shapesGraph = new ShapesGraph(this);
+};
+
+
+
 // Data graph and Shapes graph logic
 
-var results = null;
-var dataStore = $rdf.graph();
-var validationEngine = null;
-var validationError = null;
-var sequence = null;
-var shapesGraph = new validator.ShapesGraph();
 
-var parseDataGraph = function(text, mediaType, andThen) {
-    var dataGraphURI = "urn:x-shacl:dataGraph";
-    var newStore = $rdf.graph();
-    rdflibgraph.loadGraph(text, newStore, dataGraphURI, mediaType, function () {
-        dataStore = newStore;
-        $data(new RDFLibGraph(dataStore));
+SHACLValidator.prototype.parseDataGraph = function(text, mediaType, andThen) {
+    this.dataStore = $rdf.graph();
+    var that = this;
+    rdflibgraph.loadGraph(text, this.dataStore, dataGraphURI, mediaType, function () {
+        that.rdfData = new RDFLibGraph(that.dataStore);
         andThen();
     }, function (ex) {
         error(ex);
@@ -76,40 +83,41 @@ var parseDataGraph = function(text, mediaType, andThen) {
 /**
  * Validates the data graph against the shapes graph using the validation engine
  */
-var updateValidationEngine = function() {
+SHACLValidator.prototype.updateValidationEngine = function() {
     results = [];
-    validationEngine = new ValidationEngine(shapesGraph, shapesStore);
+    this.validationEngine = new ValidationEngine(this);
     try {
-        validationError = null;
-        if (sequence) {
-            sequence = [];
+        this.validationError = null;
+        if (this.sequence) {
+            this.sequence = [];
         }
-        validationEngine.validateAll();
+        this.validationEngine.validateAll(this.rdfData);
     }
     catch (ex) {
-        validationError = ex;
+        this.validationError = ex;
     }
 };
 
 /**
  * Checks for a validation error or results in the validation
- * engine to buid the RDF graph with the validation report
-  */
-var showValidationResults = function(cb) {
-    if (validationError) {
-        error("VALIDATION FAILURE: " + validationError);
-        throw (validationError);
+ * engine to build the RDF graph with the validation report.
+ * It returns a ValidationReport object wrapping the RDF graph
+ */
+SHACLValidator.prototype.showValidationResults = function(cb) {
+    if (this.validationError) {
+        error("Validation Failure: " + this.validationError);
+        throw (this.validationError);
     }
     else {
 
         var resultGraph = $rdf.graph();
         var reportNode = rdfquery.TermFactory.blankNode("report");
         resultGraph.add(reportNode, T("rdf:type"), T("sh:ValidationReport"));
-        resultGraph.add(reportNode, T("sh:conforms"), T("" + (validationEngine.results.length == 0)));
+        resultGraph.add(reportNode, T("sh:conforms"), T("" + (this.validationEngine.results.length == 0)));
         var nodes = {};
 
-        for (var i = 0; i < validationEngine.results.length; i++) {
-            var result = validationEngine.results[i];
+        for (var i = 0; i < this.validationEngine.results.length; i++) {
+            var result = this.validationEngine.results[i];
             if (nodes[result[0].toString()] == null) {
                 nodes[result[0].toString()] = true;
                 resultGraph.add(reportNode, T("sh:result"), result[0]);
@@ -146,50 +154,60 @@ var showValidationResults = function(cb) {
  * Reloads the shapes graph.
  * It will load SHACL and DASH shapes constraints.
  */
-var parseShapesGraph = function(text, mediaType, andThen) {
+SHACLValidator.prototype.parseShapesGraph = function(text, mediaType, andThen) {
     var handleError = function (ex) {
         error(ex);
     };
-    var newShapesStore = $rdf.graph();
-    rdflibgraph.loadGraph(text, newShapesStore, shapesGraphURI, mediaType, function () {
-        rdflibgraph.loadGraph(shaclFile, newShapesStore, "http://shacl.org", "text/turtle", function () {
-            rdflibgraph.loadGraph(dashFile, newShapesStore, "http://datashapes.org/dash", "text/turtle", function () {
-                shapesStore = newShapesStore;
-                $shapes(new RDFLibGraph(shapesStore));
+    this.shapesStore = $rdf.graph();
+    var that = this;
+    rdflibgraph.loadGraph(text, this.shapesStore, shapesGraphURI, mediaType, function () {
+        rdflibgraph.loadGraph(shaclFile, that.shapesStore, "http://shacl.org", "text/turtle", function () {
+            rdflibgraph.loadGraph(dashFile, that.shapesStore, "http://datashapes.org/dash", "text/turtle", function () {
+                that.rdfShapes = new RDFLibGraph(that.shapesStore);
                 andThen();
             });
         }, handleError);
     }, handleError);
 };
 
+
 // Update validations
 
-var updateDataGraph = function(text, mediaType, cb) {
+/**
+ * Updates the data graph and validate it against the current data shapes
+ */
+SHACLValidator.prototype.updateDataGraph = function(text, mediaType, cb) {
     var startTime = new Date().getTime();
-    parseDataGraph(text, mediaType, function () {
+    var that = this;
+    this.parseDataGraph(text, mediaType, function () {
         var midTime = new Date().getTime();
-        updateValidationEngine();
+        that.updateValidationEngine();
         var endTime = new Date().getTime();
         debug("Parsing took " + (midTime - startTime) + " ms. Validating the data took " + (endTime - midTime) + " ms.");
         try {
-            showValidationResults(cb);
+            that.showValidationResults(cb);
         } catch (e) {
             cb(e, null);
         }
     });
 };
 
-var updateShapesGraph = function(shapes, mediaType, cb) {
+/**
+ *  *pdates the shapes graph and validates it against the current data graph
+ */
+SHACLValidator.prototype.updateShapesGraph = function(shapes, mediaType, cb) {
     var startTime = new Date().getTime();
-    parseShapesGraph(shapes, mediaType, function () {
+    var that = this;
+    this.parseShapesGraph(shapes, mediaType, function () {
         var midTime = new Date().getTime();
-        shapesGraph = new validator.ShapesGraph();
+        that.shapesGraph = new ShapesGraph(that);
         var midTime2 = new Date().getTime();
-        updateValidationEngine();
+        that.updateValidationEngine();
         var endTime = new Date().getTime();
-        debug("Parsing took " + (midTime - startTime) + " ms. Preparing the shapes took " + (midTime2 - midTime) + " ms. Validation the data took " + (endTime - midTime2) + " ms.");
+        debug("Parsing took " + (midTime - startTime) + " ms. Preparing the shapes took " + (midTime2 - midTime)
+            + " ms. Validation the data took " + (endTime - midTime2) + " ms.");
         try {
-            showValidationResults(cb);
+            that.showValidationResults(cb);
         } catch (e) {
             cb(e, null);
         }
@@ -199,12 +217,13 @@ var updateShapesGraph = function(shapes, mediaType, cb) {
 /**
  * Validates the provided data graph against the provided shapes graph
  */
-module.exports.validate = function (data, dataMediaType, shapes, shapesMediaType, cb) {
-    updateDataGraph(data, dataMediaType, function (e) {
+SHACLValidator.prototype.validate = function (data, dataMediaType, shapes, shapesMediaType, cb) {
+    var that = this;
+    this.updateDataGraph(data, dataMediaType, function (e) {
         if (e != null) {
             cb(e, null);
         } else {
-            updateShapesGraph(shapes, shapesMediaType, function (e, result) {
+            that.updateShapesGraph(shapes, shapesMediaType, function (e, result) {
                 if (e) {
                     cb(e, null);
                 } else {
@@ -214,3 +233,5 @@ module.exports.validate = function (data, dataMediaType, shapes, shapesMediaType
         }
     });
 };
+
+module.exports = SHACLValidator;

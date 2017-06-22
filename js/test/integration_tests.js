@@ -1,4 +1,4 @@
-var validation = require("../index");
+var SHACLValidator = require("../index");
 
 /********************************/
 /* Examples                     */
@@ -236,12 +236,16 @@ schema:AddressShape\n\
 examples.peopleJSON.shapes = examples.peopleTTL.shapes;
 
 exports.test1 = function(test) {
-    validation.validate(
+    new SHACLValidator().validate(
         examples.example1.data,
         examples.example1.dataFormat,
         examples.example1.shapes,
         examples.example1.shapesFormat,
         function (e, report) {
+            if (e != null) {
+                console.log(e);
+            }
+            test.ok(e == null);
             test.ok(!report.conforms());
             var results =  report.results();
             test.ok(results.length === 1);
@@ -256,12 +260,16 @@ exports.test1 = function(test) {
 };
 
 exports.test2 = function(test) {
-    validation.validate(
+    new SHACLValidator().validate(
         examples.example2.data,
         examples.example2.dataFormat,
         examples.example2.shapes,
         examples.example2.shapesFormat,
         function (e, report) {
+            if (e != null) {
+                console.log(e);
+            }
+            test.ok(e == null);
             test.ok(!report.conforms());
             var results =  report.results();
             test.ok(results.length === 1);

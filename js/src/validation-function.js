@@ -7,10 +7,10 @@ var debug = require("debug")("validation-function");
 var globalObject = typeof(window) != null ? window : global;
 
 
-var ValidationFunction = function (functionName, parameters) {
+var ValidationFunction = function (functionName, parameters, functionRegistry) {
 
     this.funcName = functionName;
-    this.func = ValidationFunction.functionRegistry[functionName];
+    this.func = functionRegistry[functionName];
     if (!this.func) {
         throw "Cannot find validator function " + functionName;
     }
@@ -40,8 +40,6 @@ var ValidationFunction = function (functionName, parameters) {
         }
     }
 };
-
-ValidationFunction.functionRegistry = {};
 
 ValidationFunction.prototype.doExecute = function (args) {
     return this.func.apply(globalObject, args);
