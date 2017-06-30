@@ -118,7 +118,7 @@ public class TestDASHTestCases {
 			if(message == null) {
 				message = "(No " + SH.PREFIX + ":" + SH.resultMessage.getLocalName() + " found in failure)";
 			}
-			Assert.fail(message);
+			Assert.fail(testCase.getResource() + ": " + message);
 		}
 	}
 }

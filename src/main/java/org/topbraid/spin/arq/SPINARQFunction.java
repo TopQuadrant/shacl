@@ -44,6 +44,7 @@ import org.topbraid.spin.statistics.SPINStatisticsManager;
 import org.topbraid.spin.system.SPINArgumentChecker;
 import org.topbraid.spin.util.JenaDatatypes;
 import org.topbraid.spin.util.JenaUtil;
+import org.topbraid.spin.util.OntologyOptimizations;
 import org.topbraid.spin.vocabulary.SPIN;
 
 
@@ -63,6 +64,8 @@ public class SPINARQFunction implements org.apache.jena.sparql.function.Function
 	
 	private boolean cachable;
 	
+	private boolean cachableForOntologies;
+	
 	private List<Boolean> optional = new LinkedList<Boolean>();
 	
 	private String queryString;
@@ -81,6 +84,7 @@ public class SPINARQFunction implements org.apache.jena.sparql.function.Function
 		this.spinFunction = spinFunction;
 		
 		this.cachable = spinFunction.hasProperty(SPIN.cachable, JenaDatatypes.TRUE);
+		this.cachableForOntologies = spinFunction.hasProperty(SPIN.cachableForOntologies, JenaDatatypes.TRUE);
 		
 		try {
 			Query spinQuery = (Query) spinFunction.getBody();
@@ -126,6 +130,11 @@ public class SPINARQFunction implements org.apache.jena.sparql.function.Function
     public NodeValue exec(Binding binding, ExprList args, String uri, FunctionEnv env) {
 		
 		Graph activeGraph = env.getActiveGraph();
+		String optimizedKey = null;
+		if(cachableForOntologies) {
+			optimizedKey = OntologyOptimizations.get().getKeyIfEnabledFor(activeGraph);
+		}
+
 		Model model = activeGraph != null ? 
 				ModelFactory.createModelForGraph(activeGraph) :
 				ModelFactory.createDefaultModel();
@@ -136,7 +145,7 @@ public class SPINARQFunction implements org.apache.jena.sparql.function.Function
 			bindings.add(SPIN.THIS_VAR_NAME, model.asRDFNode(t));
 		}
 		Node[] argsForCache;
-		if(cachable) {
+		if(cachable || optimizedKey != null) {
 			argsForCache = new Node[args.size()];
 		}
 		else {
@@ -155,7 +164,7 @@ public class SPINARQFunction implements org.apache.jena.sparql.function.Function
 	        			argName = "arg" + (i + 1);
 	        		}
 	        		bindings.add(argName, model.asRDFNode(x.asNode()));
-	        		if(cachable) {
+	        		if(cachable || optimizedKey != null) {
 	        			argsForCache[i] = x.asNode();
 	        		}
 	        	}
@@ -198,6 +207,10 @@ public class SPINARQFunction implements org.apache.jena.sparql.function.Function
 				if(cachable) {
 					result = SPINFunctionsCache.get().execute(this, dataset, model, bindings, argsForCache);
 				}
+				else if(optimizedKey != null) {
+					SPINFunctionsCache cache = OntologyOptimizations.get().getSPINFunctionsCache(optimizedKey);
+					result = cache.execute(this, dataset, model, bindings, argsForCache);
+				}
 				else {
 					result = executeBody(dataset, model, bindings);
 				}
@@ -219,6 +232,10 @@ public class SPINARQFunction implements org.apache.jena.sparql.function.Function
 		else {
 			if(cachable) {
 				return SPINFunctionsCache.get().execute(this, dataset, model, bindings, argsForCache);
+			}
+			else if(optimizedKey != null) {
+				SPINFunctionsCache cache = OntologyOptimizations.get().getSPINFunctionsCache(optimizedKey);
+				return cache.execute(this, dataset, model, bindings, argsForCache);
 			}
 			else {
 				return executeBody(dataset, model, bindings);

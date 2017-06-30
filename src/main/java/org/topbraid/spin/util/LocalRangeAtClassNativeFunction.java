@@ -60,14 +60,33 @@ public class LocalRangeAtClassNativeFunction extends AbstractFunction2 {
 
 
 	public static Node run(Node cls, Node property, Graph graph, boolean useDefault) {
-		Node result = walk(property, cls, graph, new HashSet<Node>());
-		if(result == null) {
-			result = getGlobalRange(property, graph);
-			if(result == null && useDefault) {
-				result = getDefaultRange(property, graph);
+		String key = OntologyOptimizations.get().getKeyIfEnabledFor(graph);
+		if(key != null) {
+			ClassMetadata classMetadata = OntologyOptimizations.get().getClassMetadata(cls, graph, key);
+			Node localRange = classMetadata.getPropertyLocalRange(property, graph);
+			if(localRange != null) {
+				return localRange;
+			}
+			else {
+				Node global = getGlobalRange(property, graph);
+				if(global == null && useDefault) {
+					return getDefaultRange(property, graph);
+				}
+				else {
+					return global;
+				}
 			}
 		}
-		return result;
+		else {
+			Node result = walk(property, cls, graph, new HashSet<Node>());
+			if(result == null) {
+				result = getGlobalRange(property, graph);
+				if(result == null && useDefault) {
+					result = getDefaultRange(property, graph);
+				}
+			}
+			return result;
+		}
 	}
 	
 	
@@ -88,7 +107,7 @@ public class LocalRangeAtClassNativeFunction extends AbstractFunction2 {
 	
 	private static Node getGlobalRangeHelper(Node property, Graph graph, Set<Node> reached) {
 		reached.add(property);
-		Node range = getObject(property, RDFS.range.asNode(), graph);
+		Node range = JenaNodeUtil.getObject(property, RDFS.range.asNode(), graph);
 		if(range != null) {
 			return range;
 		}
@@ -100,17 +119,6 @@ public class LocalRangeAtClassNativeFunction extends AbstractFunction2 {
 					return global;
 				}
 			}
-		}
-		return null;
-	}
-	
-	
-	private static Node getObject(Node subject, Node predicate, Graph graph) {
-		ExtendedIterator<Triple> it = graph.find(subject, predicate, Node.ANY);
-		if(it.hasNext()) {
-			Node object = it.next().getObject();
-			it.close();
-			return object;
 		}
 		return null;
 	}
@@ -159,12 +167,12 @@ public class LocalRangeAtClassNativeFunction extends AbstractFunction2 {
 			
 			for(SHNodeShape shape : SHACLUtil.getDirectShapesAtClassOrShape((Resource)ModelFactory.createModelForGraph(graph).asRDFNode(type))) {
 				
-				Node paramResult = walkPropertyConstraint(graph, shape.asNode(), property, SH.parameter.asNode());
+				Node paramResult = walkPropertyShape(graph, shape.asNode(), property, SH.parameter.asNode());
 				if(paramResult != null) {
 					return paramResult;
 				}
 				
-				Node propertyResult = walkPropertyConstraint(graph, shape.asNode(), property, SH.property.asNode());
+				Node propertyResult = walkPropertyShape(graph, shape.asNode(), property, SH.property.asNode());
 				if(propertyResult != null) {
 					return propertyResult;
 				}
@@ -178,7 +186,7 @@ public class LocalRangeAtClassNativeFunction extends AbstractFunction2 {
 				Node superClass = it.next().getObject();
 				if(superClass.isBlank() &&
 						graph.contains(superClass, OWL.onProperty.asNode(), property)) {
-					Node allValuesFrom = getObject(superClass, OWL.allValuesFrom.asNode(), graph);
+					Node allValuesFrom = JenaNodeUtil.getObject(superClass, OWL.allValuesFrom.asNode(), graph);
 					if(allValuesFrom != null) {
 						it.close();
 						return allValuesFrom;
@@ -197,7 +205,7 @@ public class LocalRangeAtClassNativeFunction extends AbstractFunction2 {
 				if(graph.contains(constraint, SPL.predicate.asNode(), property) &&
 						(graph.contains(constraint, RDF.type.asNode(), SPL.Argument.asNode()) ||
 						 graph.contains(constraint, RDF.type.asNode(), SPL.Attribute.asNode()))) {
-					Node valueType = getObject(constraint, SPL.valueType.asNode(), graph);
+					Node valueType = JenaNodeUtil.getObject(constraint, SPL.valueType.asNode(), graph);
 					if(valueType != null) {
 						it.close();
 						return valueType;
@@ -219,46 +227,54 @@ public class LocalRangeAtClassNativeFunction extends AbstractFunction2 {
 	}
 	
 	
-	private static Node walkPropertyConstraint(Graph graph, Node shape, Node predicate, Node systemPredicate) {
+	private static Node walkPropertyShape(Graph graph, Node shape, Node predicate, Node systemPredicate) {
 		ExtendedIterator<Triple> it = graph.find(shape, systemPredicate, Node.ANY);
 		while(it.hasNext()) {
-			Node constraint = it.next().getObject();
-			if(!constraint.isLiteral()) {
-				if(graph.contains(constraint, SH.path.asNode(), predicate)) {
-					Node valueType = getObject(constraint, SH.class_.asNode(), graph);
-					if(valueType != null) {
-						it.close();
-						return valueType;
-					}
-					Node datatype = getObject(constraint, SH.datatype.asNode(), graph);
-					if(datatype != null) {
-						it.close();
-						return datatype;
-					}
-					ExtendedIterator<Triple> ors = graph.find(constraint, SH.or.asNode(), Node.ANY);
-					while(ors.hasNext()) {
-						Node or = ors.next().getObject();
-						Node first = getObject(or, RDF.first.asNode(), graph);
-						if(!first.isLiteral()) {
-							Node cls = getObject(first, SH.class_.asNode(), graph);
-							if(cls != null) {
-								it.close();
-								ors.close();
-								return cls;
-							}
-							datatype = getObject(first, SH.datatype.asNode(), graph);
-							if(datatype != null) {
-								it.close();
-								ors.close();
-								return datatype;
-							}
+			Node propertyShape = it.next().getObject();
+			if(!propertyShape.isLiteral()) {
+				if(graph.contains(propertyShape, SH.path.asNode(), predicate)) {
+					if(!graph.contains(propertyShape, SH.deactivated.asNode(), JenaDatatypes.TRUE.asNode())) {
+						Node valueType = walkPropertyShapesHelper(propertyShape, graph);
+						if(valueType != null) {
+							it.close();
+							return valueType;
 						}
-					}
-					if(graph.contains(constraint, SH.node.asNode(), DASH.ListShape.asNode())) {
-						return RDF.List.asNode();
 					}
 				}
 			}
+		}
+		return null;
+	}
+
+
+	public static Node walkPropertyShapesHelper(Node propertyShape, Graph graph) {
+		Node valueType = JenaNodeUtil.getObject(propertyShape, SH.class_.asNode(), graph);
+		if(valueType != null) {
+			return valueType;
+		}
+		Node datatype = JenaNodeUtil.getObject(propertyShape, SH.datatype.asNode(), graph);
+		if(datatype != null) {
+			return datatype;
+		}
+		ExtendedIterator<Triple> ors = graph.find(propertyShape, SH.or.asNode(), Node.ANY);
+		while(ors.hasNext()) {
+			Node or = ors.next().getObject();
+			Node first = JenaNodeUtil.getObject(or, RDF.first.asNode(), graph);
+			if(!first.isLiteral()) {
+				Node cls = JenaNodeUtil.getObject(first, SH.class_.asNode(), graph);
+				if(cls != null) {
+					ors.close();
+					return cls;
+				}
+				datatype = JenaNodeUtil.getObject(first, SH.datatype.asNode(), graph);
+				if(datatype != null) {
+					ors.close();
+					return datatype;
+				}
+			}
+		}
+		if(graph.contains(propertyShape, SH.node.asNode(), DASH.ListShape.asNode())) {
+			return RDF.List.asNode();
 		}
 		return null;
 	}

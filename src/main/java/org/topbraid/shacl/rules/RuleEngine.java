@@ -118,7 +118,7 @@ public class RuleEngine implements NodeExpressionContext {
 		
 		List<RDFNode> targetNodes = SHACLUtil.getTargetNodes(shape.getShapeResource(), dataset);
 		if(!targetNodes.isEmpty()) {
-			Double oldOrder = rules.get(0).getOrder();
+			Number oldOrder = rules.get(0).getOrder();
 			for(Rule rule : rules) {
 				if(monitor != null) {
 					if(monitor.isCanceled()) {
@@ -172,6 +172,14 @@ public class RuleEngine implements NodeExpressionContext {
 			JenaUtil.setGraphReadOptimization(false);
 		}
 	}
+	
+	
+	private void flushPending() {
+		for(Triple triple : pending) {
+			inferences.add(inferences.asStatement(triple));
+		}
+		pending.clear();
+	}
 
 
 	private List<Rule> getShapeRules(Shape shape) {
@@ -198,19 +206,6 @@ public class RuleEngine implements NodeExpressionContext {
 			}
 		}
 		return rules;
-	}
-	
-	
-	private int flushPending() {
-		int added = 0;
-		for(Triple triple : pending) {
-			if(!inferences.getGraph().contains(triple)) {
-				inferences.add(inferences.asStatement(triple));
-				added++;
-			}
-		}
-		pending.clear();
-		return added;
 	}
 	
 	

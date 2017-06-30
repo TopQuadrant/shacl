@@ -26,9 +26,13 @@ public class TOSH {
     
     public final static Resource targetContains = ResourceFactory.createResource(NS + "targetContains");
 
-    public final static Resource JSLibrary = ResourceFactory.createResource(NS + "JSLibrary");
-    
+    public final static Property editWidget = ResourceFactory.createProperty(NS + "editWidget");
+
+    public final static Property searchWidget = ResourceFactory.createProperty(NS + "searchWidget");
+
     public final static Property useDeclaredDatatype = ResourceFactory.createProperty(NS + "useDeclaredDatatype");
+
+    public final static Property viewWidget = ResourceFactory.createProperty(NS + "viewWidget");
 
 
     public static String getURI() {

@@ -29,6 +29,7 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
+import org.topbraid.shacl.arq.SHACLFunctionDriver;
 import org.topbraid.shacl.model.SHConstraintComponent;
 import org.topbraid.shacl.model.SHFactory;
 import org.topbraid.shacl.model.SHNodeShape;
@@ -36,12 +37,14 @@ import org.topbraid.shacl.model.SHParameter;
 import org.topbraid.shacl.model.SHParameterizableTarget;
 import org.topbraid.shacl.model.SHPropertyShape;
 import org.topbraid.shacl.model.SHResult;
+import org.topbraid.shacl.validation.ConstraintExecutors;
 import org.topbraid.shacl.validation.TargetPlugin;
 import org.topbraid.shacl.validation.TargetPlugins;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.util.JenaUtil;
+import org.topbraid.spin.util.OntologyOptimizations;
 import org.topbraid.spin.util.OptimizedMultiUnion;
 
 /**
@@ -471,10 +474,23 @@ public class SHACLUtil {
 	 * @return the shapes, ordered by the most specialized (subclass) first
 	 */
 	public static List<SHNodeShape> getAllShapesAtClassOrShape(Resource clsOrShape) {
-		List<SHNodeShape> results = new LinkedList<SHNodeShape>();
-		Set<Resource> reached = new HashSet<Resource>();
-		addAllShapesAtClassOrShape(clsOrShape, results, reached);
-		return results;
+		String key = OntologyOptimizations.get().getKeyIfEnabledFor(clsOrShape.getModel().getGraph());
+		if(key != null) {
+			key += ".getAllShapesAtClassOrShape(" + clsOrShape + ")";
+			@SuppressWarnings("unchecked")
+			List<SHNodeShape> results = (List<SHNodeShape>) OntologyOptimizations.get().getObject(key);
+			if(results == null) {
+				results = new LinkedList<SHNodeShape>();
+				addAllShapesAtClassOrShape(clsOrShape, results, new HashSet<Resource>());
+				OntologyOptimizations.get().putObject(key, results);
+			}
+			return results;
+		}
+		else {
+			List<SHNodeShape> results = new LinkedList<SHNodeShape>();
+			addAllShapesAtClassOrShape(clsOrShape, results, new HashSet<Resource>());
+			return results;
+		}
 	}
 	
 	
@@ -700,5 +716,19 @@ public class SHACLUtil {
 		else {
 			return false;
 		}
+	}
+	
+	
+	private static boolean jsPreferred;
+	
+	public static boolean isJSPreferred() {
+		return jsPreferred;
+	}
+	
+	public static void setJSPreferred(boolean value) {
+		jsPreferred = value;
+		ConstraintExecutors.get().setJSPreferred(value);
+		SHACLFunctionDriver.setJSPreferred(value);
+		TargetPlugins.get().setJSPreferred(value);
 	}
 }

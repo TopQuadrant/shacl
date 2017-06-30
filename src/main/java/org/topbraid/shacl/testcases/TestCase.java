@@ -1,5 +1,6 @@
 package org.topbraid.shacl.testcases;
 
+import org.topbraid.shacl.testcases.context.TestCaseContext;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.util.JenaDatatypes;
@@ -55,6 +56,13 @@ public abstract class TestCase implements Comparable<TestCase> {
 	public Resource createFailure(Model results, String message) {
 		Resource failure = createResult(results, DASH.FailureTestCaseResult);
 		failure.addProperty(SH.resultMessage, message);
+		return failure;
+	}
+
+
+	public Resource createFailure(Model results, String message, TestCaseContext context) {
+		Resource failure = createResult(results, DASH.FailureTestCaseResult);
+		failure.addProperty(SH.resultMessage, message + " (executed with " + context + ")");
 		return failure;
 	}
 	

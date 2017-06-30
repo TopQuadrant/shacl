@@ -136,6 +136,15 @@ tosh:OtherConstraintPropertyGroup
   rdfs:label "Other Constraints" ;
   sh:order 10 ;
 .
+tosh:PropertyGroupShape
+  rdf:type sh:NodeShape ;
+  rdfs:label "Property group shape" ;
+  sh:property [
+      sh:path sh:order ;
+      sh:maxCount 1 ;
+    ] ;
+  sh:targetClass sh:PropertyGroup ;
+.
 tosh:PropertyPairConstraintPropertyGroup
   rdf:type sh:PropertyGroup ;
   tosh:openable "true"^^xsd:boolean ;
@@ -219,8 +228,11 @@ tosh:PropertyShapeShape
     ] ;
   sh:property [
       sh:path sh:path ;
+      tosh:editWidget <http://topbraid.org/tosh.ui#PathEditor> ;
+      tosh:viewWidget <http://topbraid.org/tosh.ui#PathViewer> ;
       sh:group tosh:AboutPropertyGroup ;
       sh:maxCount 1 ;
+      sh:minCount 1 ;
       sh:name "on property" ;
       sh:order 0 ;
     ] ;

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
@@ -49,6 +50,8 @@ public class ValidationEngine implements NodeExpressionContext {
 	private Dataset dataset;
 	
 	private Map<Constraint,ConstraintExecutor> executors = new HashMap<>();
+	
+	private Predicate<RDFNode> focusNodeFilter;
 	
 	private Function<RDFNode,String> labelFunction;
 	
@@ -250,6 +253,17 @@ public class ValidationEngine implements NodeExpressionContext {
 			return results;
 		}
 	}
+
+	
+	/**
+	 * Sets a filter that can be used to skip certain focus node from validation.
+	 * The filter must return true if the given candidate focus node shall be validated,
+	 * and false to skip it.
+	 * @param value  the new filter
+	 */
+	public void setFocusNodeFilter(Predicate<RDFNode> value) {
+		this.focusNodeFilter = value;
+	}
 	
 	
 	public void updateConforms() {
@@ -270,6 +284,7 @@ public class ValidationEngine implements NodeExpressionContext {
 	
 	/**
 	 * Validates all target nodes against all of their shapes.
+	 * To further narrow down which nodes to validate, use {{@link #setFocusNodeFilter(Predicate)}.
 	 * @return an instance of sh:ValidationReport in the results Model
 	 */
 	public Resource validateAll() throws InterruptedException {
@@ -286,6 +301,15 @@ public class ValidationEngine implements NodeExpressionContext {
 				}
 				
 				List<RDFNode> focusNodes = SHACLUtil.getTargetNodes(shape.getShapeResource(), dataset);
+				if(focusNodeFilter != null) {
+					List<RDFNode> filteredFocusNodes = new LinkedList<RDFNode>();
+					for(RDFNode focusNode : focusNodes) {
+						if(focusNodeFilter.test(focusNode)) {
+							filteredFocusNodes.add(focusNode);
+						}
+					}
+					focusNodes = filteredFocusNodes;
+				}
 				if(!focusNodes.isEmpty()) {
 					if(!shapesGraph.isIgnored(shape.getShapeResource().asNode()) && !shape.getShapeResource().isDeactivated()) {
 						for(Constraint constraint : shape.getConstraints()) {
@@ -369,6 +393,7 @@ public class ValidationEngine implements NodeExpressionContext {
 		}
 		else {
 			FailureLog.get().logFailure("No suitable validator found for constraint " + constraint);
+			executor = getExecutor(constraint);
 		}
 	}
 }

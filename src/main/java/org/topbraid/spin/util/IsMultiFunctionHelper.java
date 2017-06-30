@@ -45,9 +45,18 @@ class IsMultiFunctionHelper {
 		}
 
 		if(type != null) {
-			// Walk up classes, doing restrictions and constraints at once
-			Set<Node> reached = new HashSet<Node>();
-			return walk(property, type, graph, reached);
+			
+			String graphKey = OntologyOptimizations.get().getKeyIfEnabledFor(graph);
+			if(graphKey != null) {
+				ClassMetadata cm = OntologyOptimizations.get().getClassMetadata(type, graph, graphKey);
+				Integer maxCount = cm.getPropertyMaxCount(property, graph);
+				return maxCount == null || maxCount > 1;
+			}
+			else {
+				// Walk up classes, doing restrictions and constraints at once
+				Set<Node> reached = new HashSet<>();
+				return walk(property, type, graph, reached);
+			}
 		}
 		else {
 			return true;

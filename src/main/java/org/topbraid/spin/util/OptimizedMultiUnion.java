@@ -18,10 +18,7 @@ public interface OptimizedMultiUnion {
 	
 	
 	List<Node> getLabelProperties();
-	
+
 	
 	void resetOptimizations();
-	
-	
-	void setBaseGraphURI(String uri);
 }

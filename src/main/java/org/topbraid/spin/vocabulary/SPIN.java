@@ -100,6 +100,8 @@ public class SPIN {
 
 	public final static Property cachable = ResourceFactory.createProperty(NS + "cachable");
 
+	public final static Property cachableForOntologies = ResourceFactory.createProperty(NS + "cachableForOntologies");
+
 	public final static Property column = ResourceFactory.createProperty(NS + "column");
 
 	public final static Property columnIndex = ResourceFactory.createProperty(NS + "columnIndex");

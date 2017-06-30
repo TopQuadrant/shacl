@@ -144,6 +144,18 @@ public class SPINFunctionsCache {
 		public int hashCode() {
 			return hashCode;
 		}
+		
+		
+		public String toString() {
+			String str = "<" + functionURI + ">(";
+			for(int i = 0; i < args.length; i++) {
+				if(i > 0) {
+					str += ", ";
+				}
+				str += args[i];
+			}
+			return str + ")";
+		}
 	}
 	
 	

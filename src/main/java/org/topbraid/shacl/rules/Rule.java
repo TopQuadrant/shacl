@@ -16,17 +16,17 @@ import org.topbraid.shacl.vocabulary.SH;
  */
 public abstract class Rule {
 	
-	private Double order;
+	private Number order;
 	
 	private Resource resource;
 	
 	
 	protected Rule(Resource resource) {
 		this.resource = resource;
-		order = 0.0;
+		order = 0;
 		Statement s = resource.getProperty(SH.order);
 		if(s != null && s.getObject().isLiteral()) {
-			order = s.getDouble();
+			order = (Number) s.getLiteral().getValue();
 		}
 	}
 	
@@ -50,12 +50,12 @@ public abstract class Rule {
 	
 	
 	public String getLabelStart(String type) {
-		Double index = getOrder();
-		return type + " rule (" + (index == 0 ? "0" : index) + "): ";
+		Number index = getOrder();
+		return type + " rule (" + (index.doubleValue() == 0 ? "0" : index) + "): ";
 	}
 	
 	
-	public Double getOrder() {
+	public Number getOrder() {
 		return order;
 	}
 	

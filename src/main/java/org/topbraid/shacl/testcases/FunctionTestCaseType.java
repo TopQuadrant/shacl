@@ -13,6 +13,10 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.sparql.function.FunctionRegistry;
+import org.topbraid.shacl.testcases.context.JSPreferredTestCaseContext;
+import org.topbraid.shacl.testcases.context.SPARQLPreferredTestCaseContext;
+import org.topbraid.shacl.testcases.context.TestCaseContext;
+import org.topbraid.shacl.testcases.context.TestCaseContextFactory;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.arq.SPINThreadFunctionRegistry;
@@ -20,6 +24,16 @@ import org.topbraid.spin.arq.SPINThreadFunctions;
 import org.topbraid.spin.util.JenaUtil;
 
 public class FunctionTestCaseType implements TestCaseType {
+	
+	private static List<TestCaseContextFactory> contextFactories = new LinkedList<>();
+	static {
+		registerContextFactory(SPARQLPreferredTestCaseContext.getTestCaseContextFactory());
+		registerContextFactory(JSPreferredTestCaseContext.getTestCaseContextFactory());
+	}
+	
+	public static void registerContextFactory(TestCaseContextFactory factory) {
+		contextFactories.add(factory);
+	}
 
 
 	@Override
@@ -46,38 +60,46 @@ public class FunctionTestCaseType implements TestCaseType {
 			FunctionRegistry oldFR = FunctionRegistry.get();
 			SPINThreadFunctionRegistry threadFR = new SPINThreadFunctionRegistry(oldFR);
 			FunctionRegistry.set(ARQ.getContext(), threadFR);
-			
-			// TODO: These should run twice, for both values of SHACLFunctionDriver.setJSPreferred
-
 			SPINThreadFunctions old = SPINThreadFunctionRegistry.register(testCase.getModel());
-			String expression = JenaUtil.getStringProperty(testCase, DASH.expression);
-			Statement expectedResultS = testCase.getProperty(DASH.expectedResult);
-			String queryString = "SELECT (" + expression + " AS ?result) WHERE {}";
-			Query query = ARQFactory.get().createQuery(testCase.getModel(), queryString);
-			try(QueryExecution qexec = ARQFactory.get().createQueryExecution(query, testCase.getModel())) {
-			    ResultSet rs = qexec.execSelect();
-			    if(!rs.hasNext()) {
-			        if(expectedResultS != null) {
-			            createFailure(results,
-			                          "Expression returned no result, but expected: " + expectedResultS.getObject());
-			            return;
-			        }
-			    }
-			    else {
-			        RDFNode result = rs.next().get("result");
-			        if(expectedResultS == null) {
-			            if(result != null) {
-			                createFailure(results,
-			                              "Expression returned a result, but none expected: " + result);
-			                return;
-			            }
-			        }
-			        else if(!expectedResultS.getObject().equals(result)) {
-			            createFailure(results,
-			                          "Mismatching result. Expected: " + expectedResultS.getObject() + ". Found: " + result);
-			            return;
-			        }
-			    }
+
+			try {
+				for(TestCaseContextFactory contextFactory : contextFactories) {
+					TestCaseContext context = contextFactory.createContext();
+					String expression = JenaUtil.getStringProperty(testCase, DASH.expression);
+					Statement expectedResultS = testCase.getProperty(DASH.expectedResult);
+					String queryString = "SELECT (" + expression + " AS ?result) WHERE {}";
+					Query query = ARQFactory.get().createQuery(testCase.getModel(), queryString);
+					context.setUpTestContext();
+					try(QueryExecution qexec = ARQFactory.get().createQueryExecution(query, testCase.getModel())) {
+					    ResultSet rs = qexec.execSelect();
+					    if(!rs.hasNext()) {
+					        if(expectedResultS != null) {
+					            createFailure(results,
+					                          "Expression returned no result, but expected: " + expectedResultS.getObject(),
+					                          context);
+					            return;
+					        }
+					    }
+					    else {
+					        RDFNode result = rs.next().get("result");
+					        if(expectedResultS == null) {
+					            if(result != null) {
+					                createFailure(results,
+					                              "Expression returned a result, but none expected: " + result, context);
+					                return;
+					            }
+					        }
+					        else if(!expectedResultS.getObject().equals(result)) {
+					            createFailure(results,
+					                          "Mismatching result. Expected: " + expectedResultS.getObject() + ". Found: " + result, context);
+					            return;
+					        }
+					    }
+					}
+					finally {
+						context.tearDownTestContext();
+					}
+				}
 			}
 			finally {
 				SPINThreadFunctionRegistry.unregister(old);

@@ -14,6 +14,10 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
+import org.topbraid.shacl.testcases.context.JSPreferredTestCaseContext;
+import org.topbraid.shacl.testcases.context.SPARQLPreferredTestCaseContext;
+import org.topbraid.shacl.testcases.context.TestCaseContext;
+import org.topbraid.shacl.testcases.context.TestCaseContextFactory;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.ARQFactory;
@@ -23,6 +27,16 @@ import org.topbraid.spin.util.ExceptionUtil;
 import org.topbraid.spin.util.JenaUtil;
 
 public class QueryTestCaseType implements TestCaseType {
+	
+	private static List<TestCaseContextFactory> contextFactories = new LinkedList<>();
+	static {
+		registerContextFactory(SPARQLPreferredTestCaseContext.getTestCaseContextFactory());
+		registerContextFactory(JSPreferredTestCaseContext.getTestCaseContextFactory());
+	}
+	
+	public static void registerContextFactory(TestCaseContextFactory factory) {
+		contextFactories.add(factory);
+	}
 
 	public static String createResultSetJSON(String queryString, Model model) {
 		SPINThreadFunctions old = SPINThreadFunctionRegistry.register(model);
@@ -66,15 +80,24 @@ public class QueryTestCaseType implements TestCaseType {
 			Resource testCase = getResource();
 			String queryString = JenaUtil.getStringProperty(testCase, SH.select);
 			Model model = testCase.getModel();
-			String actual = createResultSetJSON(queryString, model);
-			JsonObject actualJSON = JSON.parse(actual);
 			JsonObject expectedJSON = JSON.parse(JenaUtil.getStringProperty(testCase, DASH.expectedResult));
-			if(actualJSON.equals(expectedJSON)) {
-				createResult(results, DASH.SuccessTestCaseResult);
+			
+			for(TestCaseContextFactory contextFactory : contextFactories) {
+				TestCaseContext context = contextFactory.createContext();
+				context.setUpTestContext();
+				try {
+					String actual = createResultSetJSON(queryString, model);
+					JsonObject actualJSON = JSON.parse(actual);
+					if(!actualJSON.equals(expectedJSON)) {
+						createFailure(results, "Mismatching result set. Actual: " + actual, context);
+						return;
+					}
+				}
+				finally {
+					context.tearDownTestContext();
+				}
 			}
-			else {
-				createFailure(results, "Mismatching result set. Actual: " + actual);
-			}
+			createResult(results, DASH.SuccessTestCaseResult);
 		}
 	}
 }

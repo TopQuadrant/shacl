@@ -131,6 +131,8 @@ public class SH {
     public final static Property equals = ResourceFactory.createProperty(NS + "equals");
 
     public final static Property focusNode = ResourceFactory.createProperty(NS + "focusNode");
+    
+    public final static Property group = ResourceFactory.createProperty(NS + "group");
 
     public final static Property hasValue = ResourceFactory.createProperty(NS + "hasValue");
     
