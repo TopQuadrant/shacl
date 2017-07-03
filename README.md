@@ -37,6 +37,7 @@ To use them, set up your environment similar to https://jena.apache.org/document
 For example, on Windows:
 
 SET JENAROOT=C:\Users\Holger\Desktop\shacl-1.0.0-bin
+
 SET PATH=%PATH%;%JENAROOT%\bin
 
 Both tools take the following parameters, for example:
