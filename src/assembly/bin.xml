@@ -20,5 +20,13 @@
         <include>*</include>
       </includes>
     </fileSet>
+
+    <fileSet>
+      <outputDirectory>/</outputDirectory>
+      <includes>
+        <include>jena-log4j.properties</include>
+      </includes> 
+      <fileMode>0644</fileMode>
+    </fileSet>
   </fileSets>
 </assembly>

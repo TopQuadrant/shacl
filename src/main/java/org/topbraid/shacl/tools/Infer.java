@@ -24,7 +24,11 @@ public class Infer extends AbstractTool {
 	
 	private void run(String[] args) throws IOException {
 		Model dataModel = getDataModel(args);
-		Model results = RuleUtil.executeRules(dataModel, dataModel, null, null);
+		Model shapesModel = getShapesModel(args);
+		if(shapesModel == null) {
+			shapesModel = dataModel;
+		}
+		Model results = RuleUtil.executeRules(dataModel, shapesModel, null, null);
 		results.write(System.out, FileUtils.langTurtle);
 	}
 }

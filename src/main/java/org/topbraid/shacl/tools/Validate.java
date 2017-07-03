@@ -25,7 +25,11 @@ public class Validate extends AbstractTool {
 	
 	private void run(String[] args) throws IOException {
 		Model dataModel = getDataModel(args);
-		Resource report = ValidationUtil.validateModel(dataModel, dataModel, true);
+		Model shapesModel = getShapesModel(args);
+		if(shapesModel == null) {
+			shapesModel = dataModel;
+		}
+		Resource report = ValidationUtil.validateModel(dataModel, shapesModel, true);
 		report.getModel().write(System.out, FileUtils.langTurtle);
 	}
 }

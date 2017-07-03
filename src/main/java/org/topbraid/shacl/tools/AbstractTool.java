@@ -19,8 +19,10 @@ import org.topbraid.spin.util.JenaUtil;
 import org.topbraid.spin.util.SystemTriples;
 
 class AbstractTool {
-	
+
 	private final static String DATA_FILE = "-datafile";
+	
+	private final static String SHAPES_FILE = "-shapesfile";
 
 	
 	private OntDocumentManager dm = new OntDocumentManager();
@@ -51,14 +53,31 @@ class AbstractTool {
 	
 	
 	protected Model getDataModel(String[] args) throws IOException {
-		if(args.length != 2 || !DATA_FILE.equals(args[0])) {
-			System.err.println("Example arguments: -datafile myfile.ttl");
-			System.exit(0);
+		for(int i = 0; i < args.length - 1; i++) {
+			if(DATA_FILE.equals(args[i])) {
+				String dataFileName = args[i + 1];
+				OntModel dataModel = ModelFactory.createOntologyModel(spec);
+				File dataFile = new File(dataFileName);
+				dataModel.read(new FileInputStream(dataFile), "urn:x-base", FileUtils.langTurtle);
+				return dataModel;
+			}
 		}
-		String dataFileName = args[1];
-		OntModel dataModel = ModelFactory.createOntologyModel(spec);
-		File dataFile = new File(dataFileName);
-		dataModel.read(new FileInputStream(dataFile), "urn:x-base", FileUtils.langTurtle);
-		return dataModel;
+		System.err.println("Missing -datafile, e.g.: -datafile myfile.ttl");
+		System.exit(0);
+		return null;
+	}
+	
+	
+	protected Model getShapesModel(String[] args) throws IOException {
+		for(int i = 0; i < args.length - 1; i++) {
+			if(SHAPES_FILE.equals(args[i])) {
+				String fileName = args[i + 1];
+				OntModel model = ModelFactory.createOntologyModel(spec);
+				File dataFile = new File(fileName);
+				model.read(new FileInputStream(dataFile), "urn:x-base", FileUtils.langTurtle);
+				return model;
+			}
+		}
+		return null;
 	}
 }
