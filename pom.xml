@@ -7,7 +7,7 @@
 
 	<groupId>org.topbraid</groupId>
 	<artifactId>shacl</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.9.9-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>TopBraid SHACL API</name>
@@ -39,6 +39,23 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptors>
+						<descriptor>src/assembly/bin.xml</descriptor>
+					</descriptors>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 	
@@ -46,7 +63,7 @@
 		<dependency>
 			<groupId>org.apache.jena</groupId>
 			<artifactId>jena-arq</artifactId>
-			<version>3.1.1</version>
+			<version>3.3.0</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
