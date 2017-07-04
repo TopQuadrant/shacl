@@ -6,7 +6,7 @@ Contact: Holger Knublauch (holger@topquadrant.com)
 
 Can be used to perform SHACL constraint checking and rule inferencing in any Jena-based Java application.
 This API also serves as a reference implementation developed in parallel to the SHACL spec.
-**The code is totally not optimized for performance, just for correctness. And there are unfinished gaps!**
+**The code is totally not optimized for performance, just for correctness.**
 
 Coverage:
 * SHACL Core and SHACL-SPARQL validation
@@ -36,9 +36,9 @@ To use them, set up your environment similar to https://jena.apache.org/document
 
 For example, on Windows:
 
-SET JENAROOT=C:\Users\Holger\Desktop\shacl-1.0.0-bin
+SET SHACLROOT=C:\Users\Holger\Desktop\shacl-1.0.0-bin
 
-SET PATH=%PATH%;%JENAROOT%\bin
+SET PATH=%PATH%;%SHACLROOT%\bin
 
 Both tools take the following parameters, for example:
 
@@ -49,4 +49,4 @@ whereby -shapesfile is optional and falls back to using the data graph as shapes
 Currently only Turtle (.ttl) files are supported.
 
 The tools print the validation report or the inferences graph to the output screen.
-The output of the command line utilities is not limited by the SHACL license.
+The output of the command line utilities is not limited by the license of the SHACL API.

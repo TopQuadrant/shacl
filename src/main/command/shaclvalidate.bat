@@ -1,18 +1,18 @@
 @echo off
 @rem Licensed under the terms of http://www.apache.org/licenses/LICENSE-2.0
 
-if "%JENAROOT%" == "" goto :rootNotSet
-set JENA_HOME=%JENAROOT%
+if "%SHACLROOT%" == "" goto :rootNotSet
+set SHACL_HOME=%SHACLROOT%
 :rootNotSet
 
-if NOT "%JENA_HOME%" == "" goto :okHome
-echo JENA_HOME not set
+if NOT "%SHACL_HOME%" == "" goto :okHome
+echo SHACL_HOME not set
 exit /B
 
 :okHome
-set JENA_CP=%JENA_HOME%\lib\*;
-set LOGGING=file:%JENA_HOME%/jena-log4j.properties
+set SHACL_CP=%SHACL_HOME%\lib\*;
+set LOGGING=file:%SHACL_HOME%/log4j.properties
 
 @rem JVM_ARGS comes from the environment.
-java %JVM_ARGS% -Dlog4j.configuration="%LOGGING%" -cp "%JENA_CP%" org.topbraid.shacl.tools.Validate %*
+java %JVM_ARGS% -Dlog4j.configuration="%LOGGING%" -cp "%SHACL_CP%" org.topbraid.shacl.tools.Validate %*
 exit /B

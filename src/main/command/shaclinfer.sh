@@ -24,8 +24,8 @@ resolveLink() {
   echo "$NAME"
 }
 
-# If JENA_HOME is empty
-if [ -z "$JENA_HOME" ]; then
+# If SHACL_HOME is empty
+if [ -z "$SHACL_HOME" ]; then
   SCRIPT="$0"
   # Catch common issue: script has been symlinked
   if [ -L "$SCRIPT" ]; then
@@ -43,37 +43,37 @@ if [ -z "$JENA_HOME" ]; then
   fi
 
   # Work out root from script location
-  JENA_HOME="$( cd "$( dirname "$SCRIPT" )/.." && pwd )"
-  export JENA_HOME
+  SHACL_HOME="$( cd "$( dirname "$SCRIPT" )/.." && pwd )"
+  export SHACL_HOME
 fi
 
-# If JENA_HOME is a symbolic link need to resolve
-if [ -L "${JENA_HOME}" ]; then
-  JENA_HOME=$(resolveLink "$JENA_HOME")
+# If SHACL_HOME is a symbolic link need to resolve
+if [ -L "${SHACL_HOME}" ]; then
+  SHACL_HOME=$(resolveLink "$SHACL_HOME")
   # If link is relative
-  case "$JENA_HOME" in
+  case "$SHACL_HOME" in
     /*)
       # Already absolute
       ;;
     *)
       # Relative, make absolute
-      JENA_HOME=$(dirname "$JENA_HOME")
+      SHACL_HOME=$(dirname "$SHACL_HOME")
       ;;
   esac
-  export JENA_HOME
+  export SHACL_HOME
 fi
 
 # ---- Setup
 # JVM_ARGS : don't set here but it can be set in the environment.
-# Expand JENA_HOME but literal *
-JENA_CP="$JENA_HOME"'/lib/*'
+# Expand SHACL_HOME but literal *
+SHACL_CP="$SHACL_HOME"'/lib/*'
 SOCKS=
-LOGGING="${LOGGING:--Dlog4j.configuration=file:$JENA_HOME/jena-log4j.properties}"
+LOGGING="${LOGGING:--Dlog4j.configuration=file:$SHACL_HOME/log4j.properties}"
 
 # Platform specific fixup
 # On CYGWIN convert path and end with a ';' 
 case "$(uname)" in
-   CYGWIN*) JENA_CP="$(cygpath -wp "$JENA_CP");";;
+   CYGWIN*) SHACL_CP="$(cygpath -wp "$SHACL_CP");";;
 esac
 
 # Respect TMPDIR or TMP (windows?) if present
@@ -86,4 +86,4 @@ elif [ -n "$TMP" ]
 	JVM_ARGS="$JVM_ARGS -Djava.io.tmpdir=\"$TMP\""
 fi
 
-java $JVM_ARGS $LOGGING -cp "$JENA_CP" org.topbraid.shacl.tools.Validate "$@" 
+java $JVM_ARGS $LOGGING -cp "$SHACL_CP" org.topbraid.shacl.tools.Infer "$@" 

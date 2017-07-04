@@ -13,18 +13,31 @@
     </dependencySet>
   </dependencySets>
   <fileSets>
+  
     <fileSet>
       <directory>src/main/command</directory>
+      <lineEnding>unix</lineEnding>
       <outputDirectory>bin</outputDirectory>
       <includes>
-        <include>*</include>
+        <include>*.sh</include>
+      </includes>
+    </fileSet>
+  
+    <fileSet>
+      <directory>src/main/command</directory>
+      <lineEnding>dos</lineEnding>
+      <outputDirectory>bin</outputDirectory>
+      <includes>
+        <include>*.bat</include>
       </includes>
     </fileSet>
 
     <fileSet>
       <outputDirectory>/</outputDirectory>
       <includes>
-        <include>jena-log4j.properties</include>
+        <include>log4j.properties</include>
+        <include>LICENSE</include>
+        <include>README.md</include>
       </includes> 
       <fileMode>0644</fileMode>
     </fileSet>
