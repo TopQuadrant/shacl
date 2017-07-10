@@ -49,85 +49,14 @@ Equivalent SPARQL:
 */
 
 
-// In some environments such as Nashorn this may already have a value
-// In TopBraid this is redirecting to native Jena calls
-var TermFactory = {
-
-    impl: require("rdflib"),   // This needs to be connected to an API such as $rdf
-
-    // Globally registered prefixes for TTL short cuts
-    namespaces: {},
-
-    /**
-     * Registers a new namespace prefix for global TTL short cuts (qnames).
-     * @param prefix  the prefix to add
-     * @param namespace  the namespace to add for the prefix
-     */
-    registerNamespace: function (prefix, namespace) {
-        if (this.namespaces.prefix) {
-            throw "Prefix " + prefix + " already registered"
-        }
-        this.namespaces[prefix] = namespace;
-    },
-
-    /**
-     * Produces an RDF* term from a TTL string representation.
-     * Also uses the registered prefixes.
-     * @param str  a string, e.g. "owl:Thing" or "true" or '"Hello"@en'.
-     * @return an RDF term
-     */
-    term: function (str) {
-        // TODO: this implementation currently only supports booleans and qnames - better overload to rdflib.js
-        if ("true" === str || "false" === str) {
-            return this.literal(str, T("xsd:boolean"))
-        }
-        var col = str.indexOf(":");
-        if (col < 0) {
-            throw "Expected qname with a ':', but found: " + str;
-        }
-        var ns = this.namespaces[str.substring(0, col)];
-        if (!ns) {
-            throw "Unregistered prefix " + str.substring(0, col) + " of node " + str;
-        }
-        return this.namedNode(ns + str.substring(col + 1));
-    },
-
-    /**
-     * Produces a new blank node.
-     * @param id  an optional ID for the node
-     */
-    blankNode: function (id) {
-        return this.impl.blankNode(id);
-    },
-
-    /**
-     * Produces a new literal.  For example .literal("42", T("xsd:integer")).
-     * @param lex  the lexical form, e.g. "42"
-     * @param langOrDatatype  either a language string or a URI node with the datatype
-     */
-    literal: function (lex, langOrDatatype) {
-        return this.impl.literal(lex, langOrDatatype)
-    },
-
-    // This function is basically left for Task Force compatibility, but the preferred function is uri()
-    namedNode: function (uri) {
-        return this.impl.namedNode(uri)
-    },
-
-    /**
-     * Produces a new URI node.
-     * @param uri  the URI of the node
-     */
-    uri: function (uri) {
-        return TermFactory.namedNode(uri);
-    }
-};
 
 
 // Install NodeFactory as an alias - unsure which name is best long term:
 // The official name in RDF is "term", while "node" is more commonly understood.
 // Oficially, a "node" must be in a graph though, while "terms" are independent.
+var TermFactory = require("./rdfquery/term-factory");
 var NodeFactory = TermFactory;
+var NodeSet = require("./rdfquery/node-set");
 
 
 NodeFactory.registerNamespace("dc", "http://purl.org/dc/elements/1.1/");
@@ -928,62 +857,6 @@ var getLocalName = function (uri) {
     return uri.substring(index + 1);
 };
 
-
-// class NodeSet
-// (a super-primitive implementation for now!)
-
-var NodeSet = function () {
-    this.values = [];
-};
-
-NodeSet.prototype.add = function (node) {
-    if (!this.contains(node)) {
-        this.values.push(node);
-    }
-};
-
-NodeSet.prototype.addAll = function (nodes) {
-    for (var i = 0; i < nodes.length; i++) {
-        this.add(nodes[i]);
-    }
-};
-
-NodeSet.prototype.contains = function (node) {
-    for (var i = 0; i < this.values.length; i++) {
-        if (this.values[i].equals(node)) {
-            return true;
-        }
-    }
-    return false;
-};
-
-NodeSet.prototype.forEach = function (callback) {
-    for (var i = 0; i < this.values.length; i++) {
-        callback(this.values[i]);
-    }
-};
-
-NodeSet.prototype.size = function () {
-    return this.values.length;
-};
-
-NodeSet.prototype.toArray = function () {
-    return this.values;
-};
-
-NodeSet.prototype.toString = function () {
-    var str = "NodeSet(" + this.size() + "): [";
-    var arr = this.toArray();
-    for (var i = 0; i < arr.length; i++) {
-        if (i > 0) {
-            str += ", ";
-        }
-        str += arr[i];
-    }
-    return str + "]";
-};
-
-
 var var2Attr = function(varName) {
     if (!varName.indexOf("?") === 0) {
         throw "Variable name must start with ?";
@@ -1177,8 +1050,7 @@ var toRDFQueryPath = function (shPath, context) {
     return shPath;
 };
 
-RDFQuery.TermFactory = TermFactory;
-RDFQuery.NodeSet = NodeSet;
+// Utility functions
 RDFQuery.T = T;
 RDFQuery.getLocalName = getLocalName;
 RDFQuery.compareTerms = compareTerms;

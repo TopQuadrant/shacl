@@ -5,8 +5,8 @@
 // natively implemented by the surrounding engine.
 
 var rdfquery = require("./rdfquery");
+var NodeSet = require("./rdfquery/node-set");
 var T = rdfquery.T;
-
 
 var registerDASH = function(context) {
 
@@ -29,10 +29,10 @@ var registerDASH = function(context) {
         }
     };
     
-    var XSDIntegerTypes = new rdfquery.NodeSet();
+    var XSDIntegerTypes = new NodeSet();
     XSDIntegerTypes.add(T("xsd:integer"));
 
-    var XSDDecimalTypes = new rdfquery.NodeSet();
+    var XSDDecimalTypes = new NodeSet();
     XSDDecimalTypes.addAll(XSDIntegerTypes.toArray());
     XSDDecimalTypes.add(T("xsd:decimal"));
     XSDDecimalTypes.add(T("xsd:float"));
@@ -78,7 +78,7 @@ var registerDASH = function(context) {
             return;
         }
         var results = [];
-        var allowedProperties = new rdfquery.NodeSet();
+        var allowedProperties = new NodeSet();
         context.$data.query().match($this, "rdf:type", "?directType").path("?directType", {zeroOrMore: T("rdfs:subClassOf")}, "?type").forEachNode("?type", function (type) {
             context.$shapes.query().match(type, "sh:property", "?pshape").match("?pshape", "sh:path", "?path").filter(function (sol) {
                 return sol.path.isURI()
@@ -142,7 +142,7 @@ var registerDASH = function(context) {
     };
 
     var validateIn = function ($value, $in) {
-        var set = new rdfquery.NodeSet();
+        var set = new NodeSet();
         set.addAll(context.$shapes.query().rdfListToArray($in));
         return set.contains($value);
     }
@@ -311,7 +311,7 @@ var registerDASH = function(context) {
     }
 
     var validateQualifiedHelper = function ($this, $path, $qualifiedValueShape, $qualifiedValueShapesDisjoint, $currentShape) {
-        var siblingShapes = new rdfquery.NodeSet();
+        var siblingShapes = new NodeSet();
         if (T("true").equals($qualifiedValueShapesDisjoint)) {
             context.$shapes.query().match("?parentShape", "sh:property", $currentShape).match("?parentShape", "sh:property", "?sibling").match("?sibling", "sh:qualifiedValueShape", "?siblingShape").filter(exprNotEquals("?siblingShape", $qualifiedValueShape)).addAllNodes("?siblingShape", siblingShapes);
         }

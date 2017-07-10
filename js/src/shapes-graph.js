@@ -23,10 +23,12 @@
 // for each Constraint of the shape, producing results along the way.
 
 var rdfquery = require("./rdfquery");
-var ValidationFunction = require("./validation-function");
+var TermFactory = require("./rdfquery/term-factory");
+var NodeSet = require("./rdfquery/node-set");
 var T = rdfquery.T;
+var ValidationFunction = require("./validation-function");
 
-rdfquery.TermFactory.registerNamespace("dash", "http://datashapes.org/dash#");
+TermFactory.registerNamespace("dash", "http://datashapes.org/dash#");
 
 
 // class Constraint
@@ -140,7 +142,7 @@ var Shape = function(shaclValidator, shapeNode) {
     this.shapeNode = shapeNode;
     this.constraints = [];
 
-    var handled = new rdfquery.NodeSet();
+    var handled = new NodeSet();
     var self = this;
     var that = this;
     shaclValidator.$shapes.query().match(shapeNode, "?predicate", "?object").forEach(function (sol) {
@@ -163,7 +165,7 @@ Shape.prototype.getConstraints = function () {
 };
 
 Shape.prototype.getTargetNodes = function (rdfDataGraph) {
-    var results = new rdfquery.NodeSet();
+    var results = new NodeSet();
 
     if (rdfquery.isInstanceOf(this.shapeNode, T("rdfs:Class"), this.shaclValidator)) {
         results.addAll(rdfDataGraph.query().getInstancesOf(this.shapeNode).toArray());
@@ -252,7 +254,7 @@ ShapesGraph.prototype.getShape = function (shapeNode) {
 
 ShapesGraph.prototype.getShapeNodesWithConstraints = function () {
     if (!this.shapeNodesWithConstraints) {
-        var set = new rdfquery.NodeSet();
+        var set = new NodeSet();
         for (var i = 0; i < this.components.length; i++) {
             var params = this.components[i].requiredParameters;
             for (var j = 0; j < params.length; j++) {

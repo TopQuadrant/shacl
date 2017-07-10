@@ -1,5 +1,6 @@
 var rdfquery = require("./rdfquery");
 var T = rdfquery.T;
+var TermFactory = require("./rdfquery/term-factory");
 
 var nodeLabel = function (node, store) {
     if (node.isURI()) {
@@ -36,7 +37,7 @@ ValidationEngine.prototype.addResultProperty = function (result, predicate, obje
  * properties for the constraint, focused node and value node
  */
 ValidationEngine.prototype.createResult = function (constraint, focusNode, valueNode) {
-    var result = rdfquery.TermFactory.blankNode();
+    var result = TermFactory.blankNode();
     this.addResultProperty(result, T("rdf:type"), T("sh:ValidationResult"));
     this.addResultProperty(result, T("sh:resultSeverity"), constraint.shape.severity);
     this.addResultProperty(result, T("sh:sourceConstraintComponent"), constraint.component.node);
@@ -73,7 +74,7 @@ ValidationEngine.prototype.createResultFromObject = function (obj, constraint, f
         if (constraint.shape.isPropertyShape()) {
             this.addResultProperty(result, T("sh:resultPath"), constraint.shape.path); // TODO: Make deep copy
         }
-        this.addResultProperty(result, T("sh:resultMessage"), rdfquery.TermFactory.literal(obj, T("xsd:string")));
+        this.addResultProperty(result, T("sh:resultMessage"), TermFactory.literal(obj, T("xsd:string")));
         this.createResultMessages(result, constraint);
     }
     else if (typeof obj === 'object') {
@@ -94,7 +95,7 @@ ValidationEngine.prototype.createResultFromObject = function (obj, constraint, f
             this.addResultProperty(result, T("sh:value"), valueNode);
         }
         if (obj.message) {
-            this.addResultProperty(result, T("sh:resultMessage"), rdfquery.TermFactory.literal(obj.message, T("xsd:string")));
+            this.addResultProperty(result, T("sh:resultMessage"), TermFactory.literal(obj.message, T("xsd:string")));
         }
         else {
             this.createResultMessages(result, constraint);
@@ -232,7 +233,7 @@ ValidationEngine.prototype.withSubstitutions = function (msg, constraint) {
         str = str.replace("{$" + key + "}", label);
         str = str.replace("{?" + key + "}", label);
     }
-    return rdfquery.TermFactory.literal(str, msg.language | msg.datatype);
+    return TermFactory.literal(str, msg.language | msg.datatype);
 };
 
 module.exports = ValidationEngine;

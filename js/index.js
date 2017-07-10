@@ -3,8 +3,8 @@
  */
 
 var jsonld = require("jsonld");
-var rdfquery = require("./src/rdfquery");
-var T = rdfquery.T;
+var T = require("./src/rdfquery").T;
+var TermFactory = require("./src/rdfquery/term-factory");
 var ShapesGraph = require("./src/shapes-graph");
 var ValidationEngine = require("./src/validation-engine");
 var ValidationReport = require("./src/validation-report");
@@ -36,7 +36,7 @@ var createRDFListNode = function(store, items, index) {
         return T("rdf:nil");
     }
     else {
-        var bnode = rdfquery.TermFactory.blankNode();
+        var bnode = TermFactory.blankNode();
         store.add(bnode, T("rdf:first"), items[index]);
         store.add(bnode, T("rdf:rest"), createRDFListNode(store, items, index + 1));
         return bnode;
@@ -111,7 +111,7 @@ SHACLValidator.prototype.showValidationResults = function(cb) {
     else {
 
         var resultGraph = $rdf.graph();
-        var reportNode = rdfquery.TermFactory.blankNode("report");
+        var reportNode = TermFactory.blankNode("report");
         resultGraph.add(reportNode, T("rdf:type"), T("sh:ValidationReport"));
         resultGraph.add(reportNode, T("sh:conforms"), T("" + (this.validationEngine.results.length == 0)));
         var nodes = {};
