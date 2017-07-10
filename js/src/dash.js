@@ -54,7 +54,7 @@ var registerDASH = function(shaclValidator) {
     };
 
     var validateClass = function ($value, $class) {
-        return new rdfquery($data(), shaclValidator).isInstanceOf($value, $class);
+        return new rdfquery.isInstanceOf($value, $class, shaclValidator);
     };
 
     var validateClosed = function ($value, $closed, $ignoredProperties, $currentShape) {
@@ -118,7 +118,7 @@ var registerDASH = function(shaclValidator) {
 
     var validateEqualsProperty = function ($this, $path, $equals) {
         var results = [];
-        var path = new rdfquery(null, shaclValidator).toRDFQueryPath($path);
+        var path = rdfquery.toRDFQueryPath($path, shaclValidator);
         $data().query().path($this, path, "?value").forEach(
             function (solution) {
                 if (!$data().query().match($this, $equals, solution.value).hasSolution()) {
@@ -143,7 +143,7 @@ var registerDASH = function(shaclValidator) {
     };
 
     var validateHasValueProperty = function ($this, $path, $hasValue) {
-        var count = $data().query().path($this, new rdfquery(null, shaclValidator).toRDFQueryPath($path), $hasValue).getCount();
+        var count = $data().query().path($this, rdfquery.toRDFQueryPath($path, shaclValidator), $hasValue).getCount();
         return count > 0;
     };
 
@@ -172,7 +172,7 @@ var registerDASH = function(shaclValidator) {
 
     var validateLessThanProperty = function ($this, $path, $lessThan) {
         var results = [];
-        $data().query().path($this, new rdfquery(null, shaclValidator).toRDFQueryPath($path), "?value").match($this, $lessThan, "?otherValue").forEach(function (sol) {
+        $data().query().path($this, rdfquery.toRDFQueryPath($path, shaclValidator), "?value").match($this, $lessThan, "?otherValue").forEach(function (sol) {
             var c = compareNodes(sol.value, sol.otherValue);
             if (c == null || c >= 0) {
                 results.push({
@@ -185,7 +185,7 @@ var registerDASH = function(shaclValidator) {
 
     var validateLessThanOrEqualsProperty = function ($this, $path, $lessThanOrEquals) {
         var results = [];
-        $data().query().path($this, new rdfquery(null, shaclValidator).toRDFQueryPath($path), "?value").match($this, $lessThanOrEquals, "?otherValue").forEach(function (sol) {
+        $data().query().path($this, rdfquery.toRDFQueryPath($path, shaclValidator), "?value").match($this, $lessThanOrEquals, "?otherValue").forEach(function (sol) {
             var c = compareNodes(sol.value, sol.otherValue);
             if (c == null || c > 0) {
                 results.push({
@@ -197,7 +197,7 @@ var registerDASH = function(shaclValidator) {
     }
 
     var validateMaxCountProperty = function ($this, $path, $maxCount) {
-        var count = $data().query().path($this, new rdfquery(null, shaclValidator).toRDFQueryPath($path), "?any").getCount();
+        var count = $data().query().path($this, rdfquery.toRDFQueryPath($path, shaclValidator), "?any").getCount();
         return count <= Number($maxCount.value);
     }
 
@@ -217,7 +217,7 @@ var registerDASH = function(shaclValidator) {
     }
 
     var validateMinCountProperty = function ($this, $path, $minCount) {
-        var count = $data().query().path($this, new rdfquery(null, shaclValidator).toRDFQueryPath($path), "?any").getCount();
+        var count = $data().query().path($this, rdfquery.toRDFQueryPath($path, shaclValidator), "?any").getCount();
         return count >= Number($minCount.value);
     }
 
@@ -261,7 +261,7 @@ var registerDASH = function(shaclValidator) {
 
     var validateNonRecursiveProperty = function ($this, $path, $nonRecursive) {
         if (T("true").equals($nonRecursive)) {
-            if ($data().query().path($this, new rdfquery(null, shaclValidator).toRDFQueryPath($path), $this).hasSolution()) {
+            if ($data().query().path($this, rdfquery.toRDFQueryPath($path, shaclValidator), $this).hasSolution()) {
                 return {
                     path: $path,
                     value: $this
@@ -275,7 +275,7 @@ var registerDASH = function(shaclValidator) {
     }
 
     var validateOr = function ($value, $or) {
-        var shapes = new rdfquery(null, shaclValidator).RDFQueryUtil($shapes()).rdfListToArray($or);
+        var shapes = new rdfquery($shapes(), shaclValidator).rdfListToArray($or);
         for (var i = 0; i < shapes.length; i++) {
             if (nodeConformsToShape($value, shapes[i])) {
                 return true;
@@ -296,7 +296,7 @@ var registerDASH = function(shaclValidator) {
         if (!$this.isURI()) {
             return "Must be an IRI";
         }
-        if ($data().query().path($this, new rdfquery(null, shaclValidator).toRDFQueryPath($path), null).getCount() != 1) {
+        if ($data().query().path($this, rdfquery.toRDFQueryPath($path, shaclValidator), null).getCount() != 1) {
             return "Must have exactly one value";
         }
         var value = $data().query().path($this, new rdfquery(null, shaclValidator).toRDFQueryPath($path), "?value").getNode("?value");
@@ -321,7 +321,7 @@ var registerDASH = function(shaclValidator) {
         if (T("true").equals($qualifiedValueShapesDisjoint)) {
             $shapes().query().match("?parentShape", "sh:property", $currentShape).match("?parentShape", "sh:property", "?sibling").match("?sibling", "sh:qualifiedValueShape", "?siblingShape").filter(exprNotEquals("?siblingShape", $qualifiedValueShape)).addAllNodes("?siblingShape", siblingShapes);
         }
-        return $data().query().path($this, new rdfquery(null, shaclValidator).toRDFQueryPath($path), "?value").filter(function (sol) {
+        return $data().query().path($this, rdfquery.toRDFQueryPath($path, shaclValidator), "?value").filter(function (sol) {
             return nodeConformsToShape(sol.value, $qualifiedValueShape) &&
                 !validateQualifiedConformsToASibling(sol.value, siblingShapes.toArray());
         }).getCount();
@@ -353,7 +353,7 @@ var registerDASH = function(shaclValidator) {
             return;
         }
         var map = {};
-        $data().query().path($this, new rdfquery(null, shaclValidator).toRDFQueryPath($path), "?value").forEach(function (sol) {
+        $data().query().path($this, rdfquery.toRDFQueryPath($path, shaclValidator), "?value").forEach(function (sol) {
             var lang = sol.value.language;
             if (lang && lang != "") {
                 var old = map[lang];

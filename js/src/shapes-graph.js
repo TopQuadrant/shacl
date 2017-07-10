@@ -166,9 +166,8 @@ Shape.prototype.getConstraints = function () {
 Shape.prototype.getTargetNodes = function (rdfDataGraph) {
     var results = new rdfquery.NodeSet();
     var dataUtil = new rdfquery(rdfDataGraph, this.shaclValidator);
-    var shapesUtil = new rdfquery(this.shaclValidator.rdfShapes, this.shaclValidator);
 
-    if (shapesUtil.isInstanceOf(this.shapeNode, T("rdfs:Class"))) {
+    if (rdfquery.isInstanceOf(this.shapeNode, T("rdfs:Class"), this.shaclValidator)) {
         results.addAll(dataUtil.getInstancesOf(this.shapeNode).toArray());
     }
 
@@ -198,7 +197,7 @@ Shape.prototype.getTargetNodes = function (rdfDataGraph) {
 
 Shape.prototype.getValueNodes = function (focusNode, rdfDataGraph) {
     if (this.path) {
-        return rdfDataGraph.query().path(focusNode, new rdfquery(null, this.shaclValidator).toRDFQueryPath(this.path), "?object").getNodeArray("?object");
+        return rdfDataGraph.query().path(focusNode, rdfquery.toRDFQueryPath(this.path, this.shaclValidator), "?object").getNodeArray("?object");
     }
     else {
         return [focusNode];
@@ -273,10 +272,9 @@ ShapesGraph.prototype.getShapesWithTarget = function () {
     if (!this.targetShapes) {
         this.targetShapes = [];
         var cs = this.getShapeNodesWithConstraints();
-        var util = new rdfquery(this.shaclValidator.rdfShapes, this.shaclValidator);
         for (var i = 0; i < cs.length; i++) {
             var shapeNode = cs[i];
-            if (util.isInstanceOf(shapeNode, T("rdfs:Class")) ||
+            if (rdfquery.isInstanceOf(shapeNode, T("rdfs:Class"), this.shaclValidator) ||
                 rdfquery.RDFQuery(this.shaclValidator.rdfShapes).match(shapeNode, "sh:targetClass", null).hasSolution() ||
                 rdfquery.RDFQuery(this.shaclValidator.rdfShapes).match(shapeNode, "sh:targetNode", null).hasSolution() ||
                 rdfquery.RDFQuery(this.shaclValidator.rdfShapes).match(shapeNode, "sh:targetSubjectsOf", null).hasSolution() ||

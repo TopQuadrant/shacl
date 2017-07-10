@@ -1058,9 +1058,8 @@ var walkPath = function(graph, subject, path, set, visited) {
     }
 };
 
-var RDFQueryUtil = function ($source, shaclValidator) {
+var RDFQueryUtil = function ($source) {
     this.source = $source;
-    this.shaclValidator = shaclValidator;
 };
 
 RDFQueryUtil.prototype.getInstancesOf = function ($class) {
@@ -1088,18 +1087,6 @@ RDFQueryUtil.prototype.getSubClassesOf = function ($class) {
     var set = new NodeSet();
     this.walkSubjects(set, $class, T("rdfs:subClassOf"));
     return set;
-};
-
-RDFQueryUtil.prototype.isInstanceOf = function ($instance, $class) {
-    var classes = this.getSubClassesOf($class);
-    var types = this.shaclValidator.rdfData.query().match($instance, "rdf:type", "?type");
-    for (var n = types.nextSolution(); n; n = types.nextSolution()) {
-        if (n.type.equals($class) || classes.contains(n.type)) {
-            types.close();
-            return true;
-        }
-    }
-    return false;
 };
 
 RDFQueryUtil.prototype.rdfListToArray = function ($rdfList) {
@@ -1135,44 +1122,57 @@ RDFQueryUtil.prototype.walkSubjects = function ($results, $object, $predicate) {
     }
 };
 
-RDFQueryUtil.prototype.toRDFQueryPath = function (shPath) {
+RDFQueryUtil.isInstanceOf = function ($instance, $class, shaclValidator) {
+    var shapesClasses = new RDFQueryUtil(shaclValidator.rdfShapes).getSubClassesOf($class) || [];
+    var dataClasses = new RDFQueryUtil(shaclValidator.rdfData).getSubClassesOf($class) || [];
+    var types = shaclValidator.rdfData.query().match($instance, "rdf:type", "?type");
+    for (var n = types.nextSolution(); n; n = types.nextSolution()) {
+        if (n.type.equals($class) || shapesClasses.contains(n.type) || dataClasses.contains(n.type)) {
+            types.close();
+            return true;
+        }
+    }
+    return false;
+};
+
+RDFQueryUtil.toRDFQueryPath = function (shPath, shaclValidator) {
     if (shPath.isURI()) {
         return shPath;
     }
     else if (shPath.isBlankNode()) {
-        var util = new RDFQueryUtil(this.shaclValidator.rdfShapes);
-        if (this.shaclValidator.rdfShapes.query().getObject(shPath, "rdf:first")) {
+        var util = new RDFQueryUtil(shaclValidator.rdfShapes);
+        if (shaclValidator.rdfShapes.query().getObject(shPath, "rdf:first")) {
             var paths = util.rdfListToArray(shPath);
             var result = [];
             for (var i = 0; i < paths.length; i++) {
-                result.push(toRDFQueryPath(paths[i]));
+                result.push(this.toRDFQueryPath(paths[i], shaclValidator));
             }
             return result;
         }
-        var alternativePath = this.shaclValidator.rdfShapes.query().getObject(shPath, "sh:alternativePath");
+        var alternativePath = shaclValidator.rdfShapes.query().getObject(shPath, "sh:alternativePath");
         if (alternativePath) {
             var paths = util.rdfListToArray(alternativePath);
             var result = [];
             for (var i = 0; i < paths.length; i++) {
-                result.push(toRDFQueryPath(paths[i]));
+                result.push(this.toRDFQueryPath(paths[i], shaclValidator));
             }
             return { or: result };
         }
-        var zeroOrMorePath = this.shaclValidator.rdfShapes.query().getObject(shPath, "sh:zeroOrMorePath");
+        var zeroOrMorePath = shaclValidator.rdfShapes.query().getObject(shPath, "sh:zeroOrMorePath");
         if (zeroOrMorePath) {
-            return { zeroOrMore: toRDFQueryPath(zeroOrMorePath) };
+            return { zeroOrMore: this.toRDFQueryPath(zeroOrMorePath, shaclValidator) };
         }
-        var oneOrMorePath = this.shaclValidator.rdfShapes.query().getObject(shPath, "sh:oneOrMorePath");
+        var oneOrMorePath = shaclValidator.rdfShapes.query().getObject(shPath, "sh:oneOrMorePath");
         if (oneOrMorePath) {
-            return { oneOrMore: toRDFQueryPath(oneOrMorePath) };
+            return { oneOrMore: this.toRDFQueryPath(oneOrMorePath, shaclValidator) };
         }
-        var zeroOrOnePath = this.shaclValidator.rdfShapes.query().getObject(shPath, "sh:zeroOrOnePath");
+        var zeroOrOnePath = shaclValidator.rdfShapes.query().getObject(shPath, "sh:zeroOrOnePath");
         if (zeroOrOnePath) {
-            return { zeroOrOne: toRDFQueryPath(zeroOrOnePath) };
+            return { zeroOrOne: this.toRDFQueryPath(zeroOrOnePath, shaclValidator) };
         }
-        var inversePath = this.shaclValidator.rdfShapes.query().getObject(shPath, "sh:inversePath");
+        var inversePath = shaclValidator.rdfShapes.query().getObject(shPath, "sh:inversePath");
         if (inversePath) {
-            return { inverse: toRDFQueryPath(inversePath) };
+            return { inverse: this.toRDFQueryPath(inversePath, shaclValidator) };
         }
     }
     throw "Unsupported SHACL path " + shPath;
