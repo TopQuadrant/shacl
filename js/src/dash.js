@@ -44,7 +44,7 @@ var registerDASH = function(shaclValidator) {
     XSDDecimalTypes.add(T("xsd:float"));
 
     var validateAnd = function ($value, $and) {
-        var shapes = new rdfquery($shapes(), shaclValidator).rdfListToArray($and);
+        var shapes = rdfquery($shapes()).rdfListToArray($and);
         for (var i = 0; i < shapes.length; i++) {
             if (!nodeConformsToShape($value, shapes[i])) {
                 return false;
@@ -54,7 +54,7 @@ var registerDASH = function(shaclValidator) {
     };
 
     var validateClass = function ($value, $class) {
-        return new rdfquery.isInstanceOf($value, $class, shaclValidator);
+        return rdfquery.isInstanceOf($value, $class, shaclValidator);
     };
 
     var validateClosed = function ($value, $closed, $ignoredProperties, $currentShape) {
@@ -65,7 +65,7 @@ var registerDASH = function(shaclValidator) {
             return solution.path.isURI()
         }).getNodeSet("?path");
         if ($ignoredProperties) {
-            allowed.addAll(new rdfquery($shapes(), shaclValidator).rdfListToArray($ignoredProperties));
+            allowed.addAll(rdfquery($shapes()).rdfListToArray($ignoredProperties));
         }
         var results = [];
         $data().query().match($value, "?predicate", "?object").filter(function (sol) {
@@ -275,7 +275,7 @@ var registerDASH = function(shaclValidator) {
     }
 
     var validateOr = function ($value, $or) {
-        var shapes = new rdfquery($shapes(), shaclValidator).rdfListToArray($or);
+        var shapes = rdfquery($shapes()).rdfListToArray($or);
         for (var i = 0; i < shapes.length; i++) {
             if (nodeConformsToShape($value, shapes[i])) {
                 return true;
@@ -299,7 +299,7 @@ var registerDASH = function(shaclValidator) {
         if ($data().query().path($this, rdfquery.toRDFQueryPath($path, shaclValidator), null).getCount() != 1) {
             return "Must have exactly one value";
         }
-        var value = $data().query().path($this, new rdfquery(null, shaclValidator).toRDFQueryPath($path), "?value").getNode("?value");
+        var value = $data().query().path($this, rdfquery.toRDFQueryPath($path), "?value").getNode("?value");
         var uri = $uriStart.lex + encodeURIComponent(value.value);
         if (!$this.uri.equals(uri)) {
             return "Does not have URI " + uri;
@@ -378,7 +378,7 @@ var registerDASH = function(shaclValidator) {
     }
 
     var validateXone = function ($value, $xone) {
-        var shapes = new rdfquery($shapes(), shaclValidator).rdfListToArray($xone);
+        var shapes = rdfquery($shapes()).rdfListToArray($xone);
         var count = 0;
         for (var i = 0; i < shapes.length; i++) {
             if (nodeConformsToShape($value, shapes[i])) {

@@ -1058,11 +1058,8 @@ var walkPath = function(graph, subject, path, set, visited) {
     }
 };
 
-var RDFQueryUtil = function ($source) {
-    this.source = $source;
-};
 
-RDFQueryUtil.prototype.getInstancesOf = function ($class) {
+StartQuery.prototype.getInstancesOf = function ($class) {
     var set = new NodeSet();
     var classes = this.getSubClassesOf($class);
     classes.add($class);
@@ -1073,7 +1070,7 @@ RDFQueryUtil.prototype.getInstancesOf = function ($class) {
     return set;
 };
 
-RDFQueryUtil.prototype.getObject = function ($subject, $predicate) {
+StartQuery.prototype.getObject = function ($subject, $predicate) {
     if (!$subject) {
         throw "Missing subject";
     }
@@ -1083,13 +1080,13 @@ RDFQueryUtil.prototype.getObject = function ($subject, $predicate) {
     return RDFQuery(this.source).match($subject, $predicate, "?object").getNode("?object");
 };
 
-RDFQueryUtil.prototype.getSubClassesOf = function ($class) {
+StartQuery.prototype.getSubClassesOf = function ($class) {
     var set = new NodeSet();
     this.walkSubjects(set, $class, T("rdfs:subClassOf"));
     return set;
 };
 
-RDFQueryUtil.prototype.rdfListToArray = function ($rdfList) {
+StartQuery.prototype.rdfListToArray = function ($rdfList) {
     if ($rdfList.elements != null) {
         return $rdfList.elements;
     } else {
@@ -1102,7 +1099,7 @@ RDFQueryUtil.prototype.rdfListToArray = function ($rdfList) {
     }
 };
 
-RDFQueryUtil.prototype.walkObjects = function ($results, $subject, $predicate) {
+StartQuery.prototype.walkObjects = function ($results, $subject, $predicate) {
     var it = this.source.find($subject, $predicate, null);
     for (var n = it.next(); n; n = it.next()) {
         if (!$results.contains(n.object)) {
@@ -1112,7 +1109,7 @@ RDFQueryUtil.prototype.walkObjects = function ($results, $subject, $predicate) {
     }
 };
 
-RDFQueryUtil.prototype.walkSubjects = function ($results, $object, $predicate) {
+StartQuery.prototype.walkSubjects = function ($results, $object, $predicate) {
     var it = this.source.find(null, $predicate, $object);
     for (var n = it.next(); n; n = it.next()) {
         if (!$results.contains(n.subject)) {
@@ -1122,9 +1119,9 @@ RDFQueryUtil.prototype.walkSubjects = function ($results, $object, $predicate) {
     }
 };
 
-RDFQueryUtil.isInstanceOf = function ($instance, $class, shaclValidator) {
-    var shapesClasses = new RDFQueryUtil(shaclValidator.rdfShapes).getSubClassesOf($class) || [];
-    var dataClasses = new RDFQueryUtil(shaclValidator.rdfData).getSubClassesOf($class) || [];
+RDFQuery.isInstanceOf = function ($instance, $class, shaclValidator) {
+    var shapesClasses = RDFQuery(shaclValidator.rdfShapes).getSubClassesOf($class) || [];
+    var dataClasses = RDFQuery(shaclValidator.rdfData).getSubClassesOf($class) || [];
     var types = shaclValidator.rdfData.query().match($instance, "rdf:type", "?type");
     for (var n = types.nextSolution(); n; n = types.nextSolution()) {
         if (n.type.equals($class) || shapesClasses.contains(n.type) || dataClasses.contains(n.type)) {
@@ -1135,12 +1132,12 @@ RDFQueryUtil.isInstanceOf = function ($instance, $class, shaclValidator) {
     return false;
 };
 
-RDFQueryUtil.toRDFQueryPath = function (shPath, shaclValidator) {
+RDFQuery.toRDFQueryPath = function (shPath, shaclValidator) {
     if (shPath.isURI()) {
         return shPath;
     }
     else if (shPath.isBlankNode()) {
-        var util = new RDFQueryUtil(shaclValidator.rdfShapes);
+        var util = RDFQuery(shaclValidator.rdfShapes);
         if (shaclValidator.rdfShapes.query().getObject(shPath, "rdf:first")) {
             var paths = util.rdfListToArray(shPath);
             var result = [];
@@ -1180,12 +1177,10 @@ RDFQueryUtil.toRDFQueryPath = function (shPath, shaclValidator) {
     return shPath;
 };
 
-RDFQueryUtil.TermFactory = TermFactory;
-RDFQueryUtil.RDFQuery = RDFQuery;
-RDFQueryUtil.NodeSet = NodeSet;
-RDFQueryUtil.RDFQueryUtil = RDFQueryUtil;
-RDFQueryUtil.T = T;
-RDFQueryUtil.getLocalName = getLocalName;
-RDFQueryUtil.compareTerms = compareTerms;
+RDFQuery.TermFactory = TermFactory;
+RDFQuery.NodeSet = NodeSet;
+RDFQuery.T = T;
+RDFQuery.getLocalName = getLocalName;
+RDFQuery.compareTerms = compareTerms;
 
-module.exports = RDFQueryUtil;
+module.exports = RDFQuery;

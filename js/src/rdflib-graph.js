@@ -33,7 +33,7 @@ RDFLibGraph.prototype.find = function (s, p, o) {
 };
 
 RDFLibGraph.prototype.query = function () {
-    return rdfquery.RDFQuery(this);
+    return rdfquery(this);
 };
 
 
