@@ -44,7 +44,7 @@ var registerDASH = function(shaclValidator) {
     XSDDecimalTypes.add(T("xsd:float"));
 
     var validateAnd = function ($value, $and) {
-        var shapes = rdfquery($shapes()).rdfListToArray($and);
+        var shapes = $shapes().query().rdfListToArray($and);
         for (var i = 0; i < shapes.length; i++) {
             if (!nodeConformsToShape($value, shapes[i])) {
                 return false;
@@ -65,7 +65,7 @@ var registerDASH = function(shaclValidator) {
             return solution.path.isURI()
         }).getNodeSet("?path");
         if ($ignoredProperties) {
-            allowed.addAll(rdfquery($shapes()).rdfListToArray($ignoredProperties));
+            allowed.addAll($shapes().query().rdfListToArray($ignoredProperties));
         }
         var results = [];
         $data().query().match($value, "?predicate", "?object").filter(function (sol) {
@@ -149,7 +149,7 @@ var registerDASH = function(shaclValidator) {
 
     var validateIn = function ($value, $in) {
         var set = new rdfquery.NodeSet();
-        set.addAll(new rdfquery($shapes(), shaclValidator).rdfListToArray($in));
+        set.addAll($shapes().query().rdfListToArray($in));
         return set.contains($value);
     }
 
@@ -161,7 +161,7 @@ var registerDASH = function(shaclValidator) {
         if (!lang || lang === "") {
             return false;
         }
-        var ls = new rdfquery($shapes(), shaclValidator).rdfListToArray($languageIn);
+        var ls = $shapes().query().rdfListToArray($languageIn);
         for (var i = 0; i < ls.length; i++) {
             if (lang.startsWith(ls[i].lex)) {
                 return true;
@@ -275,7 +275,7 @@ var registerDASH = function(shaclValidator) {
     }
 
     var validateOr = function ($value, $or) {
-        var shapes = rdfquery($shapes()).rdfListToArray($or);
+        var shapes = $shapes().query().rdfListToArray($or);
         for (var i = 0; i < shapes.length; i++) {
             if (nodeConformsToShape($value, shapes[i])) {
                 return true;
@@ -378,7 +378,7 @@ var registerDASH = function(shaclValidator) {
     }
 
     var validateXone = function ($value, $xone) {
-        var shapes = rdfquery($shapes()).rdfListToArray($xone);
+        var shapes = $shapes().query().rdfListToArray($xone);
         var count = 0;
         for (var i = 0; i < shapes.length; i++) {
             if (nodeConformsToShape($value, shapes[i])) {
