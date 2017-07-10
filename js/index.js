@@ -56,8 +56,8 @@ var SHACLValidator = function() {
 
     this.results = null;
     this.dataStore = $rdf.graph();
-    this.rdfData = new RDFLibGraph(this.dataStore);
-    this.rdfShapes = new RDFLibGraph($rdf.graph());
+    this.$data = new RDFLibGraph(this.dataStore);
+    this.$shapes = new RDFLibGraph($rdf.graph());
     this.validationEngine = null;
     this.validationError = null;
     this.sequence = null;
@@ -73,7 +73,7 @@ SHACLValidator.prototype.parseDataGraph = function(text, mediaType, andThen) {
     this.dataStore = $rdf.graph();
     var that = this;
     rdflibgraph.loadGraph(text, this.dataStore, dataGraphURI, mediaType, function () {
-        that.rdfData = new RDFLibGraph(that.dataStore);
+        that.$data = new RDFLibGraph(that.dataStore);
         andThen();
     }, function (ex) {
         error(ex);
@@ -91,7 +91,7 @@ SHACLValidator.prototype.updateValidationEngine = function() {
         if (this.sequence) {
             this.sequence = [];
         }
-        this.validationEngine.validateAll(this.rdfData);
+        this.validationEngine.validateAll(this.$data);
     }
     catch (ex) {
         this.validationError = ex;
@@ -163,7 +163,7 @@ SHACLValidator.prototype.parseShapesGraph = function(text, mediaType, andThen) {
     rdflibgraph.loadGraph(text, this.shapesStore, shapesGraphURI, mediaType, function () {
         rdflibgraph.loadGraph(shaclFile, that.shapesStore, "http://shacl.org", "text/turtle", function () {
             rdflibgraph.loadGraph(dashFile, that.shapesStore, "http://datashapes.org/dash", "text/turtle", function () {
-                that.rdfShapes = new RDFLibGraph(that.shapesStore);
+                that.$shapes = new RDFLibGraph(that.shapesStore);
                 andThen();
             });
         }, handleError);

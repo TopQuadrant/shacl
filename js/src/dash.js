@@ -8,7 +8,7 @@ var rdfquery = require("./rdfquery");
 var T = rdfquery.T;
 
 
-var registerDASH = function(shaclValidator) {
+var registerDASH = function(context) {
 
     var depth = 0;
 
@@ -18,8 +18,8 @@ var registerDASH = function(shaclValidator) {
     };
 
     var nodeConformsToShape = function (focusNode, shapeNode) {
-        var localEngine = new ValidationEngine(shaclValidator, true);
-        var shape = shaclValidator.shapesGraph.getShape(shapeNode);
+        var localEngine = new ValidationEngine(context, true);
+        var shape = context.shapesGraph.getShape(shapeNode);
         try {
             depth++;
             return !localEngine.validateNodeAgainstShape(focusNode, shape);
@@ -28,13 +28,7 @@ var registerDASH = function(shaclValidator) {
             depth--;
         }
     };
-
-    var $shapes =  function() {
-        return shaclValidator.rdfShapes;
-    };
-    var $data = function() {
-        return shaclValidator.rdfData;
-    };
+    
     var XSDIntegerTypes = new rdfquery.NodeSet();
     XSDIntegerTypes.add(T("xsd:integer"));
 
@@ -44,7 +38,7 @@ var registerDASH = function(shaclValidator) {
     XSDDecimalTypes.add(T("xsd:float"));
 
     var validateAnd = function ($value, $and) {
-        var shapes = $shapes().query().rdfListToArray($and);
+        var shapes = context.$shapes.query().rdfListToArray($and);
         for (var i = 0; i < shapes.length; i++) {
             if (!nodeConformsToShape($value, shapes[i])) {
                 return false;
@@ -54,21 +48,21 @@ var registerDASH = function(shaclValidator) {
     };
 
     var validateClass = function ($value, $class) {
-        return rdfquery.isInstanceOf($value, $class, shaclValidator);
+        return rdfquery.isInstanceOf($value, $class, context);
     };
 
     var validateClosed = function ($value, $closed, $ignoredProperties, $currentShape) {
         if (!T("true").equals($closed)) {
             return;
         }
-        var allowed = $shapes().query().match($currentShape, "sh:property", "?propertyShape").match("?propertyShape", "sh:path", "?path").filter(function (solution) {
+        var allowed = context.$shapes.query().match($currentShape, "sh:property", "?propertyShape").match("?propertyShape", "sh:path", "?path").filter(function (solution) {
             return solution.path.isURI()
         }).getNodeSet("?path");
         if ($ignoredProperties) {
-            allowed.addAll($shapes().query().rdfListToArray($ignoredProperties));
+            allowed.addAll(context.$shapes.query().rdfListToArray($ignoredProperties));
         }
         var results = [];
-        $data().query().match($value, "?predicate", "?object").filter(function (sol) {
+        context.$data.query().match($value, "?predicate", "?object").filter(function (sol) {
             return !allowed.contains(sol.predicate)
         }).forEach(function (sol) {
             results.push({
@@ -85,12 +79,12 @@ var registerDASH = function(shaclValidator) {
         }
         var results = [];
         var allowedProperties = new rdfquery.NodeSet();
-        $data().query().match($this, "rdf:type", "?directType").path("?directType", {zeroOrMore: T("rdfs:subClassOf")}, "?type").forEachNode("?type", function (type) {
-            $shapes().query().match(type, "sh:property", "?pshape").match("?pshape", "sh:path", "?path").filter(function (sol) {
+        context.$data.query().match($this, "rdf:type", "?directType").path("?directType", {zeroOrMore: T("rdfs:subClassOf")}, "?type").forEachNode("?type", function (type) {
+            context.$shapes.query().match(type, "sh:property", "?pshape").match("?pshape", "sh:path", "?path").filter(function (sol) {
                 return sol.path.isURI()
             }).addAllNodes("?path", allowedProperties);
         });
-        $data().query().match($this, "?predicate", "?object").filter(function (sol) {
+        context.$data.query().match($this, "?predicate", "?object").filter(function (sol) {
             return !T("rdf:type").equals(sol.predicate)
         }).filter(function (sol) {
             return !allowedProperties.contains(sol.predicate)
@@ -113,23 +107,23 @@ var registerDASH = function(shaclValidator) {
     };
 
     var validateDisjoint = function ($this, $value, $disjoint) {
-        return !$data().query().match($this, $disjoint, $value).hasSolution();
+        return !context.$data.query().match($this, $disjoint, $value).hasSolution();
     };
 
     var validateEqualsProperty = function ($this, $path, $equals) {
         var results = [];
-        var path = rdfquery.toRDFQueryPath($path, shaclValidator);
-        $data().query().path($this, path, "?value").forEach(
+        var path = rdfquery.toRDFQueryPath($path, context);
+        context.$data.query().path($this, path, "?value").forEach(
             function (solution) {
-                if (!$data().query().match($this, $equals, solution.value).hasSolution()) {
+                if (!context.$data.query().match($this, $equals, solution.value).hasSolution()) {
                     results.push({
                         value: solution.value
                     });
                 }
             });
-        $data().query().match($this, $equals, "?value").forEach(
+        context.$data.query().match($this, $equals, "?value").forEach(
             function (solution) {
-                if (!$data().query().path($this, path, solution.value).hasSolution()) {
+                if (!context.$data.query().path($this, path, solution.value).hasSolution()) {
                     results.push({
                         value: solution.value
                     });
@@ -143,13 +137,13 @@ var registerDASH = function(shaclValidator) {
     };
 
     var validateHasValueProperty = function ($this, $path, $hasValue) {
-        var count = $data().query().path($this, rdfquery.toRDFQueryPath($path, shaclValidator), $hasValue).getCount();
+        var count = context.$data.query().path($this, rdfquery.toRDFQueryPath($path, context), $hasValue).getCount();
         return count > 0;
     };
 
     var validateIn = function ($value, $in) {
         var set = new rdfquery.NodeSet();
-        set.addAll($shapes().query().rdfListToArray($in));
+        set.addAll(context.$shapes.query().rdfListToArray($in));
         return set.contains($value);
     }
 
@@ -161,7 +155,7 @@ var registerDASH = function(shaclValidator) {
         if (!lang || lang === "") {
             return false;
         }
-        var ls = $shapes().query().rdfListToArray($languageIn);
+        var ls = context.$shapes.query().rdfListToArray($languageIn);
         for (var i = 0; i < ls.length; i++) {
             if (lang.startsWith(ls[i].lex)) {
                 return true;
@@ -172,7 +166,7 @@ var registerDASH = function(shaclValidator) {
 
     var validateLessThanProperty = function ($this, $path, $lessThan) {
         var results = [];
-        $data().query().path($this, rdfquery.toRDFQueryPath($path, shaclValidator), "?value").match($this, $lessThan, "?otherValue").forEach(function (sol) {
+        context.$data.query().path($this, rdfquery.toRDFQueryPath($path, context), "?value").match($this, $lessThan, "?otherValue").forEach(function (sol) {
             var c = compareNodes(sol.value, sol.otherValue);
             if (c == null || c >= 0) {
                 results.push({
@@ -185,7 +179,7 @@ var registerDASH = function(shaclValidator) {
 
     var validateLessThanOrEqualsProperty = function ($this, $path, $lessThanOrEquals) {
         var results = [];
-        $data().query().path($this, rdfquery.toRDFQueryPath($path, shaclValidator), "?value").match($this, $lessThanOrEquals, "?otherValue").forEach(function (sol) {
+        context.$data.query().path($this, rdfquery.toRDFQueryPath($path, context), "?value").match($this, $lessThanOrEquals, "?otherValue").forEach(function (sol) {
             var c = compareNodes(sol.value, sol.otherValue);
             if (c == null || c > 0) {
                 results.push({
@@ -197,7 +191,7 @@ var registerDASH = function(shaclValidator) {
     }
 
     var validateMaxCountProperty = function ($this, $path, $maxCount) {
-        var count = $data().query().path($this, rdfquery.toRDFQueryPath($path, shaclValidator), "?any").getCount();
+        var count = context.$data.query().path($this, rdfquery.toRDFQueryPath($path, context), "?any").getCount();
         return count <= Number($maxCount.value);
     }
 
@@ -217,7 +211,7 @@ var registerDASH = function(shaclValidator) {
     }
 
     var validateMinCountProperty = function ($this, $path, $minCount) {
-        var count = $data().query().path($this, rdfquery.toRDFQueryPath($path, shaclValidator), "?any").getCount();
+        var count = context.$data.query().path($this, rdfquery.toRDFQueryPath($path, context), "?any").getCount();
         return count >= Number($minCount.value);
     }
 
@@ -261,7 +255,7 @@ var registerDASH = function(shaclValidator) {
 
     var validateNonRecursiveProperty = function ($this, $path, $nonRecursive) {
         if (T("true").equals($nonRecursive)) {
-            if ($data().query().path($this, rdfquery.toRDFQueryPath($path, shaclValidator), $this).hasSolution()) {
+            if (context.$data.query().path($this, rdfquery.toRDFQueryPath($path, context), $this).hasSolution()) {
                 return {
                     path: $path,
                     value: $this
@@ -275,7 +269,7 @@ var registerDASH = function(shaclValidator) {
     }
 
     var validateOr = function ($value, $or) {
-        var shapes = $shapes().query().rdfListToArray($or);
+        var shapes = context.$shapes.query().rdfListToArray($or);
         for (var i = 0; i < shapes.length; i++) {
             if (nodeConformsToShape($value, shapes[i])) {
                 return true;
@@ -296,10 +290,10 @@ var registerDASH = function(shaclValidator) {
         if (!$this.isURI()) {
             return "Must be an IRI";
         }
-        if ($data().query().path($this, rdfquery.toRDFQueryPath($path, shaclValidator), null).getCount() != 1) {
+        if (context.$data.query().path($this, rdfquery.toRDFQueryPath($path, context), null).getCount() != 1) {
             return "Must have exactly one value";
         }
-        var value = $data().query().path($this, rdfquery.toRDFQueryPath($path), "?value").getNode("?value");
+        var value = context.$data.query().path($this, rdfquery.toRDFQueryPath($path), "?value").getNode("?value");
         var uri = $uriStart.lex + encodeURIComponent(value.value);
         if (!$this.uri.equals(uri)) {
             return "Does not have URI " + uri;
@@ -319,9 +313,9 @@ var registerDASH = function(shaclValidator) {
     var validateQualifiedHelper = function ($this, $path, $qualifiedValueShape, $qualifiedValueShapesDisjoint, $currentShape) {
         var siblingShapes = new rdfquery.NodeSet();
         if (T("true").equals($qualifiedValueShapesDisjoint)) {
-            $shapes().query().match("?parentShape", "sh:property", $currentShape).match("?parentShape", "sh:property", "?sibling").match("?sibling", "sh:qualifiedValueShape", "?siblingShape").filter(exprNotEquals("?siblingShape", $qualifiedValueShape)).addAllNodes("?siblingShape", siblingShapes);
+            context.$shapes.query().match("?parentShape", "sh:property", $currentShape).match("?parentShape", "sh:property", "?sibling").match("?sibling", "sh:qualifiedValueShape", "?siblingShape").filter(exprNotEquals("?siblingShape", $qualifiedValueShape)).addAllNodes("?siblingShape", siblingShapes);
         }
-        return $data().query().path($this, rdfquery.toRDFQueryPath($path, shaclValidator), "?value").filter(function (sol) {
+        return context.$data.query().path($this, rdfquery.toRDFQueryPath($path, context), "?value").filter(function (sol) {
             return nodeConformsToShape(sol.value, $qualifiedValueShape) &&
                 !validateQualifiedConformsToASibling(sol.value, siblingShapes.toArray());
         }).getCount();
@@ -337,7 +331,7 @@ var registerDASH = function(shaclValidator) {
     }
 
     var validateRootClass = function ($value, $rootClass) {
-        return $data().query().path($value, {zeroOrMore: T("rdfs:subClassOf")}, $rootClass).hasSolution();
+        return context.$data.query().path($value, {zeroOrMore: T("rdfs:subClassOf")}, $rootClass).hasSolution();
     }
 
     var validateStem = function ($value, $stem) {
@@ -345,7 +339,7 @@ var registerDASH = function(shaclValidator) {
     }
 
     var validateSubSetOf = function ($this, $subSetOf, $value) {
-        return $data().query().match($this, $subSetOf, $value).hasSolution();
+        return context.$data.query().match($this, $subSetOf, $value).hasSolution();
     }
 
     var validateUniqueLangProperty = function ($this, $uniqueLang, $path) {
@@ -353,7 +347,7 @@ var registerDASH = function(shaclValidator) {
             return;
         }
         var map = {};
-        $data().query().path($this, rdfquery.toRDFQueryPath($path, shaclValidator), "?value").forEach(function (sol) {
+        context.$data.query().path($this, rdfquery.toRDFQueryPath($path, context), "?value").forEach(function (sol) {
             var lang = sol.value.language;
             if (lang && lang != "") {
                 var old = map[lang];
@@ -378,7 +372,7 @@ var registerDASH = function(shaclValidator) {
     }
 
     var validateXone = function ($value, $xone) {
-        var shapes = $shapes().query().rdfListToArray($xone);
+        var shapes = context.$shapes.query().rdfListToArray($xone);
         var count = 0;
         for (var i = 0; i < shapes.length; i++) {
             if (nodeConformsToShape($value, shapes[i])) {
@@ -407,43 +401,43 @@ var registerDASH = function(shaclValidator) {
     }
 
 
-    shaclValidator.functionRegistry.validateAnd = validateAnd;
-    shaclValidator.functionRegistry.validateClass = validateClass;
-    shaclValidator.functionRegistry.validateClosed = validateClosed;
-    shaclValidator.functionRegistry.validateClosedByTypesNode = validateClosedByTypesNode;
-    shaclValidator.functionRegistry.validateDatatype = validateDatatype;
-    shaclValidator.functionRegistry.validateDisjoint = validateDisjoint;
-    shaclValidator.functionRegistry.validateEqualsProperty = validateEqualsProperty;
-    shaclValidator.functionRegistry.validateHasValueNode = validateHasValueNode;
-    shaclValidator.functionRegistry.validateHasValueProperty = validateHasValueProperty;
-    shaclValidator.functionRegistry.validateIn = validateIn;
-    shaclValidator.functionRegistry.validateLanguageIn = validateLanguageIn;
-    shaclValidator.functionRegistry.validateLessThanProperty = validateLessThanProperty;
-    shaclValidator.functionRegistry.validateLessThanOrEqualsProperty = validateLessThanOrEqualsProperty;
-    shaclValidator.functionRegistry.validateMaxCountProperty = validateMaxCountProperty;
-    shaclValidator.functionRegistry.validateMaxExclusive = validateMaxExclusive;
-    shaclValidator.functionRegistry.validateMaxInclusive = validateMaxInclusive;
-    shaclValidator.functionRegistry.validateMaxLength = validateMaxLength;
-    shaclValidator.functionRegistry.validateMinCountProperty = validateMinCountProperty;
-    shaclValidator.functionRegistry.validateMinExclusive = validateMinExclusive;
-    shaclValidator.functionRegistry.validateMinInclusive = validateMinInclusive;
-    shaclValidator.functionRegistry.validateMinLength = validateMinLength;
-    shaclValidator.functionRegistry.validateNodeKind = validateNodeKind;
-    shaclValidator.functionRegistry.validateNode = validateNode;
-    shaclValidator.functionRegistry.validateNonRecursiveProperty = validateNonRecursiveProperty;
-    shaclValidator.functionRegistry.validateNot = validateNot;
-    shaclValidator.functionRegistry.validateOr = validateOr;
-    shaclValidator.functionRegistry.validatePattern = validatePattern;
-    shaclValidator.functionRegistry.validatePrimaryKeyProperty = validatePrimaryKeyProperty;
-    shaclValidator.functionRegistry.validateQualifiedMaxCountProperty = validateQualifiedMaxCountProperty;
-    shaclValidator.functionRegistry.validateQualifiedMinCountProperty = validateQualifiedMinCountProperty;
-    shaclValidator.functionRegistry.validateQualifiedHelper = validateQualifiedHelper;
-    shaclValidator.functionRegistry.validateQualifiedConformsToASibling = validateQualifiedConformsToASibling;
-    shaclValidator.functionRegistry.validateRootClass = validateRootClass;
-    shaclValidator.functionRegistry.validateStem = validateStem;
-    shaclValidator.functionRegistry.validateSubSetOf = validateSubSetOf;
-    shaclValidator.functionRegistry.validateUniqueLangProperty = validateUniqueLangProperty;
-    shaclValidator.functionRegistry.validateXone = validateXone;
+    context.functionRegistry.validateAnd = validateAnd;
+    context.functionRegistry.validateClass = validateClass;
+    context.functionRegistry.validateClosed = validateClosed;
+    context.functionRegistry.validateClosedByTypesNode = validateClosedByTypesNode;
+    context.functionRegistry.validateDatatype = validateDatatype;
+    context.functionRegistry.validateDisjoint = validateDisjoint;
+    context.functionRegistry.validateEqualsProperty = validateEqualsProperty;
+    context.functionRegistry.validateHasValueNode = validateHasValueNode;
+    context.functionRegistry.validateHasValueProperty = validateHasValueProperty;
+    context.functionRegistry.validateIn = validateIn;
+    context.functionRegistry.validateLanguageIn = validateLanguageIn;
+    context.functionRegistry.validateLessThanProperty = validateLessThanProperty;
+    context.functionRegistry.validateLessThanOrEqualsProperty = validateLessThanOrEqualsProperty;
+    context.functionRegistry.validateMaxCountProperty = validateMaxCountProperty;
+    context.functionRegistry.validateMaxExclusive = validateMaxExclusive;
+    context.functionRegistry.validateMaxInclusive = validateMaxInclusive;
+    context.functionRegistry.validateMaxLength = validateMaxLength;
+    context.functionRegistry.validateMinCountProperty = validateMinCountProperty;
+    context.functionRegistry.validateMinExclusive = validateMinExclusive;
+    context.functionRegistry.validateMinInclusive = validateMinInclusive;
+    context.functionRegistry.validateMinLength = validateMinLength;
+    context.functionRegistry.validateNodeKind = validateNodeKind;
+    context.functionRegistry.validateNode = validateNode;
+    context.functionRegistry.validateNonRecursiveProperty = validateNonRecursiveProperty;
+    context.functionRegistry.validateNot = validateNot;
+    context.functionRegistry.validateOr = validateOr;
+    context.functionRegistry.validatePattern = validatePattern;
+    context.functionRegistry.validatePrimaryKeyProperty = validatePrimaryKeyProperty;
+    context.functionRegistry.validateQualifiedMaxCountProperty = validateQualifiedMaxCountProperty;
+    context.functionRegistry.validateQualifiedMinCountProperty = validateQualifiedMinCountProperty;
+    context.functionRegistry.validateQualifiedHelper = validateQualifiedHelper;
+    context.functionRegistry.validateQualifiedConformsToASibling = validateQualifiedConformsToASibling;
+    context.functionRegistry.validateRootClass = validateRootClass;
+    context.functionRegistry.validateStem = validateStem;
+    context.functionRegistry.validateSubSetOf = validateSubSetOf;
+    context.functionRegistry.validateUniqueLangProperty = validateUniqueLangProperty;
+    context.functionRegistry.validateXone = validateXone;
 
 };
 

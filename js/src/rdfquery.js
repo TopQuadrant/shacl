@@ -1119,10 +1119,10 @@ StartQuery.prototype.walkSubjects = function ($results, $object, $predicate) {
     }
 };
 
-RDFQuery.isInstanceOf = function ($instance, $class, shaclValidator) {
-    var shapesClasses = RDFQuery(shaclValidator.rdfShapes).getSubClassesOf($class) || [];
-    var dataClasses = RDFQuery(shaclValidator.rdfData).getSubClassesOf($class) || [];
-    var types = shaclValidator.rdfData.query().match($instance, "rdf:type", "?type");
+var isInstanceOf = function ($instance, $class, context) {
+    var shapesClasses = RDFQuery(context.$shapes).getSubClassesOf($class) || [];
+    var dataClasses = RDFQuery(context.$data).getSubClassesOf($class) || [];
+    var types = context.$data.query().match($instance, "rdf:type", "?type");
     for (var n = types.nextSolution(); n; n = types.nextSolution()) {
         if (n.type.equals($class) || shapesClasses.contains(n.type) || dataClasses.contains(n.type)) {
             types.close();
@@ -1132,44 +1132,44 @@ RDFQuery.isInstanceOf = function ($instance, $class, shaclValidator) {
     return false;
 };
 
-RDFQuery.toRDFQueryPath = function (shPath, shaclValidator) {
+var toRDFQueryPath = function (shPath, context) {
     if (shPath.isURI()) {
         return shPath;
     }
     else if (shPath.isBlankNode()) {
-        var util = RDFQuery(shaclValidator.rdfShapes);
-        if (shaclValidator.rdfShapes.query().getObject(shPath, "rdf:first")) {
+        var util = RDFQuery(context.$shapes);
+        if (context.$shapes.query().getObject(shPath, "rdf:first")) {
             var paths = util.rdfListToArray(shPath);
             var result = [];
             for (var i = 0; i < paths.length; i++) {
-                result.push(this.toRDFQueryPath(paths[i], shaclValidator));
+                result.push(this.toRDFQueryPath(paths[i], context));
             }
             return result;
         }
-        var alternativePath = shaclValidator.rdfShapes.query().getObject(shPath, "sh:alternativePath");
+        var alternativePath = context.$shapes.query().getObject(shPath, "sh:alternativePath");
         if (alternativePath) {
             var paths = util.rdfListToArray(alternativePath);
             var result = [];
             for (var i = 0; i < paths.length; i++) {
-                result.push(this.toRDFQueryPath(paths[i], shaclValidator));
+                result.push(this.toRDFQueryPath(paths[i], context));
             }
             return { or: result };
         }
-        var zeroOrMorePath = shaclValidator.rdfShapes.query().getObject(shPath, "sh:zeroOrMorePath");
+        var zeroOrMorePath = context.$shapes.query().getObject(shPath, "sh:zeroOrMorePath");
         if (zeroOrMorePath) {
-            return { zeroOrMore: this.toRDFQueryPath(zeroOrMorePath, shaclValidator) };
+            return { zeroOrMore: this.toRDFQueryPath(zeroOrMorePath, context) };
         }
-        var oneOrMorePath = shaclValidator.rdfShapes.query().getObject(shPath, "sh:oneOrMorePath");
+        var oneOrMorePath = context.$shapes.query().getObject(shPath, "sh:oneOrMorePath");
         if (oneOrMorePath) {
-            return { oneOrMore: this.toRDFQueryPath(oneOrMorePath, shaclValidator) };
+            return { oneOrMore: this.toRDFQueryPath(oneOrMorePath, context) };
         }
-        var zeroOrOnePath = shaclValidator.rdfShapes.query().getObject(shPath, "sh:zeroOrOnePath");
+        var zeroOrOnePath = context.$shapes.query().getObject(shPath, "sh:zeroOrOnePath");
         if (zeroOrOnePath) {
-            return { zeroOrOne: this.toRDFQueryPath(zeroOrOnePath, shaclValidator) };
+            return { zeroOrOne: this.toRDFQueryPath(zeroOrOnePath, context) };
         }
-        var inversePath = shaclValidator.rdfShapes.query().getObject(shPath, "sh:inversePath");
+        var inversePath = context.$shapes.query().getObject(shPath, "sh:inversePath");
         if (inversePath) {
-            return { inverse: this.toRDFQueryPath(inversePath, shaclValidator) };
+            return { inverse: this.toRDFQueryPath(inversePath, context) };
         }
     }
     throw "Unsupported SHACL path " + shPath;
@@ -1182,5 +1182,7 @@ RDFQuery.NodeSet = NodeSet;
 RDFQuery.T = T;
 RDFQuery.getLocalName = getLocalName;
 RDFQuery.compareTerms = compareTerms;
+RDFQuery.toRDFQueryPath = toRDFQueryPath;
+RDFQuery.isInstanceOf = isInstanceOf;
 
 module.exports = RDFQuery;

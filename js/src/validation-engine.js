@@ -21,8 +21,8 @@ var nodeLabel = function (node, store) {
 
 // class ValidationEngine
 
-var ValidationEngine = function (shaclValidator, conformanceOnly) {
-    this.shaclValidator = shaclValidator;
+var ValidationEngine = function (context, conformanceOnly) {
+    this.context = context;
     this.conformanceOnly = conformanceOnly;
     this.results = [];
 };
@@ -107,7 +107,7 @@ ValidationEngine.prototype.createResultFromObject = function (obj, constraint, f
  * Creates a result message from the result and the message pattern in the constraint
  */
 ValidationEngine.prototype.createResultMessages = function (result, constraint) {
-    var ms = this.shaclValidator.rdfShapes.query()
+    var ms = this.context.$shapes.query()
         .match(constraint.shape.shapeNode, "sh:message", "?message")
         .getNodeArray("?message");
     if (ms.length === 0) {
@@ -115,13 +115,13 @@ ValidationEngine.prototype.createResultMessages = function (result, constraint) 
             constraint.component.propertyValidationFunctionGeneric :
             constraint.component.nodeValidationFunctionGeneric;
         var predicate = generic ? T("sh:validator") : (constraint.shape.isPropertyShape() ? T("sh:propertyValidator") : T("sh:nodeValidator"));
-        ms = this.shaclValidator.rdfShapes.query()
+        ms = this.context.$shapes.query()
             .match(constraint.component.node, predicate, "?validator")
             .match("?validator", "sh:message", "?message")
             .getNodeArray("?message");
     }
     if (ms.length === 0) {
-        ms = this.shaclValidator.rdfShapes.query()
+        ms = this.context.$shapes.query()
             .match(constraint.component.node, "sh:message", "?message")
             .getNodeArray("?message");
     }
@@ -136,7 +136,7 @@ ValidationEngine.prototype.createResultMessages = function (result, constraint) 
  * Validates the data graph against the shapes graph
  */
 ValidationEngine.prototype.validateAll = function (rdfDataGraph) {
-    var shapes = this.shaclValidator.shapesGraph.getShapesWithTarget();
+    var shapes = this.context.shapesGraph.getShapesWithTarget();
     for (var i = 0; i < shapes.length; i++) {
         var shape = shapes[i];
         var focusNodes = shape.getTargetNodes(rdfDataGraph);
@@ -169,7 +169,7 @@ ValidationEngine.prototype.validateNodeAgainstShape = function (focusNode, shape
 ValidationEngine.prototype.validateNodeAgainstConstraint = function (focusNode, valueNodes, constraint, rdfDataGraph) {
     if (T("sh:PropertyConstraintComponent").equals(constraint.component.node)) {
         for (var i = 0; i < valueNodes.length; i++) {
-            if (this.validateNodeAgainstShape(valueNodes[i], this.shaclValidator.shapesGraph.getShape(constraint.paramValue), rdfDataGraph)) {
+            if (this.validateNodeAgainstShape(valueNodes[i], this.context.shapesGraph.getShape(constraint.paramValue), rdfDataGraph)) {
                 return true;
             }
         }
@@ -228,7 +228,7 @@ ValidationEngine.prototype.withSubstitutions = function (msg, constraint) {
     var str = msg.lex;
     var values = constraint.parameterValues;
     for (var key in values) {
-        var label = nodeLabel(values[key], this.shaclValidator.shapesGraph);
+        var label = nodeLabel(values[key], this.context.$shapes);
         str = str.replace("{$" + key + "}", label);
         str = str.replace("{?" + key + "}", label);
     }
