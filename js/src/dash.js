@@ -9,13 +9,62 @@ var NodeSet = require("./rdfquery/node-set");
 var ValidationEngine = require("./validation-engine");
 var T = rdfquery.T;
 
+var coerceValue = function(t) {
+    if (t.datatype == null) {
+        return t.value;
+    } else if (t.datatype.uri === "http://www.w3.org/2001/XMLSchema#integer") {
+        return parseInt(t.value);
+    } else if (t.datatype.uri === "http://www.w3.org/2001/XMLSchema#float") {
+        return parseFloat(t.value);
+    } else {
+        return t.value;
+    }
+};
+var compareTerms = function (t1, t2) {
+    if (!t1) {
+        return !t2 ? 0 : 1;
+    }
+    else if (!t2) {
+        return -1;
+    }
+    var bt = t1.termType.localeCompare(t2.termType);
+    if (bt !== 0) {
+        return bt;
+    }
+    else {
+        // TODO: Does not handle numeric or date comparison
+        var v1 = coerceValue(t1);
+        var v2 = coerceValue(t2);
+        if (v1 !== v2) {
+            return (v1 <= v2) ? -1 : 1;
+        }
+        else {
+            if (t1.isLiteral()) {
+                var bd = t1.datatype.uri.localeCompare(t2.datatype.uri);
+                if (bd !== 0) {
+                    return bd;
+                }
+                else if (T("rdf:langString").equals(t1.datatype)) {
+                    return t1.language.localeCompare(t2.language);
+                }
+                else {
+                    return 0;
+                }
+            }
+            else {
+                return 0;
+            }
+        }
+    }
+};
+
 var registerDASH = function(context) {
 
     var depth = 0;
 
     var compareNodes = function (node1, node2) {
         // TODO: Does not handle the case where nodes cannot be compared
-        return rdfquery.compareTerms(node1, node2);
+        return compareTerms(node1, node2);
     };
 
     var nodeConformsToShape = function (focusNode, shapeNode) {
@@ -334,7 +383,7 @@ var registerDASH = function(context) {
     var validateQualifiedHelper = function ($this, $path, $qualifiedValueShape, $qualifiedValueShapesDisjoint, $currentShape) {
         var siblingShapes = new NodeSet();
         if (T("true").equals($qualifiedValueShapesDisjoint)) {
-            context.$shapes.query().match("?parentShape", "sh:property", $currentShape).match("?parentShape", "sh:property", "?sibling").match("?sibling", "sh:qualifiedValueShape", "?siblingShape").filter(exprNotEquals("?siblingShape", $qualifiedValueShape)).addAllNodes("?siblingShape", siblingShapes);
+            context.$shapes.query().match("?parentShape", "sh:property", $currentShape).match("?parentShape", "sh:property", "?sibling").match("?sibling", "sh:qualifiedValueShape", "?siblingShape").filter(rdfquery.exprNotEquals("?siblingShape", $qualifiedValueShape)).addAllNodes("?siblingShape", siblingShapes);
         }
         return context.$data.query().path($this, rdfquery.toRDFQueryPath($path, context), "?value").filter(function (sol) {
             return nodeConformsToShape(sol.value, $qualifiedValueShape) &&
@@ -416,7 +465,9 @@ var registerDASH = function(context) {
             var r = parseFloat(lex);
             return !isNan(r);
         }
-        else {
+        else if (datatype.value === "http://www.w3.org/2001/XMLSchema#boolean") {
+            return lex !== "true" && lex !== "false";
+        } else {
             return true;
         }
     }

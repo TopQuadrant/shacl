@@ -1,35 +1,20 @@
-# baseURI: http://datashapes.org/sh/tests/core/node/and-002.test
+# baseURI: http://datashapes.org/sh/tests/core/property/datatype-002.test
 # imports: http://datashapes.org/dash
 # prefix: ex
 
 @prefix dash: <http://datashapes.org/dash#> .
-@prefix ex: <http://datashapes.org/sh/tests/core/node/and-002.test#> .
+@prefix ex: <http://datashapes.org/sh/tests/core/property/datatype-002.test#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://datashapes.org/sh/tests/core/node/and-002.test>
+<http://datashapes.org/sh/tests/core/property/datatype-002.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of sh:and at node shape 002" ;
+  rdfs:label "Test of sh:datatype at property shape 002" ;
   owl:imports <http://datashapes.org/dash> ;
   owl:versionInfo "Created with TopBraid Composer" ;
-.
-ex:AndShape
-  rdf:type sh:NodeShape ;
-  sh:and (
-      ex:SuperShape
-      [
-        sh:property [
-            sh:path ex:property ;
-            sh:maxCount 1 ;
-          ] ;
-      ]
-    ) ;
-  sh:targetNode ex:InvalidInstance1 ;
-  sh:targetNode ex:InvalidInstance2 ;
-  sh:targetNode ex:ValidInstance1 ;
 .
 ex:GraphValidationTestCase
   rdf:type dash:GraphValidationTestCase ;
@@ -39,32 +24,44 @@ ex:GraphValidationTestCase
       sh:result [
           rdf:type sh:ValidationResult ;
           sh:focusNode ex:InvalidInstance1 ;
+          sh:resultPath ex:value ;
           sh:resultSeverity sh:Violation ;
-          sh:sourceConstraintComponent sh:AndConstraintComponent ;
-          sh:sourceShape ex:AndShape ;
-          sh:value ex:InvalidInstance1 ;
+          sh:sourceConstraintComponent sh:DatatypeConstraintComponent ;
+          sh:sourceShape ex:TestShape-value ;
+          sh:value "A"@en ;
         ] ;
       sh:result [
           rdf:type sh:ValidationResult ;
           sh:focusNode ex:InvalidInstance2 ;
+          sh:resultPath ex:value ;
           sh:resultSeverity sh:Violation ;
-          sh:sourceConstraintComponent sh:AndConstraintComponent ;
-          sh:sourceShape ex:AndShape ;
-          sh:value ex:InvalidInstance2 ;
+          sh:sourceConstraintComponent sh:DatatypeConstraintComponent ;
+          sh:sourceShape ex:TestShape-value ;
+          sh:value 42 ;
         ] ;
     ] ;
 .
-ex:InvalidInstance2
-  ex:property "One" ;
-  ex:property "Two" ;
+ex:InvalidInstance1
+  ex:value "A"@en ;
 .
-ex:SuperShape
+ex:InvalidInstance2
+  ex:value 42 ;
+.
+ex:TestShape
   rdf:type sh:NodeShape ;
-  sh:property [
-      sh:path ex:property ;
-      sh:minCount 1 ;
-    ] ;
+  sh:property ex:TestShape-value ;
+  sh:targetNode ex:InvalidInstance1 ;
+  sh:targetNode ex:InvalidInstance2 ;
+  sh:targetNode ex:ValidInstance1 ;
+  sh:targetNode ex:ValidInstance2 ;
+.
+ex:TestShape-value
+  sh:path ex:value ;
+  sh:datatype xsd:string ;
 .
 ex:ValidInstance1
-  ex:property "One" ;
+  ex:value "A" ;
+.
+ex:ValidInstance2
+  ex:value "A" ;
 .

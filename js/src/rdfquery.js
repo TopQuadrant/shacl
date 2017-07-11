@@ -1006,6 +1006,15 @@ var isInstanceOf = function ($instance, $class, context) {
 };
 
 var toRDFQueryPath = function (shPath, context) {
+    if (shPath.termType === "Collection") {
+        var util = RDFQuery(context.$shapes);
+        var paths = util.rdfListToArray(shPath);
+        var result = [];
+        for (var i = 0; i < paths.length; i++) {
+            result.push(this.toRDFQueryPath(paths[i], context));
+        }
+        return result;
+    }
     if (shPath.isURI()) {
         return shPath;
     }
@@ -1056,5 +1065,6 @@ RDFQuery.getLocalName = getLocalName;
 RDFQuery.compareTerms = compareTerms;
 RDFQuery.toRDFQueryPath = toRDFQueryPath;
 RDFQuery.isInstanceOf = isInstanceOf;
-
+RDFQuery.exprEquals = exprEquals;
+RDFQuery.exprNotEquals = exprNotEquals;
 module.exports = RDFQuery;

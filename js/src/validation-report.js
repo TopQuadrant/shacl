@@ -27,6 +27,10 @@ ValidationResult.prototype.path = function() {
     return extractId(this.resultNode, "http://www.w3.org/ns/shacl#resultPath");
 };
 
+ValidationResult.prototype.sourceConstraintComponent = function() {
+    return extractId(this.resultNode, "http://www.w3.org/ns/shacl#sourceConstraintComponent");
+};
+
 ValidationResult.prototype.focusNode = function() {
     return extractId(this.resultNode, "http://www.w3.org/ns/shacl#focusNode");
 };

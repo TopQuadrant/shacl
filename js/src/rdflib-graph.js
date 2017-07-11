@@ -56,11 +56,25 @@ RDFLibGraphIterator.prototype.next = function () {
     }
 };
 
+function ensureBlankId(component) {
+    if (component.termType === "BlankNode") {
+        if (typeof(component.value) !== "string") {
+            component.value = "_:" + component.id;
+        }
+        return component;
+    }
+
+    return component
+}
+
 function postProcessGraph(store, graphURI, newStore) {
 
     var ss = newStore.statementsMatching(undefined, undefined, undefined);
     for (var i = 0; i < ss.length; i++) {
         var object = ss[i].object;
+        ensureBlankId(ss[i].subject);
+        ensureBlankId(ss[i].predicate);
+        ensureBlankId(ss[i].object);
         if (T("xsd:boolean").equals(object.datatype)) {
             if ("0" == object.value || "false" === object.value) {
                 store.add(ss[i].subject, ss[i].predicate, T("false"), graphURI);
