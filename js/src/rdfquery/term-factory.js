@@ -30,6 +30,9 @@ var TermFactory = {
         if ("true" === str || "false" === str) {
             return this.literal(str, this.term("xsd:boolean"))
         }
+        if (str.indexOf("http://") === 0 || str.indexOf("https://") === 0) {
+            return this.namedNode(str);
+        }
         var col = str.indexOf(":");
         if (col < 0) {
             throw "Expected qname with a ':', but found: " + str;

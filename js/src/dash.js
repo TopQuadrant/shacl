@@ -6,6 +6,7 @@
 
 var rdfquery = require("./rdfquery");
 var NodeSet = require("./rdfquery/node-set");
+var ValidationEngine = require("./validation-engine");
 var T = rdfquery.T;
 
 var registerDASH = function(context) {
@@ -22,7 +23,7 @@ var registerDASH = function(context) {
         var shape = context.shapesGraph.getShape(shapeNode);
         try {
             depth++;
-            return !localEngine.validateNodeAgainstShape(focusNode, shape);
+            return !localEngine.validateNodeAgainstShape(focusNode, shape, context.$data);
         }
         finally {
             depth--;
@@ -129,6 +130,26 @@ var registerDASH = function(context) {
                     });
                 }
             });
+        return results;
+    };
+
+    var validateEqualsNode = function ($this, $equals) {
+        var results = [];
+        var solutions = 0;
+        context.$data.query().path($this, $equals, "?value").forEach(
+            function (solution) {
+                solutions++;
+                if (compareNodes($this, solution['value']) !== 0) {
+                    results.push({
+                        value: solution.value
+                    });
+                }
+            });
+        if (results.length === 0 && solutions === 0) {
+            results.push({
+                value: $this.value
+            });
+        }
         return results;
     };
 
@@ -408,6 +429,7 @@ var registerDASH = function(context) {
     context.functionRegistry.validateDatatype = validateDatatype;
     context.functionRegistry.validateDisjoint = validateDisjoint;
     context.functionRegistry.validateEqualsProperty = validateEqualsProperty;
+    context.functionRegistry.validateEqualsNode = validateEqualsNode;
     context.functionRegistry.validateHasValueNode = validateHasValueNode;
     context.functionRegistry.validateHasValueProperty = validateHasValueProperty;
     context.functionRegistry.validateIn = validateIn;

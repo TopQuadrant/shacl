@@ -3,6 +3,13 @@ var T = rdfquery.T;
 var TermFactory = require("./rdfquery/term-factory");
 
 var nodeLabel = function (node, store) {
+    if (node.termType === "Collection") {
+        var acc = [];
+        for (var i=0; i<node.elements.length; i++) {
+            acc.push(nodeLabel(node.elements[i], store));
+        }
+        return acc.join(", ");
+    }
     if (node.isURI()) {
         for (prefix in store.namespaces) {
             var ns = store.namespaces[prefix];

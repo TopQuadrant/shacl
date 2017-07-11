@@ -1040,6 +1040,11 @@ sh:EqualsConstraintComponent
       sh:jsFunctionName "validateEqualsProperty" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
+  sh:nodeValidator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "validateEqualsNode" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
       sh:prefixes <http://datashapes.org/dash> ;
