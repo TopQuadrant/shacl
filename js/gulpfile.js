@@ -25,4 +25,14 @@ gulp.task('browserify', function () {
         });
 });
 
+gulp.task('generate-vocabularies', function() {
+    var vocabularies = fs.readdirSync("./vocabularies");
+    var acc = {};
+    for (var i=0; i<vocabularies.length; i++) {
+        console.log("Generating " + vocabularies[i]);
+        acc[vocabularies[i].split(".ttl")[0]] = fs.readFileSync("./vocabularies/" + vocabularies[i]).toString();
+        fs.writeFileSync("./src/vocabularies.js", "module.exports = " + JSON.stringify(acc));
+    }
+});
+
 gulp.task('default', ['test', 'browserify']);
