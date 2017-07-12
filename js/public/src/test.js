@@ -1,8 +1,6 @@
-var SHACLValidator = require("../index");
-var fs = require("fs");
 // expected result
 var $rdf = require("rdflib");
-var rdflibgraph = require("../src/rdflib-graph");
+var rdflibgraph = require("../../src/rdflib-graph");
 var RDFLibGraph = rdflibgraph.RDFLibGraph;
 
 
@@ -82,18 +80,17 @@ var isBlank = function(s) {
     return s != null && (s.indexOf("_:") === 0 || s.indexOf("_g_") > -1);
 }
 
-var validateReports = function(test, input) {
-    var data = fs.readFileSync(input).toString();
+var validateReports = function(test, done, data) {
 
     expectedResult(data, "text/turtle", function(expectedReport, e) {
         if (e != null) {
             test.ok(e != null);
-            test.done();
+            done();
         } else {
             new SHACLValidator().validate(data, "text/turtle", data, "text/turtle", function (e, report) {
                 if (e != null) {
                     test.ok(e != null);
-                    test.done();
+                    done();
                 } else {
                     test.ok(report.conforms() === expectedReport.conforms());
                     test.ok(report.results().length === expectedReport.results().length);
@@ -103,27 +100,82 @@ var validateReports = function(test, input) {
                         found = false;
                         for (var j=0; j<expectedResults.length; j++) {
                             if (//(results[i].focusNode() ===  expectedResults[j].focusNode() ) &&
-                                results[i].severity() === expectedResults[j].severity() &&
-                                ( (isBlank(results[i].sourceShape()) && isBlank(expectedResults[j].sourceShape())) ||
-                                  results[i].sourceShape() === expectedResults[j].sourceShape()) &&
-                                results[i].sourceConstraintComponent() === expectedResults[j].sourceConstraintComponent()) {
+                            results[i].severity() === expectedResults[j].severity() &&
+                            ( (isBlank(results[i].sourceShape()) && isBlank(expectedResults[j].sourceShape())) ||
+                            results[i].sourceShape() === expectedResults[j].sourceShape()) &&
+                            results[i].sourceConstraintComponent() === expectedResults[j].sourceConstraintComponent()) {
                                 found = true;
                             }
 
                         }
                         test.ok(found === true);
                     }
-                    test.done();
+                    done();
                 }
             });
         }
     });
 };
 
-fs.readdirSync(__dirname + "/data/core").forEach(function(dir) {
-    fs.readdirSync(__dirname + "/data/core/" + dir).forEach(function(file) {
-        exports[dir + "-test-" + file] = function (test) {
-            validateReports(test, __dirname + "/data/core/" + dir + "/" + file);
-        };
+var loadTestCases = function(k) {
+    var oReq = new XMLHttpRequest();
+    oReq.addEventListener("load", function() {
+        var cases = JSON.parse(this.responseText);
+        k(cases);
     });
+    oReq.open("GET", "test_cases.json");
+    oReq.send();
+};
+
+var loadTestCase = function(testCase, k) {
+    var oReq = new XMLHttpRequest();
+    oReq.addEventListener("load", function() {
+        k(this.responseText);
+    });
+    oReq.open("GET", testCase);
+    oReq.send();
+};
+
+loadTestCases(function(testCases) {
+    for (var i=0; i<testCases.length; i++) {
+        (function(file) {
+            QUnit.test("Test case " + file, function(assert) {
+                var done = assert.async();
+                loadTestCase(file, function(data) {
+                    validateReports(assert, done, data);
+                });
+            });
+        })(testCases[i])
+    }
 });
+
+
+/*
+
+
+QUnit.test("Integration test 2", function (assert) {
+    var done = assert.async();
+    new SHACLValidator().validate(
+        examples.example2.data,
+        examples.example2.dataFormat,
+        examples.example2.shapes,
+        examples.example2.shapesFormat,
+        function (e, report) {
+            if (e != null) {
+                console.log(e);
+            }
+            assert.ok(e == null);
+            assert.ok(!report.conforms());
+            var results = report.results();
+            assert.ok(results.length === 1);
+            assert.ok(results[0].message() === "More than 1 values");
+            assert.ok(results[0].path() === "http://raml.org/vocabularies/shapes/anon#title");
+            assert.ok(results[0].focusNode() !== null);
+            assert.ok(results[0].severity() === "Violation");
+            assert.ok(results[0].sourceConstraintComponent() === "http://www.w3.org/ns/shacl#MaxCountConstraintComponent");
+            assert.ok(results[0].sourceShape() === "https://mulesoft-labs.github.io/amf-playground/raml/world-music-api/api.raml#/definitions/Entry/items/0/property/title");
+            done();
+        });
+});
+
+*/

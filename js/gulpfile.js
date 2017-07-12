@@ -2,6 +2,7 @@ var gulp = require('gulp');
 var nodeunit = require('gulp-nodeunit');
 var browserify = require('gulp-browserify');
 var fs = require('fs');
+var serve = require('gulp-serve');
 
 gulp.task('test', function () {
     gulp.src('./test/**/*.js')
@@ -9,19 +10,19 @@ gulp.task('test', function () {
 });
 
 gulp.task('browserify', function () {
-    if (fs.existsSync('public/index.js')) {
-        fs.unlinkSync('public/index.js');
+    if (fs.existsSync('dist/index.js')) {
+        fs.unlinkSync('dist/index.js');
     }
-    if (fs.existsSync('public/shacl.js')) {
-        fs.unlinkSync('public/shacl.js');
+    if (fs.existsSync('dist/shacl.js')) {
+        fs.unlinkSync('dist/shacl.js');
     }
     gulp.src('index.js')
         .pipe(browserify({
             standalone: 'SHACLValidator'
         }))
-        .pipe(gulp.dest('public'))
+        .pipe(gulp.dest('dist'))
         .on('end', function () {
-            fs.renameSync('public/index.js', 'public/shacl.js');
+            fs.renameSync('dist/index.js', 'dist/shacl.js');
         });
 });
 
@@ -34,5 +35,30 @@ gulp.task('generate-vocabularies', function() {
         fs.writeFileSync("./src/vocabularies.js", "module.exports = " + JSON.stringify(acc));
     }
 });
+
+gulp.task('browserify-public-tests', function () {
+    if (fs.existsSync('public/test.js')) {
+        fs.unlinkSync('public/test.js');
+    }
+    gulp.src('public/src/test.js')
+        .pipe(browserify())
+        .pipe(gulp.dest('public'));
+});
+
+gulp.task('generate-public-test-cases', function() {
+    var testCases = [];
+    fs.readdirSync(__dirname + "/test/data/core").forEach(function(dir) {
+        fs.readdirSync(__dirname + "/test/data/core/" + dir).forEach(function(file) {
+            var read = fs.readFileSync(__dirname + "/test/data/core/" + dir + "/" + file).toString();
+            fs.writeFileSync(__dirname + "/public/data/" + dir + "_" + file, read);
+            testCases.push("data/"+ dir + "_" + file);
+        });
+    });
+
+    fs.writeFileSync(__dirname + "/public/test_cases.json", JSON.stringify(testCases));
+});
+
+
+gulp.task('test-web', ['generate-public-test-cases', 'browserify-public-tests'], serve('public'));
 
 gulp.task('default', ['test', 'browserify']);
