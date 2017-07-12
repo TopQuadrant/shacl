@@ -319,7 +319,6 @@ var registerDASH = function(context) {
     }
 
     var validateNode = function ($value, $node) {
-        console.log("validateNode...");
         return nodeConformsToShape($value, $node);
     }
 
