@@ -6,7 +6,7 @@ Contact: Holger Knublauch (holger@topquadrant.com)
 
 Can be used to perform SHACL constraint checking and rule inferencing in any Jena-based Java application.
 This API also serves as a reference implementation developed in parallel to the SHACL spec.
-**The code is totally not optimized for performance, just for correctness.**
+**The code is not really optimized for performance, just for correctness.**
 
 Coverage:
 * SHACL Core and SHACL-SPARQL validation
@@ -49,4 +49,3 @@ whereby -shapesfile is optional and falls back to using the data graph as shapes
 Currently only Turtle (.ttl) files are supported.
 
 The tools print the validation report or the inferences graph to the output screen.
-The output of the command line utilities is not limited by the license of the SHACL API.
