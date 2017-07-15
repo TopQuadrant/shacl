@@ -9,11 +9,11 @@ This API also serves as a reference implementation developed in parallel to the 
 **The code is not really optimized for performance, just for correctness.**
 
 Coverage:
-* SHACL Core and SHACL-SPARQL validation
-* SHACL Advanced Features (Rules etc)
-* SHACL JavaScript Extensions
+* [SHACL Core and SHACL-SPARQL validation](https://www.w3.org/TR/shacl/)
+* [SHACL Advanced Features (Rules etc)](https://www.w3.org/TR/shacl-af/)
+* [SHACL JavaScript Extensions](https://www.w3.org/TR/shacl-js/)
 
-See [SHACL-JS https://github.com/TopQuadrant/shacl-js] for a pure JavaScript implementation.
+See [SHACL-JS](https://github.com/TopQuadrant/shacl-js) for a pure JavaScript implementation.
 
 The same code is used in the TopBraid products (currently aligned with the upcoming TopBraid 5.4 release).
 For interoperability with TopBraid this library uses code from org.topbraid.spin packages.
