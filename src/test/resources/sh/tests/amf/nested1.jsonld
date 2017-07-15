@@ -1,0 +1,35 @@
+{
+  "http://raml.org/vocabularies/shapes#toValidate": {
+    "http://raml.org/vocabularies/shapes/anon#name": {
+      "@value": "antonio"
+    },
+    "http://raml.org/vocabularies/shapes/anon#surname": {
+      "@value": "garrote"
+    },
+    "http://raml.org/vocabularies/shapes/anon#gender": {
+      "@value": "female"
+    },
+    "http://raml.org/vocabularies/shapes/anon#scores": [
+      {
+        "@value": 1
+      },
+      {
+        "@value": 2
+      },
+      {
+        "@value": 3
+      },
+      {
+        "@value": 4
+      }
+    ],
+    "http://raml.org/vocabularies/shapes/anon#age": {
+      "@value": 45
+    },
+    "http://raml.org/vocabularies/shapes/anon#address": {
+      "http://raml.org/vocabularies/shapes/anon#city": {
+        "@value": "london"
+      }
+    }
+  }
+}

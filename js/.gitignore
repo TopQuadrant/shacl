@@ -1,0 +1,5 @@
+node_modules
+.idea
+public/data/*
+public/test.js
+public/test_cases.json
