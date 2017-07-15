@@ -1,13 +1,13 @@
 {
   "name": "shacl",
-  "version": "0.0.1",
+  "version": "1.0.0-SNAPSHOT",
   "description": "SHACL.JS Validator",
   "main": "index.js",
   "scripts": {
     "test": "gulp test"
   },
-  "author": "",
-  "license": "AGPL-3.0",
+  "author": "Holger Knublauch <holger@topquadrant.com>",
+  "license": "Apache-2.0",
   "dependencies": {
     "rdflib": "^0.15.0"
   },
