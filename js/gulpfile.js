@@ -26,10 +26,10 @@ gulp.task('browserify', function () {
         });
 });
 
-gulp.task('generate-vocabularies', function() {
+gulp.task('generate-vocabularies', function () {
     var vocabularies = fs.readdirSync("./vocabularies");
     var acc = {};
-    for (var i=0; i<vocabularies.length; i++) {
+    for (var i = 0; i < vocabularies.length; i++) {
         console.log("Generating " + vocabularies[i]);
         acc[vocabularies[i].split(".ttl")[0]] = fs.readFileSync("./vocabularies/" + vocabularies[i]).toString();
         fs.writeFileSync("./src/vocabularies.js", "module.exports = " + JSON.stringify(acc));
@@ -45,13 +45,17 @@ gulp.task('browserify-public-tests', function () {
         .pipe(gulp.dest('public'));
 });
 
-gulp.task('generate-public-test-cases', function() {
+gulp.task('generate-public-test-cases', function () {
     var testCases = [];
-    fs.readdirSync(__dirname + "/test/data/core").forEach(function(dir) {
-        fs.readdirSync(__dirname + "/test/data/core/" + dir).forEach(function(file) {
+
+    if (!fs.existsSync(__dirname + "/public/data"))
+        fs.mkdirSync(__dirname + "/public/data");
+
+    fs.readdirSync(__dirname + "/test/data/core").forEach(function (dir) {
+        fs.readdirSync(__dirname + "/test/data/core/" + dir).forEach(function (file) {
             var read = fs.readFileSync(__dirname + "/test/data/core/" + dir + "/" + file).toString();
             fs.writeFileSync(__dirname + "/public/data/" + dir + "_" + file, read);
-            testCases.push("data/"+ dir + "_" + file);
+            testCases.push("data/" + dir + "_" + file);
         });
     });
 
