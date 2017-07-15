@@ -13,9 +13,11 @@ Coverage:
 * SHACL Advanced Features (Rules etc)
 * SHACL JavaScript Extensions
 
+See [SHACL-JS https://github.com/TopQuadrant/shacl-js] for a pure JavaScript implementation.
+
 The same code is used in the TopBraid products (currently aligned with the upcoming TopBraid 5.4 release).
-For interoperability with TopBraid, and during the transition period from SPIN to SHACL, this library
-uses code from org.topbraid.spin packages. These will eventually be refactored.
+For interoperability with TopBraid this library uses code from org.topbraid.spin packages.
+These will eventually be refactored.
 Meanwhile, please don't rely on any class from the org.topbraid.spin packages directly.
 
 Feedback and questions should become GitHub issues or sent to TopBraid Users mailing list:
