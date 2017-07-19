@@ -1,6 +1,6 @@
 # TopBraid SHACL API
 
-**An open source implementation of the W3C Shapes Constraint Language (SHACL) based on the Jena API.**
+**An open source implementation of the W3C Shapes Constraint Language (SHACL) based on Apache Jena.**
 
 Contact: Holger Knublauch (holger@topquadrant.com)
 
