@@ -41,6 +41,10 @@ class ControlledUpdateGraphStore extends TransactionalNotSupported implements Da
 		}
 	}
 	
+    @Override
+    public Graph getUnionGraph() {
+        throw new UnsupportedOperationException("getUnionGraph");
+    }
 	
 	@Override
 	public void clear() {

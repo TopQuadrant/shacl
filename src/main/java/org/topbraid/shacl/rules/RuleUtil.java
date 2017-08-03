@@ -12,6 +12,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.vocabulary.RDF;
 import org.topbraid.shacl.arq.SHACLFunctions;
 import org.topbraid.shacl.engine.ShapesGraph;
+import org.topbraid.shacl.js.SHACLScriptEngineManager;
 import org.topbraid.shacl.util.SHACLSystemModel;
 import org.topbraid.shacl.vocabulary.TOSH;
 import org.topbraid.spin.arq.ARQFactory;
@@ -72,10 +73,15 @@ public class RuleUtil {
 		RuleEngine engine = new RuleEngine(dataset, shapesGraphURI, shapesGraph, inferencesModel);
 		engine.setProgressMonitor(monitor);
 		
+		boolean nested = SHACLScriptEngineManager.begin();
 		try {
 			engine.executeAll();
 		}
 		catch(InterruptedException ex) {
+			return null;
+		}
+		finally {
+			SHACLScriptEngineManager.end(nested);
 		}
 		return inferencesModel;
 	}

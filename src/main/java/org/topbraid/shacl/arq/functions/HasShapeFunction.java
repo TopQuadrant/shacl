@@ -125,8 +125,8 @@ public class HasShapeFunction extends AbstractFunction3 {
 			shapesGraphURI = DefaultShapesGraphProvider.get().getDefaultShapesGraphURI(dataset);
 		}
 		Model shapesModel = dataset.getNamedModel(shapesGraphURI.toString());
-		ShapesGraph vsg = new ShapesGraph(shapesModel);
-		return ValidationEngineFactory.get().create(dataset, shapesGraphURI, vsg, null).validateNodesAgainstShape(
+		ShapesGraph shapes = new ShapesGraph(shapesModel);
+		return ValidationEngineFactory.get().create(dataset, shapesGraphURI, shapes, null).validateNodesAgainstShape(
 				Collections.singletonList(focusNode), shape.asNode()).getModel();
 	}
 }

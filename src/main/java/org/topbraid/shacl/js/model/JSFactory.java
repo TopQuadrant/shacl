@@ -63,6 +63,16 @@ public class JSFactory {
 	}
 	
 	
+	public static Node getNodeSafe(Object obj) {
+		try {
+			return getNode(obj);
+		}
+		catch(Exception ex) {
+			return null;
+		}
+	}
+	
+	
 	public static JSTerm asJSTerm(Node node) {
 		if(node.isURI()) {
 			return new JSNamedNode(node);

@@ -47,9 +47,13 @@ public abstract class DelegatingDataset implements Dataset {
 	public Model getDefaultModel() {
 		return delegate.getDefaultModel();
 	}
-	
-	
-	public Dataset getDelegate() {
+
+    @Override
+    public Model getUnionModel() {
+        return delegate.getUnionModel();
+    }   
+
+    public Dataset getDelegate() {
 		return delegate;
 	}
 

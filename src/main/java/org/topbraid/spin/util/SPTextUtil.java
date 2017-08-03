@@ -1,6 +1,20 @@
 package org.topbraid.spin.util;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.compose.MultiUnion;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.vocabulary.RDF;
 import org.apache.xerces.util.XMLChar;
+import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.arq.ARQ2SPIN;
 import org.topbraid.spin.model.Command;
 import org.topbraid.spin.model.SPINFactory;
@@ -9,15 +23,6 @@ import org.topbraid.spin.model.update.Update;
 import org.topbraid.spin.vocabulary.SP;
 import org.topbraid.spin.vocabulary.SPIN;
 
-import org.apache.jena.graph.Graph;
-import org.apache.jena.graph.compose.MultiUnion;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
-import org.apache.jena.vocabulary.RDF;
-
 /**
  * A utility to convert RDF graphs between the sp:text syntax and SPIN RDF triples.
  * Can be used as a pre-processor of files so that they only use one syntax.
@@ -25,6 +30,20 @@ import org.apache.jena.vocabulary.RDF;
  * @author Holger Knublauch
  */
 public class SPTextUtil {
+	
+	// List of known properties that contain SPARQL strings
+	public static List<Property> sparqlProperties = new LinkedList<>(Arrays.asList(new Property[] {
+		SH.ask,
+		SH.construct,
+		SH.select,
+		SH.update,
+		SP.text
+	}));
+	
+	public static void addSPARQLProperty(Property predicate) {
+		sparqlProperties.add(predicate);
+	}
+
 	
 	/**
 	 * Adds an sp:text reflecting the SPIN RDF of a given Command.

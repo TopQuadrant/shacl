@@ -22,5 +22,5 @@ public class DatasetWithDifferentDefaultModel extends DelegatingDataset {
 	@Override
 	public Model getDefaultModel() {
 		return defaultModel;
-	}	
+	}
 }

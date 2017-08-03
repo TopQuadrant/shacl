@@ -124,7 +124,7 @@ public class NashornScriptEngine implements JSScriptEngine {
 	}
 
 
-	protected final ScriptEngine getEngine() {
+	public final ScriptEngine getEngine() {
 		return engine;
 	}
 	

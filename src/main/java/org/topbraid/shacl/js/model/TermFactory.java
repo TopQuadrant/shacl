@@ -19,6 +19,11 @@ public class TermFactory {
 	private PrefixMap pm = new PrefixMapStd();
 	
 	
+	public JSBlankNode blankNode() {
+		return blankNode(null);
+	}
+	
+	
 	public JSBlankNode blankNode(String value) {
 		Node node = value == null ?
 				NodeFactory.createBlankNode() :

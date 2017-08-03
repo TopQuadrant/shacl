@@ -19,6 +19,7 @@ import org.topbraid.shacl.js.NashornUtil;
 import org.topbraid.shacl.js.SHACLScriptEngineManager;
 import org.topbraid.shacl.js.model.JSFactory;
 import org.topbraid.shacl.model.SHJSExecutable;
+import org.topbraid.shacl.validation.SHACLException;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.spin.progress.ProgressMonitor;
 import org.topbraid.spin.util.ExceptionUtil;
@@ -71,13 +72,16 @@ class JSRule extends Rule {
 							Node object = JSFactory.getNode(nodes[2]);
 							ruleEngine.infer(Triple.create(subject, predicate, object), this, shape);
 						}
-						else {
+						else if(tripleO instanceof Map) {
 							@SuppressWarnings("rawtypes")
 							Map triple = (Map) tripleO;
 							Node subject = JSFactory.getNode(triple.get("subject"));
 							Node predicate = JSFactory.getNode(triple.get("predicate"));
 							Node object = JSFactory.getNode(triple.get("object"));
 							ruleEngine.infer(Triple.create(subject, predicate, object), this, shape);
+						}
+						else {
+							throw new SHACLException("Array members produced by rule must be either arrays with three nodes, or JS objects with subject, predicate and object");
 						}
 					}
 				}
