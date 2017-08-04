@@ -124,6 +124,26 @@ function validateEqualsProperty($this, $path, $equals) {
 	return results;
 }
 
+var validateEqualsNode = function ($this, $equals) {
+    var results = [];
+    var solutions = 0;
+    $data.query().path($this, $equals, "?value").forEach(
+        function (solution) {
+            solutions++;
+            if (SHACL.compareNodes($this, solution['value']) !== 0) {
+                results.push({
+                    value: solution.value
+                });
+            }
+        });
+    if (results.length === 0 && solutions === 0) {
+        results.push({
+            value: $this.value
+        });
+    }
+    return results;
+};
+
 function validateHasValueNode($this, $hasValue) {
 	return $this.equals($hasValue);
 }
@@ -427,6 +447,14 @@ function dash_allSubjects() {
 // Utilities ------------------------------------------------------------------
 
 function toRDFQueryPath(shPath) {
+    if (shPath.termType === "Collection") {
+        var paths = new RDFQueryUtil($shapes).rdfListToArray(shPath);
+        var result = [];
+        for (var i = 0; i < paths.length; i++) {
+            result.push(toRDFQueryPath(paths[i]));
+        }
+        return result;
+    }
 	if(shPath.isURI()) {
 		return shPath;
 	}
@@ -484,6 +512,9 @@ function isValidForDatatype(lex, datatype) {
 		var r = parseFloat(lex);
 		return !isNan(r);
 	}
+	else if (datatype.value === "http://www.w3.org/2001/XMLSchema#boolean") {
+        return lex !== "true" && lex !== "false";
+    }
 	else {
 		return true;
 	}
@@ -533,12 +564,16 @@ RDFQueryUtil.prototype.isInstanceOf = function($instance, $class) {
 }
 
 RDFQueryUtil.prototype.rdfListToArray = function($rdfList) {
-	var array = [];
-	while(!T("rdf:nil").equals($rdfList)) {
-		array.push(this.getObject($rdfList, T("rdf:first")));
-		$rdfList = this.getObject($rdfList, T("rdf:rest"));
-	}
-	return array;
+    if ($rdfList.elements != null) {
+        return $rdfList.elements;
+    } else {
+        var array = [];
+        while (!T("rdf:nil").equals($rdfList)) {
+            array.push(this.getObject($rdfList, T("rdf:first")));
+            $rdfList = this.getObject($rdfList, T("rdf:rest"));
+        }
+        return array;
+    }
 }
 
 RDFQueryUtil.prototype.walkObjects = function($results, $subject, $predicate) {
