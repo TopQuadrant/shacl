@@ -133,13 +133,7 @@ dash:CoExistsWithConstraintComponent
   rdfs:comment "A constraint component that can be used to express a constraint on property shapes so that if the property path has any value then the given property must also have a value, and vice versa." ;
   rdfs:label "Co-exists-with constraint component" ;
   sh:message "Values must co-exist with values of {$coExistsWith}" ;
-  sh:parameter [
-      sh:path dash:coExistsWith ;
-      sh:class rdf:Property ;
-      sh:group tosh:PropertyPairConstraintPropertyGroup ;
-      sh:nodeKind sh:IRI ;
-      sh:order "10"^^xsd:decimal ;
-    ] ;
+  sh:parameter dash:CoExistsWithConstraintComponent-coExistsWith ;
   sh:propertyValidator [
       rdf:type sh:JSValidator ;
       sh:jsFunctionName "validateCoExistsWith" ;
@@ -160,6 +154,12 @@ WHERE {
 }""" ;
     ] ;
   sh:targetClass sh:PropertyShape ;
+.
+dash:CoExistsWithConstraintComponent-coExistsWith
+  rdf:type sh:Parameter ;
+  sh:path dash:coExistsWith ;
+  sh:class rdf:Property ;
+  sh:nodeKind sh:IRI ;
 .
 dash:DASHJSLibrary
   rdf:type sh:JSLibrary ;
@@ -266,7 +266,6 @@ dash:HasValueWithClassConstraintComponent-hasValueWithClass
   rdf:type sh:Parameter ;
   sh:path dash:hasValueWithClass ;
   sh:class rdfs:Class ;
-  sh:group tosh:OtherConstraintPropertyGroup ;
   sh:nodeKind sh:IRI ;
 .
 dash:InferencingTestCase
@@ -1185,16 +1184,16 @@ sh:EqualsConstraintComponent
 		}
 		""" ;
     ] ;
-  sh:propertyValidator [
-      rdf:type sh:JSValidator ;
-      sh:jsFunctionName "validateEqualsProperty" ;
-      sh:jsLibrary dash:DASHJSLibrary ;
-  ] ;
   sh:nodeValidator [
       rdf:type sh:JSValidator ;
       sh:jsFunctionName "validateEqualsNode" ;
       sh:jsLibrary dash:DASHJSLibrary ;
-  ] ;
+    ] ;
+  sh:propertyValidator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "validateEqualsProperty" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
   sh:propertyValidator [
       rdf:type sh:SPARQLSelectValidator ;
       sh:prefixes <http://datashapes.org/dash> ;
