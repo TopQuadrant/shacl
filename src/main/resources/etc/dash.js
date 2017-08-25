@@ -513,7 +513,7 @@ function isValidForDatatype(lex, datatype) {
 		return !isNan(r);
 	}
 	else if (datatype.value === "http://www.w3.org/2001/XMLSchema#boolean") {
-        return lex !== "true" && lex !== "false";
+        return lex === "true" || lex === "false";
     }
 	else {
 		return true;
