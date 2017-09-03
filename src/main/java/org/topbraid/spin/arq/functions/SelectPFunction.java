@@ -83,24 +83,23 @@ public class SelectPFunction extends PropertyFunctionBase {
 		}
 		org.apache.jena.query.Query arqQuery = ARQFactory.get().createQuery(spinQuery);
 		Dataset dataset = new DatasetWithDifferentDefaultModel(model, DatasetImpl.wrap(execCxt.getDataset()));
-		QueryExecution qexec = ARQFactory.get().createQueryExecution(arqQuery, dataset, initialBinding);
-		if(arqQuery.isAskType()) {
-			return handleAsk(qexec, objects, binding, execCxt);
-		}
-		else if(arqQuery.isSelectType()) {
-			return handleSelect(qexec, objects, binding, execCxt);
-		}
-		else {
-			throw new ExprEvalException(NAME + " can only operate on SELECT or ASK queries");
+		
+		try(QueryExecution qexec = ARQFactory.get().createQueryExecution(arqQuery, dataset, initialBinding)) {
+    		if(arqQuery.isAskType()) {
+    			return handleAsk(qexec.execAsk(), objects, binding, execCxt);
+    		}
+    		else if(arqQuery.isSelectType()) {
+    			return handleSelect(qexec.execSelect(), objects, binding, execCxt);
+    		}
+    		else {
+    			throw new ExprEvalException(NAME + " can only operate on SELECT or ASK queries");
+    		}
 		}
 	}
 
 
-	private QueryIterator handleAsk(QueryExecution qexec, List<Node> objects,
-			Binding binding, ExecutionContext execCxt) {
-		boolean result = qexec.execAsk();
+	private QueryIterator handleAsk(boolean result, List<Node> objects, Binding binding, ExecutionContext execCxt) {
 		Node resultNode = result ? JenaDatatypes.TRUE.asNode() : JenaDatatypes.FALSE.asNode();
-		qexec.close();
 		Node firstObject = objects.get(0);
 		if(firstObject.isVariable()) {
 			return new QueryIterExtendByVar(binding, (Var) firstObject, 
@@ -116,10 +115,7 @@ public class SelectPFunction extends PropertyFunctionBase {
 		}
 	}
 
-
-	private QueryIterator handleSelect(QueryExecution qexec,
-			List<Node> objects, Binding binding, ExecutionContext execCxt) {
-		ResultSet rs = qexec.execSelect();
+	private QueryIterator handleSelect(ResultSet rs, List<Node> objects, Binding binding, ExecutionContext execCxt) {
 		List<String> resultVars = rs.getResultVars();
 		QueryIterConcat concat = new QueryIterConcat(execCxt);
 		while(rs.hasNext()) {
@@ -149,7 +145,6 @@ public class SelectPFunction extends PropertyFunctionBase {
 				concat.add(IterLib.result(bindingMap, execCxt));
 			}
 		}
-		qexec.close();
 		return concat;
 	}
 }

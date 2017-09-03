@@ -116,7 +116,8 @@ public class SHACLSPARQLARQFunction extends SHACLARQFunction {
 	}
 	
 	
-	public NodeValue executeBody(Dataset dataset, Model defaultModel, QuerySolution bindings) {
+	@Override
+    public NodeValue executeBody(Dataset dataset, Model defaultModel, QuerySolution bindings) {
 	    try( QueryExecution qexec = createQueryExecution(dataset, defaultModel, bindings) ) {
 	        if(arqQuery.isAskType()) {
 	            boolean result = qexec.execAsk();

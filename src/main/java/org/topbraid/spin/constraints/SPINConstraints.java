@@ -174,54 +174,54 @@ public class SPINConstraints {
 		
 		Query arq = ARQFactory.get().createQuery(queryString);
 		Model model = resource.getModel();
-		QueryExecution qexec = ARQFactory.get().createQueryExecution(arq, model, arqBindings);
-		
-		long startTime = System.currentTimeMillis();
-		if(arq.isAskType()) {
-			if(qexec.execAsk() != matchValue) {
-				String message;
-				String comment = qot.getQuery().getComment();
-				if(comment == null) {
-					comment = JenaUtil.getStringProperty(qot.getQuery(), RDFS.label);
-				}
-				if(comment == null) {
-					message = SPINLabels.get().getLabel(qot.getQuery());
-				}
-				else {
-					message = comment;
-				}
-				message += "\n(SPIN constraint at " + SPINLabels.get().getLabel(qot.getCls()) + ")";
-				List<SimplePropertyPath> paths;
-				Resource path = JenaUtil.getPropertyResourceValue(qot.getQuery(), SPIN.violationPath);
-				if(path != null && path.isURIResource()) {
-					paths = new ArrayList<SimplePropertyPath>(1);
-					paths.add(new ObjectPropertyPath(resource, JenaUtil.asProperty(path)));
-				}
-				else {
-					paths = getPropertyPaths(resource, qot.getQuery().getWhere(), null);
-				}
-				Resource source = getSource(qot);
-				results.add(createConstraintViolation(paths, null, NO_FIXES, resource, message, source, null));
-			}
-		}
-		else if(arq.isConstructType()) {
-			Model cm = qexec.execConstruct();
-			qexec.close();
-			addConstructedProblemReports(cm, results, model, qot.getCls(), resource, qot.getQuery().getComment(), getSource(qot));
-		}
-		long endTime = System.currentTimeMillis();
-		if(stats != null) {
-			long duration = startTime - endTime;
-			String label = qot.toString();
-			String queryText;
-			if(qot.getTemplateCall() != null) {
-				queryText = SPINLabels.get().getLabel(qot.getTemplateCall().getTemplate().getBody());
-			}
-			else {
-				queryText = SPINLabels.get().getLabel(qot.getQuery());
-			}
-			Node cls = qot.getCls() != null ? qot.getCls().asNode() : null;
-			stats.add(new SPINStatistics(label, queryText, duration, startTime, cls));
+		try ( QueryExecution qexec = ARQFactory.get().createQueryExecution(arq, model, arqBindings) ) {
+    		
+    		long startTime = System.currentTimeMillis();
+    		if(arq.isAskType()) {
+    			if(qexec.execAsk() != matchValue) {
+    				String message;
+    				String comment = qot.getQuery().getComment();
+    				if(comment == null) {
+    					comment = JenaUtil.getStringProperty(qot.getQuery(), RDFS.label);
+    				}
+    				if(comment == null) {
+    					message = SPINLabels.get().getLabel(qot.getQuery());
+    				}
+    				else {
+    					message = comment;
+    				}
+    				message += "\n(SPIN constraint at " + SPINLabels.get().getLabel(qot.getCls()) + ")";
+    				List<SimplePropertyPath> paths;
+    				Resource path = JenaUtil.getPropertyResourceValue(qot.getQuery(), SPIN.violationPath);
+    				if(path != null && path.isURIResource()) {
+    					paths = new ArrayList<SimplePropertyPath>(1);
+    					paths.add(new ObjectPropertyPath(resource, JenaUtil.asProperty(path)));
+    				}
+    				else {
+    					paths = getPropertyPaths(resource, qot.getQuery().getWhere(), null);
+    				}
+    				Resource source = getSource(qot);
+    				results.add(createConstraintViolation(paths, null, NO_FIXES, resource, message, source, null));
+    			}
+    		}
+    		else if(arq.isConstructType()) {
+    			Model cm = qexec.execConstruct();
+    			addConstructedProblemReports(cm, results, model, qot.getCls(), resource, qot.getQuery().getComment(), getSource(qot));
+    		}
+    		long endTime = System.currentTimeMillis();
+    		if(stats != null) {
+    			long duration = startTime - endTime;
+    			String label = qot.toString();
+    			String queryText;
+    			if(qot.getTemplateCall() != null) {
+    				queryText = SPINLabels.get().getLabel(qot.getTemplateCall().getTemplate().getBody());
+    			}
+    			else {
+    				queryText = SPINLabels.get().getLabel(qot.getQuery());
+    			}
+    			Node cls = qot.getCls() != null ? qot.getCls().asNode() : null;
+    			stats.add(new SPINStatistics(label, queryText, duration, startTime, cls));
+    		}
 		}
 	}
 
@@ -258,22 +258,22 @@ public class SPINConstraints {
 				
 				Model model = resource.getModel();
 				Query arq = ARQFactory.get().createQuery(spinQuery);
-				QueryExecution qexec = ARQFactory.get().createQueryExecution(arq, model, bindings);
-				
-				if(spinQuery instanceof Ask) {
-					if(qexec.execAsk() != matchValue) {
-						List<SimplePropertyPath> paths = getPropertyPaths(resource, spinQuery.getWhere(), templateCall.getArgumentsMapByProperties());
-						String message = SPINLabels.get().getLabel(templateCall);
-						message += "\n(SPIN constraint at " + SPINLabels.get().getLabel(qot.getCls()) + ")";
-						results.add(createConstraintViolation(paths, null, NO_FIXES, resource, message, templateCall, null));
-					}
-				}
-				else if(spinQuery instanceof Construct) {
-					Model cm = qexec.execConstruct();
-					qexec.close();
-					Resource source = getSource(qot);
-					String label = SPINLabels.get().getLabel(templateCall);
-					addConstructedProblemReports(cm, results, model, qot.getCls(), resource, label, source);
+				try(QueryExecution qexec = ARQFactory.get().createQueryExecution(arq, model, bindings)) {
+    				
+    				if(spinQuery instanceof Ask) {
+    					if(qexec.execAsk() != matchValue) {
+    						List<SimplePropertyPath> paths = getPropertyPaths(resource, spinQuery.getWhere(), templateCall.getArgumentsMapByProperties());
+    						String message = SPINLabels.get().getLabel(templateCall);
+    						message += "\n(SPIN constraint at " + SPINLabels.get().getLabel(qot.getCls()) + ")";
+    						results.add(createConstraintViolation(paths, null, NO_FIXES, resource, message, templateCall, null));
+    					}
+    					return;
+    				}
+    				// CONSTRUCT query.
+    				Model cm = qexec.execConstruct();
+    				Resource source = getSource(qot);
+    				String label = SPINLabels.get().getLabel(templateCall);
+    				addConstructedProblemReports(cm, results, model, qot.getCls(), resource, label, source);
 				}
 			}
 		}

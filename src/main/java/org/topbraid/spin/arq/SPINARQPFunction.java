@@ -4,22 +4,17 @@
  *******************************************************************************/
 package org.topbraid.spin.arq;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import org.apache.jena.atlas.iterator.Iter;
+import org.apache.jena.atlas.logging.Log;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QuerySolutionMap;
-import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.core.DatasetImpl;
 import org.apache.jena.sparql.core.Substitute;
@@ -27,9 +22,12 @@ import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.ExecutionContext;
 import org.apache.jena.sparql.engine.QueryIterator;
 import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.engine.binding.BindingFactory;
 import org.apache.jena.sparql.engine.binding.BindingHashMap;
 import org.apache.jena.sparql.engine.binding.BindingMap;
 import org.apache.jena.sparql.engine.iterator.QueryIterConcat;
+import org.apache.jena.sparql.engine.iterator.QueryIterPlainWrapper;
+import org.apache.jena.sparql.engine.iterator.QueryIteratorWrapper;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.expr.NodeValue;
@@ -127,11 +125,11 @@ public class SPINARQPFunction extends PropertyFunctionBase implements PropertyFu
 
 	
     @Override
-	public QueryIterator exec(Binding binding, PropFuncArg argSubject, Node predicate,
+	public QueryIterator exec(Binding inputBinding, PropFuncArg argSubject, Node predicate,
 			PropFuncArg argObject, ExecutionContext context) {
 
-		argObject = Substitute.substitute(argObject, binding);
-		argSubject = Substitute.substitute(argSubject, binding);
+		argObject = Substitute.substitute(argObject, inputBinding);
+		argSubject = Substitute.substitute(argSubject, inputBinding);
 		
 		ExprList subjectExprList = argSubject.asExprList();
 		ExprList objectExprList = argObject.asExprList();
@@ -174,7 +172,7 @@ public class SPINARQPFunction extends PropertyFunctionBase implements PropertyFu
 					Iterator<Triple> it = queryGraph.find(matchSubject, predicate, matchObject);
 					while(it.hasNext()) {
 						Triple triple = it.next();
-						BindingMap map = new BindingHashMap(binding);
+						BindingMap map = new BindingHashMap(inputBinding);
 						if(subject.isVariable()) {
 							map.add(subject.asVar(), triple.getSubject());
 						}
@@ -198,7 +196,7 @@ public class SPINARQPFunction extends PropertyFunctionBase implements PropertyFu
 				activeGraph = JenaUtil.createDefaultGraph();
 			}
 			Model model = ModelFactory.createModelForGraph(activeGraph);
-			Node t = binding.get(Var.alloc(SPIN.THIS_VAR_NAME));
+			Node t = inputBinding.get(Var.alloc(SPIN.THIS_VAR_NAME));
 			QuerySolutionMap bindings = new QuerySolutionMap();
 			if(t != null) {
 				bindings.add(SPIN.THIS_VAR_NAME, model.asRDFNode(t));
@@ -214,12 +212,12 @@ public class SPINARQPFunction extends PropertyFunctionBase implements PropertyFu
 				for(int i = 0; i < objectVarNames.size() && i < objectExprList.size(); i++) {
 					Expr expr = objectExprList.get(i);
 					String objectVarName = objectVarNames.get(i);
-					if(expr.isVariable() && !binding.contains(expr.asVar())) {
+					if(expr.isVariable() && !inputBinding.contains(expr.asVar())) {
 						Var var = expr.asVar();
 						vars.put(objectVarName, var);
 					}
 					else {
-			        	NodeValue x = expr.eval(binding, context);
+			        	NodeValue x = expr.eval(inputBinding, context);
 			        	if(x != null) {
 			        		bindings.add(objectVarName, model.asRDFNode(x.asNode()));
 			        	}
@@ -231,42 +229,144 @@ public class SPINARQPFunction extends PropertyFunctionBase implements PropertyFu
 			for(int i = 0; i < subjectExprList.size(); i++) {
 				String subjectVarName = "arg" + (i + 1);
 				Expr expr = subjectExprList.get(i);
-				if(expr.isVariable() && !binding.contains(expr.asVar())) {
+				if(expr.isVariable() && !inputBinding.contains(expr.asVar())) {
 					Var var = expr.asVar();
 					vars.put(subjectVarName, var);
 				}
 				else {
-		        	NodeValue x = expr.eval(binding, context);
+		        	NodeValue x = expr.eval(inputBinding, context);
 		        	if(x != null) {
 		        		bindings.add(subjectVarName, model.asRDFNode(x.asNode()));
 		        	}
 				}
 			}
 			
-			// Execute SELECT query and wrap it with a custom iterator
-			QueryExecution qexec;
-			if(context.getDataset() != null) {
-				Dataset newDataset = new DatasetWithDifferentDefaultModel(model, DatasetImpl.wrap(context.getDataset()));
-				qexec = ARQFactory.get().createQueryExecution(theQuery, newDataset, bindings);
-			}
-			else {
-				qexec = ARQFactory.get().createQueryExecution(theQuery, model);
-			}
-			ResultSet rs = qexec.execSelect();
-			QueryIterator it = new PFunctionQueryIterator(rs, qexec, vars, binding);
-			if(existingValues != null) {
-				existingValues.add(it);
-				return existingValues;
-			}
-			else {
-				return it;
-			}
+            // Query Dataset or model
+            Dataset ds = (context.getDataset() != null) 
+                ? new DatasetWithDifferentDefaultModel(model, DatasetImpl.wrap(context.getDataset()))
+                : null;
+
+            // Suppress "resource" - qexec is passed out of scope because queryIterator
+            // (QueryIterator it) is returned from this property function.
+            @SuppressWarnings("all")
+            QueryExecution qexec = (ds != null) ? ARQFactory.get().createQueryExecution(theQuery, ds, bindings)
+                                                : ARQFactory.get().createQueryExecution(theQuery, model);
+            ResultSet rs = qexec.execSelect();
+            List<Var> rvs = theQuery.getProjectVars();
+            // QuerySolution to result Binding 
+            Iterator<Binding> x = Iter.map(rs, qs->convertRow(qs, vars, rvs, inputBinding));
+            // Become a QueryIterator
+            QueryIterator it0 = new QueryIterPlainWrapper(x, context);
+            // Add saftey wrapper
+            QueryIterator it  = QueryIteratorClosing.protect(it0, qexec);
+            if(existingValues != null) {
+                existingValues.add(it);
+                return existingValues;
+            }
+            else {
+                return it;
+            }
+            
+            // Do by materialization. This is safer. 
+            // It detaches the iterator from the inner QueryExecution, which is then closed.
+            // The results are then solely part of the queye execution that called exec. 
+            
+//          try ( QueryExecution qexec = (ds != null) ? ARQFactory.get().createQueryExecution(theQuery, ds, bindings)
+//                                                    : ARQFactory.get().createQueryExecution(theQuery, model) ) {
+//              ResultSet rs = qexec.execSelect();
+//              List<Var> rvs = theQuery.getProjectVars();
+//              QueryIterator it = new QueryIterPlainWrapper(rsBindings.iterator(), context);
+//              // QuerySolution to result Binding 
+//              List<Binding> bx = Iter.iter(rs).map(qs->convertRow(qs, vars, rvs, inputBinding)).toList();
+//              QueryIterator it = new QueryIterPlainWrapper(bx.iterator, context);
+//              if(existingValues != null) {
+//                  existingValues.add(it);
+//                  return existingValues;
+//              }
+//              else {
+//                  return it;
+//              }
+//          }
 		}
 		else if(existingValues != null) {
 			return existingValues;
 		}
 		else {
-			return IterLib.result(binding, context);
+			return IterLib.result(inputBinding, context);
 		}
 	}
+    
+    private static Binding convertRow(QuerySolution row, Map<String, Var> vars, List<Var> rvs, Binding parentBinding) {
+        BindingMap result = BindingFactory.create(parentBinding);
+        for(Var var1 : rvs) {
+            RDFNode resultNode = row.get(var1.getVarName());
+            if(resultNode != null) {
+                Var var2 = vars.get(var1.getVarName());
+                if(var2 != null) {
+                    result.add(var2, resultNode.asNode());
+                }
+            }
+        }
+        return result;
+    }
+    
+    // If anything goes wrong during the iteration from the property function, which is not an ARQ exception,
+    // then close the AutoCloseable which is a QueryExecution.
+    //
+    // QueryIteratorClosing adds try-catch around points where the property function
+    // can be involved, and close and cancel cause the closeable to be closed.
+    // Assumes the QueryIterator is used properly.
+    private static class QueryIteratorClosing extends QueryIteratorWrapper {
+
+        static QueryIterator protect(QueryIterator qIter, AutoCloseable closeable) {
+            if ( qIter instanceof QueryIteratorClosing )
+                Log.warn(SPINARQFunction.class, "Wrapping an already wrapped QueryIteratorClosing");
+            return new QueryIteratorClosing(qIter, closeable);
+        }
+        
+        private final AutoCloseable closeable;
+
+        private QueryIteratorClosing(QueryIterator qIter, AutoCloseable closeable) {
+            super(qIter);
+            this.closeable = closeable;
+        }
+        
+        @Override
+        protected boolean hasNextBinding() {
+            try {
+                return super.hasNextBinding() ;
+            }
+            catch (RuntimeException ex) { closeInternal() ; throw ex; }
+        }
+        
+        @Override
+        protected Binding moveToNextBinding() {
+            try {
+                return super.moveToNextBinding();
+            }
+            catch (RuntimeException ex) { closeInternal() ; throw ex; }
+        }
+
+        @Override
+        protected void closeIterator() {
+            closeInternal();
+            super.closeIterator();
+        }
+        
+        @Override
+        protected void requestCancel() {
+            closeInternal();
+            super.requestCancel();
+        }
+        
+        private void closeInternal() {
+            try {
+                closeable.close();
+            } catch (RuntimeException ex) { 
+                throw ex;
+            } catch (Exception ex) {
+                throw new IllegalStateException("Unexpected checked exception", ex);
+            }
+        }
+    }
 }

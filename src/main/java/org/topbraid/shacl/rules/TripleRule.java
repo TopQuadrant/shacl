@@ -90,10 +90,12 @@ class TripleRule extends Rule {
 		QuerySolutionMap binding = new QuerySolutionMap();
 		for(RDFNode focusNode : focusNodes) {
 			binding.add(SH.thisVar.getVarName(), focusNode);
-			QueryExecution qexec = ARQFactory.get().createQueryExecution(query, ruleEngine.getDataset(), binding);
-			Model c = qexec.execConstruct();
+			Model c;
+			try ( QueryExecution qexec = ARQFactory.get().createQueryExecution(query, ruleEngine.getDataset(), binding) ) {
+			    c = qexec.execConstruct();
+			}
 			for(Triple triple : c.getGraph().find(Node.ANY, Node.ANY, Node.ANY).toList()) {
-				ruleEngine.infer(triple, this, shape);
+			    ruleEngine.infer(triple, this, shape);
 			}
 		}
 	}

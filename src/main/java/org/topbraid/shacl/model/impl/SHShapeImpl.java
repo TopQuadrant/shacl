@@ -8,6 +8,8 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.topbraid.shacl.model.SHFactory;
+import org.topbraid.shacl.model.SHPropertyShape;
 import org.topbraid.shacl.model.SHRule;
 import org.topbraid.shacl.model.SHShape;
 import org.topbraid.shacl.util.SHACLUtil;
@@ -26,6 +28,40 @@ public abstract class SHShapeImpl extends SHParameterizableInstanceImpl implemen
 	@Override
 	public Resource getPath() {
 		return JenaUtil.getResourceProperty(this, SH.path);
+	}
+
+
+	@Override
+	public List<SHPropertyShape> getPropertyShapes() {
+		List<SHPropertyShape> results = new LinkedList<>();
+		for(Statement s : listProperties(SH.parameter).toList()) {
+			if(s.getObject().isResource()) {
+				results.add(SHFactory.asPropertyShape(s.getObject()));
+			}
+		}
+		for(Statement s : listProperties(SH.property).toList()) {
+			if(s.getObject().isResource()) {
+				results.add(SHFactory.asPropertyShape(s.getObject()));
+			}
+		}
+		return results;
+	}
+
+
+	@Override
+	public List<SHPropertyShape> getPropertyShapes(RDFNode predicate) {
+		List<SHPropertyShape> results = new LinkedList<SHPropertyShape>();
+		for(Resource property : JenaUtil.getResourceProperties(this, SH.parameter)) {
+			if(property.hasProperty(SH.path, predicate)) {
+				results.add(SHFactory.asPropertyShape(property));
+			}
+		}
+		for(Resource property : JenaUtil.getResourceProperties(this, SH.property)) {
+			if(property.hasProperty(SH.path, predicate)) {
+				results.add(SHFactory.asPropertyShape(property));
+			}
+		}
+		return results;
 	}
 
 

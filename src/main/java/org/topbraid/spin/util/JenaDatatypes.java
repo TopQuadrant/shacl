@@ -87,6 +87,12 @@ public class JenaDatatypes {
 	}
 
 	
+	public static Literal createDecimal(int value) {
+		return ResourceFactory.createTypedLiteral("" + value, TypeMapper.getInstance()
+				.getSafeTypeByName(XSD.decimal.getURI()));
+	}
+
+	
 	public static Literal createInteger(int value) {
 		return ResourceFactory.createTypedLiteral("" + value, TypeMapper.getInstance()
 				.getSafeTypeByName(XSD.integer.getURI()));

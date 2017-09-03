@@ -1,5 +1,9 @@
 package org.topbraid.spin.util;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import org.apache.jena.atlas.iterator.Iter;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
@@ -25,6 +29,36 @@ public class JenaNodeUtil {
 		else {
 			return null;
 		}
+	}
+
+	
+	public static long getObjectCount(Node subject, Node predicate, Graph graph) {
+		return Iter.count(graph.find(subject, predicate, Node.ANY));
+	}
+
+	
+	public static List<Node> getObjects(Node subject, Node predicate, Graph graph) {
+		List<Node> results = new LinkedList<>();
+		ExtendedIterator<Triple> it = graph.find(subject, predicate, Node.ANY);
+		while(it.hasNext()) {
+			results.add(it.next().getObject());
+		}
+		return results;
+	}
+
+	
+	public static long getSubjectCount(Node predicate, Node object, Graph graph) {
+		return Iter.count(graph.find(Node.ANY, predicate, object));
+	}
+	
+	
+	public static List<Node> getSubjects(Node predicate, Node object, Graph graph) {
+		List<Node> results = new LinkedList<>();
+		ExtendedIterator<Triple> it = graph.find(Node.ANY, predicate, object);
+		while(it.hasNext()) {
+			results.add(it.next().getSubject());
+		}
+		return results;
 	}
 	
 	

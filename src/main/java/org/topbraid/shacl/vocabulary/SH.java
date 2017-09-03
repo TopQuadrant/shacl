@@ -241,7 +241,7 @@ public class SH {
     public final static Property zeroOrOnePath = ResourceFactory.createProperty(NS + "zeroOrOnePath");
     
     
-    // Advanced features - may end up in another namespace
+    // Advanced features
 
     public final static Resource ExpressionConstraintComponent = ResourceFactory.createResource(NS + "ExpressionConstraintComponent");
 

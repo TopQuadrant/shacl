@@ -88,8 +88,9 @@ public class SPINExpressions {
 		}
 		else {
 			Query arq = ARQFactory.get().createExpressionQuery(expression);
-			QueryExecution qexec = ARQFactory.get().createQueryExecution(arq, dataset, bindings);
-			return SPINUtil.getFirstResult(qexec);
+			try(QueryExecution qexec = ARQFactory.get().createQueryExecution(arq, dataset, bindings)) {
+			    return SPINUtil.getFirstResult(qexec);
+			}
 		}
 	}
 	

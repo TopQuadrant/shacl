@@ -110,31 +110,39 @@ public abstract class AbstractJSExecutor implements ConstraintExecutor {
 
 	
 	@SuppressWarnings("rawtypes")
-	private void addDefaultMessages(ValidationEngine engine, Resource messageHolder, Resource fallback, Resource result, 
+	private void addDefaultMessages(ValidationEngine engine, Constraint constraint, Resource messageHolder, Resource fallback, Resource result, 
 				QuerySolution bindings, Map resultObject) {
-		boolean found = false;
-		for(Statement s : messageHolder.listProperties(SH.message).toList()) {
-			if(s.getObject().isLiteral()) {
-				QuerySolutionMap map = new QuerySolutionMap();
-				map.addAll(bindings);
-				if(resultObject != null) {
-					for(Object keyObject : resultObject.keySet()) {
-						String key = (String) keyObject;
-						Object value = map.get(key);
-						if(value != null) {
-							Node valueNode = JSFactory.getNode(value);
-							if(valueNode != null) {
-								map.add(key, result.getModel().asRDFNode(valueNode));
+		if(constraint != null && constraint.getShapeResource().hasProperty(SH.message)) {
+			for(Statement s : constraint.getShapeResource().listProperties(SH.message).toList()) {
+				result.addProperty(SH.resultMessage, s.getObject());
+			}
+		}
+		else {
+	
+			boolean found = false;
+			for(Statement s : messageHolder.listProperties(SH.message).toList()) {
+				if(s.getObject().isLiteral()) {
+					QuerySolutionMap map = new QuerySolutionMap();
+					map.addAll(bindings);
+					if(resultObject != null) {
+						for(Object keyObject : resultObject.keySet()) {
+							String key = (String) keyObject;
+							Object value = map.get(key);
+							if(value != null) {
+								Node valueNode = JSFactory.getNode(value);
+								if(valueNode != null) {
+									map.add(key, result.getModel().asRDFNode(valueNode));
+								}
 							}
 						}
 					}
+					engine.addResultMessage(result, s.getLiteral(), map);
+					found = true;
 				}
-				engine.addResultMessage(result, s.getLiteral(), map);
-				found = true;
 			}
-		}
-		if(!found && fallback != null) {
-			addDefaultMessages(engine, fallback, null, result, bindings, resultObject);
+			if(!found && fallback != null) {
+				addDefaultMessages(engine, null, fallback, null, result, bindings, resultObject);
+			}
 		}
 	}
 
@@ -168,7 +176,7 @@ public abstract class AbstractJSExecutor implements ConstraintExecutor {
 				if(valueNode != null) {
 					result.addProperty(SH.value, valueNode);
 				}
-				addDefaultMessages(engine, messageHolder, constraint.getComponent(), result, bindings, null);
+				addDefaultMessages(engine, constraint, messageHolder, constraint.getComponent(), result, bindings, null);
 			}
 		}
 		else if(resultObj instanceof String) {
@@ -177,7 +185,7 @@ public abstract class AbstractJSExecutor implements ConstraintExecutor {
 			if(valueNode != null) {
 				result.addProperty(SH.value, valueNode);
 			}
-			addDefaultMessages(engine, messageHolder, constraint.getComponent(), result, bindings, null);
+			addDefaultMessages(engine, constraint, messageHolder, constraint.getComponent(), result, bindings, null);
 		}
 	}
 	
@@ -210,7 +218,7 @@ public abstract class AbstractJSExecutor implements ConstraintExecutor {
 			result.addProperty(SH.resultMessage, (String)ro);
 		}
 		if(!result.hasProperty(SH.resultMessage)) {
-			addDefaultMessages(engine, messageHolder, constraint.getComponent(), result, bindings, ro instanceof Map ? (Map)ro : null);
+			addDefaultMessages(engine, constraint, messageHolder, constraint.getComponent(), result, bindings, ro instanceof Map ? (Map)ro : null);
 		}
 	}
 	

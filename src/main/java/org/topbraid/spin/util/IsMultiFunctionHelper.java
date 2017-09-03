@@ -151,7 +151,7 @@ class IsMultiFunctionHelper {
 
 
 	private static boolean hasShapeMaxCount1(SHNodeShape shape, Node predicateNode) {
-		for(SHPropertyShape c : shape.getPropertyConstraints(shape.getModel().asRDFNode(predicateNode))) {
+		for(SHPropertyShape c : shape.getPropertyShapes(shape.getModel().asRDFNode(predicateNode))) {
 			if(!c.isDeactivated()) {
 				Integer maxCount = JenaUtil.getIntegerProperty(c, SH.maxCount);
 				if(maxCount != null && maxCount < 2) {

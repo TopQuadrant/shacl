@@ -82,7 +82,7 @@ public class ValidationEngine implements NodeExpressionContext {
 
 		this.shapesGraphURI = shapesGraphURI;
 		if(report == null) {
-			Model reportModel = JenaUtil.createDefaultModel();
+			Model reportModel = JenaUtil.createMemoryModel();
 			reportModel.setNsPrefixes(dataset.getDefaultModel());
 			this.report = reportModel.createResource(SH.ValidationReport);
 		}
@@ -362,8 +362,8 @@ public class ValidationEngine implements NodeExpressionContext {
 
 	
 	/**
-	 * Validates a given focus node against a given Shape.
-	 * @param focusNode  the resource to validate
+	 * Validates a given list of focus node against a given Shape.
+	 * @param focusNodes  the nodes to validate
 	 * @param shape  the sh:Shape to validate against
 	 * @return an instance of sh:ValidationReport in the results Model
 	 */
@@ -393,7 +393,6 @@ public class ValidationEngine implements NodeExpressionContext {
 		}
 		else {
 			FailureLog.get().logFailure("No suitable validator found for constraint " + constraint);
-			executor = getExecutor(constraint);
 		}
 	}
 }

@@ -1,5 +1,7 @@
 package org.topbraid.shacl.model;
 
+import java.util.List;
+
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 
@@ -18,6 +20,22 @@ public interface SHShape extends SHResource {
 	 */
 	Resource getPath();
 	
+	
+	/**
+	 * Gets all property shapes declared for this shape using either sh:parameter or sh:property.
+	 * @return the property shapes
+	 */
+	List<SHPropertyShape> getPropertyShapes();
+
+	
+	/**
+	 * Gets all property shapes declared for this shape using either sh:parameter or sh:property
+	 * that are about a given predicate.
+	 * @param predicate  the predicate
+	 * @return a possibly empty list
+	 */
+	List<SHPropertyShape> getPropertyShapes(RDFNode predicate);
+
 	
 	/**
 	 * Gets the rules attached to this shape via sh:rule.
