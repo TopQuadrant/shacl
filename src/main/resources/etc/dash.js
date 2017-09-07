@@ -510,7 +510,7 @@ function isValidForDatatype(lex, datatype) {
 	}
 	else if(XSDDecimalTypes.contains(datatype)) {
 		var r = parseFloat(lex);
-		return !isNan(r);
+		return !isNaN(r);
 	}
 	else if (datatype.value === "http://www.w3.org/2001/XMLSchema#boolean") {
         return lex === "true" || lex === "false";
