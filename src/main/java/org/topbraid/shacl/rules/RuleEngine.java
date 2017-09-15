@@ -225,7 +225,8 @@ public class RuleEngine implements NodeExpressionContext {
 	}
 	
 	
-	public ShapesGraph getShapesGraph() {
+	@Override
+    public ShapesGraph getShapesGraph() {
 		return shapesGraph;
 	}
 	

@@ -145,7 +145,8 @@ class TripleRule extends Rule {
 	}
 	
 	
-	public String toString() {
+	@Override
+    public String toString() {
 		String label = getLabel();
 		if(label == null) {
 			label = getSPARQL();

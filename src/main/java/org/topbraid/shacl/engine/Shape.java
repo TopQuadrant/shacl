@@ -101,7 +101,8 @@ public class Shape {
 	}
 	
 	
-	public String toString() {
+	@Override
+    public String toString() {
 		return SPINLabels.get().getLabel(getShapeResource());
 	}
 }

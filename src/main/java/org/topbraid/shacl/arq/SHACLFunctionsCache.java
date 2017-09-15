@@ -32,7 +32,6 @@ public class SHACLFunctionsCache {
 	
 	private static final int capacity = 10000;
 	
-	@SuppressWarnings("serial")
 	private static class MyCache extends LinkedHashMap<Key,Result> {
 
 		MyCache() {

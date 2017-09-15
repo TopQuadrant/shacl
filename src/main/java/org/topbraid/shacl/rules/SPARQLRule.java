@@ -58,7 +58,8 @@ public class SPARQLRule extends Rule {
 	}
 	
 	
-	public String toString() {
+	@Override
+    public String toString() {
 		String label = getLabel();
 		if(label == null) {
 			Statement s = getResource().getProperty(SH.construct);

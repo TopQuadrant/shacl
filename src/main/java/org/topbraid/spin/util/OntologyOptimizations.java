@@ -54,7 +54,6 @@ public class OntologyOptimizations {
 	
 	private static final int capacity = 10000;
 	
-	@SuppressWarnings("serial")
 	public static class MyCache extends LinkedHashMap<Object,Object> {
 
 		public MyCache() {

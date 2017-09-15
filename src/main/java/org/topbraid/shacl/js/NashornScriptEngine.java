@@ -79,7 +79,8 @@ public class NashornScriptEngine implements JSScriptEngine {
 	}
 
 
-	public void executeLibraries(Resource e) throws Exception {
+	@Override
+    public void executeLibraries(Resource e) throws Exception {
 		for(Resource library : JenaUtil.getResourceProperties(e, SH.jsLibrary)) {
 			if(!visitedLibraries.contains(library)) {
 				visitedLibraries.add(library);
@@ -95,12 +96,13 @@ public class NashornScriptEngine implements JSScriptEngine {
 	}
 	
 	
-	public final void executeScriptFromURL(String url) throws Exception {
+	@Override
+    public final void executeScriptFromURL(String url) throws Exception {
 		if(!loadedURLs.contains(url)) {
 			loadedURLs.add(url);
-			Reader reader = createScriptReader(url);
-			engine.eval(reader);
-			reader.close();
+			try ( Reader reader = createScriptReader(url) ) {
+			    engine.eval(reader);
+			}
 		}
 	}
 
@@ -184,7 +186,8 @@ public class NashornScriptEngine implements JSScriptEngine {
 	}
 
 
-	public void put(String varName, Object value) {
+	@Override
+    public void put(String varName, Object value) {
 		engine.put(varName, value);
 	}
 }

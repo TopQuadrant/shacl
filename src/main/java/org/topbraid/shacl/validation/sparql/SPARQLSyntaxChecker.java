@@ -40,7 +40,6 @@ public class SPARQLSyntaxChecker {
 	 * Checks whether a given Query violates any of the syntax rules in Appendix A.
 	 * @param query  the Query to check
 	 * @param preBoundVars  the potentially pre-bound variables
-	 * @param wasAsk  to enable special handling of BIND($this AS ?value)
 	 * @return an List of error messages (empty if OK)
 	 */
 	public static List<String> checkQuery(Query query, Set<String> preBoundVars) {

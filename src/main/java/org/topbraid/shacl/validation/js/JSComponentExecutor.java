@@ -39,7 +39,8 @@ public class JSComponentExecutor extends AbstractJSExecutor {
 	}
 
 
-	protected List<RDFNode> getValueNodes(ValidationEngine validationEngine, Constraint constraint, QuerySolutionMap bindings, RDFNode focusNode) {
+	@Override
+    protected List<RDFNode> getValueNodes(ValidationEngine validationEngine, Constraint constraint, QuerySolutionMap bindings, RDFNode focusNode) {
 		SHConstraintComponent component = constraint.getComponent();
 		Resource context = constraint.getContext();
 		Resource validatorResource = component.getValidator(SH.JSValidator, context);

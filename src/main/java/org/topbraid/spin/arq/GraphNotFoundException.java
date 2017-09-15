@@ -10,7 +10,6 @@ package org.topbraid.spin.arq;
  * 
  * @author Holger Knublauch
  */
-@SuppressWarnings("serial")
 public class GraphNotFoundException extends RuntimeException {
 
 	public GraphNotFoundException(String message) {

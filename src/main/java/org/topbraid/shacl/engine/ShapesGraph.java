@@ -73,7 +73,6 @@ public class ShapesGraph {
 	
 	/**
 	 * Gets all shapes that declare a target and pass the provided filter.
-	 * @param rootFilter  a shapes filter or null to allow all shapes.
 	 * @return the root shapes
 	 */
 	public List<Shape> getRootShapes() {

@@ -32,7 +32,6 @@ public class SPINFunctionsCache {
 	
 	private static final int capacity = 10000;
 	
-	@SuppressWarnings("serial")
 	private static class MyCache extends LinkedHashMap<Key,Result> {
 
 		MyCache() {
@@ -146,7 +145,8 @@ public class SPINFunctionsCache {
 		}
 		
 		
-		public String toString() {
+		@Override
+        public String toString() {
 			String str = "<" + functionURI + ">(";
 			for(int i = 0; i < args.length; i++) {
 				if(i > 0) {

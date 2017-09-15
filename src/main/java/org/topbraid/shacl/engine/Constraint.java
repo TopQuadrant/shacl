@@ -88,7 +88,8 @@ public class Constraint {
 	}
 	
 	
-	public String toString() {
+	@Override
+    public String toString() {
 		return "Constraint " + component.getLocalName() + " at " + shape;
 	}
 }
