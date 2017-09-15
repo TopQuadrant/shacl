@@ -42,7 +42,8 @@ public class TestDASHTestCases {
 			@Override
 			public JSScriptEngine createScriptEngine() {
 				return new NashornScriptEngine() {
-					protected Reader createScriptReader(String url) throws Exception {
+					@Override
+                    protected Reader createScriptReader(String url) throws Exception {
 						if(DASH_JS.equals(url)) {
 							return new InputStreamReader(NashornScriptEngine.class.getResourceAsStream("/etc/dash.js"));
 						}

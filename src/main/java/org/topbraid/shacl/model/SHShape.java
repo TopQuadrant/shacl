@@ -46,7 +46,6 @@ public interface SHShape extends SHResource {
 	
 	/**
 	 * Returns the sh:severity of this shape, defaulting to sh:Violation.
-	 * @return
 	 */
 	Resource getSeverity();
 	

@@ -114,7 +114,8 @@ public class ValidationEngine implements NodeExpressionContext {
 	}
 	
 	
-	public Dataset getDataset() {
+	@Override
+    public Dataset getDataset() {
 		return dataset;
 	}
 	
@@ -167,12 +168,14 @@ public class ValidationEngine implements NodeExpressionContext {
 	}
 	
 	
-	public ShapesGraph getShapesGraph() {
+	@Override
+    public ShapesGraph getShapesGraph() {
 		return shapesGraph;
 	}
 	
 	
-	public URI getShapesGraphURI() {
+	@Override
+    public URI getShapesGraphURI() {
 		return shapesGraphURI;
 	}
 	

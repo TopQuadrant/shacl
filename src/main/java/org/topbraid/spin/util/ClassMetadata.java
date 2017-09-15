@@ -248,7 +248,8 @@ public class ClassMetadata {
 	}
 	
 	
-	public String toString() {
+	@Override
+    public String toString() {
 		return "ClassMetadata for " + classNode + " with " + properties.size() + " properties";
 	}
 	
