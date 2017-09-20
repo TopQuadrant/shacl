@@ -17,6 +17,7 @@
     <name>TopQuadrant, Inc.</name>
     <url>http://topquadrant.com</url>
   </organization>
+
   <licenses>
     <license>
       <name>Apache License v2.0</name>
@@ -24,6 +25,16 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+  <issueManagement>
+    <url>https://github.com/TopQuadrant/shacl/issues</url>
+  </issueManagement>
+
+  <scm>
+    <url>https://github.com/TopQuadrant/shacl</url>
+    <connection>scm:git:https://github.com/TopQuadrant/shacl</connection>
+    <developerConnection>scm:git:git@github.com:TopQuadrant/shacl.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -33,42 +44,6 @@
     <ver.log4j1>1.2.17</ver.log4j1>
   </properties>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.7.0</version>
-         <configuration>
-            <encoding>UTF-8</encoding>
-            <debug>true</debug>
-            <debuglevel>source,lines,vars</debuglevel>
-            <optimize>true</optimize>
-            <source>1.8</source>
-            <target>1.8</target>
-         </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>3.1.0</version>
-        <configuration>
-          <descriptors>
-            <descriptor>src/assembly/bin.xml</descriptor>
-          </descriptors>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
-  
   <dependencies>
 
     <dependency>
@@ -108,4 +83,98 @@
     </dependency>
 
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.7.0</version>
+         <configuration>
+            <encoding>UTF-8</encoding>
+            <debug>true</debug>
+            <debuglevel>source,lines,vars</debuglevel>
+            <optimize>true</optimize>
+            <source>1.8</source>
+            <target>1.8</target>
+         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.1.0</version>
+        <configuration>
+          <descriptors>
+            <descriptor>src/assembly/bin.xml</descriptor>
+          </descriptors>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  
+  <profiles>
+    <profile>
+      <id>release</id>
+      <activation>
+        <property>
+          <name>performRelease</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>2.9.1</version>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+  
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh.snapshots</id>
+      <name>Sonatype Snapshots Repository</name>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>ossrh.releases</id>
+      <name>Sonatype Gateway to Maven Central</name>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
+
 </project>

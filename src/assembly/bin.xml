@@ -33,7 +33,7 @@
     </fileSet>
 
     <fileSet>
-      <outputDirectory>/</outputDirectory>
+      <outputDirectory></outputDirectory>
       <includes>
         <include>log4j.properties</include>
         <include>LICENSE</include>

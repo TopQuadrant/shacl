@@ -42,6 +42,11 @@ target/
 maven-eclipse.xml
 build.properties
 site-content
+# Release plugin intermediate files.
+pom.xml.next
+pom.xml.releaseBackup
+pom.xml.tag
+release.properties
 
 ## Gradle
 .gradle
@@ -71,3 +76,4 @@ gradle-app.setting
 .DS_Store
 .DS_Store?
 ._*
+/bin/
