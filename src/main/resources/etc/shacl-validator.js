@@ -1,7 +1,3 @@
-/* Copyright (C) TopQuadrant, Inc - licensed under AGPL
- * Written by Holger Knublauch <holger@topquadrant.com>, 2017
- */
-
 // A simple SHACL validator in JavaScript based on SHACL-JS.
 
 // Design:
