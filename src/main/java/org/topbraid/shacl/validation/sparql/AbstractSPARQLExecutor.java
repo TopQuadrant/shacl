@@ -55,6 +55,9 @@ public abstract class AbstractSPARQLExecutor implements ConstraintExecutor {
 	// Flag to generate sh:details for all violations.
 	public static boolean createDetails = false;
 	
+	// Flag to generate dash:SuccessResults for all violations.
+	public static boolean createSuccessResults = false;
+	
 	private Query query;
 	
 	private String queryString;
@@ -224,12 +227,14 @@ public abstract class AbstractSPARQLExecutor implements ConstraintExecutor {
 					}
 				}
 			}
-			else if(createDetails) {
+			else if(createSuccessResults) {
 				Resource success = engine.createResult(DASH.SuccessResult, constraint, focusNode);
 				if(SH.SPARQLConstraintComponent.equals(constraint.getComponent())) {
 					success.addProperty(SH.sourceConstraint, constraint.getParameterValue());
 				}
-				addDetails(success, nestedResults);
+				if(createDetails) {
+					addDetails(success, nestedResults);
+				}
 			}
 		}
 		finally {

@@ -46,7 +46,12 @@ public class SHACLObject {
 	
 	public Integer compareNodes(JSTerm node1, JSTerm node2) {
 		try {
-			return NodeValue.compare(NodeValue.makeNode(node1.getNode()), NodeValue.makeNode(node2.getNode()));
+			if(node1.isURI() && node2.isURI()) {
+				return node1.getUri().compareTo(node2.getUri());
+			}
+			else {
+				return NodeValue.compare(NodeValue.makeNode(node1.getNode()), NodeValue.makeNode(node2.getNode()));
+			}
 		}
 		catch(ExprNotComparableException ex) {
 			return null;

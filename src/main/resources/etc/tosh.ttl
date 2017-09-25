@@ -17,6 +17,13 @@ dash:
 dash:ClosedByTypesConstraintComponent-closedByTypes
   sh:group tosh:OtherConstraintPropertyGroup ;
 .
+dash:CoExistsWithConstraintComponent-coExistsWith
+  sh:group tosh:PropertyPairConstraintPropertyGroup ;
+  sh:order "10"^^xsd:decimal ;
+.
+dash:HasValueWithClassConstraintComponent-hasValueWithClass
+  sh:group tosh:OtherConstraintPropertyGroup ;
+.
 dash:NonRecursiveConstraintComponent
   dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
   sh:property [
@@ -555,6 +562,14 @@ tosh:valuesWithShapeCount
 			}
 		}
 		""" ;
+.
+tosh:viewGadget
+  rdf:type rdf:Property ;
+  rdfs:comment """Can link a property shape with a UI gadget that shall be used to render property values on forms (in viewing mode). In contrast to tosh:viewWidget which is about individual values only, a gadget is expected to take full control, i.e. it needs to make all necessary decisions to render the values appropriately. The gadget is parameterized with the focus node and the path.
+
+This property is currently only supported at property groups and then applies to all properties in that group.""" ;
+  rdfs:label "view gadget" ;
+  rdfs:range rdfs:Resource ;
 .
 tosh:viewGroupDescription
   rdf:type rdf:Property ;

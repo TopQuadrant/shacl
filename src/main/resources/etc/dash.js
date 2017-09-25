@@ -138,7 +138,7 @@ var validateEqualsNode = function ($this, $equals) {
         });
     if (results.length === 0 && solutions === 0) {
         results.push({
-            value: $this.value
+            value: $this
         });
     }
     return results;
