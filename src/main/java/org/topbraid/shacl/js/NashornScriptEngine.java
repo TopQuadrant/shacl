@@ -78,7 +78,7 @@ public class NashornScriptEngine implements JSScriptEngine {
 	
 	
 	public NashornScriptEngine() {
-		engine = new ScriptEngineManager().getEngineByName("nashorn");
+		engine = findNashorn();
 		engine.put("TermFactory", new TermFactory());
 		try {
 			engine.eval(ARGS_FUNCTION);
@@ -86,6 +86,17 @@ public class NashornScriptEngine implements JSScriptEngine {
 		catch(ScriptException ex) {
 			ExceptionUtil.throwUnchecked(ex);
 		}
+	}
+
+	private ScriptEngine findNashorn() {
+		ScriptEngine nashorn = new ScriptEngineManager().getEngineByName("nashorn");
+		if (nashorn == null) {
+			nashorn = new ScriptEngineManager(null).getEngineByName("nashorn");
+		}
+		if (nashorn == null) {
+			throw new RuntimeException("Oracle Nashorn not found in the current context");
+		}
+		return nashorn;
 	}
 	
 	
