@@ -22,6 +22,13 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.jena.enhanced.EnhGraph;
+import org.apache.jena.graph.Node;
+import org.apache.jena.rdf.model.RDFList;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.util.iterator.ExtendedIterator;
 import org.topbraid.spin.arq.ARQ2SPIN;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.model.Aggregation;
@@ -31,14 +38,6 @@ import org.topbraid.spin.model.Variable;
 import org.topbraid.spin.model.print.PrintContext;
 import org.topbraid.spin.model.print.Printable;
 import org.topbraid.spin.vocabulary.SP;
-
-import org.apache.jena.enhanced.EnhGraph;
-import org.apache.jena.graph.Node;
-import org.apache.jena.rdf.model.RDFList;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.util.iterator.ExtendedIterator;
 
 
 public class SelectImpl extends QueryImpl implements Select {
@@ -120,14 +119,8 @@ public class SelectImpl extends QueryImpl implements Select {
 		else {
 			for(Iterator<Resource> vit = vars.iterator(); vit.hasNext(); ) {
 				Resource var = vit.next();
-				if(var instanceof Variable) {
-					if(var.hasProperty(SP.expression)) {
-						printProjectExpression(p, (Variable) var);
-					}
-					else {
-						((Variable)var).print(p);
-					}
-				}
+				if(var instanceof Variable)
+				    printVariableExpression(p, (Variable) var);
 				else if(var instanceof Aggregation) {
 					((Printable)var).print(p);
 				}
@@ -188,16 +181,8 @@ public class SelectImpl extends QueryImpl implements Select {
 		}
 	}
 	
-	
-	private void printProjectExpression(PrintContext p, Variable var) {
-		p.print("((");
-		RDFNode expr = var.getProperty(SP.expression).getObject();
-		Printable expression = (Printable) SPINFactory.asExpression(expr);
-		expression.print(p);
-		p.print(") ");
-		p.printKeyword("AS");
-		p.print(" ");
-		p.print(var.toString());
-		p.print(")");
+	private void printVarExpr(PrintContext p, RDFNode varExpr) {
+	    
 	}
+
 }

@@ -18,20 +18,18 @@
 package org.topbraid.spin.model.impl;
 
 import org.apache.jena.atlas.lib.StrUtils;
-import org.topbraid.spin.arq.Aggregations;
-import org.topbraid.spin.model.Aggregation;
-import org.topbraid.spin.model.SPINFactory;
-import org.topbraid.spin.model.Variable;
-import org.topbraid.spin.model.print.PrintContext;
-import org.topbraid.spin.model.print.Printable;
-import org.topbraid.spin.vocabulary.SP;
-
 import org.apache.jena.enhanced.EnhGraph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDF;
+import org.topbraid.spin.arq.Aggregations;
+import org.topbraid.spin.model.Aggregation;
+import org.topbraid.spin.model.SPINFactory;
+import org.topbraid.spin.model.Variable;
+import org.topbraid.spin.model.print.PrintContext;
+import org.topbraid.spin.vocabulary.SP;
 
 
 public class AggregationImpl extends AbstractSPINResourceImpl implements Aggregation {
@@ -83,15 +81,9 @@ public class AggregationImpl extends AbstractSPINResourceImpl implements Aggrega
 		}
 		
 		Statement exprS = getProperty(SP.expression);
-		if(exprS != null && exprS.getObject().isResource()) {
-			Resource r = exprS.getResource();
-			RDFNode expr = SPINFactory.asExpression(r);
-			if(expr instanceof Printable) {
-				((Printable)expr).print(p);
-			}
-			else {
-				p.printURIResource(r);
-			}
+		if(exprS != null) {
+			RDFNode expr = SPINFactory.asExpression(exprS.getObject());
+			printNestedExpressionString(p, expr);
 		}
 		else {
 			p.print("*");

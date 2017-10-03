@@ -24,6 +24,7 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.vocabulary.RDFS;
 import org.topbraid.shacl.model.SHFactory;
 import org.topbraid.shacl.model.SHPropertyShape;
 import org.topbraid.shacl.model.SHRule;
@@ -103,8 +104,9 @@ public abstract class SHShapeImpl extends SHParameterizableInstanceImpl implemen
 		
 		// rdf:type / sh:targetClass
 		if(node instanceof Resource) {
+			boolean shapeClass = JenaUtil.hasIndirectType(this, RDFS.Class);
 			for(Resource type : JenaUtil.getAllTypes((Resource)node)) {
-				if(JenaUtil.hasIndirectType(type, SH.Shape)) {
+				if(shapeClass && type.equals(this)) {
 					return true;
 				}
 				if(hasProperty(SH.targetClass, type)) {

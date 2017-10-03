@@ -149,7 +149,33 @@ public abstract class AbstractSPINResourceImpl extends org.topbraid.spin.model.S
 		p.print("}");
 	}
 
-	
+	/** Print a variable of variable-expression: ?V or (123 AS ?V) */
+	protected void printVariableExpression(PrintContext p, Variable var) {
+	    // Project expression encoding of variable+possible expression.
+	    RDFNode expr = null;
+	    if ( var.hasProperty(SP.expression) ) {
+	        RDFNode expr0 = var.getProperty(SP.expression).getObject();
+	        expr = SPINFactory.asExpression(expr0);
+        }
+        printVariableExpression(p, var, expr);
+    }
+
+    /** Print a variable of variable-expression: ?V or (123 AS ?V) */  
+    protected void printVariableExpression(PrintContext p, Variable var, RDFNode expr) {
+        // variable and expression provied separately. e.g. BIND
+        if ( expr == null ) {
+            var.print(p);
+            return;
+        }
+        p.print("(");
+        printNestedExpressionString(p, expr);
+        p.print(" ");
+        p.printKeyword("AS");
+        p.print(" ");
+        p.print(var.toString());
+        p.print(")");
+    }
+
 	protected void printNestedExpressionString(PrintContext context, RDFNode node) {
 		printNestedExpressionString(context, node, false);
 	}

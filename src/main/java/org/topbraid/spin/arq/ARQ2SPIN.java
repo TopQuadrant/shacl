@@ -329,8 +329,7 @@ public class ARQ2SPIN {
 					String varName = var.getName();
 					Resource variable = getVariable(varName);
 					members.add(variable);
-		        }
-		        else if(expr instanceof ExprFunction || expr instanceof ExprAggregator || expr instanceof ExprVar) {
+		        } else {
 		        	RDFNode e = createExpression(expr);
 		        	if(var.isAllocVar()) {
 						members.add(e);

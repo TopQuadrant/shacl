@@ -64,25 +64,8 @@ public class BindImpl extends ElementImpl implements Bind {
 	@Override
     public void print(PrintContext context) {
 		context.printKeyword("BIND");
-		context.print(" (");
-		RDFNode expression = getExpression();
-		if(expression != null) {
-			printNestedExpressionString(context, expression);
-		}
-		else {
-			context.print("<Error: Missing expression>");
-		}
 		context.print(" ");
-		context.printKeyword("AS");
-		context.print(" ");
-		Variable variable = getVariable();
-		if(variable != null) {
-			context.print(variable.toString());
-		}
-		else {
-			context.print("<Error: Missing variable>");
-		}
-		context.print(")");
+		printVariableExpression(context, getVariable(), getExpression());
 	}
 
 
