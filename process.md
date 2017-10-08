@@ -59,10 +59,20 @@ repository in your personal `settings.xml` (e.g. `$HOME/.m2/settings.xml`).
 
 ### Setup Release Process
 
-The maven release plugin will move the version from SNAPSHOT to the
-release version, and tag the github repository. It will also move to
-the next SNAPSHOT version after building the release
-(autoVersionSubmodules is set true).
+#### Versions
+
+Choose the release version, next version and the tag, otherwise maven
+will ask for these interactively:
+
+```
+export VER="-DreleaseVersion=x.y.z -DdevelopmentVersion=x.next.z-SNAPSHOT -Dtag=shacl-x.y.z"
+```
+
+The maven release plugin will move the version from the current SNAPSHOT
+to the release version, and tag the github repository. It will also move
+to the next SNAPSHOT version after building the release.
+
+#### Signing
 
 If you have multiple PGP keys, choose the right one:
 
@@ -78,20 +88,26 @@ If you have only one key, set this to the empty string:
 export KEY=""
 ```
 
-or omit `$KEY`.
+or omit `$KEY` in the examples below.
 
 ### Dry run
 
 It is advisable to dry run the release:
 ```
-mvn release:clean release:prepare -DdryRun=true $KEY
+mvn release:clean release:prepare -DdryRun=true -Prelease $VER $KEY
 ```
 
 ### Check
 
-Look in `target/`
+Look in `target/`.
 
-You should see various files built.
+You should see various files built including thebinary ".bin.zip", the
+javadoc (which is only done in the release cycle), `sources`, `tests`
+and `test-sources`. The files should have been signed and `.asc` files
+created.
+
+If there is no javadoc jar or no `.asc` files, check you gave the
+`-Prelease` argument.
 
 It still says "SNAPSHOT" because the dry run does not change the version in POM.
 
@@ -99,13 +115,18 @@ It still says "SNAPSHOT" because the dry run does not change the version in POM.
 
 This has two steps:
 
-`mvn release:clean release:prepare`
-`mvn release:perform $KEY`
+`mvn release:clean release:prepare  -Prelease $KEY $VER`
+`mvn release:perform -Prelease $KEY $VER`
 
 ### If it goes wrong:
 
-`mvn release:rollback`
+`mvn release:rollback`  
 `mvn release:clean`
+
+You may also need to delete the tag.
+
+`git tag -d shacl-x.y.z`  
+`git push --delete origin shacl-x.y.z`
 
 ### Release to central
 
