@@ -4,7 +4,7 @@ This page describes processes for the SHACL API Project.
 
 ## Local Build
 
-To build the latest code for your lcoal system:
+To build the latest snapshot code for your local system:
 
 Clone the github repo, run maven in the local directory:
 
@@ -52,7 +52,6 @@ repository in your personal `settings.xml` (e.g. `$HOME/.m2/settings.xml`).
     <username>SONATYPE_USERNAME</username>
     <password>SONATYPE_PASSWORD</password>
   </server>
-
 ```
 
 ### Release Process
@@ -85,14 +84,15 @@ export KEY=""
 
 It is advisable to dry run the release:
 
-`mvn release:clean release:prepare $VER -DdryRun=true` $KEY
+```
+mvn release:clean release:prepare $VER -DdryRun=true $KEY
+```
 
 #### Check
 
 Look in `target/`
 
-You should see various files shacl-VER-SNAPSHOT and with them a `.asc`
-signing file.
+You should see various files built.
 
 It still says "SNAPSHOT" because the dry run does not change the version in POM.
 
