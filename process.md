@@ -2,6 +2,8 @@
 
 This page describes processes for the SHACL API Project.
 
+----
+
 ## Local Build
 
 To build the latest snapshot code for your local system:
@@ -25,6 +27,7 @@ repository.  Check the pom.xml for the correct version string.
 </dependency>
 ```
 
+----
 
 ## Release
 
@@ -54,41 +57,37 @@ repository in your personal `settings.xml` (e.g. `$HOME/.m2/settings.xml`).
   </server>
 ```
 
-### Release Process
+### Setup Release Process
 
-#### Choose next versions.
-
-This is optional - the maven release plugin will ask for these otherwise:
-
-`export VER="-DreleaseVersion=x.y.z -DdevelopmentVersion=x.next.z-SNAPSHOT -Dtag=shacl-x.y.z"`
-
-for suitable x/y/z settings.
-
-The maven release plugin will move the version from SNAPSHOT to the relase
-version, and tag the githib repository.  It will also move to the next
-SNAPSHOT version after building the release.
+The maven release plugin will move the version from SNAPSHOT to the
+release version, and tag the github repository. It will also move to
+the next SNAPSHOT version after building the release
+(autoVersionSubmodules is set true).
 
 If you have multiple PGP keys, choose the right one:
 
 `export KEY="-Darguments=-Dgpg.keyname=KEY_SIGNATURE"`
 
-(Note the slightly odd value here; the release pluing calls maven
+(Note the slightly odd value here; the release plugin calls maven
 recursively and `-Darguments=` is maven recursively passing
-down arguments to subprocess)
+down arguments to the subprocess.)
 
 If you have only one key, set this to the empty string:
 
+```
 export KEY=""
+```
 
-#### Dry run
+or omit `$KEY`.
+
+### Dry run
 
 It is advisable to dry run the release:
-
 ```
-mvn release:clean release:prepare $VER -DdryRun=true $KEY
+mvn release:clean release:prepare -DdryRun=true $KEY
 ```
 
-#### Check
+### Check
 
 Look in `target/`
 
@@ -96,31 +95,31 @@ You should see various files built.
 
 It still says "SNAPSHOT" because the dry run does not change the version in POM.
 
-#### Do the release
+### Do the release
 
 This has two steps:
 
-`mvn release:clean release:prepare $VER $KEY`
-`mvn release:perform $VER $KEY`
+`mvn release:clean release:prepare`
+`mvn release:perform $KEY`
 
-#### If it goes wrong:
+### If it goes wrong:
 
 `mvn release:rollback`
 `mvn release:clean`
 
-#### Release to central
+### Release to central
 
 The steps so far pushed the built artifacts to the staging repository.
 
 To push them up to central.maven, go to https://oss.sonatype.org/
 
-* Find repo (it's open) orgtopbraid....
+* Find repo (it's open) `orgtopbraid....`
 * Check it ("content" tab)
 * Close it, at which point the checking rules run.
 * Refresh the webpage until rule checkign completes.
 * If all is good, click "release" at the top.
 
-#### Clearup
+### Clearup
 
 Check where any intermediate files are left over.
 
