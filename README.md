@@ -28,9 +28,26 @@ To get started, look at the class ValidationUtil in
 the package org.topbraid.shacl.validation.
 There is also an [Example Test Case](../master/src/test/java/org/topbraid/shacl/ValidationExample.java)
 
+## Application dependency
+
+Releases are available in the central maven repository:
+
+```
+<dependency>
+  <groupId>org.topbraid</groupId>
+  <artifactId>shacl</artifactId>
+  <version>*VER*</version>
+</dependency>
+```
 ## Command Line Usage
 
-Download the latest release from the Release tab.
+Download the latest release from:
+
+`http://central.maven.org/maven2/org/topbraid/shacl/`
+
+The binary distribution is:
+
+`http://central.maven.org/maven2/org/topbraid/shacl/*VER*/shacl-*VER*-bin.zip`.
 
 Two command line utilities are included: validate (performs constraint validation) and infer (performs SHACL rule inferencing).
 
@@ -38,15 +55,16 @@ To use them, set up your environment similar to https://jena.apache.org/document
 
 For example, on Windows:
 
+```
 SET SHACLROOT=C:\Users\Holger\Desktop\shacl-1.0.0-bin
-
 SET PATH=%PATH%;%SHACLROOT%\bin
+```
 
 Both tools take the following parameters, for example:
 
-shaclvalidate.bat -datafile myfile.ttl -shapesfile myshapes.ttl
+`shaclvalidate.bat -datafile myfile.ttl -shapesfile myshapes.ttl`
 
-whereby -shapesfile is optional and falls back to using the data graph as shapes graph.
+where `-shapesfile` is optional and falls back to using the data graph as shapes graph.
 
 Currently only Turtle (.ttl) files are supported.
 

@@ -140,6 +140,8 @@ To push them up to central.maven, go to https://oss.sonatype.org/
 * Refresh the webpage until rule checkign completes.
 * If all is good, click "release" at the top.
 
+Note from 1.0.1: this happened automatically. The rules ran as part of `release:perform`.
+
 ### Clearup
 
 Check where any intermediate files are left over.
