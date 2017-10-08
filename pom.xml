@@ -26,6 +26,7 @@
   <packaging>jar</packaging>
 
   <name>TopBraid SHACL API</name>
+  <description>TopBraid SHACL API</description>
   <url>http://topbraid.org/shacl/api</url>
 
   <organization>
@@ -40,9 +41,23 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+
   <issueManagement>
     <url>https://github.com/TopQuadrant/shacl/issues</url>
   </issueManagement>
+
+  <developers>
+    <developer>
+      <name>Holger Knublauch</name>
+    </developer>
+  </developers>
+  
+  <contributors>
+    <contributor>
+      <!-- Github contributors page -->
+      <url>https://github.com/TopQuadrant/shacl/graphs/contributors</url>
+    </contributor>
+  </contributors>
 
   <scm>
     <url>https://github.com/TopQuadrant/shacl</url>
