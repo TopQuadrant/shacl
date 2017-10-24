@@ -1,23 +1,22 @@
-# baseURI: http://datashapes.org/sh/tests/sparql/component/nodeValidator-ask-001.test
+# baseURI: http://datashapes.org/sh/tests/sparql/component/nodeValidator-001.test
 # imports: http://datashapes.org/dash
 # prefix: ex
 
 @prefix dash: <http://datashapes.org/dash#> .
-@prefix ex: <http://datashapes.org/sh/tests/sparql/component/nodeValidator-ask-001.test#> .
+@prefix ex: <http://datashapes.org/sh/tests/sparql/component/nodeValidator-001.test#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://datashapes.org/sh/tests/sparql/component/nodeValidator-ask-001.test>
+<http://datashapes.org/sh/tests/sparql/component/nodeValidator-001.test>
   rdf:type owl:Ontology ;
-  rdfs:label "Test of sh:nodeValidator with ASK 001" ;
+  rdfs:label "Test of sh:nodeValidator 001" ;
   owl:imports <http://datashapes.org/dash> ;
-  owl:versionInfo "Created with TopBraid Composer" ;
   sh:declare [
       rdf:type sh:PrefixDeclaration ;
-      sh:namespace "http://datashapes.org/sh/tests/sparql/component/nodeValidator-ask-001.test#"^^xsd:anyURI ;
+      sh:namespace "http://datashapes.org/sh/tests/sparql/component/nodeValidator-001.test#"^^xsd:anyURI ;
       sh:prefix "ex" ;
     ] ;
 .
@@ -43,11 +42,15 @@ ex:TestConstraintComponent
   rdf:type sh:ConstraintComponent ;
   rdfs:label "Test constraint component" ;
   sh:nodeValidator [
-      rdf:type sh:SPARQLAskValidator ;
-      sh:ask """ASK {
-    $this ex:property ?requiredParam .
-}""" ;
-      sh:prefixes <http://datashapes.org/sh/tests/sparql/component/nodeValidator-ask-001.test> ;
+      rdf:type sh:SPARQLSelectValidator ;
+      sh:prefixes <http://datashapes.org/sh/tests/sparql/component/nodeValidator-001.test> ;
+      sh:select """
+      SELECT DISTINCT $this
+      WHERE {
+        $this ?p ?o .
+        FILTER NOT EXISTS {
+            $this ex:property ?requiredParam .
+      }}""" ;
     ] ;
   sh:parameter [
       sh:path ex:optionalParam ;

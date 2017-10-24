@@ -151,7 +151,14 @@ public class SHACLPaths {
 		}
 		else if(path.hasProperty(SH.inversePath)) {
 			sb.append("^");
-			appendPath(sb, JenaUtil.getResourceProperty(path, SH.inversePath));
+			if(path.getProperty(SH.inversePath).getObject().isAnon()) {
+				sb.append("(");
+				appendPath(sb, JenaUtil.getResourceProperty(path, SH.inversePath));
+				sb.append(")");
+			}
+			else {
+				appendPath(sb, JenaUtil.getResourceProperty(path, SH.inversePath));
+			}
 		}
 		else if(path.hasProperty(SH.alternativePath)) {
 			appendNestedPath(sb, JenaUtil.getResourceProperty(path, SH.alternativePath), ALTERNATIVE_PATH_SEPARATOR);

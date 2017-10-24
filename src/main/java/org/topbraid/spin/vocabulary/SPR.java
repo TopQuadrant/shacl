@@ -60,8 +60,6 @@ public class SPR {
 
     public final static Resource colWidth = ResourceFactory.createResource(NS + "colWidth");
 
-    public final static Resource contains = ResourceFactory.createResource(NS + "contains");
-
     public final static Resource hasCell = ResourceFactory.createResource(NS + "hasCell");
 
     public final static Resource hasCellFunction = ResourceFactory.createResource(NS + "hasCellFunction");
@@ -69,8 +67,6 @@ public class SPR {
     public final static Resource rowCount = ResourceFactory.createResource(NS + "rowCount");
 
     public final static Resource rowCountFunction = ResourceFactory.createResource(NS + "rowCountFunction");
-
-    public final static Resource union = ResourceFactory.createResource(NS + "union");
 
 
     public static String getURI() {
