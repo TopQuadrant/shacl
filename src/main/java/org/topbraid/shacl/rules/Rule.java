@@ -67,7 +67,9 @@ public abstract class Rule {
 	
 	public String getLabelStart(String type) {
 		Number index = getOrder();
-		return type + " rule (" + (index.doubleValue() == 0 ? "0" : index) + "): ";
+		int conditionCount = getResource().listProperties(SH.condition).toList().size();
+		return type + " rule (" + (index.doubleValue() == 0 ? "0" : index) + 
+				(conditionCount > 0 ? (", with " + conditionCount + " conditions") : "") + "): ";
 	}
 	
 	

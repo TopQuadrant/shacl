@@ -72,6 +72,8 @@ public class DASH {
     
     public final static Resource SuccessTestCaseResult = ResourceFactory.createResource(NS + "SuccessTestCaseResult");
 
+    public final static Resource SuggestionResult = ResourceFactory.createResource(NS + "SuggestionResult");
+
     public final static Resource TestCase = ResourceFactory.createResource(NS + "TestCase");
 
     public final static Resource TestEnvironment = ResourceFactory.createResource(NS + "TestEnvironment");
@@ -92,6 +94,8 @@ public class DASH {
     public final static Property deletedTriple = ResourceFactory.createProperty(NS + "deletedTriple");
     
     public final static Property expectedResult = ResourceFactory.createProperty(NS + "expectedResult");
+    
+    public final static Property expectedResultIsTTL = ResourceFactory.createProperty(NS + "expectedResultIsTTL");
 
     public final static Property expression = ResourceFactory.createProperty(NS + "expression");
 
@@ -106,6 +110,8 @@ public class DASH {
     public final static Property rootClass = ResourceFactory.createProperty(NS + "rootClass");
     
     public final static Property suggestion = ResourceFactory.createProperty(NS + "suggestion");
+    
+    public final static Property suggestionConfidence = ResourceFactory.createProperty(NS + "suggestionConfidence");
     
     public final static Property suggestionGenerator = ResourceFactory.createProperty(NS + "suggestionGenerator");
     

@@ -34,8 +34,8 @@ import org.topbraid.shacl.arq.SHACLPaths;
 import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.engine.filters.ExcludeMetaShapesFilter;
 import org.topbraid.shacl.util.SHACLUtil;
-import org.topbraid.shacl.validation.SHACLSuggestionGenerator;
-import org.topbraid.shacl.validation.SHACLSuggestionGeneratorFactory;
+import org.topbraid.shacl.validation.ValidationSuggestionGenerator;
+import org.topbraid.shacl.validation.ValidationSuggestionGeneratorFactory;
 import org.topbraid.shacl.validation.ValidationEngine;
 import org.topbraid.shacl.validation.ValidationEngineFactory;
 import org.topbraid.shacl.vocabulary.DASH;
@@ -66,7 +66,7 @@ public class GraphValidationTestCaseType implements TestCaseType {
 
 	
 	public static void addSuggestions(Model dataModel, Model shapesModel, Model actualResults) {
-		SHACLSuggestionGenerator generator = SHACLSuggestionGeneratorFactory.get().createSuggestionGenerator(dataModel, shapesModel);
+		ValidationSuggestionGenerator generator = ValidationSuggestionGeneratorFactory.get().createValidationSuggestionGenerator(dataModel, shapesModel);
 		if(generator == null) {
 			throw new UnsupportedOperationException("Cannot run test due to no suggestion generator installed");
 		}

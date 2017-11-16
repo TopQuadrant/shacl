@@ -83,7 +83,7 @@ public class SPARQLTargetPlugin implements TargetPlugin {
 
 	@Override
 	public boolean isNodeInTarget(RDFNode focusNode, Dataset dataset, Resource executable, SHParameterizableTarget parameterizableTarget) {
-		String ask = JenaUtil.getStringProperty(parameterizableTarget, SH.ask);
+		String ask = JenaUtil.getStringProperty(executable, SH.ask);
 		if(ask != null) {
 			String queryString = SPARQLSubstitutions.withPrefixes(ask, executable);
 			Query query;

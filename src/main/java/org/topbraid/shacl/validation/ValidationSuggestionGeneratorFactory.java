@@ -19,19 +19,19 @@ package org.topbraid.shacl.validation;
 import org.apache.jena.rdf.model.Model;
 
 /**
- * A singleton object that can create SHACLSuggestionGenerators.
+ * A singleton object that can create ValidationSuggestionGenerators.
  * 
  * @author Holger Knublauch
  */
-public class SHACLSuggestionGeneratorFactory {
+public class ValidationSuggestionGeneratorFactory {
 	
-	private static SHACLSuggestionGeneratorFactory singleton = new SHACLSuggestionGeneratorFactory();
+	private static ValidationSuggestionGeneratorFactory singleton = new ValidationSuggestionGeneratorFactory();
 	
-	public static SHACLSuggestionGeneratorFactory get() {
+	public static ValidationSuggestionGeneratorFactory get() {
 		return singleton;
 	}
 	
-	public static void set(SHACLSuggestionGeneratorFactory value) {
+	public static void set(ValidationSuggestionGeneratorFactory value) {
 		singleton = value;
 	}
 	
@@ -41,9 +41,9 @@ public class SHACLSuggestionGeneratorFactory {
 	 * open source package.
 	 * @param dataModel  the data graph to operate on
 	 * @param shapesModel  the shapes graph to operate on
-	 * @return a {@link SHACLSuggestionGenerator} or null
+	 * @return a {@link ValidationSuggestionGenerator} or null
 	 */
-	public SHACLSuggestionGenerator createSuggestionGenerator(Model dataModel, Model shapesModel) {
+	public ValidationSuggestionGenerator createValidationSuggestionGenerator(Model dataModel, Model shapesModel) {
 		return null;
 	}
 }

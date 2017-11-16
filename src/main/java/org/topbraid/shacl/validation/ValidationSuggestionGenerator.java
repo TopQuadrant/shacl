@@ -27,7 +27,7 @@ import org.apache.jena.rdf.model.Resource;
  * 
  * @author Holger Knublauch
  */
-public interface SHACLSuggestionGenerator {
+public interface ValidationSuggestionGenerator {
 	
 	/**
 	 * Adds dash:suggestion triples for all result resource in the given results Model.

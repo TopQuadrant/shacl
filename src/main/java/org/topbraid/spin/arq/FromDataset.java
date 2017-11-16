@@ -105,4 +105,12 @@ public class FromDataset extends DelegatingDataset {
 			return namedGraphs.iterator();
 		}
 	}
+
+
+    @Override
+    public boolean isEmpty() {
+        return 
+            defaultModel.isEmpty() &&
+            namedGraphs.stream().map(name->getNamedModel(name)).allMatch(model->model.isEmpty());
+    }
 }

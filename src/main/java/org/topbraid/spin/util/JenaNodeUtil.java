@@ -36,15 +36,14 @@ import org.apache.jena.util.iterator.ExtendedIterator;
 public class JenaNodeUtil {
 	
 	public static Node getObject(Node subject, Node predicate, Graph graph) {
-		ExtendedIterator<Triple> it = graph.find(subject, predicate, Node.ANY);
-		if(it.hasNext()) {
-			Node object = it.next().getObject();
-			it.close();
-			return object;
-		}
-		else {
-			return null;
-		}
+	    ExtendedIterator<Triple> it = graph.find(subject, predicate, Node.ANY);
+	    try { 
+            return it.hasNext() 
+                ? it.next().getObject() 
+                : null;
+	    } finally { 
+	        it.close();
+	    }
 	}
 
 	

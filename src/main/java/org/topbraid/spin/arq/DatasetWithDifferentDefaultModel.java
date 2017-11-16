@@ -39,4 +39,11 @@ public class DatasetWithDifferentDefaultModel extends DelegatingDataset {
 	public Model getDefaultModel() {
 		return defaultModel;
 	}
+
+
+    @Override
+    public boolean isEmpty() {
+        // Don't risk looping on all named graphs.
+        throw new UnsupportedOperationException();
+    }
 }

@@ -16,10 +16,12 @@
  */
 package org.topbraid.shacl.testcases;
 
+import java.io.ByteArrayInputStream;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.jena.graph.Graph;
 import org.apache.jena.query.ARQ;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -29,6 +31,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.sparql.function.FunctionRegistry;
+import org.apache.jena.util.FileUtils;
 import org.topbraid.shacl.testcases.context.JSPreferredTestCaseContext;
 import org.topbraid.shacl.testcases.context.SPARQLPreferredTestCaseContext;
 import org.topbraid.shacl.testcases.context.TestCaseContext;
@@ -37,6 +40,7 @@ import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.spin.arq.ARQFactory;
 import org.topbraid.spin.arq.SPINThreadFunctionRegistry;
 import org.topbraid.spin.arq.SPINThreadFunctions;
+import org.topbraid.spin.util.JenaDatatypes;
 import org.topbraid.spin.util.JenaUtil;
 
 public class FunctionTestCaseType implements TestCaseType {
@@ -97,17 +101,26 @@ public class FunctionTestCaseType implements TestCaseType {
 					        }
 					    }
 					    else {
-					        RDFNode result = rs.next().get("result");
+					        RDFNode actual = rs.next().get("result");
 					        if(expectedResultS == null) {
-					            if(result != null) {
+					            if(actual != null) {
 					                createFailure(results,
-					                              "Expression returned a result, but none expected: " + result, context);
+					                              "Expression returned a result, but none expected: " + actual, context);
 					                return;
 					            }
 					        }
-					        else if(!expectedResultS.getObject().equals(result)) {
+					        else if(testCase.hasProperty(DASH.expectedResultIsTTL, JenaDatatypes.TRUE)) {
+					        	Graph expectedGraph = parseGraph(expectedResultS.getObject());
+					        	Graph actualGraph = parseGraph(actual);
+					        	if(!expectedGraph.isIsomorphicWith(actualGraph)) {
+						            createFailure(results,
+					                          "Mismatching result graphs. Expected: " + expectedResultS.getObject() + ". Found: " + actual, context);
+						            return;
+					        	}
+					        }
+					        else if(!expectedResultS.getObject().equals(actual)) {
 					            createFailure(results,
-					                          "Mismatching result. Expected: " + expectedResultS.getObject() + ". Found: " + result, context);
+					                          "Mismatching result. Expected: " + expectedResultS.getObject() + ". Found: " + actual, context);
 					            return;
 					        }
 					    }
@@ -123,6 +136,16 @@ public class FunctionTestCaseType implements TestCaseType {
 			}
 			
 			createResult(results, DASH.SuccessTestCaseResult);
+		}
+		
+		
+		private Graph parseGraph(RDFNode node) {
+			Model model = JenaUtil.createDefaultModel();
+			if(node.isLiteral()) {
+				String str = node.asLiteral().getLexicalForm();
+				model.read(new ByteArrayInputStream(str.getBytes()), "urn:x-dummy", FileUtils.langTurtle);
+			}
+			return model.getGraph();
 		}
 	}
 }
