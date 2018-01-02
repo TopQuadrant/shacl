@@ -42,9 +42,13 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
+import org.topbraid.jenax.util.ARQFactory;
+import org.topbraid.jenax.util.JenaNodeUtil;
+import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.arq.SHACLFunctionDriver;
 import org.topbraid.shacl.model.SHConstraintComponent;
 import org.topbraid.shacl.model.SHFactory;
@@ -53,15 +57,14 @@ import org.topbraid.shacl.model.SHParameter;
 import org.topbraid.shacl.model.SHParameterizableTarget;
 import org.topbraid.shacl.model.SHPropertyShape;
 import org.topbraid.shacl.model.SHResult;
+import org.topbraid.shacl.optimize.OntologyOptimizations;
+import org.topbraid.shacl.optimize.OptimizedMultiUnion;
 import org.topbraid.shacl.validation.ConstraintExecutors;
 import org.topbraid.shacl.validation.TargetPlugin;
 import org.topbraid.shacl.validation.TargetPlugins;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.arq.ARQFactory;
-import org.topbraid.spin.util.JenaUtil;
-import org.topbraid.spin.util.OntologyOptimizations;
-import org.topbraid.spin.util.OptimizedMultiUnion;
+import org.topbraid.shacl.vocabulary.TOSH;
 
 /**
  * Various SHACL-related utility methods that didn't fit elsewhere.
@@ -112,13 +115,13 @@ public class SHACLUtil {
 	
 	public static void addDirectPropertiesOfClass(Resource cls, Collection<Property> results) {
 		for(Resource argument : JenaUtil.getResourceProperties(cls, SH.parameter)) {
-			Resource predicate = JenaUtil.getPropertyResourceValue(argument, SH.path);
+			Resource predicate = argument.getPropertyResourceValue(SH.path);
 			if(predicate != null && predicate.isURIResource() && !results.contains(predicate)) {
 				results.add(JenaUtil.asProperty(predicate));
 			}
 		}
 		for(Resource property : JenaUtil.getResourceProperties(cls, SH.property)) {
-			Resource predicate = JenaUtil.getPropertyResourceValue(property, SH.path);
+			Resource predicate = property.getPropertyResourceValue(SH.path);
 			if(predicate != null && predicate.isURIResource() && !results.contains(predicate)) {
 				results.add(JenaUtil.asProperty(predicate));
 			}
@@ -671,7 +674,7 @@ public class SHACLUtil {
 	public static Model withDefaultValueTypeInferences(Model model) {
 		return ModelFactory.createModelForGraph(new MultiUnion(new Graph[] {
 				model.getGraph(),
-				DASH.createDefaultValueTypesModel(model).getGraph()
+				SHACLUtil.createDefaultValueTypesModel(model).getGraph()
 		}));
 	}
 
@@ -733,6 +736,30 @@ public class SHACLUtil {
 			return false;
 		}
 	}
+
+
+	/**
+	 * Runs the rule to infer missing rdf:type triples for certain blank nodes.
+	 * @param model  the input Model
+	 * @return a new Model containing the inferred triples
+	 */
+	public static Model createDefaultValueTypesModel(Model model) {
+		String sparql = JenaUtil.getStringProperty(DASH.DefaultValueTypeRule.inModel(model), SH.construct);
+		if(sparql == null) {
+			throw new IllegalArgumentException("Shapes graph does not include " + TOSH.PREFIX + ":" + DASH.DefaultValueTypeRule);
+		}
+		Model resultModel = JenaUtil.createMemoryModel();
+		MultiUnion multiUnion = new MultiUnion(new Graph[] {
+			model.getGraph(),
+			resultModel.getGraph()
+		});
+		Model unionModel = ModelFactory.createModelForGraph(multiUnion);
+		Query query = ARQFactory.get().createQuery(model, sparql);
+		try(QueryExecution qexec = ARQFactory.get().createQueryExecution(query, unionModel)) {
+		    qexec.execConstruct(resultModel);
+		    return resultModel;    
+		}
+	}
 	
 	
 	private static boolean jsPreferred;
@@ -746,5 +773,38 @@ public class SHACLUtil {
 		ConstraintExecutors.get().setJSPreferred(value);
 		SHACLFunctionDriver.setJSPreferred(value);
 		TargetPlugins.get().setJSPreferred(value);
+	}
+
+
+	public static Node walkPropertyShapesHelper(Node propertyShape, Graph graph) {
+		Node valueType = JenaNodeUtil.getObject(propertyShape, SH.class_.asNode(), graph);
+		if(valueType != null) {
+			return valueType;
+		}
+		Node datatype = JenaNodeUtil.getObject(propertyShape, SH.datatype.asNode(), graph);
+		if(datatype != null) {
+			return datatype;
+		}
+		ExtendedIterator<Triple> ors = graph.find(propertyShape, SH.or.asNode(), Node.ANY);
+		while(ors.hasNext()) {
+			Node or = ors.next().getObject();
+			Node first = JenaNodeUtil.getObject(or, RDF.first.asNode(), graph);
+			if(!first.isLiteral()) {
+				Node cls = JenaNodeUtil.getObject(first, SH.class_.asNode(), graph);
+				if(cls != null) {
+					ors.close();
+					return cls;
+				}
+				datatype = JenaNodeUtil.getObject(first, SH.datatype.asNode(), graph);
+				if(datatype != null) {
+					ors.close();
+					return datatype;
+				}
+			}
+		}
+		if(graph.contains(propertyShape, SH.node.asNode(), DASH.ListShape.asNode())) {
+			return RDF.List.asNode();
+		}
+		return null;
 	}
 }

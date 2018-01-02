@@ -21,11 +21,11 @@ import java.util.List;
 import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.model.SHConstraintComponent;
 import org.topbraid.shacl.model.SHParameter;
 import org.topbraid.shacl.model.SHShape;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.util.JenaUtil;
 
 /**
  * Represents a constraint as input to an engine (e.g. validation or rule).

@@ -40,12 +40,12 @@ import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDFS;
+import org.topbraid.jenax.util.ARQFactory;
+import org.topbraid.jenax.util.JenaUtil;
+import org.topbraid.jenax.util.RDFLabels;
 import org.topbraid.shacl.validation.SHACLException;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.shacl.vocabulary.TOSH;
-import org.topbraid.spin.arq.ARQFactory;
-import org.topbraid.spin.system.SPINLabels;
-import org.topbraid.spin.util.JenaUtil;
 
 /**
  * Collects various helper algorithms currently used by the SPARQL execution language.
@@ -120,7 +120,7 @@ public class SPARQLSubstitutions {
 								buffer.append(labelFunction.apply(varValue));
 							}
 							else if(varValue instanceof Resource) {
-								buffer.append(SPINLabels.get().getLabel((Resource)varValue));
+								buffer.append(RDFLabels.get().getLabel((Resource)varValue));
 							}
 							else if(varValue instanceof Literal) {
 								buffer.append(varValue.asNode().getLiteralLexicalForm());

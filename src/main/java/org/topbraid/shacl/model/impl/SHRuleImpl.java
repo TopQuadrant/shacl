@@ -21,9 +21,9 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.model.SHRule;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.util.JenaUtil;
 
 public class SHRuleImpl extends SHResourceImpl implements SHRule {
 	

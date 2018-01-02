@@ -29,13 +29,13 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.expr.ExprEvalException;
 import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.expr.NodeValue;
+import org.topbraid.jenax.util.ARQFactory;
+import org.topbraid.jenax.util.DatasetWithDifferentDefaultModel;
+import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.model.SHConstraintComponent;
 import org.topbraid.shacl.model.SHSPARQLFunction;
 import org.topbraid.shacl.validation.sparql.SPARQLSubstitutions;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.arq.ARQFactory;
-import org.topbraid.spin.arq.DatasetWithDifferentDefaultModel;
-import org.topbraid.spin.util.JenaUtil;
 
 
 /**

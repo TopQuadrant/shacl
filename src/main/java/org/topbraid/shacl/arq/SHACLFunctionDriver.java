@@ -17,11 +17,11 @@
 package org.topbraid.shacl.arq;
 
 import org.apache.jena.rdf.model.Resource;
+import org.topbraid.jenax.functions.DeclarativeFunctionDriver;
+import org.topbraid.jenax.functions.DeclarativeFunctionFactory;
 import org.topbraid.shacl.model.SHJSFunction;
 import org.topbraid.shacl.model.SHSPARQLFunction;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.arq.SPINFunctionDriver;
-import org.topbraid.spin.arq.SPINFunctionFactory;
 
 
 /**
@@ -31,7 +31,7 @@ import org.topbraid.spin.arq.SPINFunctionFactory;
  * 
  * @author Holger Knublauch
  */
-public class SHACLFunctionDriver implements SPINFunctionDriver {
+public class SHACLFunctionDriver implements DeclarativeFunctionDriver {
 	
 	private static boolean jsPreferred = false;
 	
@@ -41,7 +41,7 @@ public class SHACLFunctionDriver implements SPINFunctionDriver {
 
 	
 	@Override
-	public SPINFunctionFactory create(Resource shaclFunction) {
+	public DeclarativeFunctionFactory create(Resource shaclFunction) {
 		if(jsPreferred) {
 			if(shaclFunction.hasProperty(SH.jsLibrary)) {
 				return new SHACLJSARQFunction(shaclFunction.as(SHJSFunction.class));

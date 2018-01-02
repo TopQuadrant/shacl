@@ -39,8 +39,8 @@ import org.apache.jena.sparql.function.FunctionRegistry;
 import org.apache.jena.sparql.util.Context;
 import org.apache.jena.sparql.util.ExprUtils;
 import org.apache.jena.sparql.util.NodeFactoryExtra;
-import org.topbraid.shacl.arq.OptionalArgsFunction;
-import org.topbraid.spin.system.SPINLabels;
+import org.topbraid.jenax.functions.OptionalArgsFunction;
+import org.topbraid.jenax.util.RDFLabels;
 
 public class FunctionExpression extends ComplexNodeExpression {
 	
@@ -86,7 +86,7 @@ public class FunctionExpression extends ComplexNodeExpression {
 
 
 	private void appendCall(AppendContext context, String varName) {
-		context.append(SPINLabels.get().getLabel(function));
+		context.append(RDFLabels.get().getLabel(function));
 		context.append("(");
 		for(int i = 0; i < args.size(); i++) {
 			NodeExpression arg = args.get(i);

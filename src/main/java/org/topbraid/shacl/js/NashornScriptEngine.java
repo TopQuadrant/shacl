@@ -36,11 +36,11 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.topbraid.jenax.util.ExceptionUtil;
+import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.js.model.JSFactory;
 import org.topbraid.shacl.js.model.TermFactory;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.util.ExceptionUtil;
-import org.topbraid.spin.util.JenaUtil;
 
 /**
  * Default implementation of JSScriptEngine, based on Nashorn.

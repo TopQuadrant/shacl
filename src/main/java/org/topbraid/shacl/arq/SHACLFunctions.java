@@ -21,11 +21,12 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.function.FunctionFactory;
 import org.apache.jena.sparql.function.FunctionRegistry;
+import org.topbraid.jenax.functions.DeclarativeFunctionDrivers;
+import org.topbraid.jenax.functions.DeclarativeFunctionFactory;
+import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.model.SHConstraintComponent;
+import org.topbraid.shacl.model.SHFactory;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.arq.SPINFunctionDrivers;
-import org.topbraid.spin.arq.SPINFunctionFactory;
-import org.topbraid.spin.util.JenaUtil;
 
 /**
  * Manages globally registered SHACL functions, usually loaded from .shapes.* files.
@@ -39,10 +40,10 @@ public class SHACLFunctions {
 	 * @param resource  the function resource
 	 */
 	public static void registerFunction(Resource resource) {
-		FunctionFactory arqFunction = SPINFunctionDrivers.get().create(resource);
+		FunctionFactory arqFunction = DeclarativeFunctionDrivers.get().create(resource);
 		if(arqFunction != null) {
 			FunctionFactory oldFF = FunctionRegistry.get().get(resource.getURI());
-			if(oldFF == null || oldFF instanceof SPINFunctionFactory) {
+			if(oldFF == null || oldFF instanceof DeclarativeFunctionFactory) {
 				FunctionRegistry.get().put(resource.getURI(), arqFunction);
 			}
 		}
@@ -54,6 +55,8 @@ public class SHACLFunctions {
 	 * @param model  the Model to register the functions from
 	 */
 	public static void registerFunctions(Model model) {
+		
+		SHFactory.ensureInited();
 		
 		Resource shaclFunctionClass = SH.Function.inModel(model);
 		for(Resource resource : JenaUtil.getAllInstances(shaclFunctionClass)) {

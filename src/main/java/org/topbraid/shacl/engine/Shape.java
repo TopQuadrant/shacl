@@ -29,7 +29,7 @@ import org.topbraid.shacl.model.SHConstraintComponent;
 import org.topbraid.shacl.model.SHParameter;
 import org.topbraid.shacl.model.SHShape;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.system.SPINLabels;
+import org.topbraid.jenax.util.RDFLabels;
 
 /**
  * Represents a shape as input to an engine (e.g. validation or rule).
@@ -119,6 +119,6 @@ public class Shape {
 	
 	@Override
     public String toString() {
-		return SPINLabels.get().getLabel(getShapeResource());
+		return RDFLabels.get().getLabel(getShapeResource());
 	}
 }

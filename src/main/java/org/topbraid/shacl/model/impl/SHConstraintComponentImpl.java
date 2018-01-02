@@ -20,9 +20,9 @@ import org.apache.jena.enhanced.EnhGraph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
+import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.model.SHConstraintComponent;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.util.JenaUtil;
 
 public class SHConstraintComponentImpl extends SHParameterizableImpl implements SHConstraintComponent {
 	

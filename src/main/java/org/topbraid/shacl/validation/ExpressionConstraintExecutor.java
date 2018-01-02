@@ -21,11 +21,11 @@ import java.util.List;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.topbraid.jenax.util.JenaDatatypes;
 import org.topbraid.shacl.engine.Constraint;
 import org.topbraid.shacl.expr.NodeExpression;
 import org.topbraid.shacl.expr.NodeExpressionFactory;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.util.JenaDatatypes;
 
 public class ExpressionConstraintExecutor implements ConstraintExecutor {
 

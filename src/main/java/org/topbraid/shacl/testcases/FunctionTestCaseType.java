@@ -32,16 +32,16 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.sparql.function.FunctionRegistry;
 import org.apache.jena.util.FileUtils;
+import org.topbraid.jenax.functions.CurrentThreadFunctionRegistry;
+import org.topbraid.jenax.functions.CurrentThreadFunctions;
+import org.topbraid.jenax.util.ARQFactory;
+import org.topbraid.jenax.util.JenaDatatypes;
+import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.testcases.context.JSPreferredTestCaseContext;
 import org.topbraid.shacl.testcases.context.SPARQLPreferredTestCaseContext;
 import org.topbraid.shacl.testcases.context.TestCaseContext;
 import org.topbraid.shacl.testcases.context.TestCaseContextFactory;
 import org.topbraid.shacl.vocabulary.DASH;
-import org.topbraid.spin.arq.ARQFactory;
-import org.topbraid.spin.arq.SPINThreadFunctionRegistry;
-import org.topbraid.spin.arq.SPINThreadFunctions;
-import org.topbraid.spin.util.JenaDatatypes;
-import org.topbraid.spin.util.JenaUtil;
 
 public class FunctionTestCaseType implements TestCaseType {
 	
@@ -78,9 +78,9 @@ public class FunctionTestCaseType implements TestCaseType {
 			Resource testCase = getResource();
 			
 			FunctionRegistry oldFR = FunctionRegistry.get();
-			SPINThreadFunctionRegistry threadFR = new SPINThreadFunctionRegistry(oldFR);
+			CurrentThreadFunctionRegistry threadFR = new CurrentThreadFunctionRegistry(oldFR);
 			FunctionRegistry.set(ARQ.getContext(), threadFR);
-			SPINThreadFunctions old = SPINThreadFunctionRegistry.register(testCase.getModel());
+			CurrentThreadFunctions old = CurrentThreadFunctionRegistry.register(testCase.getModel());
 
 			try {
 				for(TestCaseContextFactory contextFactory : contextFactories) {
@@ -131,7 +131,7 @@ public class FunctionTestCaseType implements TestCaseType {
 				}
 			}
 			finally {
-				SPINThreadFunctionRegistry.unregister(old);
+				CurrentThreadFunctionRegistry.unregister(old);
 				FunctionRegistry.set(ARQ.getContext(), oldFR);
 			}
 			

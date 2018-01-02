@@ -21,9 +21,9 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDFS;
+import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.model.SHPropertyShape;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.util.JenaUtil;
 
 public class SHPropertyShapeImpl extends SHShapeImpl implements SHPropertyShape {
 	

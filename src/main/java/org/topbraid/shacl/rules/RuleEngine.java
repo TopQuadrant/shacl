@@ -33,6 +33,11 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.topbraid.jenax.progress.ProgressMonitor;
+import org.topbraid.jenax.statistics.ExecStatistics;
+import org.topbraid.jenax.statistics.ExecStatisticsManager;
+import org.topbraid.jenax.util.JenaDatatypes;
+import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.engine.Shape;
 import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.expr.NodeExpressionContext;
@@ -41,12 +46,7 @@ import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.validation.ValidationEngine;
 import org.topbraid.shacl.validation.ValidationEngineFactory;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.progress.ProgressMonitor;
-import org.topbraid.spin.statistics.SPINStatistics;
-import org.topbraid.spin.statistics.SPINStatisticsManager;
-import org.topbraid.spin.system.SPINLabels;
-import org.topbraid.spin.util.JenaDatatypes;
-import org.topbraid.spin.util.JenaUtil;
+import org.topbraid.jenax.util.RDFLabels;
 
 /**
  * A SHACL Rules engine with a pluggable architecture for different execution languages
@@ -82,12 +82,25 @@ public class RuleEngine implements NodeExpressionContext {
 	
 	
 	public void executeAll() throws InterruptedException {
-		List<Shape> ruleShapes = new ArrayList<Shape>();
+		List<Shape> ruleShapes = new ArrayList<>();
 		for(Shape shape : shapesGraph.getRootShapes()) {
 			if(shape.getShapeResource().hasProperty(SH.rule)) {
 				ruleShapes.add(shape);
 			}
 		}
+		executeShapes(ruleShapes, null);
+	}
+	
+	
+	/**
+	 * Executes the rules attached to a given list of shapes, either for a dedicated
+	 * focus node or all target nodes of the shapes.
+	 * @param ruleShapes  the shapes to execute
+	 * @param focusNode  the (optional) focus node or null for all target nodes
+	 * @throws InterruptedException
+	 */
+	public void executeShapes(List<Shape> ruleShapes, RDFNode focusNode) throws InterruptedException {
+
 		if(ruleShapes.isEmpty()) {
 			return;
 		}
@@ -115,13 +128,13 @@ public class RuleEngine implements NodeExpressionContext {
 				oldOrder = shape.getOrder();
 				flushPending();
 			}
-			executeShape(shape, baseMessage);
+			executeShape(shape, baseMessage, focusNode);
 		}
 		flushPending();
 	}
 	
 	
-	public void executeShape(Shape shape, String baseMessage) throws InterruptedException {
+	public void executeShape(Shape shape, String baseMessage, RDFNode focusNode) throws InterruptedException {
 		
 		if(shape.getShapeResource().isDeactivated()) {
 			return;
@@ -132,7 +145,14 @@ public class RuleEngine implements NodeExpressionContext {
 			return;
 		}
 		
-		List<RDFNode> targetNodes = SHACLUtil.getTargetNodes(shape.getShapeResource(), dataset);
+		List<RDFNode> targetNodes;
+		if(focusNode != null) {
+			targetNodes = Collections.singletonList(focusNode);
+		}
+		else {
+			targetNodes = SHACLUtil.getTargetNodes(shape.getShapeResource(), dataset);
+		}
+		
 		if(!targetNodes.isEmpty()) {
 			Number oldOrder = rules.get(0).getOrder();
 			for(Rule rule : rules) {
@@ -140,7 +160,7 @@ public class RuleEngine implements NodeExpressionContext {
 					if(monitor.isCanceled()) {
 						throw new InterruptedException();
 					}
-					monitor.setTaskName(baseMessage + " (at " + SPINLabels.get().getLabel(shape.getShapeResource()) + " with " + targetNodes.size() + " target nodes)");
+					monitor.setTaskName(baseMessage + " (at " + RDFLabels.get().getLabel(shape.getShapeResource()) + " with " + targetNodes.size() + " target nodes)");
 					monitor.subTask(rule.toString().replace("\n", " "));
 				}
 				if(!oldOrder.equals(rule.getOrder())) {
@@ -149,7 +169,7 @@ public class RuleEngine implements NodeExpressionContext {
 				}
 				List<Resource> conditions = rule2Conditions.get(rule);
 				if(!conditions.isEmpty()) {
-					List<RDFNode> filtered = new LinkedList<RDFNode>();
+					List<RDFNode> filtered = new LinkedList<>();
 					for(RDFNode targetNode : targetNodes) {
 						if(nodeConformsToAllShapes(targetNode, conditions)) {
 							filtered.add(targetNode);
@@ -171,14 +191,14 @@ public class RuleEngine implements NodeExpressionContext {
 	private void executeRule(Rule rule, List<RDFNode> focusNodes, Shape shape) {
 		JenaUtil.setGraphReadOptimization(true);
 		try {
-			if(SPINStatisticsManager.get().isRecording()) {
+			if(ExecStatisticsManager.get().isRecording()) {
 				long startTime = System.currentTimeMillis();
 				rule.execute(this, focusNodes, shape);
 				long endTime = System.currentTimeMillis();
 				long duration = (endTime - startTime);
 				String queryText = rule.toString();
-				SPINStatisticsManager.get().add(Collections.singletonList(
-						new SPINStatistics(queryText, queryText, duration, startTime, rule.getResource().asNode())));
+				ExecStatisticsManager.get().add(Collections.singletonList(
+						new ExecStatistics(queryText, queryText, duration, startTime, rule.getResource().asNode())));
 			}
 			else {
 				rule.execute(this, focusNodes, shape);

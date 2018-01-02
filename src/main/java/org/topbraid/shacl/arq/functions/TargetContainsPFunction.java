@@ -34,8 +34,8 @@ import org.apache.jena.sparql.engine.iterator.QueryIterExtendByVar;
 import org.apache.jena.sparql.expr.ExprEvalException;
 import org.apache.jena.sparql.pfunction.PropFuncArg;
 import org.apache.jena.sparql.pfunction.PropertyFunctionBase;
+import org.topbraid.jenax.util.DatasetWithDifferentDefaultModel;
 import org.topbraid.shacl.util.SHACLUtil;
-import org.topbraid.spin.arq.DatasetWithDifferentDefaultModel;
 
 /**
  * The property function tosh:targetContains.

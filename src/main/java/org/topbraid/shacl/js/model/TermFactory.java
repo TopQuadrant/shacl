@@ -73,7 +73,13 @@ public class TermFactory {
 	
 	
 	public JSTerm term(String str) {
-        Node n = NodeFactoryExtra.parseNode(str, pm);
+        Node n;
+        try {
+        	n = NodeFactoryExtra.parseNode(str, pm);
+        }
+        catch(Exception ex) {
+        	throw new IllegalArgumentException("Cannot parse node \"" + str + "\"", ex);
+        }
         if(n.isURI()) {
         	return new JSNamedNode(n);
         }

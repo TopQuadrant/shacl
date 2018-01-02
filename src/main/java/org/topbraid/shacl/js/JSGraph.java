@@ -23,10 +23,10 @@ import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.util.iterator.ExtendedIterator;
+import org.topbraid.jenax.util.ExceptionUtil;
 import org.topbraid.shacl.js.model.JSFactory;
 import org.topbraid.shacl.js.model.JSTriple;
 import org.topbraid.shacl.util.FailureLog;
-import org.topbraid.spin.util.ExceptionUtil;
 
 public class JSGraph {
 	

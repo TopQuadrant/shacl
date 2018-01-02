@@ -20,10 +20,10 @@ import java.io.InputStream;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.util.FileUtils;
+import org.topbraid.jenax.util.JenaUtil;
+import org.topbraid.jenax.util.SystemTriples;
 import org.topbraid.shacl.arq.SHACLFunctions;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.util.JenaUtil;
-import org.topbraid.spin.util.SystemTriples;
 
 /**
  * Provides API access to the system graphs needed by SHACL.
@@ -42,13 +42,13 @@ public class SHACLSystemModel {
 			
 			shaclModel = JenaUtil.createDefaultModel();
 			
-			InputStream shaclTTL = SHACLSystemModel.class.getResourceAsStream("/etc/shacl.ttl");
+			InputStream shaclTTL = SHACLSystemModel.class.getResourceAsStream("/rdf/shacl.ttl");
 			shaclModel.read(shaclTTL, SH.BASE_URI, FileUtils.langTurtle);
 			
-			InputStream dashTTL = SHACLSystemModel.class.getResourceAsStream("/etc/dash.ttl");
+			InputStream dashTTL = SHACLSystemModel.class.getResourceAsStream("/rdf/dash.ttl");
 			shaclModel.read(dashTTL, SH.BASE_URI, FileUtils.langTurtle);
 			
-			InputStream toshTTL = SHACLSystemModel.class.getResourceAsStream("/etc/tosh.ttl");
+			InputStream toshTTL = SHACLSystemModel.class.getResourceAsStream("/rdf/tosh.ttl");
 			shaclModel.read(toshTTL, SH.BASE_URI, FileUtils.langTurtle);
 			
 			shaclModel.add(SystemTriples.getVocabularyModel());

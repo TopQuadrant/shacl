@@ -20,8 +20,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.jena.rdf.model.Resource;
+import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.util.JenaUtil;
 
 /**
  * Global registry of known RuleLanguage instances.

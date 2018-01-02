@@ -24,8 +24,8 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.XSD;
+import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.util.JenaUtil;
 
 /**
  * Utilities related to querying and updating prefix declarations based on sh:declare.

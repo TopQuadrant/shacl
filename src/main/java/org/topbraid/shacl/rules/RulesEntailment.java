@@ -23,10 +23,10 @@ import org.apache.jena.graph.compose.MultiUnion;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.topbraid.jenax.progress.ProgressMonitor;
+import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.entailment.SHACLEntailment;
-import org.topbraid.spin.progress.ProgressMonitor;
-import org.topbraid.spin.util.JenaUtil;
 
 public class RulesEntailment implements SHACLEntailment.Engine {
 

@@ -38,6 +38,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.js.JSScriptEngine;
 import org.topbraid.shacl.js.JSScriptEngineFactory;
 import org.topbraid.shacl.js.NashornScriptEngine;
@@ -47,7 +48,6 @@ import org.topbraid.shacl.testcases.TestCaseTypes;
 import org.topbraid.shacl.util.SHACLSystemModel;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.util.JenaUtil;
 
 @RunWith(Parameterized.class)
 public class TestDASHTestCases {
@@ -61,10 +61,10 @@ public class TestDASHTestCases {
 					@Override
                     protected Reader createScriptReader(String url) throws Exception {
 						if(DASH_JS.equals(url)) {
-							return new InputStreamReader(NashornScriptEngine.class.getResourceAsStream("/etc/dash.js"));
+							return new InputStreamReader(NashornScriptEngine.class.getResourceAsStream("/rdf/dash.js"));
 						}
 						else if(RDFQUERY_JS.equals(url)) {
-							return new InputStreamReader(NashornScriptEngine.class.getResourceAsStream("/etc/rdfquery.js"));
+							return new InputStreamReader(NashornScriptEngine.class.getResourceAsStream("/rdf/rdfquery.js"));
 						}
 						else if(url.startsWith("http://datashapes.org/js/")) {
 							return new InputStreamReader(NashornScriptEngine.class.getResourceAsStream(url.substring(21)));

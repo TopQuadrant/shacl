@@ -30,6 +30,8 @@ import org.apache.jena.sparql.expr.ExprEvalException;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.function.FunctionEnv;
 import org.apache.jena.vocabulary.RDF;
+import org.topbraid.jenax.functions.AbstractFunction3;
+import org.topbraid.jenax.util.JenaDatatypes;
 import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.util.FailureLog;
 import org.topbraid.shacl.validation.DefaultShapesGraphProvider;
@@ -37,8 +39,6 @@ import org.topbraid.shacl.validation.ValidationEngineFactory;
 import org.topbraid.shacl.validation.sparql.AbstractSPARQLExecutor;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.arq.AbstractFunction3;
-import org.topbraid.spin.util.JenaDatatypes;
 
 /**
  * The implementation of the tosh:hasShape function.

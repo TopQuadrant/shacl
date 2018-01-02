@@ -21,6 +21,7 @@ package org.topbraid.shacl.validation;
  *  
  * @author Holger Knublauch
  */
+@SuppressWarnings("serial")
 public class SHACLException extends RuntimeException {
 
 	public SHACLException(String message) {

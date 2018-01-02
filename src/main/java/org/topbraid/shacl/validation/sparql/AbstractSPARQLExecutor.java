@@ -33,6 +33,12 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDF;
+import org.topbraid.jenax.statistics.ExecStatistics;
+import org.topbraid.jenax.statistics.ExecStatisticsManager;
+import org.topbraid.jenax.util.ARQFactory;
+import org.topbraid.jenax.util.JenaDatatypes;
+import org.topbraid.jenax.util.JenaUtil;
+import org.topbraid.jenax.util.RDFLabels;
 import org.topbraid.shacl.arq.SHACLPaths;
 import org.topbraid.shacl.arq.functions.HasShapeFunction;
 import org.topbraid.shacl.engine.Constraint;
@@ -43,12 +49,6 @@ import org.topbraid.shacl.validation.SHACLException;
 import org.topbraid.shacl.validation.ValidationEngine;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.arq.ARQFactory;
-import org.topbraid.spin.statistics.SPINStatistics;
-import org.topbraid.spin.statistics.SPINStatisticsManager;
-import org.topbraid.spin.system.SPINLabels;
-import org.topbraid.spin.util.JenaDatatypes;
-import org.topbraid.spin.util.JenaUtil;
 
 public abstract class AbstractSPARQLExecutor implements ConstraintExecutor {
 	
@@ -111,7 +111,7 @@ public abstract class AbstractSPARQLExecutor implements ConstraintExecutor {
 				QueryExecution qexec = SPARQLSubstitutions.createQueryExecution(query, engine.getDataset(), bindings);
 				executeSelectQuery(engine, constraint, nestedResults, focusNode, qexec, bindings);
 			}			
-			if(SPINStatisticsManager.get().isRecording()) {
+			if(ExecStatisticsManager.get().isRecording()) {
 				long endTime = System.currentTimeMillis();
 				long duration = endTime - startTime;
 				String label = getLabel(constraint);
@@ -123,8 +123,8 @@ public abstract class AbstractSPARQLExecutor implements ConstraintExecutor {
 						queryString += "\n- ?" + varName + ": " + bindings.get(varName);
 					}
 				}
-				SPINStatistics stats = new SPINStatistics(label, queryString, duration, startTime, constraint.getComponent().asNode());
-				SPINStatisticsManager.get().add(Collections.singletonList(stats));
+				ExecStatistics stats = new ExecStatistics(label, queryString, duration, startTime, constraint.getComponent().asNode());
+				ExecStatisticsManager.get().add(Collections.singletonList(stats));
 			}
 		}
 		finally {
@@ -180,7 +180,7 @@ public abstract class AbstractSPARQLExecutor implements ConstraintExecutor {
 									message += focusNode;
 								}
 								else {
-									message += SPINLabels.get().getLabel((Resource)focusNode);
+									message += RDFLabels.get().getLabel((Resource)focusNode);
 								}
 							}
 							FailureLog.get().logFailure(message);

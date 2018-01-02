@@ -18,9 +18,9 @@ package org.topbraid.shacl.model.impl;
 
 import org.apache.jena.enhanced.EnhGraph;
 import org.apache.jena.graph.Node;
+import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.model.SHParameter;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.util.JenaUtil;
 
 public class SHParameterImpl extends SHPropertyShapeImpl implements SHParameter {
 	

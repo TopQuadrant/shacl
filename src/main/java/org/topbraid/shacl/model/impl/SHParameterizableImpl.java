@@ -29,11 +29,11 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.topbraid.jenax.util.JenaDatatypes;
+import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.model.SHParameter;
 import org.topbraid.shacl.model.SHParameterizable;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.util.JenaDatatypes;
-import org.topbraid.spin.util.JenaUtil;
 
 public class SHParameterizableImpl extends SHResourceImpl implements SHParameterizable {
 	

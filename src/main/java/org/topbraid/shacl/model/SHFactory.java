@@ -24,6 +24,7 @@ import org.apache.jena.sparql.function.FunctionRegistry;
 import org.apache.jena.sparql.pfunction.PropertyFunctionRegistry;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
+import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.arq.functions.CheckRegexSyntaxFunction;
 import org.topbraid.shacl.arq.functions.EvalExprPFunction;
 import org.topbraid.shacl.arq.functions.HasShapeFunction;
@@ -46,15 +47,18 @@ import org.topbraid.shacl.model.impl.SHSPARQLConstraintImpl;
 import org.topbraid.shacl.model.impl.SHSPARQLFunctionImpl;
 import org.topbraid.shacl.model.impl.SHSPARQLTargetImpl;
 import org.topbraid.shacl.util.SHACLUtil;
+import org.topbraid.shacl.util.SimpleImplementation;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.shacl.vocabulary.TOSH;
-import org.topbraid.spin.util.JenaUtil;
-import org.topbraid.spin.util.SimpleImplementation;
 
 public class SHFactory {
     
     static {
 		init(BuiltinPersonalities.model);
+    }
+    
+    
+    public static void ensureInited() {
     }
 
     
@@ -86,6 +90,11 @@ public class SHFactory {
 	
 	public static SHConstraintComponent asConstraintComponent(RDFNode resource) {
 		return resource.as(SHConstraintComponent.class);
+	}
+	
+	
+	public static SHJSConstraint asJSConstraint(RDFNode node) {
+		return node.as(SHJSConstraint.class);
 	}
 	
 	
@@ -144,6 +153,13 @@ public class SHFactory {
 	
 	public static SHParameterizableTarget asParameterizableTarget(RDFNode node) {
 		return node.as(SHParameterizableTarget.class);
+	}
+
+	
+	public static boolean isJSConstraint(RDFNode node) {
+		return node instanceof Resource && 
+				(JenaUtil.hasIndirectType((Resource)node, SH.JSConstraint) ||
+				(!((Resource)node).hasProperty(RDF.type) && node.getModel().contains(null, SH.js, node)));
 	}
 	
 	

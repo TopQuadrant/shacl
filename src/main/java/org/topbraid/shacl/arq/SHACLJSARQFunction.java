@@ -25,6 +25,8 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.expr.ExprEvalException;
 import org.apache.jena.sparql.expr.NodeValue;
+import org.topbraid.jenax.util.ExceptionUtil;
+import org.topbraid.jenax.util.JenaDatatypes;
 import org.topbraid.shacl.js.JSGraph;
 import org.topbraid.shacl.js.JSScriptEngine;
 import org.topbraid.shacl.js.SHACLScriptEngineManager;
@@ -32,8 +34,6 @@ import org.topbraid.shacl.js.model.JSFactory;
 import org.topbraid.shacl.model.SHJSExecutable;
 import org.topbraid.shacl.model.SHJSFunction;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.util.ExceptionUtil;
-import org.topbraid.spin.util.JenaDatatypes;
 
 public class SHACLJSARQFunction extends SHACLARQFunction {
 	

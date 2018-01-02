@@ -25,7 +25,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.topbraid.shacl.validation.ValidationEngine;
 import org.topbraid.shacl.validation.ValidationEngineFactory;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.system.SPINLabels;
+import org.topbraid.jenax.util.RDFLabels;
 
 public class FilterShapeExpression extends ComplexNodeExpression {
 	
@@ -55,7 +55,7 @@ public class FilterShapeExpression extends ComplexNodeExpression {
 		}
 		context.append(", ");
 		if(filterShape.isURIResource()) {
-			context.append(SPINLabels.get().getLabel(filterShape));
+			context.append(RDFLabels.get().getLabel(filterShape));
 		}
 		else {
 			context.append("_:" + filterShape.asNode().getBlankNodeLabel());

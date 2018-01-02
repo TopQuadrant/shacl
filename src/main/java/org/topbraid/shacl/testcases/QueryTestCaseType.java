@@ -30,17 +30,17 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
+import org.topbraid.jenax.functions.CurrentThreadFunctionRegistry;
+import org.topbraid.jenax.functions.CurrentThreadFunctions;
+import org.topbraid.jenax.util.ARQFactory;
+import org.topbraid.jenax.util.ExceptionUtil;
+import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.testcases.context.JSPreferredTestCaseContext;
 import org.topbraid.shacl.testcases.context.SPARQLPreferredTestCaseContext;
 import org.topbraid.shacl.testcases.context.TestCaseContext;
 import org.topbraid.shacl.testcases.context.TestCaseContextFactory;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.arq.ARQFactory;
-import org.topbraid.spin.arq.SPINThreadFunctionRegistry;
-import org.topbraid.spin.arq.SPINThreadFunctions;
-import org.topbraid.spin.util.ExceptionUtil;
-import org.topbraid.spin.util.JenaUtil;
 
 public class QueryTestCaseType implements TestCaseType {
 	
@@ -55,7 +55,7 @@ public class QueryTestCaseType implements TestCaseType {
 	}
 
 	public static String createResultSetJSON(String queryString, Model model) {
-		SPINThreadFunctions old = SPINThreadFunctionRegistry.register(model);
+		CurrentThreadFunctions old = CurrentThreadFunctionRegistry.register(model);
 		try {
 			Query query = ARQFactory.get().createQuery(model, queryString);
 			try(QueryExecution qexec = ARQFactory.get().createQueryExecution(query, model)) {
@@ -69,7 +69,7 @@ public class QueryTestCaseType implements TestCaseType {
 			throw ExceptionUtil.throwUnchecked(e);
 		}
 		finally {
-			SPINThreadFunctionRegistry.unregister(old);
+			CurrentThreadFunctionRegistry.unregister(old);
 		}
 	}
 

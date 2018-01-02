@@ -21,9 +21,9 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.function.FunctionEnv;
+import org.topbraid.jenax.functions.AbstractFunction2;
 import org.topbraid.shacl.model.SHFactory;
 import org.topbraid.shacl.model.SHShape;
-import org.topbraid.spin.arq.AbstractFunction2;
 
 /**
  * The function tosh:isInTargetOf.

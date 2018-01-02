@@ -26,12 +26,12 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.model.SHFactory;
 import org.topbraid.shacl.model.SHParameter;
 import org.topbraid.shacl.model.SHParameterizable;
 import org.topbraid.shacl.model.SHParameterizableInstance;
 import org.topbraid.shacl.util.SHACLUtil;
-import org.topbraid.spin.util.JenaUtil;
 
 public class SHParameterizableInstanceImpl extends SHResourceImpl implements SHParameterizableInstance {
 	

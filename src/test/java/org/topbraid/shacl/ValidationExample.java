@@ -19,9 +19,9 @@ package org.topbraid.shacl;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.util.FileUtils;
+import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.util.ModelPrinter;
 import org.topbraid.shacl.validation.ValidationUtil;
-import org.topbraid.spin.util.JenaUtil;
 
 public class ValidationExample {
 

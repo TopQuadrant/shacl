@@ -23,10 +23,10 @@ import java.util.Set;
 import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.engine.Constraint;
 import org.topbraid.shacl.model.SHParameter;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.util.JenaUtil;
 
 public class SPARQLComponentExecutor extends AbstractSPARQLExecutor {
 	

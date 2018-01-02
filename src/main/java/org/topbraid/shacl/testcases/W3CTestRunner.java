@@ -41,6 +41,9 @@ import org.apache.jena.sparql.vocabulary.EARL;
 import org.apache.jena.util.FileUtils;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
+import org.topbraid.jenax.util.ARQFactory;
+import org.topbraid.jenax.util.ExceptionUtil;
+import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.arq.SHACLPaths;
 import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.engine.filters.CoreConstraintFilter;
@@ -53,9 +56,6 @@ import org.topbraid.shacl.vocabulary.MF;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.shacl.vocabulary.SHT;
 import org.topbraid.shacl.vocabulary.TOSH;
-import org.topbraid.spin.arq.ARQFactory;
-import org.topbraid.spin.util.ExceptionUtil;
-import org.topbraid.spin.util.JenaUtil;
 
 /**
  * Helper object for executing the W3C test cases for SHACL.

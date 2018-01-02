@@ -29,12 +29,12 @@ import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.topbraid.jenax.util.ARQFactory;
+import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.model.SHParameterizableTarget;
 import org.topbraid.shacl.validation.SHACLException;
 import org.topbraid.shacl.validation.TargetPlugin;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.arq.ARQFactory;
-import org.topbraid.spin.util.JenaUtil;
 
 public class SPARQLTargetPlugin implements TargetPlugin {
 

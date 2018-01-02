@@ -26,6 +26,7 @@ import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.topbraid.jenax.util.ExceptionUtil;
 import org.topbraid.shacl.js.JSGraph;
 import org.topbraid.shacl.js.JSScriptEngine;
 import org.topbraid.shacl.js.NashornUtil;
@@ -35,7 +36,6 @@ import org.topbraid.shacl.model.SHJSExecutable;
 import org.topbraid.shacl.model.SHParameterizableTarget;
 import org.topbraid.shacl.validation.TargetPlugin;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.util.ExceptionUtil;
 
 public class JSTargetPlugin implements TargetPlugin {
 

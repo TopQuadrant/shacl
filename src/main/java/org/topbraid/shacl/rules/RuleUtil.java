@@ -17,6 +17,8 @@
 package org.topbraid.shacl.rules;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.jena.graph.Graph;
@@ -26,14 +28,16 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.vocabulary.RDF;
+import org.topbraid.jenax.progress.ProgressMonitor;
+import org.topbraid.jenax.util.ARQFactory;
+import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.arq.SHACLFunctions;
+import org.topbraid.shacl.engine.Shape;
 import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.js.SHACLScriptEngineManager;
 import org.topbraid.shacl.util.SHACLSystemModel;
+import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.shacl.vocabulary.TOSH;
-import org.topbraid.spin.arq.ARQFactory;
-import org.topbraid.spin.progress.ProgressMonitor;
-import org.topbraid.spin.util.JenaUtil;
 
 /**
  * Convenience methods to execute SHACL rules.
@@ -56,7 +60,31 @@ public class RuleUtil {
 	 * @return the Model of inferred triples (i.e. inferencesModel if not null, or a new Model)
 	 */
 	public static Model executeRules(Model dataModel, Model shapesModel, Model inferencesModel, ProgressMonitor monitor) {
-		
+		return executeRulesHelper(dataModel, null, shapesModel, inferencesModel, monitor);
+	}
+
+
+	/**
+	 * Executes all rules from a given shapes Model on a given focus node (in its data Model).
+	 * This only executes the rules from the shapes that have the focus node in their target.
+	 * If the shapesModel does not include the system graph triples then these will be added.
+	 * If inferencesModel is not null then it must be part of the dataModel (e.g. a sub-graph)
+	 * of a Jena MultiUnion object.
+	 * Otherwise, the function will create a new inferences Model which is merged with the
+	 * dataModel for the duration of the execution.
+	 * @param focusNode  the focus node in the data Model
+	 * @param shapesModel  the shapes Model
+	 * @param inferencesModel  the Model for the inferred triples or null
+	 * @param monitor  an optional progress monitor
+	 * @return the Model of inferred triples (i.e. inferencesModel if not null, or a new Model)
+	 */	
+	public static Model executeRules(RDFNode focusNode, Model shapesModel, Model inferencesModel, ProgressMonitor monitor) {
+		return executeRulesHelper(focusNode.getModel(), focusNode, shapesModel, inferencesModel, monitor);
+	}
+	
+	
+	private static Model executeRulesHelper(Model dataModel, RDFNode focusNode, Model shapesModel, Model inferencesModel, ProgressMonitor monitor) {
+
 		// Ensure that the SHACL, DASH and TOSH graphs are present in the shapes Model
 		if(!shapesModel.contains(TOSH.hasShape, RDF.type, (RDFNode)null)) { // Heuristic
 			Model unionModel = SHACLSystemModel.getSHACLModel();
@@ -91,7 +119,13 @@ public class RuleUtil {
 		
 		boolean nested = SHACLScriptEngineManager.begin();
 		try {
-			engine.executeAll();
+			if(focusNode == null) {
+				engine.executeAll();
+			}
+			else {
+				List<Shape> shapes = getShapesWithTargetNode(focusNode, shapesGraph);
+				engine.executeShapes(shapes, focusNode);
+			}
 		}
 		catch(InterruptedException ex) {
 			return null;
@@ -100,5 +134,17 @@ public class RuleUtil {
 			SHACLScriptEngineManager.end(nested);
 		}
 		return inferencesModel;
+	}
+
+
+	public static List<Shape> getShapesWithTargetNode(RDFNode focusNode, ShapesGraph shapesGraph) {
+		// TODO: Not a particularly smart algorithm - walks all shapes that have rules
+		List<Shape> shapes = new ArrayList<>();
+		for(Shape shape : shapesGraph.getRootShapes()) {
+			if(shape.getShapeResource().hasProperty(SH.rule) && shape.getShapeResource().hasTargetNode(focusNode)) {
+				shapes.add(shape);
+			}
+		}
+		return shapes;
 	}
 }

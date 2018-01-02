@@ -53,9 +53,9 @@ import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 import org.apache.jena.sparql.util.Context;
 import org.apache.jena.sparql.util.FmtUtils;
 import org.apache.jena.vocabulary.RDF;
+import org.topbraid.jenax.util.ARQFactory;
+import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.arq.ARQFactory;
-import org.topbraid.spin.util.JenaUtil;
 
 /**
  * Utilties to manage the conversion between SHACL paths and SPARQL 1.1 property paths.

@@ -27,12 +27,12 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
+import org.topbraid.jenax.util.ARQFactory;
 import org.topbraid.shacl.arq.SHACLFunctions;
 import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.engine.filters.ExcludeMetaShapesFilter;
 import org.topbraid.shacl.util.SHACLSystemModel;
 import org.topbraid.shacl.vocabulary.TOSH;
-import org.topbraid.spin.arq.ARQFactory;
 
 /**
  * Convenience methods to perform SHACL validation.

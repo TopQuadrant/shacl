@@ -43,15 +43,16 @@ import org.apache.jena.sparql.serializer.SerializationContext;
 import org.apache.jena.sparql.sse.SSE;
 import org.apache.jena.sparql.util.ExprUtils;
 import org.apache.jena.sparql.util.FmtUtils;
+import org.topbraid.jenax.functions.OptionalArgsFunction;
+import org.topbraid.jenax.functions.DeclarativeFunctionFactory;
+import org.topbraid.jenax.statistics.ExecStatistics;
+import org.topbraid.jenax.statistics.ExecStatisticsManager;
+import org.topbraid.jenax.util.JenaDatatypes;
+import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.model.SHFunction;
 import org.topbraid.shacl.model.SHParameter;
 import org.topbraid.shacl.model.SHParameterizable;
 import org.topbraid.shacl.vocabulary.DASH;
-import org.topbraid.spin.arq.SPINFunctionFactory;
-import org.topbraid.spin.statistics.SPINStatistics;
-import org.topbraid.spin.statistics.SPINStatisticsManager;
-import org.topbraid.spin.util.JenaDatatypes;
-import org.topbraid.spin.util.JenaUtil;
 
 
 /**
@@ -59,7 +60,7 @@ import org.topbraid.spin.util.JenaUtil;
  * 
  * @author Holger Knublauch
  */
-public abstract class SHACLARQFunction implements org.apache.jena.sparql.function.Function, OptionalArgsFunction, SPINFunctionFactory {
+public abstract class SHACLARQFunction implements org.apache.jena.sparql.function.Function, OptionalArgsFunction, DeclarativeFunctionFactory {
 	
 	private boolean cachable;
 	
@@ -155,7 +156,7 @@ public abstract class SHACLARQFunction implements org.apache.jena.sparql.functio
 		
 		Dataset dataset = DatasetImpl.wrap(env.getDataset());
 		
-		if(SPINStatisticsManager.get().isRecording() && SPINStatisticsManager.get().isRecordingSPINFunctions()) {
+		if(ExecStatisticsManager.get().isRecording() && ExecStatisticsManager.get().isRecordingDeclarativeFunctions()) {
 			StringBuffer sb = new StringBuffer();
 			sb.append("SHACL Function ");
 			sb.append(SSE.str(NodeFactory.createURI(uri), model));
@@ -197,8 +198,8 @@ public abstract class SHACLARQFunction implements org.apache.jena.sparql.functio
 			}
 			finally {
 				long endTime = System.currentTimeMillis();
-				SPINStatistics stats = new SPINStatistics(sb.toString(), getQueryString(), endTime - startTime, startTime, NodeFactory.createURI(uri));
-				SPINStatisticsManager.get().addSilently(Collections.singleton(stats));
+				ExecStatistics stats = new ExecStatistics(sb.toString(), getQueryString(), endTime - startTime, startTime, NodeFactory.createURI(uri));
+				ExecStatisticsManager.get().addSilently(Collections.singleton(stats));
 			}
 			return result;
 		}

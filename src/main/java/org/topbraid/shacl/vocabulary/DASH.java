@@ -16,17 +16,9 @@
  */
 package org.topbraid.shacl.vocabulary;
 
-import org.apache.jena.graph.Graph;
-import org.apache.jena.graph.compose.MultiUnion;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
-import org.topbraid.spin.arq.ARQFactory;
-import org.topbraid.spin.util.JenaUtil;
 
 /**
  * Vocabulary for http://datashapes.org/dash
@@ -135,28 +127,4 @@ public class DASH {
     public static String getURI() {
         return NS;
     }
-
-
-	/**
-	 * Runs the rule to infer missing rdf:type triples for certain blank nodes.
-	 * @param model  the input Model
-	 * @return a new Model containing the inferred triples
-	 */
-	public static Model createDefaultValueTypesModel(Model model) {
-		String sparql = JenaUtil.getStringProperty(DASH.DefaultValueTypeRule.inModel(model), SH.construct);
-		if(sparql == null) {
-			throw new IllegalArgumentException("Shapes graph does not include " + TOSH.PREFIX + ":" + DASH.DefaultValueTypeRule);
-		}
-		Model resultModel = JenaUtil.createMemoryModel();
-		MultiUnion multiUnion = new MultiUnion(new Graph[] {
-			model.getGraph(),
-			resultModel.getGraph()
-		});
-		Model unionModel = ModelFactory.createModelForGraph(multiUnion);
-		Query query = ARQFactory.get().createQuery(model, sparql);
-		try(QueryExecution qexec = ARQFactory.get().createQueryExecution(query, unionModel)) {
-		    qexec.execConstruct(resultModel);
-		    return resultModel;    
-		}
-	}
 }

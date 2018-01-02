@@ -20,9 +20,9 @@ import org.apache.jena.enhanced.EnhGraph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.model.SHResult;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.util.JenaUtil;
 
 public class SHResultImpl extends SHResourceImpl implements SHResult {
 	
@@ -45,7 +45,7 @@ public class SHResultImpl extends SHResourceImpl implements SHResult {
 	
 	@Override
 	public Resource getPath() {
-		return JenaUtil.getPropertyResourceValue(this, SH.resultPath);
+		return getPropertyResourceValue(SH.resultPath);
 	}
 
 	

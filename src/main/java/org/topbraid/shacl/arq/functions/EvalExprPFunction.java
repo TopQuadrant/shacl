@@ -34,11 +34,11 @@ import org.apache.jena.sparql.engine.iterator.QueryIterExtendByVar;
 import org.apache.jena.sparql.expr.ExprEvalException;
 import org.apache.jena.sparql.pfunction.PropFuncArg;
 import org.apache.jena.sparql.pfunction.PropertyFunctionBase;
+import org.topbraid.jenax.util.ARQFactory;
 import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.expr.NodeExpression;
 import org.topbraid.shacl.expr.NodeExpressionContext;
 import org.topbraid.shacl.expr.NodeExpressionFactory;
-import org.topbraid.spin.arq.ARQFactory;
 
 /**
  * The property function tosh:evalExpr.

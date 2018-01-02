@@ -22,7 +22,7 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.expr.ExprEvalException;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.function.FunctionEnv;
-import org.topbraid.spin.arq.AbstractFunction1;
+import org.topbraid.jenax.functions.AbstractFunction1;
 
 public class CheckRegexSyntaxFunction extends AbstractFunction1 {
 

@@ -17,7 +17,7 @@ See [SHACL-JS](https://github.com/TopQuadrant/shacl-js) for a pure JavaScript im
 
 The same code is used in the TopBraid products (currently aligned with the upcoming TopBraid 5.4 release).
 For interoperability with TopBraid this library uses code from org.topbraid.spin packages.
-These will eventually be refactored.
+These dependencies have been removed for release 1.1.0 (currently the source snapshot).
 Meanwhile, please don't rely on any class from the org.topbraid.spin packages directly.
 
 Feedback and questions should become GitHub issues or sent to TopBraid Users mailing list:

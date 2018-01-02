@@ -25,15 +25,15 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.topbraid.jenax.util.JenaDatatypes;
+import org.topbraid.jenax.util.JenaUtil;
+import org.topbraid.jenax.util.RDFLabels;
 import org.topbraid.shacl.engine.Constraint;
 import org.topbraid.shacl.model.SHFactory;
 import org.topbraid.shacl.model.SHSPARQLConstraint;
 import org.topbraid.shacl.validation.SHACLException;
 import org.topbraid.shacl.validation.ValidationEngine;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.system.SPINLabels;
-import org.topbraid.spin.util.JenaDatatypes;
-import org.topbraid.spin.util.JenaUtil;
 
 public class SPARQLConstraintExecutor extends AbstractSPARQLExecutor {
 	
@@ -79,14 +79,14 @@ public class SPARQLConstraintExecutor extends AbstractSPARQLExecutor {
 		SHSPARQLConstraint sc = SHFactory.asSPARQLConstraint(constraint.getParameterValue());
 		String select = JenaUtil.getStringProperty(sc, SH.select);
 		if(select == null) {
-			String message = "Missing " + SH.PREFIX + ":" + SH.select.getLocalName() + " of " + SPINLabels.get().getLabel(sc);
+			String message = "Missing " + SH.PREFIX + ":" + SH.select.getLocalName() + " of " + RDFLabels.get().getLabel(sc);
 			if(sc.isAnon()) {
 				StmtIterator it = sc.getModel().listStatements(null, null, sc);
 				if(it.hasNext()) {
 					Statement s = it.next();
 					it.close();
-					message += " at " + SPINLabels.get().getLabel(s.getSubject());
-					message += " via " + SPINLabels.get().getLabel(s.getPredicate());
+					message += " at " + RDFLabels.get().getLabel(s.getSubject());
+					message += " via " + RDFLabels.get().getLabel(s.getPredicate());
 				}
 			}
 			throw new SHACLException(message);

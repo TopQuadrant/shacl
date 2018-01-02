@@ -38,6 +38,9 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.vocabulary.RDF;
+import org.topbraid.jenax.progress.ProgressMonitor;
+import org.topbraid.jenax.util.JenaDatatypes;
+import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.arq.SHACLPaths;
 import org.topbraid.shacl.engine.Constraint;
 import org.topbraid.shacl.engine.Shape;
@@ -49,9 +52,6 @@ import org.topbraid.shacl.util.FailureLog;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.validation.sparql.SPARQLSubstitutions;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.spin.progress.ProgressMonitor;
-import org.topbraid.spin.util.JenaDatatypes;
-import org.topbraid.spin.util.JenaUtil;
 
 /**
  * A ValidationEngine uses a given shapes graph (represented via an instance of VShapesGraph)

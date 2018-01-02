@@ -27,12 +27,12 @@ import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.util.FileUtils;
+import org.topbraid.jenax.util.JenaUtil;
+import org.topbraid.jenax.util.SystemTriples;
 import org.topbraid.shacl.util.SHACLSystemModel;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.shacl.vocabulary.TOSH;
-import org.topbraid.spin.util.JenaUtil;
-import org.topbraid.spin.util.SystemTriples;
 
 class AbstractTool {
 
