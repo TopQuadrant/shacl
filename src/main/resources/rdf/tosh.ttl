@@ -65,6 +65,11 @@ This namespace also includes the function tosh:hasShape, which can be used to im
     ] ;
   sh:declare [
       rdf:type sh:PrefixDeclaration ;
+      sh:namespace "http://topbraid.org/sparqlmotionfunctions#"^^xsd:anyURI ;
+      sh:prefix "smf" ;
+    ] ;
+  sh:declare [
+      rdf:type sh:PrefixDeclaration ;
       sh:namespace "http://topbraid.org/tosh#"^^xsd:anyURI ;
       sh:prefix "tosh" ;
     ] ;
@@ -84,6 +89,7 @@ tosh:CardinalityConstraintPropertyGroup
 .
 tosh:ComplexConstraintPropertyGroup
   rdf:type sh:PropertyGroup ;
+  tosh:editGroupDescription "Most edit fields in this section currently require Turtle source code, esp to enter blank node expressions. To reference existing shapes via their URI, enter them as <URI>." ;
   tosh:openable "true"^^xsd:boolean ;
   rdfs:label "Complex Constraints" ;
   sh:order 9 ;
@@ -94,12 +100,15 @@ tosh:ConstraintMetadataPropertyGroup
 .
 tosh:DeleteTripleSuggestionGenerator
   rdf:type dash:SPARQLUpdateSuggestionGenerator ;
+  rdfs:comment "Produces a suggestion that would delete the offending value in the validation result from the focus node." ;
   rdfs:label "Delete triple suggestion generator" ;
   sh:message "Delete the invalid statement" ;
+  sh:order 100 ;
   sh:update """DELETE {
 	$focusNode $predicate $value .
 }
 WHERE {
+	$focusNode $predicate $value .
 }""" ;
 .
 tosh:DisplayPropertyGroup
@@ -251,6 +260,77 @@ tosh:RelationshipPropertyGroup
   rdfs:label "Relationship" ;
   sh:order 8 ;
 .
+tosh:ReplaceWithDefaultValueSuggestionGenerator
+  rdf:type dash:SPARQLUpdateSuggestionGenerator ;
+  rdfs:comment "Produces a suggestion to replace all values of the given predicate (which must exist) at the focus node to the default value declared at the shape that has caused the violation. Does nothing if the shape does not declare a sh:defaultValue. Deletes any old value of the property." ;
+  rdfs:label "Replace with default value suggestion generator" ;
+  sh:message "Replace with default value" ;
+  sh:prefixes <http://topbraid.org/tosh> ;
+  sh:select """SELECT ?defaultValue
+WHERE {
+	GRAPH $shapesGraph {
+		$sourceShape sh:defaultValue ?defaultValue .
+	}
+}""" ;
+  sh:update """DELETE {
+	$focusNode $predicate ?oldValue .
+}
+INSERT {
+	$focusNode $predicate ?defaultValue .
+}
+WHERE {
+	$focusNode $predicate ?oldValue .
+}""" ;
+.
+tosh:SetToDefaultValueSuggestionGenerator
+  rdf:type dash:SPARQLUpdateSuggestionGenerator ;
+  rdfs:comment "Produces a suggestion to set the given predicate at the focus node to the default value declared at the shape that has caused the violation. Does nothing if the shape does not declare a sh:defaultValue. Deletes any old value of the property." ;
+  rdfs:label "Set to default value suggestion generator" ;
+  sh:message "Set to default value" ;
+  sh:prefixes <http://topbraid.org/tosh> ;
+  sh:select """SELECT ?defaultValue
+WHERE {
+	GRAPH $shapesGraph {
+		$sourceShape sh:defaultValue ?defaultValue .
+	}
+}""" ;
+  sh:update """DELETE {
+	$focusNode $predicate ?oldValue .
+}
+INSERT {
+	$focusNode $predicate ?defaultValue .
+}
+WHERE {
+	OPTIONAL {
+		$focusNode $predicate ?oldValue .
+	}
+}""" ;
+.
+tosh:ShapeInGraphConstraintComponent
+  rdf:type sh:ConstraintComponent ;
+  dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
+  rdfs:comment "A constraint component that can be used to verify that the value nodes have a given shape, where the shape validation is executed in a given graph. This can, for example, be used to verify that a given value is declared as an instance of a given class in some specified (not imported) graph." ;
+  rdfs:label "Shape in graph constraint component" ;
+  sh:labelTemplate "Values must have shape {$shapeInGraph} defined in graph {$graph}" ;
+  sh:message "Value does not have shape {$shapeInGraph} defined in graph {$graph}" ;
+  sh:parameter [
+      sh:path tosh:graph ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+  sh:parameter [
+      sh:path tosh:shapeInGraph ;
+      sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+  sh:validator [
+      rdf:type sh:SPARQLAskValidator ;
+      sh:ask """ASK {
+    GRAPH $graph {
+		FILTER tosh:hasShape($value, $shapeInGraph)
+	}
+}""" ;
+      sh:prefixes <http://topbraid.org/tosh> ;
+    ] ;
+.
 tosh:ShapeShape
   rdf:type sh:NodeShape ;
   rdfs:label "Shape of shapes" ;
@@ -307,6 +387,7 @@ tosh:UseDeclaredDatatypeConstraintComponent
   dash:propertySuggestionGenerator [
       rdf:type dash:SPARQLUpdateSuggestionGenerator ;
       sh:message "Change datatype of the invalid value to the specified sh:datatype" ;
+      sh:prefixes <http://topbraid.org/tosh> ;
       sh:update """DELETE {
 	$subject $predicate $object .
 }
@@ -411,6 +492,11 @@ tosh:editWidget
   rdfs:label "edit widget" ;
   rdfs:range swa:ObjectEditorClass ;
 .
+tosh:graph
+  rdf:type rdf:Property ;
+  rdfs:comment "The graph that the shape is validated in." ;
+  rdfs:label "graph" ;
+.
 tosh:hasDatatype
   rdf:type sh:SPARQLAskValidator ;
   rdfs:comment "Checks whether a given node ($value) is a literal with a given datatype ($datatype), and that the literal is well-formed." ;
@@ -484,6 +570,11 @@ tosh:shaclExists
   rdfs:comment "Checks whether the current query graph has SHACL activated, i.e. imports the triples typically found in the SHACL namespace. This is currently relying on an approximation, only certain triples, and is natively implemented for TopBraid. Future versions may expose the actual logic as a SPARQL query." ;
   rdfs:label "SHACL exists" ;
   sh:returnType xsd:boolean ;
+.
+tosh:shapeInGraph
+  rdf:type rdf:Property ;
+  rdfs:comment "The shape that the value nodes must have." ;
+  rdfs:label "shape in graph" ;
 .
 tosh:systemNamespace
   rdf:type rdf:Property ;
@@ -633,6 +724,7 @@ sh:AndConstraintComponent-and
 .
 sh:ClassConstraintComponent
   dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
+  dash:propertySuggestionGenerator tosh:ReplaceWithDefaultValueSuggestionGenerator ;
 .
 sh:ClassConstraintComponent-class
   sh:group tosh:ValueTypeConstraintPropertyGroup ;
@@ -648,10 +740,12 @@ sh:ClosedConstraintComponent-ignoredProperties
 .
 sh:DatatypeConstraintComponent
   dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
+  dash:propertySuggestionGenerator tosh:ReplaceWithDefaultValueSuggestionGenerator ;
   dash:propertySuggestionGenerator [
       rdf:type dash:SPARQLUpdateSuggestionGenerator ;
       sh:message "Change the datatype of the invalid value to {$datatype}" ;
       sh:order -2 ;
+      sh:prefixes <http://topbraid.org/tosh> ;
       sh:update """DELETE {
     $focusNode $predicate $value .
 }
@@ -667,6 +761,7 @@ WHERE {
       rdf:type dash:SPARQLUpdateSuggestionGenerator ;
       sh:message "Convert the invalid date/time value into a date value" ;
       sh:order -1 ;
+      sh:prefixes <http://topbraid.org/tosh> ;
       sh:update """DELETE {
     $subject $predicate $object
 }
@@ -721,6 +816,7 @@ sh:HasValueConstraintComponent-hasValue
 .
 sh:InConstraintComponent
   dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
+  dash:propertySuggestionGenerator tosh:ReplaceWithDefaultValueSuggestionGenerator ;
   dash:propertySuggestionGenerator [
       rdf:type dash:SPARQLUpdateSuggestionGenerator ;
       sh:message "Replace invalid value with {$newObject}" ;
@@ -806,10 +902,12 @@ sh:MaxInclusiveConstraintComponent-maxInclusive
 .
 sh:MaxLengthConstraintComponent
   dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
+  dash:propertySuggestionGenerator tosh:ReplaceWithDefaultValueSuggestionGenerator ;
   dash:propertySuggestionGenerator [
       rdf:type dash:SPARQLUpdateSuggestionGenerator ;
       sh:message "Prune string to only {$maxLength} characters" ;
       sh:order 1 ;
+      sh:prefixes <http://topbraid.org/tosh> ;
       sh:update """DELETE {
     $focusNode $predicate $value .
 }
@@ -966,6 +1064,10 @@ sh:OrConstraintComponent-or
   tosh:viewWidget swa:SourceCodeViewer ;
   sh:group tosh:ComplexConstraintPropertyGroup ;
   sh:order 12 ;
+.
+sh:PatternConstraintComponent
+  dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
+  dash:propertySuggestionGenerator tosh:ReplaceWithDefaultValueSuggestionGenerator ;
 .
 sh:PatternConstraintComponent-flags
   tosh:editWidget <http://topbraid.org/tosh.ui#FlagsEditor> ;

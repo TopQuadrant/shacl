@@ -49,7 +49,6 @@ import org.apache.jena.vocabulary.RDFS;
 import org.topbraid.jenax.util.ARQFactory;
 import org.topbraid.jenax.util.JenaNodeUtil;
 import org.topbraid.jenax.util.JenaUtil;
-import org.topbraid.shacl.arq.SHACLFunctionDriver;
 import org.topbraid.shacl.model.SHConstraintComponent;
 import org.topbraid.shacl.model.SHFactory;
 import org.topbraid.shacl.model.SHNodeShape;
@@ -59,7 +58,6 @@ import org.topbraid.shacl.model.SHPropertyShape;
 import org.topbraid.shacl.model.SHResult;
 import org.topbraid.shacl.optimize.OntologyOptimizations;
 import org.topbraid.shacl.optimize.OptimizedMultiUnion;
-import org.topbraid.shacl.validation.ConstraintExecutors;
 import org.topbraid.shacl.validation.TargetPlugin;
 import org.topbraid.shacl.validation.TargetPlugins;
 import org.topbraid.shacl.vocabulary.DASH;
@@ -759,20 +757,6 @@ public class SHACLUtil {
 		    qexec.execConstruct(resultModel);
 		    return resultModel;    
 		}
-	}
-	
-	
-	private static boolean jsPreferred;
-	
-	public static boolean isJSPreferred() {
-		return jsPreferred;
-	}
-	
-	public static void setJSPreferred(boolean value) {
-		jsPreferred = value;
-		ConstraintExecutors.get().setJSPreferred(value);
-		SHACLFunctionDriver.setJSPreferred(value);
-		TargetPlugins.get().setJSPreferred(value);
 	}
 
 

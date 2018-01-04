@@ -16,7 +16,7 @@
  */
 package org.topbraid.shacl.testcases.context;
 
-import org.topbraid.shacl.util.SHACLUtil;
+import org.topbraid.shacl.util.SHACLPreferences;
 
 /**
  * A TestCaseContext in which JavaScript execution is preferred over SPARQL.
@@ -39,14 +39,14 @@ public class JSPreferredTestCaseContext implements TestCaseContext {
 
 	@Override
 	public void setUpTestContext() {
-		oldValue = SHACLUtil.isJSPreferred();
-		SHACLUtil.setJSPreferred(true);
+		oldValue = SHACLPreferences.isJSPreferred();
+		SHACLPreferences.setJSPreferred(true);
 	}
 
 	
 	@Override
 	public void tearDownTestContext() {
-		SHACLUtil.setJSPreferred(oldValue);
+		SHACLPreferences.setJSPreferred(oldValue);
 	}
 
 

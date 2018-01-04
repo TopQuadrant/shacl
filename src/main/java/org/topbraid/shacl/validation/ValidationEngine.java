@@ -39,6 +39,7 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.vocabulary.RDF;
 import org.topbraid.jenax.progress.ProgressMonitor;
+import org.topbraid.jenax.util.ExceptionUtil;
 import org.topbraid.jenax.util.JenaDatatypes;
 import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.arq.SHACLPaths;
@@ -49,8 +50,10 @@ import org.topbraid.shacl.entailment.SHACLEntailment;
 import org.topbraid.shacl.expr.NodeExpressionContext;
 import org.topbraid.shacl.js.SHACLScriptEngineManager;
 import org.topbraid.shacl.util.FailureLog;
+import org.topbraid.shacl.util.SHACLPreferences;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.validation.sparql.SPARQLSubstitutions;
+import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 
 /**
@@ -408,7 +411,18 @@ public class ValidationEngine implements NodeExpressionContext {
 	private void validateNodesAgainstConstraint(List<RDFNode> focusNodes, Constraint constraint) {
 		ConstraintExecutor executor = getExecutor(constraint);
 		if(executor != null) {
-			executor.executeConstraint(constraint, this, focusNodes);
+			if(SHACLPreferences.isProduceFailuresMode()) {
+				try {
+					executor.executeConstraint(constraint, this, focusNodes);
+				}
+				catch(Exception ex) {
+					Resource result = createResult(DASH.FailureResult, constraint, null);
+					result.addProperty(SH.resultMessage, "Exception during validation: " + ExceptionUtil.getStackTrace(ex));
+				}
+			}
+			else {
+				executor.executeConstraint(constraint, this, focusNodes);
+			}
 		}
 		else {
 			FailureLog.get().logFailure("No suitable validator found for constraint " + constraint);

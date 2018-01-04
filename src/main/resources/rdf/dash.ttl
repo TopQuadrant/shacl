@@ -226,6 +226,7 @@ dash:FunctionTestCase
 .
 dash:GraphUpdate
   rdf:type rdfs:Class ;
+  rdfs:comment "A suggestion consisting of added and/or deleted triples, represented as rdf:Statements via dash:addedTriple and dash:deletedTriple." ;
   rdfs:label "Graph update" ;
   rdfs:subClassOf dash:Suggestion ;
 .
@@ -588,15 +589,23 @@ dash:SuccessTestCaseResult
 .
 dash:Suggestion
   rdf:type rdfs:Class ;
+  dash:abstract "true"^^xsd:boolean ;
   rdfs:comment "Base class of suggestions that modify a graph to \"fix\" the source of a validation result." ;
   rdfs:label "Suggestion" ;
   rdfs:subClassOf rdfs:Resource ;
 .
 dash:SuggestionGenerator
   rdf:type rdfs:Class ;
+  dash:abstract "true"^^xsd:boolean ;
   rdfs:comment "Base class of objects that can generate suggestions (added or deleted triples) for a validation result of a given constraint component." ;
   rdfs:label "Suggestion generator" ;
   rdfs:subClassOf rdfs:Resource ;
+.
+dash:SuggestionResult
+  rdf:type rdfs:Class ;
+  rdfs:comment "Class of results that have been produced as suggestions, not through SHACL validation. How the actual results are produced is up to implementers. Each instance of this class should have values for sh:focusNode, sh:resultMessage, sh:resultSeverity (suggested default: sh:Info), and dash:suggestion to point at one or more suggestions." ;
+  rdfs:label "Suggestion result" ;
+  rdfs:subClassOf sh:AbstractResult ;
 .
 dash:TestCase
   rdf:type rdfs:Class ;
@@ -607,6 +616,7 @@ dash:TestCase
 .
 dash:TestCaseResult
   rdf:type rdfs:Class ;
+  dash:abstract "true"^^xsd:boolean ;
   rdfs:comment "Base class for results produced by running test cases." ;
   rdfs:label "Test case result" ;
   rdfs:subClassOf sh:AbstractResult ;
@@ -713,6 +723,13 @@ dash:expectedResult
   rdfs:comment "The expected result(s) of a test case. The value range of this property is different for each kind of test cases." ;
   rdfs:domain dash:TestCase ;
   rdfs:label "expected result" ;
+.
+dash:expectedResultIsTTL
+  rdf:type rdf:Property ;
+  rdfs:comment "A flag to indicate that the expected result represents an RDF graph encoded as a Turtle file. If set to true, then tests would compare graphs instead of actual syntax." ;
+  rdfs:domain dash:TestCase ;
+  rdfs:label "expected result is Turtle" ;
+  rdfs:range xsd:boolean ;
 .
 dash:fixed
   rdf:type rdf:Property ;
@@ -968,15 +985,21 @@ dash:subSetOf
 .
 dash:suggestion
   rdf:type rdf:Property ;
-  rdfs:comment "Can be used to link a validation result with one or more suggestions on how to fix the underlying issue." ;
-  rdfs:domain sh:ValidationResult ;
+  rdfs:comment "Can be used to link a result with one or more suggestions on how to address or improve the underlying issue." ;
+  rdfs:domain sh:AbstractResult ;
   rdfs:label "suggestion" ;
   rdfs:range dash:Suggestion ;
 .
+dash:suggestionConfidence
+  rdf:type rdf:Property ;
+  rdfs:comment "An optional confidence between 0% and 100%. Suggestions with 100% confidence are strongly recommended. Can be used to sort recommended updates." ;
+  rdfs:domain dash:Suggestion ;
+  rdfs:label "suggestion confidence" ;
+  rdfs:range xsd:decimal ;
+.
 dash:suggestionGenerator
   rdf:type rdf:Property ;
-  rdfs:comment "Links a sh:SPARQLConstraint with instances of dash:SuggestionGenerator that may be used to produce suggestions for a given validation result that was produced by the constraint." ;
-  rdfs:domain sh:SPARQLConstraint ;
+  rdfs:comment "Links a sh:SPARQLConstraint or sh:JSConstraint with instances of dash:SuggestionGenerator that may be used to produce suggestions for a given validation result that was produced by the constraint." ;
   rdfs:label "suggestion generator" ;
   rdfs:range dash:SuggestionGenerator ;
 .
@@ -1076,6 +1099,9 @@ dash:y
 owl:Class
   rdf:type rdfs:Class ;
   rdfs:subClassOf rdfs:Class ;
+.
+sh:AbstractResult
+  dash:abstract "true"^^xsd:boolean ;
 .
 sh:AndConstraintComponent
   sh:targetClass sh:Shape ;
@@ -1221,6 +1247,7 @@ sh:EqualsConstraintComponent
   sh:targetClass sh:Shape ;
 .
 sh:Function
+  dash:abstract "true"^^xsd:boolean ;
   sh:property [
       sh:path dash:cachable ;
       sh:datatype xsd:boolean ;
@@ -1276,6 +1303,9 @@ sh:InConstraintComponent
       sh:jsFunctionName "validateIn" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
+.
+sh:JSExecutable
+  dash:abstract "true"^^xsd:boolean ;
 .
 sh:LanguageInConstraintComponent
   dash:localConstraint "true"^^xsd:boolean ;
@@ -1494,6 +1524,9 @@ sh:OrConstraintComponent
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
 .
+sh:Parameterizable
+  dash:abstract "true"^^xsd:boolean ;
+.
 sh:PatternConstraintComponent
   dash:staticConstraint "true"^^xsd:boolean ;
   sh:labelTemplate "Value must match pattern \"{$pattern}\"" ;
@@ -1526,6 +1559,27 @@ sh:QualifiedMinCountConstraintComponent
     ] ;
   sh:targetClass sh:PropertyShape ;
 .
+sh:Rule
+  dash:abstract "true"^^xsd:boolean ;
+.
+sh:Rules
+  rdf:type rdfs:Resource ;
+  rdfs:comment "The SHACL rules entailment regime." ;
+  rdfs:label "SHACL Rules" ;
+  rdfs:seeAlso <https://www.w3.org/TR/shacl-af/#Rules> ;
+.
+sh:SPARQLExecutable
+  dash:abstract "true"^^xsd:boolean ;
+.
+sh:Shape
+  dash:abstract "true"^^xsd:boolean ;
+.
+sh:Target
+  dash:abstract "true"^^xsd:boolean ;
+.
+sh:TargetType
+  dash:abstract "true"^^xsd:boolean ;
+.
 sh:UniqueLangConstraintComponent
   dash:localConstraint "true"^^xsd:boolean ;
   sh:labelTemplate "No language can be used more than once" ;
@@ -1555,6 +1609,9 @@ sh:UniqueLangConstraintComponent
 		""" ;
     ] ;
   sh:targetClass sh:PropertyShape ;
+.
+sh:Validator
+  dash:abstract "true"^^xsd:boolean ;
 .
 sh:XoneConstraintComponent
   sh:targetClass sh:Shape ;

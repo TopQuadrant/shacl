@@ -57,7 +57,7 @@ public class SHACLFunctions {
 	public static void registerFunctions(Model model) {
 		
 		SHFactory.ensureInited();
-		
+
 		Resource shaclFunctionClass = SH.Function.inModel(model);
 		for(Resource resource : JenaUtil.getAllInstances(shaclFunctionClass)) {
 			if(resource.isURIResource()) {
