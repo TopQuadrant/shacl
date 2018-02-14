@@ -32,7 +32,11 @@ public interface SHPropertyShape extends SHShape {
 	
 	String getCountDisplayString();
 
-	
+
+	/**
+	 * Gets the sh:description, if it exists.
+	 * @return the description or null
+	 */
 	String getDescription();
 	
 	
@@ -40,6 +44,13 @@ public interface SHPropertyShape extends SHShape {
 	
 	
 	Integer getMinCount();
+
+
+	/**
+	 * Gets the sh:name, if it exists.
+	 * @return the name or null
+	 */
+	String getName();
 	
 	
 	/**

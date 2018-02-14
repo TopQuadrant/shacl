@@ -48,6 +48,8 @@ public class DASH {
 
     public final static Resource InferencingTestCase = ResourceFactory.createResource(NS + "InferencingTestCase");
 
+    public final static Resource isDeactivated = ResourceFactory.createResource(NS + "isDeactivated");
+
     public final static Resource JSTestCase = ResourceFactory.createResource(NS + "JSTestCase");
 
     public final static Resource ListShape = ResourceFactory.createResource(NS + "ListShape");

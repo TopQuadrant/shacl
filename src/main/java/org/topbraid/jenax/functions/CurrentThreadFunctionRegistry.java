@@ -39,17 +39,17 @@ import org.apache.jena.sparql.function.FunctionRegistry;
  * 
  * <p>The contract of this class is very strict to prevent memory leaks:
  * Users always need to make sure that unregister is called as soon
- * as a query (block) ends, and to restore any old SPINThreadFunctions
+ * as a query (block) ends, and to restore any old CurrentThreadFunctions
  * object that was registered before.  So a typical block would be:</p>
  * 
  * <code>
- * 	Model model = ... a Model with extra SPIN functions
- * 	SPINThreadFunctions old = SPINThreadFunctionRegistry.register(model);
+ * 	Model model = ... a Model with extra SHACL/SPIN functions
+ * 	CurrentThreadFunctions old = CurrentThreadFunctionRegistry.register(model);
  * 	try {
  * 		// run SPARQL queries here
  * 	}
  * 	finally {
- * 		SPINThreadFunctionRegistry.unregister(old);
+ * 		CurrentThreadFunctionRegistry.unregister(old);
  * 	}</code>
  * 
  * <p>In preparation of the above, the application should start up with code
@@ -57,11 +57,11 @@ import org.apache.jena.sparql.function.FunctionRegistry;
  * 
  * <code>
  * 	FunctionRegistry oldFR = FunctionRegistry.get();
- *  SPINThreadFunctionRegistry threadFR = new SPINThreadFunctionRegistry(oldFR);
+ *  CurrentThreadFunctionRegistry threadFR = new CurrentThreadFunctionRegistry(oldFR);
  *	FunctionRegistry.set(ARQ.getContext(), threadFR);
  * </code>
  *
- * <p>and do the same for the SPINThreadPropertyFunctionRegistry.</p>
+ * <p>and (for SPIN) do the same for the SPINThreadPropertyFunctionRegistry.</p>
  * 
  * @author Holger Knublauch
  */

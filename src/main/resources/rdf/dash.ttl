@@ -964,6 +964,12 @@ dash:rootClass
   rdf:type rdf:Property ;
   rdfs:label "root class" ;
 .
+dash:shape
+  rdf:type rdf:Property ;
+  rdfs:comment "States that a subject resource has a given shape. This property can, for example, be used to capture results of SHACL validation on static data." ;
+  rdfs:label "shape" ;
+  rdfs:range sh:Shape ;
+.
 dash:staticConstraint
   rdf:type rdf:Property ;
   rdfs:comment """Can be set to true for those constraint components where the validation does not require to visit any other triples than the parameters. Examples of this include sh:datatype or sh:nodeKind, where no further triples need to be queried to determine the result.
@@ -1247,7 +1253,6 @@ sh:EqualsConstraintComponent
   sh:targetClass sh:Shape ;
 .
 sh:Function
-  dash:abstract "true"^^xsd:boolean ;
   sh:property [
       sh:path dash:cachable ;
       sh:datatype xsd:boolean ;

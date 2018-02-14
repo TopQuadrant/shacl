@@ -42,9 +42,17 @@ public class JenaDatatypes {
 	
 	public static final Literal TRUE = ResourceFactory.createTypedLiteral("true", TypeMapper.getInstance().getSafeTypeByName(XSD.xboolean.getURI()));
 
-	private static Set<String> numericDatatypeURIs = new HashSet<String>();
+	private static Set<String> floatDatatypeURIs = new HashSet<>();
 
-	private static Set<String> otherDatatypeURIs = new HashSet<String>();
+	private static Set<String> numericDatatypeURIs = new HashSet<>();
+
+	private static Set<String> otherDatatypeURIs = new HashSet<>();
+
+	static {
+		floatDatatypeURIs.add(XSD.decimal.getURI());
+		floatDatatypeURIs.add(XSD.xdouble.getURI());
+		floatDatatypeURIs.add(XSD.xfloat.getURI());
+	}
 
 	static {
 		numericDatatypeURIs.add(XSD.decimal.getURI());
@@ -120,6 +128,17 @@ public class JenaDatatypes {
 		list.addAll(otherDatatypeURIs);
 		list.addAll(numericDatatypeURIs);
 		return list;
+	}
+
+
+	/**
+	 * Checks if a given URI is a numeric floating point datatype URI:
+	 * xsd:decimal, xsd:float or xsd:double.
+	 * @param datatypeURI  the URI of the datatype to test
+	 * @return true if so
+	 */
+	public static boolean isFloat(String datatypeURI) {
+		return floatDatatypeURIs.contains(datatypeURI);
 	}
 
 

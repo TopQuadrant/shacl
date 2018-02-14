@@ -25,9 +25,7 @@ import org.topbraid.shacl.vocabulary.SH;
 
 
 /**
- * A SPINFunctionDriver for SHACL functions.
- * 
- * This class currently relies on infrastructure from the SPIN API.
+ * A DeclarativeFunctionDriver for SHACL functions.
  * 
  * @author Holger Knublauch
  */

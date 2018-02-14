@@ -183,6 +183,11 @@ public class SHACLUtil {
 			return ModelFactory.createModelForGraph(union);
 		}
 	}
+
+
+	public static URI createRandomShapesGraphURI() {
+		return URI.create(URN_X_SHACL + UUID.randomUUID());
+	}
 	
 	
 	/**
@@ -678,7 +683,7 @@ public class SHACLUtil {
 
 
 	public static URI withShapesGraph(Dataset dataset) {
-		URI shapesGraphURI = URI.create(URN_X_SHACL + UUID.randomUUID());
+		URI shapesGraphURI = createRandomShapesGraphURI();
 		Model shapesModel = createShapesModel(dataset);
 		dataset.addNamedModel(shapesGraphURI.toString(), shapesModel);
 		return shapesGraphURI;

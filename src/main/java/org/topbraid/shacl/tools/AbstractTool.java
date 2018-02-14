@@ -48,18 +48,18 @@ class AbstractTool {
 	
 	AbstractTool() {
 		
-		InputStream shaclTTL = SHACLSystemModel.class.getResourceAsStream("/etc/shacl.ttl");
+		InputStream shaclTTL = SHACLSystemModel.class.getResourceAsStream("/rdf/shacl.ttl");
 		Model shacl = JenaUtil.createMemoryModel();
 		shacl.read(shaclTTL, SH.BASE_URI, FileUtils.langTurtle);
 		shacl.add(SystemTriples.getVocabularyModel());
 		dm.addModel(SH.BASE_URI, shacl);
 		
-		InputStream dashTTL = SHACLSystemModel.class.getResourceAsStream("/etc/dash.ttl");
+		InputStream dashTTL = SHACLSystemModel.class.getResourceAsStream("/rdf/dash.ttl");
 		Model dash = JenaUtil.createMemoryModel();
 		dash.read(dashTTL, SH.BASE_URI, FileUtils.langTurtle);
 		dm.addModel(DASH.BASE_URI, dash);
 		
-		InputStream toshTTL = SHACLSystemModel.class.getResourceAsStream("/etc/tosh.ttl");
+		InputStream toshTTL = SHACLSystemModel.class.getResourceAsStream("/rdf/tosh.ttl");
 		Model tosh = JenaUtil.createMemoryModel();
 		tosh.read(toshTTL, SH.BASE_URI, FileUtils.langTurtle);
 		dm.addModel(TOSH.BASE_URI, tosh);

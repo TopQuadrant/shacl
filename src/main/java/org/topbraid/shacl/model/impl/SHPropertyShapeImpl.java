@@ -90,6 +90,12 @@ public class SHPropertyShapeImpl extends SHShapeImpl implements SHPropertyShape 
 		return JenaUtil.getIntegerProperty(this, SH.minCount);
 	}
 
+
+	@Override
+	public String getName() {
+		return JenaUtil.getStringProperty(this, SH.name);
+	}
+
 	
 	@Override
 	public Integer getOrder() {

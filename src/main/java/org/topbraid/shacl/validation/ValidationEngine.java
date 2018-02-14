@@ -406,6 +406,42 @@ public class ValidationEngine implements NodeExpressionContext {
 		}
 		return report;
 	}
+
+	
+	/**
+	 * Validates a given list of focus node against a given Shape, and stops as soon
+	 * as one validation result is reported.  No results are recorded.
+	 * @param focusNodes  the nodes to validate
+	 * @param shape  the sh:Shape to validate against
+	 * @return true if there were any validation results
+	 */
+	public boolean validateNodesAgainstShapeBoolean(List<RDFNode> focusNodes, Node shape) {
+		if(!shapesGraph.isIgnored(shape)) {
+			Resource oldReport = report;
+			report = JenaUtil.createMemoryModel().createResource();
+			try {
+				Shape vs = shapesGraph.getShape(shape);
+				if(!vs.getShapeResource().isDeactivated()) {
+					boolean nested = SHACLScriptEngineManager.begin();
+					try {
+						for(Constraint constraint : vs.getConstraints()) {
+							validateNodesAgainstConstraint(focusNodes, constraint);
+							if(report.hasProperty(SH.result)) {
+								return false;
+							}
+						}
+					}
+					finally {
+						SHACLScriptEngineManager.end(nested);
+					}
+				}
+			}
+			finally {
+				this.report = oldReport;
+			}
+		}
+		return true;
+	}
 	
 	
 	private void validateNodesAgainstConstraint(List<RDFNode> focusNodes, Constraint constraint) {

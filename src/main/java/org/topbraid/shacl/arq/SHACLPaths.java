@@ -265,7 +265,13 @@ public class SHACLPaths {
 		if(element instanceof ElementGroup) {
 			Element e = ((ElementGroup)element).getElements().get(0);
 			if(e instanceof ElementPathBlock) {
-				return ((ElementPathBlock) e).getPattern().get(0).getPath();
+				Path path = ((ElementPathBlock) e).getPattern().get(0).getPath();
+				if(path instanceof P_Link && ((P_Link)path).isForward()) {
+					return model.asRDFNode(((P_Link)path).getNode());
+				}
+				else {
+					return path;
+				}
 			}
 			else if(e instanceof ElementTriplesBlock) {
 				return model.asRDFNode(((ElementTriplesBlock) e).getPattern().get(0).getPredicate());

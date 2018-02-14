@@ -63,7 +63,13 @@ public class SH {
 
     public final static Resource MaxCountConstraintComponent = ResourceFactory.createResource(NS + "MaxCountConstraintComponent");
 
+    public final static Resource MaxLengthConstraintComponent = ResourceFactory.createResource(NS + "MaxLengthConstraintComponent");
+
     public final static Resource MinCountConstraintComponent = ResourceFactory.createResource(NS + "MinCountConstraintComponent");
+
+    public final static Resource MinLengthConstraintComponent = ResourceFactory.createResource(NS + "MinLengthConstraintComponent");
+
+    public final static Resource NodeKindConstraintComponent = ResourceFactory.createResource(NS + "NodeKindConstraintComponent");
 
     public final static Resource NodeShape = ResourceFactory.createResource(NS + "NodeShape");
 
@@ -144,6 +150,8 @@ public class SH {
 
     public final static Property equals = ResourceFactory.createProperty(NS + "equals");
 
+    public final static Property flags = ResourceFactory.createProperty(NS + "flags");
+
     public final static Property focusNode = ResourceFactory.createProperty(NS + "focusNode");
     
     public final static Property group = ResourceFactory.createProperty(NS + "group");
@@ -155,6 +163,8 @@ public class SH {
     public final static Property inversePath = ResourceFactory.createProperty(NS + "inversePath");
 
     public final static Property labelTemplate = ResourceFactory.createProperty(NS + "labelTemplate");
+
+    public final static Property languageIn = ResourceFactory.createProperty(NS + "languageIn");
 
     public final static Property lessThan = ResourceFactory.createProperty(NS + "lessThan");
 
@@ -211,6 +221,12 @@ public class SH {
     public final static Property property = ResourceFactory.createProperty(NS + "property");
 
     public final static Property propertyValidator = ResourceFactory.createProperty(NS + "propertyValidator");
+
+    public final static Property qualifiedMaxCount = ResourceFactory.createProperty(NS + "qualifiedMaxCount");
+
+    public final static Property qualifiedMinCount = ResourceFactory.createProperty(NS + "qualifiedMinCount");
+
+    public final static Property qualifiedValueShape = ResourceFactory.createProperty(NS + "qualifiedValueShape");
 
     public final static Property result = ResourceFactory.createProperty(NS + "result");
 

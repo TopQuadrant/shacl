@@ -106,10 +106,11 @@ public abstract class AbstractSPARQLExecutor implements ConstraintExecutor {
 		
 		try {
 			long startTime = System.currentTimeMillis();
+			Resource messageHolder = getSPARQLExecutable(constraint);
 			for(RDFNode focusNode : focusNodes) {
 				bindings.add(SH.thisVar.getVarName(), focusNode); // Overwrite any previous binding
 				QueryExecution qexec = SPARQLSubstitutions.createQueryExecution(query, engine.getDataset(), bindings);
-				executeSelectQuery(engine, constraint, nestedResults, focusNode, qexec, bindings);
+				executeSelectQuery(engine, constraint, messageHolder, nestedResults, focusNode, qexec, bindings);
 			}			
 			if(ExecStatisticsManager.get().isRecording()) {
 				long endTime = System.currentTimeMillis();
@@ -151,7 +152,7 @@ public abstract class AbstractSPARQLExecutor implements ConstraintExecutor {
 	protected abstract String getSPARQL(Constraint constraint);
 	
 
-	private void executeSelectQuery(ValidationEngine engine, Constraint constraint, Model nestedResults,
+	private void executeSelectQuery(ValidationEngine engine, Constraint constraint, Resource messageHolder, Model nestedResults,
 			RDFNode focusNode, QueryExecution qexec, QuerySolution bindings) {
 		
 		ResultSet rs = qexec.execSelect();
@@ -161,7 +162,6 @@ public abstract class AbstractSPARQLExecutor implements ConstraintExecutor {
 			throw new IllegalArgumentException("SELECT constraints must return $this");
 		}
 		
-		Resource messageHolder = getSPARQLExecutable(constraint);
 		try {
 			if(rs.hasNext()) {
 				while(rs.hasNext()) {

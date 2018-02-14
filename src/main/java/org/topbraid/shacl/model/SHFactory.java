@@ -28,8 +28,10 @@ import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.arq.functions.CheckRegexSyntaxFunction;
 import org.topbraid.shacl.arq.functions.EvalExprPFunction;
 import org.topbraid.shacl.arq.functions.HasShapeFunction;
+import org.topbraid.shacl.arq.functions.IsDeactivatedFunction;
 import org.topbraid.shacl.arq.functions.IsInTargetOfFunction;
 import org.topbraid.shacl.arq.functions.IsValidForDatatypeFunction;
+import org.topbraid.shacl.arq.functions.IsValidLangTagFunction;
 import org.topbraid.shacl.arq.functions.TargetContainsPFunction;
 import org.topbraid.shacl.model.impl.SHConstraintComponentImpl;
 import org.topbraid.shacl.model.impl.SHJSConstraintImpl;
@@ -48,6 +50,7 @@ import org.topbraid.shacl.model.impl.SHSPARQLFunctionImpl;
 import org.topbraid.shacl.model.impl.SHSPARQLTargetImpl;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.util.SimpleImplementation;
+import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.shacl.vocabulary.TOSH;
 
@@ -79,10 +82,12 @@ public class SHFactory {
 		p.add(SHSPARQLFunction.class, new SimpleImplementation(SH.SPARQLFunction.asNode(), SHSPARQLFunctionImpl.class));
 		p.add(SHSPARQLTarget.class, new SimpleImplementation(SH.SPARQLTarget.asNode(), SHSPARQLTargetImpl.class));
 
+		FunctionRegistry.get().put(DASH.isDeactivated.getURI(), IsDeactivatedFunction.class);
 		FunctionRegistry.get().put(TOSH.hasShape.getURI(), HasShapeFunction.class);
 		FunctionRegistry.get().put(TOSH.isInTargetOf.getURI(), IsInTargetOfFunction.class);
 		FunctionRegistry.get().put("http://spinrdf.org/spif#checkRegexSyntax", CheckRegexSyntaxFunction.class);
 		FunctionRegistry.get().put("http://spinrdf.org/spif#isValidForDatatype", IsValidForDatatypeFunction.class);
+		FunctionRegistry.get().put("http://spinrdf.org/spif#isValidLangTag", IsValidLangTagFunction.class);
 		PropertyFunctionRegistry.get().put(TOSH.evalExpr.getURI(), EvalExprPFunction.class);
 		PropertyFunctionRegistry.get().put(TOSH.targetContains.getURI(), TargetContainsPFunction.class);
     }
