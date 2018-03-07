@@ -22,6 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Function;
 
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
@@ -70,6 +71,8 @@ public class OntologyOptimizations {
 	
 	private static final int capacity = 10000;
 	
+	// TODO: Switch to Guava caches
+	
 	@SuppressWarnings("serial")
 	public static class MyCache extends LinkedHashMap<Object,Object> {
 
@@ -104,6 +107,11 @@ public class OntologyOptimizations {
 	
 	public Object getObject(Object key) {
 		return objects.get(key);
+	}
+	
+	
+	public Object getOrComputeObject(Object key, Function<Object,Object> function) {
+		return objects.computeIfAbsent(key, function);
 	}
 	
 	

@@ -20,7 +20,7 @@ import org.topbraid.shacl.engine.Constraint;
 
 public interface SpecialConstraintExecutorFactory {
 	
-	boolean canExecute(Constraint constraint, ValidationEngine engine);
+	boolean canExecute(Constraint constraint);
 
 	ConstraintExecutor create(Constraint constraint);
 }

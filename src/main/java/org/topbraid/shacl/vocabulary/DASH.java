@@ -79,6 +79,8 @@ public class DASH {
     
     public final static Property addedTriple = ResourceFactory.createProperty(NS + "addedTriple");
 
+    public final static Property applicableToClass = ResourceFactory.createProperty(NS + "applicableToClass");
+
     public final static Property cachable = ResourceFactory.createProperty(NS + "cachable");
 
     public final static Property composite = ResourceFactory.createProperty(NS + "composite");

@@ -28,11 +28,12 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDFS;
+import org.topbraid.jenax.util.JenaDatatypes;
 import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.model.SHConstraintComponent;
 import org.topbraid.shacl.model.SHFactory;
-import org.topbraid.shacl.model.SHParameter;
 import org.topbraid.shacl.model.SHShape;
 import org.topbraid.shacl.vocabulary.SH;
 
@@ -46,7 +47,7 @@ public class ShapesGraph {
 	
 	private Predicate<Constraint> constraintFilter;
 	
-	private Map<Property,SHConstraintComponent> parametersMap;
+	private Map<Property,SHConstraintComponent> parametersMap = new HashMap<>();
 	
 	private List<Shape> rootShapes;
 	
@@ -64,26 +65,33 @@ public class ShapesGraph {
 	public ShapesGraph(Model shapesModel) {
 		this.shapesModel = shapesModel;
 	}
+
 	
-	
-	private void computeParametersMap() {
-		if(parametersMap == null) {
-			parametersMap = new HashMap<>();
-			for(Resource cc : JenaUtil.getAllInstances(SH.ConstraintComponent.inModel(shapesModel))) {
-				SHConstraintComponent component = SHFactory.asConstraintComponent(cc);
-				for(SHParameter param : component.getParameters()) {
-					if(!param.isOptional()) {
-						parametersMap.put(param.getPredicate(), component);
+	public SHConstraintComponent getComponentWithParameter(Property parameter) {
+		if(!parametersMap.containsKey(parameter)) {
+			StmtIterator it = shapesModel.listStatements(null, SH.path, parameter);
+			while(it.hasNext()) {
+				Resource param = it.next().getSubject();
+				if(!param.hasProperty(SH.optional, JenaDatatypes.TRUE)) {
+					StmtIterator i2 = shapesModel.listStatements(null, SH.parameter, param);
+					while(i2.hasNext()) {
+						Resource r = i2.next().getSubject();
+						if(JenaUtil.hasIndirectType(r, SH.ConstraintComponent)) {
+							i2.close();
+							it.close();
+							SHConstraintComponent cc = SHFactory.asConstraintComponent(r);
+							parametersMap.put(parameter, cc);
+							return cc;
+						}
 					}
 				}
 			}
+			parametersMap.put(parameter, null);
+			return null;
 		}
-	}
-	
-	
-	public SHConstraintComponent getComponentWithParameter(Property parameter) {
-		computeParametersMap();
-		return parametersMap.get(parameter);
+		else {
+			return parametersMap.get(parameter);
+		}
 	}
 	
 	

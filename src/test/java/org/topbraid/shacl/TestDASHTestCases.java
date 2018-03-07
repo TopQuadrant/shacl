@@ -61,10 +61,10 @@ public class TestDASHTestCases {
 					@Override
                     protected Reader createScriptReader(String url) throws Exception {
 						if(DASH_JS.equals(url)) {
-							return new InputStreamReader(NashornScriptEngine.class.getResourceAsStream("/rdf/dash.js"));
+							return new InputStreamReader(NashornScriptEngine.class.getResourceAsStream("/js/dash.js"));
 						}
 						else if(RDFQUERY_JS.equals(url)) {
-							return new InputStreamReader(NashornScriptEngine.class.getResourceAsStream("/rdf/rdfquery.js"));
+							return new InputStreamReader(NashornScriptEngine.class.getResourceAsStream("/js/rdfquery.js"));
 						}
 						else if(url.startsWith("http://datashapes.org/js/")) {
 							return new InputStreamReader(NashornScriptEngine.class.getResourceAsStream(url.substring(21)));

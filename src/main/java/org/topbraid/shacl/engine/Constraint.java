@@ -25,6 +25,8 @@ import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.model.SHConstraintComponent;
 import org.topbraid.shacl.model.SHParameter;
 import org.topbraid.shacl.model.SHShape;
+import org.topbraid.shacl.validation.ConstraintExecutor;
+import org.topbraid.shacl.validation.ConstraintExecutors;
 import org.topbraid.shacl.vocabulary.SH;
 
 /**
@@ -37,6 +39,8 @@ import org.topbraid.shacl.vocabulary.SH;
 public class Constraint {
 	
 	private SHConstraintComponent component;
+	
+	private ConstraintExecutor executor;
 	
 	private RDFNode parameterValue;
 	
@@ -86,6 +90,14 @@ public class Constraint {
 		else {
 			return SH.NodeShape;
 		}
+	}
+	
+	
+	public ConstraintExecutor getExecutor() {
+		if(executor == null) {
+			executor = ConstraintExecutors.get().getExecutor(this);
+		}
+		return executor;
 	}
 	
 	

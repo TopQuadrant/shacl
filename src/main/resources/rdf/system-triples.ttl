@@ -1,0 +1,923 @@
+# RDF/OWL system triples
+
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+rdf:type
+  rdf:type rdf:Property ;
+  rdfs:comment "The subject is an instance of a class." ;
+  rdfs:domain rdfs:Resource ;
+  rdfs:isDefinedBy rdf: ;
+  rdfs:label "type" ;
+  rdfs:range rdfs:Class ;
+.
+rdf:Alt
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of containers of alternatives." ;
+  rdfs:isDefinedBy rdf: ;
+  rdfs:label "Alt" ;
+  rdfs:subClassOf rdfs:Container ;
+.
+rdf:Bag
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of unordered containers." ;
+  rdfs:isDefinedBy rdf: ;
+  rdfs:label "Bag" ;
+  rdfs:subClassOf rdfs:Container ;
+.
+rdf:List
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of RDF Lists." ;
+  rdfs:isDefinedBy rdf: ;
+  rdfs:label "List" ;
+.
+rdf:Property
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of RDF properties." ;
+  rdfs:isDefinedBy rdf: ;
+  rdfs:label "Property" ;
+  rdfs:subClassOf rdfs:Resource ;
+.
+rdf:Seq
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of ordered containers." ;
+  rdfs:isDefinedBy rdf: ;
+  rdfs:label "Seq" ;
+  rdfs:subClassOf rdfs:Container ;
+.
+rdf:Statement
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of RDF statements." ;
+  rdfs:isDefinedBy rdf: ;
+  rdfs:label "Statement" ;
+  rdfs:subClassOf rdfs:Resource ;
+.
+rdf:XMLLiteral
+  rdf:type rdfs:Datatype ;
+  rdfs:comment "The class of XML literal values." ;
+  rdfs:isDefinedBy rdf: ;
+  rdfs:label "XMLLiteral" ;
+.
+rdf:first
+  rdf:type rdf:Property ;
+  rdfs:comment "The first item in the subject RDF list." ;
+  rdfs:domain rdf:List ;
+  rdfs:isDefinedBy rdf: ;
+  rdfs:label "first" ;
+  rdfs:range rdfs:Resource ;
+.
+()
+  rdf:type rdf:List ;
+  rdfs:comment "The empty list, with no items in it. If the rest of a list is nil then the list has no more items in it." ;
+  rdfs:isDefinedBy rdf: ;
+  rdfs:label "nil" ;
+.
+rdf:object
+  rdf:type rdf:Property ;
+  rdfs:comment "The object of the subject RDF statement." ;
+  rdfs:domain rdf:Statement ;
+  rdfs:isDefinedBy rdf: ;
+  rdfs:label "object" ;
+  rdfs:range rdfs:Resource ;
+.
+rdf:predicate
+  rdf:type rdf:Property ;
+  rdfs:comment "The predicate of the subject RDF statement." ;
+  rdfs:domain rdf:Statement ;
+  rdfs:isDefinedBy rdf: ;
+  rdfs:label "predicate" ;
+  rdfs:range rdf:Property ;
+.
+rdf:rest
+  rdf:type rdf:Property ;
+  rdfs:comment "The rest of the subject RDF list after the first item." ;
+  rdfs:domain rdf:List ;
+  rdfs:isDefinedBy rdf: ;
+  rdfs:label "rest" ;
+  rdfs:range rdf:List ;
+.
+rdf:subject
+  rdf:type rdf:Property ;
+  rdfs:comment "The subject of the subject RDF statement." ;
+  rdfs:domain rdf:Statement ;
+  rdfs:isDefinedBy rdf: ;
+  rdfs:label "subject" ;
+  rdfs:range rdfs:Resource ;
+.
+rdf:value
+  rdf:type rdf:Property ;
+  rdfs:comment "Idiomatic property used for structured values." ;
+  rdfs:domain rdfs:Resource ;
+  rdfs:isDefinedBy rdf: ;
+  rdfs:label "value" ;
+  rdfs:range rdfs:Resource ;
+.
+rdfs:
+  rdfs:seeAlso <http://www.w3.org/2000/01/rdf-schema-more> ;
+.
+rdfs:Class
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of classes." ;
+  rdfs:isDefinedBy rdfs: ;
+  rdfs:label "Class" ;
+  rdfs:subClassOf rdfs:Resource ;
+.
+rdfs:Container
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of RDF containers." ;
+  rdfs:isDefinedBy rdfs: ;
+  rdfs:label "Container" ;
+  rdfs:subClassOf rdfs:Resource ;
+.
+rdfs:ContainerMembershipProperty
+  rdf:type rdfs:Class ;
+  rdfs:comment """The class of container membership properties, rdf:_1, rdf:_2, ...,
+                    all of which are sub-properties of 'member'.""" ;
+  rdfs:isDefinedBy rdfs: ;
+  rdfs:label "ContainerMembershipProperty" ;
+  rdfs:subClassOf rdf:Property ;
+.
+rdfs:Datatype
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of RDF datatypes." ;
+  rdfs:isDefinedBy rdfs: ;
+  rdfs:label "Datatype" ;
+  rdfs:subClassOf rdfs:Class ;
+.
+rdfs:Literal
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of literal values, eg. textual strings and integers." ;
+  rdfs:isDefinedBy rdfs: ;
+  rdfs:label "Literal" ;
+.
+rdfs:Resource
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class resource, everything." ;
+  rdfs:isDefinedBy rdfs: ;
+  rdfs:label "Resource" ;
+.
+rdfs:comment
+  rdf:type rdf:Property ;
+  rdfs:comment "A description of the subject resource." ;
+  rdfs:domain rdfs:Resource ;
+  rdfs:isDefinedBy rdfs: ;
+  rdfs:label "comment" ;
+  rdfs:range rdfs:Literal ;
+.
+rdfs:domain
+  rdf:type rdf:Property ;
+  rdfs:comment "A domain of the subject property." ;
+  rdfs:domain rdf:Property ;
+  rdfs:isDefinedBy rdfs: ;
+  rdfs:label "domain" ;
+  rdfs:range rdfs:Class ;
+.
+rdfs:isDefinedBy
+  rdf:type rdf:Property ;
+  rdfs:comment "The defininition of the subject resource." ;
+  rdfs:domain rdfs:Resource ;
+  rdfs:isDefinedBy rdfs: ;
+  rdfs:label "isDefinedBy" ;
+  rdfs:range rdfs:Resource ;
+  rdfs:subPropertyOf rdfs:seeAlso ;
+.
+rdfs:label
+  rdf:type rdf:Property ;
+  rdfs:comment "A human-readable name for the subject." ;
+  rdfs:domain rdfs:Resource ;
+  rdfs:isDefinedBy rdfs: ;
+  rdfs:label "label" ;
+  rdfs:range rdfs:Literal ;
+.
+rdfs:member
+  rdf:type rdf:Property ;
+  rdfs:comment "A member of the subject container." ;
+  rdfs:domain rdfs:Resource ;
+  rdfs:isDefinedBy rdfs: ;
+  rdfs:label "member" ;
+  rdfs:range rdfs:Resource ;
+.
+rdfs:range
+  rdf:type rdf:Property ;
+  rdfs:comment "A range of the subject property." ;
+  rdfs:domain rdf:Property ;
+  rdfs:isDefinedBy rdfs: ;
+  rdfs:label "range" ;
+  rdfs:range rdfs:Class ;
+.
+rdfs:seeAlso
+  rdf:type rdf:Property ;
+  rdfs:comment "Further information about the subject resource." ;
+  rdfs:domain rdfs:Resource ;
+  rdfs:isDefinedBy rdfs: ;
+  rdfs:label "seeAlso" ;
+  rdfs:range rdfs:Resource ;
+.
+rdfs:subClassOf
+  rdf:type rdf:Property ;
+  rdfs:comment "The subject is a subclass of a class." ;
+  rdfs:domain rdfs:Class ;
+  rdfs:isDefinedBy rdfs: ;
+  rdfs:label "subClassOf" ;
+  rdfs:range rdfs:Class ;
+.
+rdfs:subPropertyOf
+  rdf:type rdf:Property ;
+  rdfs:comment "The subject is a subproperty of a property." ;
+  rdfs:domain rdf:Property ;
+  rdfs:isDefinedBy rdfs: ;
+  rdfs:label "subPropertyOf" ;
+  rdfs:range rdf:Property ;
+.
+xsd:fractionDigits
+  rdf:type rdf:Property ;
+  rdfs:comment "fractionDigits controls the size of the minimum difference between values in the value space of datatypes derived from decimal, by restricting the value space to numbers that are expressible as i x 10^-n where i and n are integers and 0 <= n <= fractionDigits." ;
+  rdfs:label "fraction digits" ;
+  rdfs:range xsd:nonNegativeInteger ;
+  rdfs:seeAlso <http://www.w3.org/TR/xmlschema-2/#rf-fractionDigits> ;
+.
+xsd:length
+  rdf:type rdf:Property ;
+  rdfs:comment "length is the number of units of length, where units of length varies depending on the type that is being derived from." ;
+  rdfs:label "length" ;
+  rdfs:range xsd:nonNegativeInteger ;
+  rdfs:seeAlso <http://www.w3.org/TR/xmlschema-2/#rf-length> ;
+.
+xsd:maxExclusive
+  rdf:type rdf:Property ;
+  rdfs:comment "maxExclusive is the exclusive upper bound of the value space for a datatype with the ordered property. The value of maxExclusive must be in the value space of the base type or be equal to {value} in {base type definition}." ;
+  rdfs:label "max exclusive" ;
+  rdfs:range rdfs:Literal ;
+  rdfs:seeAlso <http://www.w3.org/TR/xmlschema-2/#rf-maxExclusive> ;
+.
+xsd:maxInclusive
+  rdf:type rdf:Property ;
+  rdfs:comment "maxInclusive is the inclusive upper bound of the value space for a datatype with the ordered property. The value of maxInclusive must be in the value space of the base type." ;
+  rdfs:label "max inclusive" ;
+  rdfs:range rdfs:Literal ;
+  rdfs:seeAlso <http://www.w3.org/TR/xmlschema-2/#rf-maxInclusive> ;
+.
+xsd:maxLength
+  rdf:type rdf:Property ;
+  rdfs:comment "minLength is the minimum number of units of length, where units of length varies depending on the type that is being derived from." ;
+  rdfs:label "max length" ;
+  rdfs:range xsd:nonNegativeInteger ;
+  rdfs:seeAlso <http://www.w3.org/TR/xmlschema-2/#rf-minLength> ;
+.
+xsd:minExclusive
+  rdf:type rdf:Property ;
+  rdfs:comment "minExclusive is the exclusive lower bound of the value space for a datatype with the ordered property. The value of minExclusive must be in the value space of the base type or be equal to {value} in {base type definition}." ;
+  rdfs:label "min exclusive" ;
+  rdfs:range rdfs:Literal ;
+  rdfs:seeAlso <http://www.w3.org/TR/xmlschema-2/#rf-minExclusive> ;
+.
+xsd:minInclusive
+  rdf:type rdf:Property ;
+  rdfs:comment "minInclusive is the inclusive lower bound of the value space for a datatype with the ordered property. The value of minInclusive must be in the value space of the base type." ;
+  rdfs:label "min inclusive" ;
+  rdfs:range rdfs:Literal ;
+  rdfs:seeAlso <http://www.w3.org/TR/xmlschema-2/#rf-minInclusive> ;
+.
+xsd:minLength
+  rdf:type rdf:Property ;
+  rdfs:comment "maxLength is the maximum number of units of length, where units of length varies depending on the type that is being derived from." ;
+  rdfs:label "min length" ;
+  rdfs:range xsd:nonNegativeInteger ;
+  rdfs:seeAlso <http://www.w3.org/TR/xmlschema-2/#rf-maxLength> ;
+.
+xsd:pattern
+  rdf:type rdf:Property ;
+  rdfs:comment "pattern is a constraint on the value space of a datatype which is achieved by constraining the lexical space to literals which match a specific pattern. The value of pattern must be a regular expression." ;
+  rdfs:label "pattern" ;
+  rdfs:range xsd:string ;
+  rdfs:seeAlso <http://www.w3.org/TR/xmlschema-2/#rf-pattern> ;
+.
+xsd:totalDigits
+  rdf:type rdf:Property ;
+  rdfs:comment "totalDigits controls the maximum number of values in the value space of datatypes derived from decimal, by restricting it to numbers that are expressible as i x 10^-n where i and n are integers such that |i| < 10^totalDigits and 0 <= n <= totalDigits." ;
+  rdfs:label "total digits" ;
+  rdfs:range xsd:nonNegativeInteger ;
+  rdfs:seeAlso <http://www.w3.org/TR/xmlschema-2/#rf-totalDigits> ;
+.
+<http://www.w3.org/2002/07/owl>
+  rdf:type owl:Ontology ;
+  rdfs:comment """
+  This ontology partially describes the built-in classes and
+  properties that together form the basis of the RDF/XML syntax of OWL 2.
+  The content of this ontology is based on Tables 6.1 and 6.2
+  in Section 6.4 of the OWL 2 RDF-Based Semantics specification,
+  available at http://www.w3.org/TR/owl2-rdf-based-semantics/.
+  Please note that those tables do not include the different annotations
+  (labels, comments and rdfs:isDefinedBy links) used in this file.  
+  Also note that the descriptions provided in this ontology do not
+  provide a complete and correct formal description of either the syntax
+  or the semantics of the introduced terms (please see the OWL 2
+  recommendations for the complete and normative specifications).
+  Furthermore, the information provided by this ontology may be
+  misleading if not used with care. This ontology SHOULD NOT be imported
+  into OWL ontologies. Importing this file into an OWL 2 DL ontology
+  will cause it to become an OWL 2 Full ontology and may have other,
+  unexpected, consequences.
+   """ ;
+  rdfs:isDefinedBy <http://www.w3.org/TR/owl2-mapping-to-rdf/> ;
+  rdfs:isDefinedBy <http://www.w3.org/TR/owl2-rdf-based-semantics/> ;
+  rdfs:isDefinedBy <http://www.w3.org/TR/owl2-syntax/> ;
+  rdfs:seeAlso <http://www.w3.org/TR/owl2-rdf-based-semantics/#table-axiomatic-classes> ;
+  rdfs:seeAlso <http://www.w3.org/TR/owl2-rdf-based-semantics/#table-axiomatic-properties> ;
+  owl:imports <http://www.w3.org/2000/01/rdf-schema> ;
+  owl:versionIRI <http://www.w3.org/2002/07/owl> ;
+  owl:versionInfo "$Date: 2009/11/04 15:40:28 $" ;
+.
+owl:AllDifferent
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of collections of pairwise different individuals." ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "AllDifferent" ;
+  rdfs:subClassOf rdfs:Resource ;
+.
+owl:AllDisjointClasses
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of collections of pairwise disjoint classes." ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "AllDisjointClasses" ;
+  rdfs:subClassOf rdfs:Resource ;
+.
+owl:AllDisjointProperties
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of collections of pairwise disjoint properties." ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "AllDisjointProperties" ;
+  rdfs:subClassOf rdfs:Resource ;
+.
+owl:Annotation
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of annotated annotations for which the RDF serialization consists of an annotated subject, predicate and object." ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "Annotation" ;
+  rdfs:subClassOf rdfs:Resource ;
+.
+owl:AnnotationProperty
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of annotation properties." ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "AnnotationProperty" ;
+  rdfs:subClassOf rdf:Property ;
+.
+owl:AsymmetricProperty
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of asymmetric properties." ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "AsymmetricProperty" ;
+  rdfs:subClassOf owl:ObjectProperty ;
+.
+owl:Axiom
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of annotated axioms for which the RDF serialization consists of an annotated subject, predicate and object." ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "Axiom" ;
+  rdfs:subClassOf rdfs:Resource ;
+.
+owl:Class
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of OWL classes." ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "Class" ;
+  rdfs:subClassOf rdfs:Class ;
+.
+owl:DataRange
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of OWL data ranges, which are special kinds of datatypes. Note: The use of the IRI owl:DataRange has been deprecated as of OWL 2. The IRI rdfs:Datatype SHOULD be used instead." ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "DataRange" ;
+  rdfs:subClassOf rdfs:Datatype ;
+.
+owl:DatatypeProperty
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of data properties." ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "DatatypeProperty" ;
+  rdfs:subClassOf rdf:Property ;
+.
+owl:DeprecatedClass
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of deprecated classes." ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "DeprecatedClass" ;
+  rdfs:subClassOf rdfs:Class ;
+.
+owl:DeprecatedProperty
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of deprecated properties." ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "DeprecatedProperty" ;
+  rdfs:subClassOf rdf:Property ;
+.
+owl:FunctionalProperty
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of functional properties." ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "FunctionalProperty" ;
+  rdfs:subClassOf rdf:Property ;
+.
+owl:InverseFunctionalProperty
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of inverse-functional properties." ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "InverseFunctionalProperty" ;
+  rdfs:subClassOf owl:ObjectProperty ;
+.
+owl:IrreflexiveProperty
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of irreflexive properties." ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "IrreflexiveProperty" ;
+  rdfs:subClassOf owl:ObjectProperty ;
+.
+owl:NamedIndividual
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of named individuals." ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "NamedIndividual" ;
+  rdfs:subClassOf owl:Thing ;
+.
+owl:NegativePropertyAssertion
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of negative property assertions." ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "NegativePropertyAssertion" ;
+  rdfs:subClassOf rdfs:Resource ;
+.
+owl:Nothing
+  rdf:type owl:Class ;
+  rdfs:comment "This empty class." ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "Nothing" ;
+  rdfs:subClassOf owl:Thing ;
+.
+owl:ObjectProperty
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of object properties." ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "ObjectProperty" ;
+  rdfs:subClassOf rdf:Property ;
+.
+owl:Ontology
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of ontologies." ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "Ontology" ;
+  rdfs:subClassOf rdfs:Resource ;
+.
+owl:OntologyProperty
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of ontology properties." ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "OntologyProperty" ;
+  rdfs:subClassOf rdf:Property ;
+.
+owl:ReflexiveProperty
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of reflexive properties." ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "ReflexiveProperty" ;
+  rdfs:subClassOf owl:ObjectProperty ;
+.
+owl:Restriction
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of property restrictions." ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "Restriction" ;
+  rdfs:subClassOf owl:Class ;
+.
+owl:SymmetricProperty
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of symmetric properties." ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "SymmetricProperty" ;
+  rdfs:subClassOf owl:ObjectProperty ;
+.
+owl:Thing
+  rdf:type owl:Class ;
+  rdfs:comment "The class of OWL individuals." ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "Thing" ;
+.
+owl:TransitiveProperty
+  rdf:type rdfs:Class ;
+  rdfs:comment "The class of transitive properties." ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "TransitiveProperty" ;
+  rdfs:subClassOf owl:ObjectProperty ;
+.
+owl:allValuesFrom
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines the class that a universal property restriction refers to." ;
+  rdfs:domain owl:Restriction ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "allValuesFrom" ;
+  rdfs:range rdfs:Class ;
+.
+owl:annotatedProperty
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines the predicate of an annotated axiom or annotated annotation." ;
+  rdfs:domain rdfs:Resource ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "annotatedProperty" ;
+  rdfs:range rdfs:Resource ;
+.
+owl:annotatedSource
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines the subject of an annotated axiom or annotated annotation." ;
+  rdfs:domain rdfs:Resource ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "annotatedSource" ;
+  rdfs:range rdfs:Resource ;
+.
+owl:annotatedTarget
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines the object of an annotated axiom or annotated annotation." ;
+  rdfs:domain rdfs:Resource ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "annotatedTarget" ;
+  rdfs:range rdfs:Resource ;
+.
+owl:assertionProperty
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines the predicate of a negative property assertion." ;
+  rdfs:domain owl:NegativePropertyAssertion ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "assertionProperty" ;
+  rdfs:range rdf:Property ;
+.
+owl:backwardCompatibleWith
+  rdf:type owl:AnnotationProperty ;
+  rdf:type owl:OntologyProperty ;
+  rdfs:comment "The annotation property that indicates that a given ontology is backward compatible with another ontology." ;
+  rdfs:domain owl:Ontology ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "backwardCompatibleWith" ;
+  rdfs:range owl:Ontology ;
+.
+owl:bottomDataProperty
+  rdf:type owl:DatatypeProperty ;
+  rdfs:comment "The data property that does not relate any individual to any data value." ;
+  rdfs:domain owl:Thing ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "bottomDataProperty" ;
+  rdfs:range rdfs:Literal ;
+.
+owl:bottomObjectProperty
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "The object property that does not relate any two individuals." ;
+  rdfs:domain owl:Thing ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "bottomObjectProperty" ;
+  rdfs:range owl:Thing ;
+.
+owl:cardinality
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines the cardinality of an exact cardinality restriction." ;
+  rdfs:domain owl:Restriction ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "cardinality" ;
+  rdfs:range xsd:nonNegativeInteger ;
+.
+owl:complementOf
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines that a given class is the complement of another class." ;
+  rdfs:domain owl:Class ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "complementOf" ;
+  rdfs:range owl:Class ;
+.
+owl:datatypeComplementOf
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines that a given data range is the complement of another data range with respect to the data domain." ;
+  rdfs:domain rdfs:Datatype ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "datatypeComplementOf" ;
+  rdfs:range rdfs:Datatype ;
+.
+owl:deprecated
+  rdf:type owl:AnnotationProperty ;
+  rdfs:comment "The annotation property that indicates that a given entity has been deprecated." ;
+  rdfs:domain rdfs:Resource ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "deprecated" ;
+  rdfs:range xsd:boolean ;
+.
+owl:differentFrom
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines that two given individuals are different." ;
+  rdfs:domain owl:Thing ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "differentFrom" ;
+  rdfs:range owl:Thing ;
+.
+owl:disjointUnionOf
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines that a given class is equivalent to the disjoint union of a collection of other classes." ;
+  rdfs:domain owl:Class ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "disjointUnionOf" ;
+  rdfs:range rdf:List ;
+.
+owl:disjointWith
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines that two given classes are disjoint." ;
+  rdfs:domain owl:Class ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "disjointWith" ;
+  rdfs:range owl:Class ;
+.
+owl:distinctMembers
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines the collection of pairwise different individuals in a owl:AllDifferent axiom." ;
+  rdfs:domain owl:AllDifferent ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "distinctMembers" ;
+  rdfs:range rdf:List ;
+.
+owl:equivalentClass
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines that two given classes are equivalent, and that is used to specify datatype definitions." ;
+  rdfs:domain rdfs:Class ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "equivalentClass" ;
+  rdfs:range rdfs:Class ;
+.
+owl:equivalentProperty
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines that two given properties are equivalent." ;
+  rdfs:domain rdf:Property ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "equivalentProperty" ;
+  rdfs:range rdf:Property ;
+.
+owl:hasKey
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines the collection of properties that jointly build a key." ;
+  rdfs:domain owl:Class ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "hasKey" ;
+  rdfs:range rdf:List ;
+.
+owl:hasSelf
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines the property that a self restriction refers to." ;
+  rdfs:domain owl:Restriction ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "hasSelf" ;
+  rdfs:range rdfs:Resource ;
+.
+owl:hasValue
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines the individual that a has-value restriction refers to." ;
+  rdfs:domain owl:Restriction ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "hasValue" ;
+  rdfs:range rdfs:Resource ;
+.
+owl:imports
+  rdf:type owl:OntologyProperty ;
+  rdfs:comment "The property that is used for importing other ontologies into a given ontology." ;
+  rdfs:domain owl:Ontology ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "imports" ;
+  rdfs:range owl:Ontology ;
+.
+owl:incompatibleWith
+  rdf:type owl:AnnotationProperty ;
+  rdf:type owl:OntologyProperty ;
+  rdfs:comment "The annotation property that indicates that a given ontology is incompatible with another ontology." ;
+  rdfs:domain owl:Ontology ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "incompatibleWith" ;
+  rdfs:range owl:Ontology ;
+.
+owl:intersectionOf
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines the collection of classes or data ranges that build an intersection." ;
+  rdfs:domain rdfs:Class ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "intersectionOf" ;
+  rdfs:range rdf:List ;
+.
+owl:inverseOf
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines that two given properties are inverse." ;
+  rdfs:domain owl:ObjectProperty ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "inverseOf" ;
+  rdfs:range owl:ObjectProperty ;
+.
+owl:maxCardinality
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines the cardinality of a maximum cardinality restriction." ;
+  rdfs:domain owl:Restriction ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "maxCardinality" ;
+  rdfs:range xsd:nonNegativeInteger ;
+.
+owl:maxQualifiedCardinality
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines the cardinality of a maximum qualified cardinality restriction." ;
+  rdfs:domain owl:Restriction ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "maxQualifiedCardinality" ;
+  rdfs:range xsd:nonNegativeInteger ;
+.
+owl:members
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines the collection of members in either a owl:AllDifferent, owl:AllDisjointClasses or owl:AllDisjointProperties axiom." ;
+  rdfs:domain rdfs:Resource ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "members" ;
+  rdfs:range rdf:List ;
+.
+owl:minCardinality
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines the cardinality of a minimum cardinality restriction." ;
+  rdfs:domain owl:Restriction ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "minCardinality" ;
+  rdfs:range xsd:nonNegativeInteger ;
+.
+owl:minQualifiedCardinality
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines the cardinality of a minimum qualified cardinality restriction." ;
+  rdfs:domain owl:Restriction ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "minQualifiedCardinality" ;
+  rdfs:range xsd:nonNegativeInteger ;
+.
+owl:onClass
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines the class that a qualified object cardinality restriction refers to." ;
+  rdfs:domain owl:Restriction ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "onClass" ;
+  rdfs:range owl:Class ;
+.
+owl:onDataRange
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines the data range that a qualified data cardinality restriction refers to." ;
+  rdfs:domain owl:Restriction ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "onDataRange" ;
+  rdfs:range rdfs:Datatype ;
+.
+owl:onDatatype
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines the datatype that a datatype restriction refers to." ;
+  rdfs:domain rdfs:Datatype ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "onDatatype" ;
+  rdfs:range rdfs:Datatype ;
+.
+owl:onProperties
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines the n-tuple of properties that a property restriction on an n-ary data range refers to." ;
+  rdfs:domain owl:Restriction ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "onProperties" ;
+  rdfs:range rdf:List ;
+.
+owl:onProperty
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines the property that a property restriction refers to." ;
+  rdfs:domain owl:Restriction ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "onProperty" ;
+  rdfs:range rdf:Property ;
+.
+owl:oneOf
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines the collection of individuals or data values that build an enumeration." ;
+  rdfs:domain rdfs:Class ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "oneOf" ;
+  rdfs:range rdf:List ;
+.
+owl:priorVersion
+  rdf:type owl:AnnotationProperty ;
+  rdf:type owl:OntologyProperty ;
+  rdfs:comment "The annotation property that indicates the predecessor ontology of a given ontology." ;
+  rdfs:domain owl:Ontology ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "priorVersion" ;
+  rdfs:range owl:Ontology ;
+.
+owl:propertyChainAxiom
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines the n-tuple of properties that build a sub property chain of a given property." ;
+  rdfs:domain owl:ObjectProperty ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "propertyChainAxiom" ;
+  rdfs:range rdf:List ;
+.
+owl:propertyDisjointWith
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines that two given properties are disjoint." ;
+  rdfs:domain rdf:Property ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "propertyDisjointWith" ;
+  rdfs:range rdf:Property ;
+.
+owl:qualifiedCardinality
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines the cardinality of an exact qualified cardinality restriction." ;
+  rdfs:domain owl:Restriction ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "qualifiedCardinality" ;
+  rdfs:range xsd:nonNegativeInteger ;
+.
+owl:sameAs
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines that two given individuals are equal." ;
+  rdfs:domain owl:Thing ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "sameAs" ;
+  rdfs:range owl:Thing ;
+.
+owl:someValuesFrom
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines the class that an existential property restriction refers to." ;
+  rdfs:domain owl:Restriction ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "someValuesFrom" ;
+  rdfs:range rdfs:Class ;
+.
+owl:sourceIndividual
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines the subject of a negative property assertion." ;
+  rdfs:domain owl:NegativePropertyAssertion ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "sourceIndividual" ;
+  rdfs:range owl:Thing ;
+.
+owl:targetIndividual
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines the object of a negative object property assertion." ;
+  rdfs:domain owl:NegativePropertyAssertion ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "targetIndividual" ;
+  rdfs:range owl:Thing ;
+.
+owl:targetValue
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines the value of a negative data property assertion." ;
+  rdfs:domain owl:NegativePropertyAssertion ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "targetValue" ;
+  rdfs:range rdfs:Literal ;
+.
+owl:topDataProperty
+  rdf:type owl:DatatypeProperty ;
+  rdfs:comment "The data property that relates every individual to every data value." ;
+  rdfs:domain owl:Thing ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "topDataProperty" ;
+  rdfs:range rdfs:Literal ;
+.
+owl:topObjectProperty
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "The object property that relates every two individuals." ;
+  rdfs:domain owl:Thing ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "topObjectProperty" ;
+  rdfs:range owl:Thing ;
+.
+owl:unionOf
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines the collection of classes or data ranges that build a union." ;
+  rdfs:domain rdfs:Class ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "unionOf" ;
+  rdfs:range rdf:List ;
+.
+owl:versionIRI
+  rdf:type owl:OntologyProperty ;
+  rdfs:comment "The property that identifies the version IRI of an ontology." ;
+  rdfs:domain owl:Ontology ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "versionIRI" ;
+  rdfs:range owl:Ontology ;
+.
+owl:versionInfo
+  rdf:type owl:AnnotationProperty ;
+  rdfs:comment "The annotation property that provides version information for an ontology or another OWL construct." ;
+  rdfs:domain rdfs:Resource ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "versionInfo" ;
+.
+owl:withRestrictions
+  rdf:type rdf:Property ;
+  rdfs:comment "The property that determines the collection of facet-value pairs that define a datatype restriction." ;
+  rdfs:domain rdfs:Datatype ;
+  rdfs:isDefinedBy owl: ;
+  rdfs:label "withRestrictions" ;
+  rdfs:range rdf:List ;
+.

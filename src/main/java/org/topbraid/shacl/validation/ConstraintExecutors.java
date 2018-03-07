@@ -95,16 +95,16 @@ public class ConstraintExecutors {
 	}
 	
 	
-	public ConstraintExecutor getExecutor(Constraint constraint, ValidationEngine engine) {
+	public ConstraintExecutor getExecutor(Constraint constraint) {
 
 		SpecialConstraintExecutorFactory special = specialExecutors.get(constraint.getComponent());
-		if(special != null && special.canExecute(constraint, engine)) {
+		if(special != null && special.canExecute(constraint)) {
 			return special.create(constraint);
 		}
 		
 		for(ValidationLanguage language : languages) {
-			if(language.canExecute(constraint, engine)) {
-				return language.createExecutor(constraint, engine);
+			if(language.canExecute(constraint)) {
+				return language.createExecutor(constraint);
 			}
 		}
 

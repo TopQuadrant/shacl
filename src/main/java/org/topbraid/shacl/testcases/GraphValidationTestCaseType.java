@@ -36,11 +36,12 @@ import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.arq.SHACLPaths;
 import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.engine.filters.ExcludeMetaShapesFilter;
+import org.topbraid.shacl.util.ModelPrinter;
 import org.topbraid.shacl.util.SHACLUtil;
-import org.topbraid.shacl.validation.ValidationSuggestionGenerator;
-import org.topbraid.shacl.validation.ValidationSuggestionGeneratorFactory;
 import org.topbraid.shacl.validation.ValidationEngine;
 import org.topbraid.shacl.validation.ValidationEngineFactory;
+import org.topbraid.shacl.validation.ValidationSuggestionGenerator;
+import org.topbraid.shacl.validation.ValidationSuggestionGeneratorFactory;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 
@@ -139,6 +140,7 @@ public class GraphValidationTestCaseType implements TestCaseType {
 				createResult(results, DASH.SuccessTestCaseResult);
 			}
 			else {
+				System.out.println("Expected: " + ModelPrinter.get().print(expectedModel) + "\nActual: " + ModelPrinter.get().print(actualResults));
 				createFailure(results, 
 						"Mismatching validation results. Expected " + expectedModel.size() + " triples, found " + actualResults.size());
 			}

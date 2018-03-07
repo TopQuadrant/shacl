@@ -136,10 +136,10 @@ public class NashornScriptEngine implements JSScriptEngine {
 
 	protected Reader createScriptReader(String url) throws Exception {
 		if(DASH_JS.equals(url)) {
-			return new InputStreamReader(NashornScriptEngine.class.getResourceAsStream("/etc/dash.js"));
+			return new InputStreamReader(NashornScriptEngine.class.getResourceAsStream("/js/dash.js"));
 		}
 		else if(RDFQUERY_JS.equals(url)) {
-			return new InputStreamReader(NashornScriptEngine.class.getResourceAsStream("/etc/rdfquery.js"));
+			return new InputStreamReader(NashornScriptEngine.class.getResourceAsStream("/js/rdfquery.js"));
 		}
 		else {
 			return new InputStreamReader(new URL(url).openStream());

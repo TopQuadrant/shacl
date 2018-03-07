@@ -18,11 +18,9 @@ package org.topbraid.shacl.validation;
 
 import java.net.URI;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -68,11 +66,9 @@ public class ValidationEngine implements NodeExpressionContext {
 	
 	private Dataset dataset;
 	
-	private Map<Constraint,ConstraintExecutor> executors = new HashMap<>();
-	
 	private Predicate<RDFNode> focusNodeFilter;
 	
-	private Function<RDFNode,String> labelFunction;
+	private Function<RDFNode,String> labelFunction = (node -> node.toString());
 	
 	private ProgressMonitor monitor;
 	
@@ -136,16 +132,6 @@ public class ValidationEngine implements NodeExpressionContext {
 	@Override
     public Dataset getDataset() {
 		return dataset;
-	}
-	
-	
-	private ConstraintExecutor getExecutor(Constraint constraint) {
-		ConstraintExecutor executor = executors.get(constraint);
-		if(executor == null) {
-			executor = ConstraintExecutors.get().getExecutor(constraint, this);
-			executors.put(constraint, executor);
-		}
-		return executor;
 	}
 
 	
@@ -445,7 +431,7 @@ public class ValidationEngine implements NodeExpressionContext {
 	
 	
 	private void validateNodesAgainstConstraint(List<RDFNode> focusNodes, Constraint constraint) {
-		ConstraintExecutor executor = getExecutor(constraint);
+		ConstraintExecutor executor = constraint.getExecutor();
 		if(executor != null) {
 			if(SHACLPreferences.isProduceFailuresMode()) {
 				try {

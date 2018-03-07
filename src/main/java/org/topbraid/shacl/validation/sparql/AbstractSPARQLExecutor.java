@@ -42,6 +42,7 @@ import org.topbraid.jenax.util.RDFLabels;
 import org.topbraid.shacl.arq.SHACLPaths;
 import org.topbraid.shacl.arq.functions.HasShapeFunction;
 import org.topbraid.shacl.engine.Constraint;
+import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.util.FailureLog;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.validation.ConstraintExecutor;
@@ -97,8 +98,11 @@ public abstract class AbstractSPARQLExecutor implements ConstraintExecutor {
 			}
 		}
 		
-		URI oldShapesGraphURI = HasShapeFunction.getShapesGraph();
-		HasShapeFunction.setShapesGraph(engine.getShapesGraphURI());
+		URI oldShapesGraphURI = HasShapeFunction.getShapesGraphURI();
+		ShapesGraph oldShapesGraph = HasShapeFunction.getShapesGraph();
+		if(!engine.getShapesGraphURI().equals(oldShapesGraphURI)) {
+			HasShapeFunction.setShapesGraph(engine.getShapesGraph(), engine.getShapesGraphURI());
+		}
 		
 		Model oldNestedResults = HasShapeFunction.getResultsModel();
 		Model nestedResults = JenaUtil.createMemoryModel();
@@ -129,7 +133,7 @@ public abstract class AbstractSPARQLExecutor implements ConstraintExecutor {
 			}
 		}
 		finally {
-			HasShapeFunction.setShapesGraph(oldShapesGraphURI);
+			HasShapeFunction.setShapesGraph(oldShapesGraph, oldShapesGraphURI);
 			HasShapeFunction.setResultsModel(oldNestedResults);
 		}
 	}

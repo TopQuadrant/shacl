@@ -673,6 +673,13 @@ dash:addedTriple
   rdfs:label "added triple" ;
   rdfs:range rdf:Statement ;
 .
+dash:applicableToClass
+  rdf:type rdf:Property ;
+  rdfs:comment "Can be used to state that a shape is applicable to instances of a given class. This is a softer statement than \"target class\": a target means that all instances of the class must conform to the shape. Being applicable to simply means that the shape may apply to (some) instances of the class. This information can be used by algorithms or humans." ;
+  rdfs:domain sh:Shape ;
+  rdfs:label "applicable to class" ;
+  rdfs:range rdfs:Class ;
+.
 dash:cachable
   rdf:type rdf:Property ;
   rdfs:comment "If set to true then the results of the SHACL function can be cached in between invocations with the same arguments. In other words, they are stateless and do not depend on triples in any graph, or the current time stamp etc." ;

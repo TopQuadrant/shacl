@@ -94,7 +94,7 @@ public class SHACLSPARQLARQFunction extends SHACLARQFunction {
 		
 		try {
 			queryString = shaclFunction.getSPARQL();
-			arqQuery = ARQFactory.get().createQuery(shaclFunction.getModel(), queryString);
+			arqQuery = ARQFactory.get().createQuery(SPARQLSubstitutions.withPrefixes(queryString, shaclFunction));
 		}
 		catch(Exception ex) {
 			throw new IllegalArgumentException("Function " + shaclFunction.getURI() + " does not define a valid body", ex);

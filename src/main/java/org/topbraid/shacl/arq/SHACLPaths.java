@@ -250,6 +250,17 @@ public class SHACLPaths {
 			throw new IllegalArgumentException("Path element not supported by SHACL syntax: " + path);
 		}
 	}
+	
+	
+	public static Object getJenaPath(Resource path) throws QueryParseException {
+		if(path.isURIResource()) {
+			return path;
+		}
+		else {
+			String pathString = SHACLPaths.getPathString(path);
+			return SHACLPaths.getJenaPath(pathString, path.getModel());
+		}
+	}
 
 	
 	/**

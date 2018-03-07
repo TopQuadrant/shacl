@@ -25,6 +25,7 @@ import org.apache.jena.datatypes.xsd.impl.XMLLiteralType;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.util.FileUtils;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
@@ -78,11 +79,8 @@ public class SystemTriples {
 			vocabulary = JenaUtil.createDefaultModel();
 			org.topbraid.jenax.util.JenaUtil.initNamespaces(vocabulary.getGraph());
 			vocabulary.setNsPrefix("xsd", XSD.getURI());
-			InputStream rdfs = SystemTriples.class.getResourceAsStream("/rdf/rdf-schema.rdf");
-			vocabulary.read(rdfs, RDFS.getURI());
-			InputStream owl = SystemTriples.class.getResourceAsStream("/rdf/owl.rdf");
-			vocabulary.read(owl, OWL.getURI());
-			vocabulary.removeNsPrefix(""); // Otherwise OWL would be default namespace
+			InputStream ttl = SystemTriples.class.getResourceAsStream("/rdf/system-triples.ttl");
+			vocabulary.read(ttl, "urn:dummy", FileUtils.langTurtle);
 			ensureSuperClasses(RDFS.Class, RDFS.Resource);
 			ensureSuperClasses(OWL.Class, OWL.Thing);
 			

@@ -31,6 +31,7 @@ import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.function.FunctionEnv;
 import org.apache.jena.vocabulary.RDF;
 import org.topbraid.jenax.functions.AbstractFunction3;
+import org.topbraid.jenax.util.ARQFactory;
 import org.topbraid.jenax.util.JenaDatatypes;
 import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.util.FailureLog;
@@ -51,22 +52,33 @@ public class HasShapeFunction extends AbstractFunction3 {
 	
 	private static ThreadLocal<Model> resultsModelTL = new ThreadLocal<>();
 	
-	private static ThreadLocal<URI> shapesGraph = new ThreadLocal<URI>();
+	private static ThreadLocal<ShapesGraph> shapesGraph = new ThreadLocal<>();
+	
+	private static ThreadLocal<URI> shapesGraphURI = new ThreadLocal<URI>();
 	
 	public static Model getResultsModel() {
 		return resultsModelTL.get();
 	}
 	
-	public static URI getShapesGraph() {
+	public static ShapesGraph getShapesGraph() {
 		return shapesGraph.get();
+	}
+	
+	public static URI getShapesGraphURI() {
+		return shapesGraphURI.get();
 	}
 	
 	public static void setResultsModel(Model value) {
 		resultsModelTL.set(value);
 	}
 	
-	public static void setShapesGraph(URI uri) {
-		shapesGraph.set(uri);
+	public static void setShapesGraph(ShapesGraph value, URI uri) {
+		if(value == null && uri != null) {
+			Model shapesModel = ARQFactory.getNamedModel(uri.toString());
+			value = new ShapesGraph(shapesModel);
+		}
+		shapesGraph.set(value);
+		shapesGraphURI.set(uri);
 	}
 
 	
@@ -136,13 +148,21 @@ public class HasShapeFunction extends AbstractFunction3 {
 
 
 	private Model doRun(RDFNode focusNode, Resource shape, Dataset dataset) {
-		URI shapesGraphURI = shapesGraph.get();
-		if(shapesGraphURI == null) {
-			shapesGraphURI = DefaultShapesGraphProvider.get().getDefaultShapesGraphURI(dataset);
+		URI sgURI = shapesGraphURI.get();
+		ShapesGraph sg = shapesGraph.get();
+		if(sgURI == null) {
+			sgURI = DefaultShapesGraphProvider.get().getDefaultShapesGraphURI(dataset);
+			Model shapesModel = dataset.getNamedModel(sgURI.toString());
+			sg = new ShapesGraph(shapesModel);
 		}
-		Model shapesModel = dataset.getNamedModel(shapesGraphURI.toString());
-		ShapesGraph shapes = new ShapesGraph(shapesModel);
-		return ValidationEngineFactory.get().create(dataset, shapesGraphURI, shapes, null).validateNodesAgainstShape(
-				Collections.singletonList(focusNode), shape.asNode()).getModel();
+		else if(sg == null) {
+			Model shapesModel = dataset.getNamedModel(sgURI.toString());
+			sg = new ShapesGraph(shapesModel);
+			shapesGraph.set(sg);
+		}
+		return ValidationEngineFactory.get().
+				create(dataset, sgURI, sg, null).
+				validateNodesAgainstShape(Collections.singletonList(focusNode), shape.asNode()).
+				getModel();
 	}
 }
