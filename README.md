@@ -60,6 +60,14 @@ SET SHACLROOT=C:\Users\Holger\Desktop\shacl-1.0.0-bin
 SET PATH=%PATH%;%SHACLROOT%\bin
 ```
 
+As another example, for Linux, add to .bashrc these lines:
+
+```
+# for shacl
+export SHACLROOT=/home/holger/shacl/shacl-1.0.0-bin/shacl-1.0.0/bin
+export PATH=$SHACLROOT:$PATH 
+```
+
 Both tools take the following parameters, for example:
 
 `shaclvalidate.bat -datafile myfile.ttl -shapesfile myshapes.ttl`
