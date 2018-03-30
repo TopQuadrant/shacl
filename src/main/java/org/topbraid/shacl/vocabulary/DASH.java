@@ -42,6 +42,8 @@ public class DASH {
 
     public final static Resource FunctionTestCase = ResourceFactory.createResource(NS + "FunctionTestCase");
 
+    public final static Resource GraphStoreTestCase = ResourceFactory.createResource(NS + "GraphStoreTestCase");
+
     public final static Resource GraphUpdate = ResourceFactory.createResource(NS + "GraphUpdate");
 
     public final static Resource GraphValidationTestCase = ResourceFactory.createResource(NS + "GraphValidationTestCase");
@@ -104,6 +106,8 @@ public class DASH {
     public final static Property propertySuggestionGenerator = ResourceFactory.createProperty(NS + "propertySuggestionGenerator");
 
     public final static Property rootClass = ResourceFactory.createProperty(NS + "rootClass");
+
+    public final static Property shape = ResourceFactory.createProperty(NS + "shape");
     
     public final static Property suggestion = ResourceFactory.createProperty(NS + "suggestion");
     
@@ -120,6 +124,10 @@ public class DASH {
     public final static Property testGraph = ResourceFactory.createProperty(NS + "testGraph");
     
     public final static Property testModifiesEnvironment = ResourceFactory.createProperty(NS + "testModifiesEnvironment");
+    
+    public final static Property uri = ResourceFactory.createProperty(NS + "uri");
+    
+    public final static Property uriStart = ResourceFactory.createProperty(NS + "uriStart");
     
     public final static Property validateShapes = ResourceFactory.createProperty(NS + "validateShapes");
     

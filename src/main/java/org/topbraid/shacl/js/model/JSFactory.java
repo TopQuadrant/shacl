@@ -23,6 +23,8 @@ import org.apache.jena.datatypes.TypeMapper;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
+import org.apache.jena.vocabulary.XSD;
+import org.topbraid.jenax.util.JenaDatatypes;
 
 public class JSFactory {
 	
@@ -72,6 +74,29 @@ public class JSFactory {
 			else {
 				throw new IllegalArgumentException("Unsupported term type " + termType);
 			}
+		}
+		else {
+			return null;
+		}
+	}
+
+	
+	public static Node getNodeFlex(Object obj) {
+		Node fromTerm = getNode(obj);
+		if(fromTerm != null) {
+			return fromTerm;
+		}
+		else if(obj instanceof Integer) {
+			return JenaDatatypes.createInteger((Integer)obj).asNode();
+		}
+		else if(obj instanceof Number) {
+			return NodeFactory.createLiteral(obj.toString(), TypeMapper.getInstance().getSafeTypeByName(XSD.decimal.getURI()));
+		}
+		else if(obj instanceof Boolean) {
+			return ((Boolean)obj) ? JenaDatatypes.TRUE.asNode() : JenaDatatypes.FALSE.asNode();
+		}
+		else if(obj != null) {
+			return NodeFactory.createLiteral(obj.toString());
 		}
 		else {
 			return null;

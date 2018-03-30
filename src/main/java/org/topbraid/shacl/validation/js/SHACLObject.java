@@ -60,11 +60,16 @@ public class SHACLObject {
 	
 	
 	public boolean nodeConformsToShape(JSTerm node, JSTerm shape) {
+		try {
 		Model shapesModel = dataset.getNamedModel(shapesGraphURI.toString());
 		ShapesGraph shapesGraph = new ShapesGraph(shapesModel);
 		List<RDFNode> focusNodes = Collections.singletonList(dataset.getDefaultModel().asRDFNode(node.getNode()));
 		Resource report = ValidationEngineFactory.get().create(dataset, shapesGraphURI, shapesGraph, null).
 				validateNodesAgainstShape(focusNodes, shape.getNode());
 		return !report.hasProperty(SH.result);
+		}
+		catch(StackOverflowError ex) {
+			return false;
+		}
 	}
 }

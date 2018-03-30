@@ -22,9 +22,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.path.Path;
+import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.arq.SHACLPaths;
 
 public class PathExpression extends ComplexNodeExpression {
@@ -79,8 +81,9 @@ public class PathExpression extends ComplexNodeExpression {
 		if(input != null) {
 			Set<RDFNode> results = new HashSet<>();
 			if(jenaPath == null) {
+				Property predicate = JenaUtil.asProperty(path);
 				for(RDFNode node : input.eval(focusNode, context)) {
-					SHACLPaths.addValueNodes(node.inModel(context.getDataset().getDefaultModel()), path, results);
+					SHACLPaths.addValueNodes(node.inModel(context.getDataset().getDefaultModel()), predicate, results);
 				}
 			}
 			else {
@@ -93,7 +96,8 @@ public class PathExpression extends ComplexNodeExpression {
 		else {
 			List<RDFNode> results = new LinkedList<>();
 			if(jenaPath == null) {
-				SHACLPaths.addValueNodes(focusNode.inModel(context.getDataset().getDefaultModel()), path, results);
+				Property predicate = JenaUtil.asProperty(path);
+				SHACLPaths.addValueNodes(focusNode.inModel(context.getDataset().getDefaultModel()), predicate, results);
 			}
 			else {
 				SHACLPaths.addValueNodes(focusNode.inModel(context.getDataset().getDefaultModel()), jenaPath, results);

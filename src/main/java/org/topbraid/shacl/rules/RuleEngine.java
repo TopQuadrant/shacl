@@ -38,15 +38,15 @@ import org.topbraid.jenax.statistics.ExecStatistics;
 import org.topbraid.jenax.statistics.ExecStatisticsManager;
 import org.topbraid.jenax.util.JenaDatatypes;
 import org.topbraid.jenax.util.JenaUtil;
+import org.topbraid.jenax.util.RDFLabels;
+import org.topbraid.shacl.engine.AbstractEngine;
 import org.topbraid.shacl.engine.Shape;
 import org.topbraid.shacl.engine.ShapesGraph;
-import org.topbraid.shacl.expr.NodeExpressionContext;
 import org.topbraid.shacl.util.OrderComparator;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.validation.ValidationEngine;
 import org.topbraid.shacl.validation.ValidationEngineFactory;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.jenax.util.RDFLabels;
 
 /**
  * A SHACL Rules engine with a pluggable architecture for different execution languages
@@ -54,30 +54,20 @@ import org.topbraid.jenax.util.RDFLabels;
  * 
  * @author Holger Knublauch
  */
-public class RuleEngine implements NodeExpressionContext {
-	
-	private Dataset dataset;
+public class RuleEngine extends AbstractEngine {
 	
 	private Model inferences;
-	
-	private ProgressMonitor monitor;
 	
 	private Set<Triple> pending = new HashSet<>();
 	
 	private Map<Rule,List<Resource>> rule2Conditions = new HashMap<>();
 	
-	private ShapesGraph shapesGraph;
-	
-	private URI shapesGraphURI;
-	
 	private Map<Shape,List<Rule>> shape2Rules = new HashMap<>(); 
 
 	
 	public RuleEngine(Dataset dataset, URI shapesGraphURI, ShapesGraph shapesGraph, Model inferences) {
-		this.dataset = dataset;
+		super(dataset, shapesGraph, shapesGraphURI);
 		this.inferences = inferences;
-		this.shapesGraph = shapesGraph;
-		this.shapesGraphURI = shapesGraphURI;
 	}
 	
 	
@@ -245,36 +235,13 @@ public class RuleEngine implements NodeExpressionContext {
 	}
 	
 	
-	@Override
-	public Dataset getDataset() {
-		return dataset;
-	}
-	
-	
 	public Model getInferencesModel() {
 		return inferences;
 	}
 	
 	
-	public ProgressMonitor getProgressMonitor() {
-		return monitor;
-	}
-	
-	
-	@Override
-    public ShapesGraph getShapesGraph() {
-		return shapesGraph;
-	}
-	
-	
 	public Model getShapesModel() {
 		return dataset.getNamedModel(shapesGraphURI.toString());
-	}
-	
-	
-	@Override
-	public URI getShapesGraphURI() {
-		return shapesGraphURI;
 	}
 	
 	

@@ -550,8 +550,44 @@ public class JenaUtil {
 		}
 		return results;
 	}
+	
+	
+	/**
+	 * Walks up the class hierarchy starting at a given class until one of them
+	 * returns a value for a given Function.
+	 * @param cls  the class to start at
+	 * @param function  the Function to execute on each class
+	 * @return the "first" non-null value, or null
+	 */
+	public static <T> T getNearest(Resource cls, java.util.function.Function<Resource,T> function) {
+		T result = function.apply(cls);
+		if(result != null) {
+			return result;
+		}
+		return getNearest(cls, function, new HashSet<>());
+	}
 
+	
+	private static <T> T getNearest(Resource cls, java.util.function.Function<Resource,T> function, Set<Resource> reached) {
+		reached.add(cls);
+		StmtIterator it = cls.listProperties(RDFS.subClassOf);
+		while(it.hasNext()) {
+			Statement s = it.next();
+			if(s.getObject().isResource() && !reached.contains(s.getResource())) {
+				T result = function.apply(s.getResource());
+				if(result == null) {
+					result = getNearest(s.getResource(), function, reached);
+				}
+				if(result != null) {
+					it.close();
+					return result;
+				}
+			}
+		}
+		return null;
+	}
 
+	
 	/**
 	 * Overcomes a bug in Jena: if the base model does not declare a default namespace then the
 	 * default namespace of an import is returned!
@@ -624,6 +660,30 @@ public class JenaUtil {
 	}
 	
 	
+	public static Resource getURIResourceProperty(Resource subject, Property predicate) {
+		Statement s = subject.getProperty(predicate);
+		if(s != null && s.getObject().isURIResource()) {
+			return s.getResource();
+		}
+		else {
+			return null;
+		}
+	}
+	
+	
+	public static List<Resource> getURIResourceProperties(Resource subject, Property predicate) {
+		List<Resource> results = new LinkedList<>();
+		StmtIterator it = subject.listProperties(predicate);
+		while(it.hasNext()) {
+			Statement s = it.next();
+			if(s.getObject().isURIResource()) {
+				results.add(s.getResource());
+			}
+		}
+		return results;
+	}
+	
+	
 	public static String getStringProperty(Resource subject, Property predicate) {
 		Statement s = subject.getProperty(predicate);
 		if(s != null && s.getObject().isLiteral()) {
@@ -644,7 +704,29 @@ public class JenaUtil {
 			return false;
 		}
 	}
-
+	
+	
+	public static Double getDoubleProperty(Resource subject, Property predicate) {
+		Statement s = subject.getProperty(predicate);
+		if(s != null && s.getObject().isLiteral()) {
+			return s.getDouble();
+		}
+		else {
+			return null;
+		}
+	}
+	
+	
+	public static double getDoubleProperty(Resource subject, Property predicate, double defaultValue) {
+		Double d = getDoubleProperty(subject, predicate);
+		if(d != null) {
+			return d;
+		}
+		else {
+			return defaultValue;
+		}
+	}
+	
 	
 	public static List<Graph> getSubGraphs(MultiUnion union) {
 		List<Graph> results = new LinkedList<>();

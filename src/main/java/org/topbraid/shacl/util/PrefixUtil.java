@@ -35,7 +35,7 @@ import org.topbraid.shacl.vocabulary.SH;
 public class PrefixUtil {
 	
 	public static Resource addNamespace(Resource ontology, String prefix, String namespace) {
-		Resource declaration = ontology.getModel().createResource(SH.PrefixDeclaration);
+		Resource declaration = ontology.getModel().createResource(namespace + SH.PrefixDeclaration.getLocalName(), SH.PrefixDeclaration);
 		ontology.addProperty(SH.declare, declaration);
 		declaration.addProperty(SH.prefix, prefix);
 		declaration.addProperty(SH.namespace, ResourceFactory.createTypedLiteral(namespace, TypeMapper.getInstance().getSafeTypeByName(XSD.anyURI.getURI())));

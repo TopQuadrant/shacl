@@ -36,16 +36,14 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.vocabulary.RDF;
-import org.topbraid.jenax.progress.ProgressMonitor;
 import org.topbraid.jenax.util.ExceptionUtil;
 import org.topbraid.jenax.util.JenaDatatypes;
 import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.arq.SHACLPaths;
+import org.topbraid.shacl.engine.AbstractEngine;
 import org.topbraid.shacl.engine.Constraint;
 import org.topbraid.shacl.engine.Shape;
 import org.topbraid.shacl.engine.ShapesGraph;
-import org.topbraid.shacl.entailment.SHACLEntailment;
-import org.topbraid.shacl.expr.NodeExpressionContext;
 import org.topbraid.shacl.js.SHACLScriptEngineManager;
 import org.topbraid.shacl.util.FailureLog;
 import org.topbraid.shacl.util.SHACLPreferences;
@@ -62,22 +60,13 @@ import org.topbraid.shacl.vocabulary.SH;
  * 
  * @author Holger Knublauch
  */
-public class ValidationEngine implements NodeExpressionContext {
-	
-	private Dataset dataset;
+public class ValidationEngine extends AbstractEngine {
 	
 	private Predicate<RDFNode> focusNodeFilter;
 	
 	private Function<RDFNode,String> labelFunction = (node -> node.toString());
 	
-	private ProgressMonitor monitor;
-	
 	private Resource report;
-	
-	private ShapesGraph shapesGraph;
-	
-	private URI shapesGraphURI;
-	
 
 	
 	/**
@@ -88,14 +77,7 @@ public class ValidationEngine implements NodeExpressionContext {
 	 * @param report  the sh:ValidationReport object in the results Model, or null to create a new one
 	 */
 	protected ValidationEngine(Dataset dataset, URI shapesGraphURI, ShapesGraph shapesGraph, Resource report) {
-		this.dataset = dataset;
-		this.shapesGraph = shapesGraph;
-		
-		if(shapesGraphURI == null) {
-			shapesGraphURI = DefaultShapesGraphProvider.get().getDefaultShapesGraphURI(dataset);
-		}
-
-		this.shapesGraphURI = shapesGraphURI;
+		super(dataset, shapesGraph, shapesGraphURI);
 		if(report == null) {
 			Model reportModel = JenaUtil.createMemoryModel();
 			reportModel.setNsPrefixes(dataset.getDefaultModel());
@@ -104,34 +86,6 @@ public class ValidationEngine implements NodeExpressionContext {
 		else {
 			this.report = report;
 		}
-	}
-	
-	
-	/**
-	 * Ensures that the data graph includes any entailed triples inferred by the regime
-	 * specified using sh:entailment in the shapes graph.
-	 * Should be called prior to validation.
-	 * Throws an Exception if unsupported entailments are found.
-	 * If multiple sh:entailments are present then their order is undefined but they all get applied.
-	 */
-	public void applyEntailments() throws InterruptedException {
-		Model shapesModel = dataset.getNamedModel(shapesGraphURI.toString());
-		for(Statement s : shapesModel.listStatements(null, SH.entailment, (RDFNode)null).toList()) {
-			if(s.getObject().isURIResource()) {
-				if(SHACLEntailment.get().getEngine(s.getResource().getURI()) != null) {
-					this.dataset = SHACLEntailment.get().withEntailment(dataset, shapesGraphURI, shapesGraph, s.getResource(), monitor);
-				}
-				else {
-					throw new UnsupportedOperationException("Unsupported entailment regime " + s.getResource());
-				}
-			}
-		}
-	}
-	
-	
-	@Override
-    public Dataset getDataset() {
-		return dataset;
 	}
 
 	
@@ -142,16 +96,6 @@ public class ValidationEngine implements NodeExpressionContext {
 	
 	public void setLabelFunction(Function<RDFNode,String> value) {
 		this.labelFunction = value;
-	}
-	
-	
-	public ProgressMonitor getProgressMonitor() {
-		return monitor;
-	}
-	
-	
-	public void setProgressMonitor(ProgressMonitor value) {
-		this.monitor = value;
 	}
 	
 	
@@ -170,18 +114,6 @@ public class ValidationEngine implements NodeExpressionContext {
 			result.addProperty(SH.focusNode, focusNode);
 		}
 		return result;
-	}
-	
-	
-	@Override
-    public ShapesGraph getShapesGraph() {
-		return shapesGraph;
-	}
-	
-	
-	@Override
-    public URI getShapesGraphURI() {
-		return shapesGraphURI;
 	}
 	
 	
@@ -250,13 +182,13 @@ public class ValidationEngine implements NodeExpressionContext {
 			return Collections.singletonList(focusNode);
 		}
 		else {
-			List<RDFNode> results = new LinkedList<RDFNode>();
+			List<RDFNode> results = new LinkedList<>();
 			Path jenaPath = constraint.getShape().getJenaPath();
 			if(jenaPath != null) {
 				SHACLPaths.addValueNodes(focusNode, jenaPath, results);
 			}
 			else {
-				SHACLPaths.addValueNodes(focusNode, path, results);
+				SHACLPaths.addValueNodes(focusNode, JenaUtil.asProperty(path), results);
 			}
 			return results;
 		}

@@ -119,6 +119,7 @@ public class RuleUtil {
 		
 		boolean nested = SHACLScriptEngineManager.begin();
 		try {
+			engine.applyEntailments();
 			if(focusNode == null) {
 				engine.executeAll();
 			}

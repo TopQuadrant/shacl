@@ -81,6 +81,8 @@ public class SH {
     
     public final static Resource PrefixDeclaration = ResourceFactory.createResource(NS + "PrefixDeclaration");
 
+    public final static Resource PropertyGroup = ResourceFactory.createResource(NS + "PropertyGroup");
+
     public final static Resource PropertyShape = ResourceFactory.createResource(NS + "PropertyShape");
 
     public final static Resource PropertyConstraintComponent = ResourceFactory.createResource(NS + "PropertyConstraintComponent");

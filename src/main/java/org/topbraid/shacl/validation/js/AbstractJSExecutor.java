@@ -143,7 +143,7 @@ public abstract class AbstractJSExecutor implements ConstraintExecutor {
 					if(resultObject != null) {
 						for(Object keyObject : resultObject.keySet()) {
 							String key = (String) keyObject;
-							Object value = map.get(key);
+							Object value = resultObject.get(key);
 							if(value != null) {
 								Node valueNode = JSFactory.getNode(value);
 								if(valueNode != null) {

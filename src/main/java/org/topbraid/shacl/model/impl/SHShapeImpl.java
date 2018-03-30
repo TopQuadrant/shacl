@@ -67,7 +67,7 @@ public abstract class SHShapeImpl extends SHParameterizableInstanceImpl implemen
 
 	@Override
 	public List<SHPropertyShape> getPropertyShapes(RDFNode predicate) {
-		List<SHPropertyShape> results = new LinkedList<SHPropertyShape>();
+		List<SHPropertyShape> results = new LinkedList<>();
 		for(Resource property : JenaUtil.getResourceProperties(this, SH.parameter)) {
 			if(property.hasProperty(SH.path, predicate)) {
 				results.add(SHFactory.asPropertyShape(property));
@@ -84,7 +84,7 @@ public abstract class SHShapeImpl extends SHParameterizableInstanceImpl implemen
 
 	@Override
 	public Iterable<SHRule> getRules() {
-		List<SHRule> results = new LinkedList<SHRule>();
+		List<SHRule> results = new LinkedList<>();
 		for(Resource r : JenaUtil.getResourceProperties(this, SH.rule)) {
 			results.add(r.as(SHRule.class));
 		}
