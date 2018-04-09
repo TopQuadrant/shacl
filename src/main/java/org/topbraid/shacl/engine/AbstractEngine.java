@@ -26,6 +26,8 @@ public abstract class AbstractEngine implements NodeExpressionContext {
 	protected ShapesGraph shapesGraph;
 	
 	protected URI shapesGraphURI;
+	
+	private Model shapesModel;
 
 	
 	protected AbstractEngine(Dataset dataset, ShapesGraph shapesGraph, URI shapesGraphURI) {
@@ -80,6 +82,14 @@ public abstract class AbstractEngine implements NodeExpressionContext {
 	@Override
     public URI getShapesGraphURI() {
 		return shapesGraphURI;
+	}
+	
+	
+	public Model getShapesModel() {
+		if(shapesModel == null) {
+			shapesModel = dataset.getNamedModel(shapesGraphURI.toString());
+		}
+		return shapesModel;
 	}
 
 	

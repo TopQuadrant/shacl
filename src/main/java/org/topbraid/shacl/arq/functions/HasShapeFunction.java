@@ -35,6 +35,7 @@ import org.topbraid.jenax.util.ARQFactory;
 import org.topbraid.jenax.util.JenaDatatypes;
 import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.util.FailureLog;
+import org.topbraid.shacl.util.RecursionGuard;
 import org.topbraid.shacl.validation.DefaultShapesGraphProvider;
 import org.topbraid.shacl.validation.ValidationEngineFactory;
 import org.topbraid.shacl.validation.sparql.AbstractSPARQLExecutor;
@@ -90,7 +91,8 @@ public class HasShapeFunction extends AbstractFunction3 {
 			recursionIsErrorFlag.set(true);
 		}
 		try {
-			if(SHACLRecursionGuard.start(focusNode, shapeNode)) {
+			if(RecursionGuard.start(focusNode, shapeNode)) {
+				RecursionGuard.end(focusNode, shapeNode);
 				if(JenaDatatypes.TRUE.asNode().equals(recursionIsError) || (oldFlag != null && oldFlag)) {
 					String message = "Unsupported recursion";
 					Model resultsModel = resultsModelTL.get();
@@ -102,7 +104,6 @@ public class HasShapeFunction extends AbstractFunction3 {
 					throw new ExprEvalException("Unsupported recursion");
 				}
 				else {
-					SHACLRecursionGuard.end(focusNode, shapeNode);
 					return NodeValue.TRUE;
 				}
 			}
@@ -137,7 +138,7 @@ public class HasShapeFunction extends AbstractFunction3 {
 					}
 				}
 				finally {
-					SHACLRecursionGuard.end(focusNode, shapeNode);
+					RecursionGuard.end(focusNode, shapeNode);
 				}
 			}
 		}

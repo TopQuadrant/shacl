@@ -21,24 +21,25 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.expr.ExprNotComparableException;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.js.model.JSTerm;
+import org.topbraid.shacl.util.RecursionGuard;
 import org.topbraid.shacl.validation.ValidationEngineFactory;
-import org.topbraid.shacl.vocabulary.SH;
 
 public class SHACLObject {
 	
 	private Dataset dataset;
 	
+	private ShapesGraph shapesGraph;
+	
 	private URI shapesGraphURI;
 	
 	
-	public SHACLObject(URI shapesGraphURI, Dataset dataset) {
+	public SHACLObject(ShapesGraph shapesGraph, URI shapesGraphURI, Dataset dataset) {
+		this.shapesGraph = shapesGraph;
 		this.shapesGraphURI = shapesGraphURI;
 		this.dataset = dataset;
 	}
@@ -61,15 +62,17 @@ public class SHACLObject {
 	
 	public boolean nodeConformsToShape(JSTerm node, JSTerm shape) {
 		try {
-		Model shapesModel = dataset.getNamedModel(shapesGraphURI.toString());
-		ShapesGraph shapesGraph = new ShapesGraph(shapesModel);
-		List<RDFNode> focusNodes = Collections.singletonList(dataset.getDefaultModel().asRDFNode(node.getNode()));
-		Resource report = ValidationEngineFactory.get().create(dataset, shapesGraphURI, shapesGraph, null).
-				validateNodesAgainstShape(focusNodes, shape.getNode());
-		return !report.hasProperty(SH.result);
+			if(RecursionGuard.start(node.getNode(), shape.getNode())) {
+				return true;
+			}
+			else {
+				List<RDFNode> focusNodes = Collections.singletonList(dataset.getDefaultModel().asRDFNode(node.getNode()));
+				return ValidationEngineFactory.get().create(dataset, shapesGraphURI, shapesGraph, null).
+					nodesConformToShape(focusNodes, shape.getNode());
+			}
 		}
-		catch(StackOverflowError ex) {
-			return false;
+		finally {
+			RecursionGuard.end(node.getNode(), shape.getNode());
 		}
 	}
 }

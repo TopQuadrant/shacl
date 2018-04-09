@@ -22,10 +22,9 @@ import java.util.List;
 
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.topbraid.jenax.util.RDFLabels;
 import org.topbraid.shacl.validation.ValidationEngine;
 import org.topbraid.shacl.validation.ValidationEngineFactory;
-import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.jenax.util.RDFLabels;
 
 public class FilterShapeExpression extends ComplexNodeExpression {
 	
@@ -78,7 +77,6 @@ public class FilterShapeExpression extends ComplexNodeExpression {
 	
 	private boolean conforms(RDFNode node, NodeExpressionContext context) {
 		ValidationEngine engine = ValidationEngineFactory.get().create(context.getDataset(), context.getShapesGraphURI(), context.getShapesGraph(), null);
-		Resource report = engine.validateNodesAgainstShape(Collections.singletonList(node), filterShape.asNode());
-		return !report.hasProperty(SH.result);
+		return engine.nodesConformToShape(Collections.singletonList(node), filterShape.asNode());
 	}
 }

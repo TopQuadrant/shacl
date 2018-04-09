@@ -331,9 +331,9 @@ public class ValidationEngine extends AbstractEngine {
 	 * as one validation result is reported.  No results are recorded.
 	 * @param focusNodes  the nodes to validate
 	 * @param shape  the sh:Shape to validate against
-	 * @return true if there were any validation results
+	 * @return true if there were no validation results, false for violations
 	 */
-	public boolean validateNodesAgainstShapeBoolean(List<RDFNode> focusNodes, Node shape) {
+	public boolean nodesConformToShape(List<RDFNode> focusNodes, Node shape) {
 		if(!shapesGraph.isIgnored(shape)) {
 			Resource oldReport = report;
 			report = JenaUtil.createMemoryModel().createResource();

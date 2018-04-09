@@ -60,10 +60,10 @@ public abstract class AbstractJSExecutor implements ConstraintExecutor {
 		Dataset dataset = validationEngine.getDataset();
 		URI shapesGraphURI = validationEngine.getShapesGraphURI();
 		String functionName = null;
-		JSGraph shapesJSGraph = new JSGraph(dataset.getNamedModel(shapesGraphURI.toString()).getGraph(), jsEngine);
+		JSGraph shapesJSGraph = new JSGraph(validationEngine.getShapesModel().getGraph(), jsEngine);
 		Model dataModel = dataset.getDefaultModel();
 		Object oldSHACL = jsEngine.get(SHACL);
-		jsEngine.put(SHACL, new SHACLObject(shapesGraphURI, dataset));
+		jsEngine.put(SHACL, new SHACLObject(validationEngine.getShapesGraph(), shapesGraphURI, dataset));
 		JSGraph dataJSGraph = new JSGraph(dataModel.getGraph(), jsEngine);
 		try {
 			

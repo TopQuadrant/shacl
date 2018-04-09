@@ -14,7 +14,7 @@
  *  See the NOTICE file distributed with this work for additional
  *  information regarding copyright ownership.
  */
-package org.topbraid.shacl.arq.functions;
+package org.topbraid.shacl.util;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -22,50 +22,46 @@ import java.util.Set;
 import org.apache.jena.graph.Node;
 
 /**
- * A ThreadLocal structure to prevent infinite loops of tosh:hasShape calls.
+ * A ThreadLocal structure to prevent infinite loops of tosh:hasShape calls etc.
  * 
  * @author Holger Knublauch
  */
-class SHACLRecursionGuard {
+public class RecursionGuard {
 	
 	private static ThreadLocal<Set<Call>> sets = new ThreadLocal<Set<Call>>();
 	
 	
-	public static boolean start(Node resource, Node matchType) {
-		
+	public static boolean start(Node focusNode, Node shape) {
 		Set<Call> set = sets.get();
 		if(set == null) {
 			set = new HashSet<Call>();
 			sets.set(set);
 		}
-
-		Call call = new Call(resource, matchType);
+		Call call = new Call(focusNode, shape);
 		if(set.contains(call)) {
-			// System.out.println("Recursion: " + call);
 			return true;
 		}
 		else {
 			set.add(call);
-			// System.out.println("Step " + set.size() + ": " + call);
 			return false;
 		}
 	}
 	
 	
-	public static void end(Node resource, Node matchType) {
-		sets.get().remove(new Call(resource, matchType));
+	public static void end(Node focusNode, Node shape) {
+		sets.get().remove(new Call(focusNode, shape));
 	}
 	
 	
 	private static class Call {
 		
-		private Node resource;
+		private Node focusNode;
 		
 		private Node shape;
 		
 		
 		Call(Node resource, Node shape) {
-			this.resource = resource;
+			this.focusNode = resource;
 			this.shape = shape;
 		}
 		
@@ -73,7 +69,7 @@ class SHACLRecursionGuard {
 		@Override
 		public boolean equals(Object other) {
 			if(other instanceof Call) {
-				return ((Call)other).resource.equals(resource) && ((Call)other).shape.equals(shape);
+				return ((Call)other).focusNode.equals(focusNode) && ((Call)other).shape.equals(shape);
 			}
 			else {
 				return false;
@@ -83,13 +79,13 @@ class SHACLRecursionGuard {
 		
 		@Override
 		public int hashCode() {
-			return resource.hashCode() + shape.hashCode();
+			return focusNode.hashCode() + shape.hashCode();
 		}
 		
 		
 		@Override
         public String toString() {
-			return "(" + resource + ", " + shape + ")";
+			return "(" + focusNode + ", " + shape + ")";
 		}
 	}
 }

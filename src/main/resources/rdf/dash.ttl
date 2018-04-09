@@ -224,6 +224,30 @@ dash:FunctionTestCase
       sh:name "expression" ;
     ] ;
 .
+dash:GraphStoreTestCase
+  rdf:type rdfs:Class ;
+  rdf:type sh:NodeShape ;
+  rdfs:comment "A test case that can be used to verify that an RDF file could be loaded (from a file) and that the resulting RDF graph is equivalent to a given TTL file." ;
+  rdfs:label "Graph store test case" ;
+  rdfs:subClassOf dash:TestCase ;
+  sh:property [
+      rdf:type sh:PropertyShape ;
+      sh:path dash:expectedResult ;
+      sh:datatype xsd:string ;
+      sh:description "The expected RDF graph, as a Turtle string." ;
+      sh:maxCount 1 ;
+      sh:minCount 1 ;
+    ] ;
+  sh:property [
+      rdf:type sh:PropertyShape ;
+      sh:path dash:uri ;
+      sh:datatype xsd:anyURI ;
+      sh:description "The URI of the graph to load." ;
+      sh:maxCount 1 ;
+      sh:minCount 1 ;
+      sh:name "uri" ;
+    ] ;
+.
 dash:GraphUpdate
   rdf:type rdfs:Class ;
   rdfs:comment "A suggestion consisting of added and/or deleted triples, represented as rdf:Statements via dash:addedTriple and dash:deletedTriple." ;
@@ -645,6 +669,42 @@ dash:TestEnvironment
   rdfs:label "Test environment" ;
   rdfs:subClassOf rdfs:Resource ;
 .
+dash:UniqueValueForClassConstraintComponent
+  rdf:type sh:ConstraintComponent ;
+  dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
+  rdfs:comment "A constraint component that can be used to state that the values of a property must be unique for all instances of a given class (and its subclasses)." ;
+  rdfs:label "Unique value for class constraint component" ;
+  sh:labelTemplate "Values must be unique among all instances of {?uniqueValueForClass}" ;
+  sh:parameter dash:UniqueValueForClassConstraintComponent-uniqueValueForClass ;
+  sh:propertyValidator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "validateUniqueValueForClass" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+      sh:message "Value {?value} must be unique but is also used by {?other}" ;
+    ] ;
+  sh:propertyValidator [
+      rdf:type sh:SPARQLSelectValidator ;
+      sh:message "Value {?value} must be unique but is also used by {?other}" ;
+      sh:prefixes <http://datashapes.org/dash> ;
+      sh:select """SELECT DISTINCT $this ?value ?other
+WHERE {
+	{
+    	$this $PATH ?value .
+		?other $PATH ?value .
+		FILTER (?other != $this) .
+	}
+	?other a ?type .
+	?type rdfs:subClassOf* $uniqueValueForClass .
+}""" ;
+    ] ;
+  sh:targetClass sh:PropertyShape ;
+.
+dash:UniqueValueForClassConstraintComponent-uniqueValueForClass
+  rdf:type sh:Parameter ;
+  sh:path dash:uniqueValueForClass ;
+  sh:class rdfs:Class ;
+  sh:nodeKind sh:IRI ;
+.
 dash:ValidationTestCase
   rdf:type rdfs:Class ;
   rdf:type sh:NodeShape ;
@@ -1056,6 +1116,10 @@ dash:toString
   sh:select """SELECT (xsd:string($arg) AS ?result)
 WHERE {
 }""" ;
+.
+dash:uniqueValueForClass
+  rdf:type rdf:Property ;
+  rdfs:label "unique value for class" ;
 .
 dash:validateShapes
   rdf:type rdf:Property ;

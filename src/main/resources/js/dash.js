@@ -403,6 +403,26 @@ function validateUniqueLangProperty($this, $uniqueLang, $path) {
 	return results;
 }
 
+function validateUniqueValueForClass($this, $uniqueValueForClass, $path) {
+	var results = [];
+	$data.query().
+		path($this, toRDFQueryPath($path), "?value").
+		path("?other", toRDFQueryPath($path), "?value").
+		filter(function(sol) {
+				return !$this.equals(sol.other);
+			}).
+		filter(function(sol) {
+				return new RDFQueryUtil($data).isInstanceOf(sol.other, $uniqueValueForClass)
+			}).
+		forEach(function(sol) {
+			results.push({
+				other: sol.other,
+				value: sol.value
+			})
+		});
+	return results;
+}
+
 function validateXone($value, $xone) {
 	var shapes = new RDFQueryUtil($shapes).rdfListToArray($xone);
 	var count = 0;

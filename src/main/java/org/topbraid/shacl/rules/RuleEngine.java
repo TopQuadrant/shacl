@@ -253,8 +253,7 @@ public class RuleEngine extends AbstractEngine {
 	private boolean nodeConformsToAllShapes(RDFNode focusNode, Iterable<Resource> shapes) {
 		for(Resource shape : shapes) {
 			ValidationEngine engine = ValidationEngineFactory.get().create(dataset, shapesGraphURI, shapesGraph, null);
-			Resource report = engine.validateNodesAgainstShape(Collections.singletonList(focusNode), shape.asNode());
-			if(report.hasProperty(SH.result)) {
+			if(!engine.nodesConformToShape(Collections.singletonList(focusNode), shape.asNode())) {
 				return false;
 			}
 		}

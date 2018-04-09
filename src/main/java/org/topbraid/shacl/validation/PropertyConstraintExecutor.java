@@ -19,10 +19,10 @@ package org.topbraid.shacl.validation;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.RDFNode;
 import org.topbraid.shacl.engine.Constraint;
-import org.topbraid.shacl.model.SHFactory;
-import org.topbraid.shacl.model.SHPropertyShape;
+import org.topbraid.shacl.util.RecursionGuard;
 
 /**
  * Implements the special handling of sh:property by recursively calling the validator
@@ -34,16 +34,33 @@ class PropertyConstraintExecutor implements ConstraintExecutor {
 
 	@Override
 	public void executeConstraint(Constraint constraint, ValidationEngine engine, List<RDFNode> focusNodes) {
-		SHPropertyShape propertyShape = SHFactory.asPropertyShape(constraint.getParameterValue());
+		Node propertyShape = constraint.getParameterValue().asNode();
 		if(constraint.getShapeResource().isPropertyShape()) {
-			List<RDFNode> valueNodes = new LinkedList<RDFNode>();
 			for(RDFNode focusNode : focusNodes) {
-				valueNodes.addAll(engine.getValueNodes(constraint, focusNode));
+				List<RDFNode> valueNodes = engine.getValueNodes(constraint, focusNode);
+				executeHelper(engine, valueNodes, propertyShape);
 			}
-			engine.validateNodesAgainstShape(valueNodes, propertyShape.asNode());
 		}
 		else {
-			engine.validateNodesAgainstShape(focusNodes, propertyShape.asNode());
+			executeHelper(engine, focusNodes, propertyShape);
+		}
+	}
+
+	
+	private void executeHelper(ValidationEngine engine, List<RDFNode> valueNodes, Node propertyShape) {
+		List<RDFNode> doNodes = new LinkedList<>();
+		for(RDFNode focusNode : valueNodes) {
+			if(!RecursionGuard.start(focusNode.asNode(), propertyShape)) {
+				doNodes.add(focusNode);
+			}
+		}
+		try {
+			engine.validateNodesAgainstShape(doNodes, propertyShape);
+		}
+		finally {
+			for(RDFNode valueNode : doNodes) {
+				RecursionGuard.end(valueNode.asNode(), propertyShape);
+			}
 		}
 	}
 }
