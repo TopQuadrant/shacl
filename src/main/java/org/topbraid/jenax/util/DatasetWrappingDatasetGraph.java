@@ -25,6 +25,7 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.ReadWrite;
+import org.apache.jena.query.TxnType;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.shared.Lock;
 import org.apache.jena.sparql.core.DatasetGraphBase;
@@ -171,12 +172,33 @@ public class DatasetWrappingDatasetGraph extends DatasetGraphBase {
 		throw new UnsupportedOperationException();
 	}
 
-
 	@Override
 	public void begin(ReadWrite readWrite) {
-		dataset.begin(readWrite);
+	    dataset.begin(readWrite);
 	}
 
+	@Override
+	public void begin(TxnType type) {
+	    dataset.begin(type);
+	}
+
+
+	@Override
+	public boolean promote(Promote mode) {
+	    return false;
+	}
+
+
+	@Override
+	public ReadWrite transactionMode() {
+	    return dataset.transactionMode();
+	}
+
+
+	@Override
+	public TxnType transactionType() {
+	    return dataset.transactionType();
+	}
 
 	@Override
 	public void commit() {

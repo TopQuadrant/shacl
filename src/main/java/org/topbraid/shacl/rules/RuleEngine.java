@@ -240,7 +240,8 @@ public class RuleEngine extends AbstractEngine {
 	}
 	
 	
-	public Model getShapesModel() {
+	@Override
+    public Model getShapesModel() {
 		return dataset.getNamedModel(shapesGraphURI.toString());
 	}
 	
@@ -261,7 +262,8 @@ public class RuleEngine extends AbstractEngine {
 	}
 	
 	
-	public void setProgressMonitor(ProgressMonitor value) {
+	@Override
+    public void setProgressMonitor(ProgressMonitor value) {
 		this.monitor = value;
 	}
 }

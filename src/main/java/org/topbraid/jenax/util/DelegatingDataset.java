@@ -21,6 +21,7 @@ import java.util.Iterator;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.LabelExistsException;
 import org.apache.jena.query.ReadWrite;
+import org.apache.jena.query.TxnType;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.shared.Lock;
 import org.apache.jena.sparql.core.DatasetGraph;
@@ -32,7 +33,7 @@ import org.apache.jena.sparql.util.Context;
  * 
  * @author Holger Knublauch
  */
-public abstract class DelegatingDataset implements Dataset {
+public class DelegatingDataset implements Dataset {
 
 	private Dataset delegate;
 	
@@ -92,58 +93,81 @@ public abstract class DelegatingDataset implements Dataset {
 
 	
 	@Override
-	public void setDefaultModel(Model model) {
+	public Dataset setDefaultModel(Model model) {
 		delegate.setDefaultModel(model);
+		return this;
 	}
 
 	
 	@Override
-	public void addNamedModel(String uri, Model model)
-			throws LabelExistsException {
+	public Dataset addNamedModel(String uri, Model model) throws LabelExistsException {
 		delegate.addNamedModel(uri, model);
+		return this;
 	}
 
 	
 	@Override
-	public void removeNamedModel(String uri) {
+	public Dataset removeNamedModel(String uri) {
 		delegate.removeNamedModel(uri);
+        return this;
 	}
 
 	
 	@Override
-	public void replaceNamedModel(String uri, Model model) {
+	public Dataset replaceNamedModel(String uri, Model model) {
 		delegate.replaceNamedModel(uri, model);
+        return this;
 	}
-
 	
 	@Override
 	public Context getContext() {
 		return delegate.getContext();
 	}
-
 	
 	@Override
 	public boolean supportsTransactions() {
 		return delegate.supportsTransactions();
 	}
-
 	
 	@Override
 	public boolean supportsTransactionAbort() {
 		return delegate.supportsTransactionAbort();
 	}
 
+    @Override
+    public void begin(TxnType type) {
+        delegate.begin(type);
+    }
+
 	@Override
 	public void begin(ReadWrite readWrite) {
 		delegate.begin(readWrite);
 	}
 
-	
-	@Override
+    @Override
+    public boolean promote(Promote mode) {
+        return delegate.promote(mode);
+    }
+
+    @Override
+    public TxnType transactionType() {
+        return delegate.transactionType();
+    }
+
+    @Override
+    public ReadWrite transactionMode() {
+        return delegate.transactionMode();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
+
+    @Override
 	public void commit() {
 		delegate.commit();
 	}
-
 	
 	@Override
 	public void abort() {
