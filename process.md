@@ -143,6 +143,8 @@ To push them up to central.maven, go to https://oss.sonatype.org/
 
 Note from 1.0.1: this happened automatically. The rules ran as part of `release:perform`.
 
+The release artifacts end up in "Repositories -> Releases -> org.topbraid".
+
 ### Clearup
 
 Check where any intermediate files are left over.
