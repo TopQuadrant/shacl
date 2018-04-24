@@ -145,6 +145,10 @@ Note from 1.0.1: this happened automatically. The rules ran as part of `release:
 
 The release artifacts end up in "Repositories -> Releases -> org.topbraid".
 
+### Github
+
+Do a Github release using the tag `shacl-x.y.z` above.
+
 ### Clearup
 
 Check where any intermediate files are left over.
