@@ -116,6 +116,7 @@ It still says "SNAPSHOT" because the dry run does not change the version in POM.
 This has two steps:
 
 `mvn release:clean release:prepare  -Prelease $KEY $VER`
+
 `mvn release:perform -Prelease $KEY $VER`
 
 ### If it goes wrong:
