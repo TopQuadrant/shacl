@@ -101,7 +101,7 @@ mvn release:clean release:prepare -DdryRun=true -Prelease $VER $KEY
 
 Look in `target/`.
 
-You should see various files built including thebinary ".bin.zip", the
+You should see various files built including the binary ".bin.zip", the
 javadoc (which is only done in the release cycle), `sources`, `tests`
 and `test-sources`. The files should have been signed and `.asc` files
 created.
