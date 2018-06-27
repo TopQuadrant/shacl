@@ -41,8 +41,12 @@ import org.topbraid.shacl.vocabulary.TOSH;
  */
 public class ValidationUtil {
 
-	
+
 	public static ValidationEngine createValidationEngine(Model dataModel, Model shapesModel, boolean validateShapes) {
+		return createValidationEngine(dataModel, shapesModel, new ValidationEngineConfiguration().setValidateShapes(validateShapes));
+	}
+
+	public static ValidationEngine createValidationEngine(Model dataModel, Model shapesModel, ValidationEngineConfiguration configuration) {
 		// Ensure that the SHACL, DASH and TOSH graphs are present in the shapes Model
 		if(!shapesModel.contains(TOSH.hasShape, RDF.type, (RDFNode)null)) { // Heuristic
 			Model unionModel = SHACLSystemModel.getSHACLModel();
@@ -55,7 +59,7 @@ public class ValidationUtil {
 
 		// Make sure all sh:Functions are registered
 		SHACLFunctions.registerFunctions(shapesModel);
-		
+
 		// Create Dataset that contains both the data model and the shapes model
 		// (here, using a temporary URI for the shapes graph)
 		URI shapesGraphURI = URI.create("urn:x-shacl-shapes-graph:" + UUID.randomUUID().toString());
@@ -63,13 +67,13 @@ public class ValidationUtil {
 		dataset.addNamedModel(shapesGraphURI.toString(), shapesModel);
 
 		ShapesGraph shapesGraph = new ShapesGraph(shapesModel);
-		if(!validateShapes) {
-			shapesGraph.setShapeFilter(new ExcludeMetaShapesFilter());
-		}
-		return ValidationEngineFactory.get().create(dataset, shapesGraphURI, shapesGraph, null);
+
+		ValidationEngine engine = ValidationEngineFactory.get().create(dataset, shapesGraphURI, shapesGraph, null);
+		engine.setConfiguration(configuration);
+		return engine;
 	}
 
-	
+
 	/**
 	 * Validates a given data Model against all shapes from a given shapes Model.
 	 * If the shapesModel does not include the system graph triples then these will be added.
@@ -80,8 +84,22 @@ public class ValidationUtil {
 	 * @return an instance of sh:ValidationReport in a results Model
 	 */
 	public static Resource validateModel(Model dataModel, Model shapesModel, boolean validateShapes) {
-		
-		ValidationEngine engine = createValidationEngine(dataModel, shapesModel, validateShapes);
+		return validateModel(dataModel, shapesModel, new ValidationEngineConfiguration().setValidateShapes(validateShapes));
+	}
+
+	/**
+	 * Validates a given data Model against all shapes from a given shapes Model.
+	 * If the shapesModel does not include the system graph triples then these will be added.
+	 * Entailment regimes are applied prior to validation.
+	 * @param dataModel  the data Model
+	 * @param shapesModel  the shapes Model
+	 * @param configuration  configuration for the validation engine
+	 * @return an instance of sh:ValidationReport in a results Model
+	 */
+	public static Resource validateModel(Model dataModel, Model shapesModel, ValidationEngineConfiguration configuration) {
+
+		ValidationEngine engine = createValidationEngine(dataModel, shapesModel, configuration);
+		engine.setConfiguration(configuration);
 		try {
 			engine.applyEntailments();
 			return engine.validateAll();

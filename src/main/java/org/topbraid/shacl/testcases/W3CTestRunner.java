@@ -50,6 +50,7 @@ import org.topbraid.shacl.engine.filters.CoreConstraintFilter;
 import org.topbraid.shacl.engine.filters.ExcludeMetaShapesFilter;
 import org.topbraid.shacl.util.ModelPrinter;
 import org.topbraid.shacl.validation.ValidationEngine;
+import org.topbraid.shacl.validation.ValidationEngineConfiguration;
 import org.topbraid.shacl.validation.ValidationEngineFactory;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.MF;
@@ -242,11 +243,12 @@ public class W3CTestRunner {
 			dataset.addNamedModel(shapesGraphURI.toString(), shapesModel);
 
 			ShapesGraph shapesGraph = new ShapesGraph(shapesModel);
-			shapesGraph.setShapeFilter(new ExcludeMetaShapesFilter());
+			ValidationEngineConfiguration configuration = new ValidationEngineConfiguration().setValidateShapes(false);
 			if(entry.hasProperty(ResourceFactory.createProperty(MF.NS + "requires"), SHT.CoreOnly)) {
 				shapesGraph.setConstraintFilter(new CoreConstraintFilter());
 			}
 			ValidationEngine engine = ValidationEngineFactory.get().create(dataset, shapesGraphURI, shapesGraph, null);
+			engine.setConfiguration(configuration);
 			try {
 				Resource actualReport = engine.validateAll();
 				Model actualResults = actualReport.getModel();
