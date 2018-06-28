@@ -22,7 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.jena.datatypes.TypeMapper;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
@@ -38,9 +38,9 @@ import org.apache.jena.vocabulary.XSD;
  */
 public class JenaDatatypes {
 	
-	public static final Literal FALSE = ResourceFactory.createTypedLiteral("false", TypeMapper.getInstance().getSafeTypeByName(XSD.xboolean.getURI()));
+	public static final Literal FALSE = ResourceFactory.createTypedLiteral("false", XSDDatatype.XSDboolean);
 	
-	public static final Literal TRUE = ResourceFactory.createTypedLiteral("true", TypeMapper.getInstance().getSafeTypeByName(XSD.xboolean.getURI()));
+	public static final Literal TRUE = ResourceFactory.createTypedLiteral("true", XSDDatatype.XSDboolean);
 
 	private static Set<String> floatDatatypeURIs = new HashSet<>();
 
@@ -108,14 +108,12 @@ public class JenaDatatypes {
 
 	
 	public static Literal createDecimal(int value) {
-		return ResourceFactory.createTypedLiteral("" + value, TypeMapper.getInstance()
-				.getSafeTypeByName(XSD.decimal.getURI()));
+		return ResourceFactory.createTypedLiteral("" + value, XSDDatatype.XSDdecimal);
 	}
 
 	
 	public static Literal createInteger(int value) {
-		return ResourceFactory.createTypedLiteral("" + value, TypeMapper.getInstance()
-				.getSafeTypeByName(XSD.integer.getURI()));
+		return ResourceFactory.createTypedLiteral("" + value, XSDDatatype.XSDinteger);
 	}
 
 

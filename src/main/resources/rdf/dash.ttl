@@ -193,6 +193,12 @@ dash:DefaultValueTypeRule
 		}
 		""" ;
 .
+dash:ExecutionPlatform
+  rdf:type rdfs:Class ;
+  rdfs:comment "An platform (such as TopBraid) that may have features needed to execute, for example, SPARQL queries." ;
+  rdfs:label "Execution platform" ;
+  rdfs:subClassOf rdfs:Resource ;
+.
 dash:FailureResult
   rdf:type rdfs:Class ;
   rdfs:comment "A result representing a validation failure such as an unsupported recursion." ;
@@ -264,7 +270,7 @@ dash:HasValueWithClassConstraintComponent
   rdf:type sh:ConstraintComponent ;
   rdfs:comment "A constraint component that can be used to express a constraint on property shapes so that one of the values of the property path must be an instance of a given class." ;
   rdfs:label "Has value with class constraint component" ;
-  sh:message "At least one of the values must have class {$hasValueWithClass}" ;
+  sh:message "At least one of the values must be an instance of class {$hasValueWithClass}" ;
   sh:parameter dash:HasValueWithClassConstraintComponent-hasValueWithClass ;
   sh:propertyValidator [
       rdf:type sh:JSValidator ;
@@ -478,6 +484,7 @@ dash:PrimaryKeyConstraintComponent-uriStart
   sh:path dash:uriStart ;
   sh:datatype xsd:string ;
   sh:description "The start of the URIs of well-formed resources." ;
+  sh:group tosh:OtherConstraintPropertyGroup ;
   sh:name "URI start" ;
 .
 dash:QueryTestCase
@@ -630,6 +637,36 @@ dash:SuggestionResult
   rdfs:comment "Class of results that have been produced as suggestions, not through SHACL validation. How the actual results are produced is up to implementers. Each instance of this class should have values for sh:focusNode, sh:resultMessage, sh:resultSeverity (suggested default: sh:Info), and dash:suggestion to point at one or more suggestions." ;
   rdfs:label "Suggestion result" ;
   rdfs:subClassOf sh:AbstractResult ;
+.
+dash:SymmetricConstraintComponent
+  rdf:type sh:ConstraintComponent ;
+  rdfs:comment "A contraint component for property shapes to validate that a property is symmetric. For symmetric properties, if A relates to B then B must relate to A." ;
+  rdfs:label "Symmetric constraint component" ;
+  sh:message "Symmetric value expected" ;
+  sh:parameter dash:SymmetricConstraintComponent-symmetric ;
+  sh:propertyValidator [
+      rdf:type sh:JSValidator ;
+      sh:jsFunctionName "validateSymmetric" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
+  sh:propertyValidator [
+      rdf:type sh:SPARQLSelectValidator ;
+      sh:prefixes <http://datashapes.org/dash> ;
+      sh:select """SELECT $this ?value {
+	FILTER ($symmetric) .
+	$this $PATH ?value .
+	FILTER NOT EXISTS {
+    	$value $PATH $this .
+	}
+}""" ;
+    ] ;
+  sh:targetClass sh:PropertyShape ;
+.
+dash:SymmetricConstraintComponent-symmetric
+  rdf:type sh:Parameter ;
+  sh:path dash:symmetric ;
+  sh:datatype xsd:boolean ;
+  sh:group tosh:RelationshipPropertyGroup ;
 .
 dash:TestCase
   rdf:type rdfs:Class ;
@@ -913,6 +950,13 @@ dash:height
   rdfs:label "height" ;
   rdfs:range xsd:integer ;
 .
+dash:includedExecutionPlatform
+  rdf:type rdf:Property ;
+  rdfs:comment "Can be used to state that one (subject) execution platform includes all features of another platform (object)." ;
+  rdfs:domain dash:ExecutionPlatform ;
+  rdfs:label "included execution platform" ;
+  rdfs:range dash:ExecutionPlatform ;
+.
 dash:isDeactivated
   rdf:type sh:SPARQLFunction ;
   rdfs:comment "Checks whether a given shape or constraint has been marked as \"deactivated\" using sh:deactivated." ;
@@ -1027,6 +1071,13 @@ dash:propertySuggestionGenerator
   rdfs:label "property suggestion generator" ;
   rdfs:range dash:SuggestionGenerator ;
 .
+dash:requiredExecutionPlatform
+  rdf:type rdf:Property ;
+  rdfs:comment "Links a SPARQL executable with the platforms that it can be executed on. This can be used by a SHACL implementation to determine whether a constraint validator or rule shall be ignored based on the current platform. For example, if a SPARQL query uses a function or magic property that is only available in TopBraid then a non-TopBraid platform can ignore the constraint (or simply always return no validation results). If this property has no value then the assumption is that the execution will succeed. As soon as one value exists, the assumption is that the engine supports at least one of the given platforms." ;
+  rdfs:domain sh:SPARQLExecutable ;
+  rdfs:label "required execution platform" ;
+  rdfs:range dash:ExecutionPlatform ;
+.
 dash:rootClass
   rdf:type rdf:Property ;
   rdfs:label "root class" ;
@@ -1081,6 +1132,11 @@ dash:suggestionGroup
   rdfs:comment "Can be used to link a suggestion with the group identifier to which it belongs. By default this is a link to the dash:SuggestionGenerator, but in principle this could be any value." ;
   rdfs:domain dash:Suggestion ;
   rdfs:label "suggestion" ;
+.
+dash:symmetric
+  rdf:type rdf:Property ;
+  rdfs:comment "True to declare that the associated property path is symmetric." ;
+  rdfs:label "symmetric" ;
 .
 dash:testEnvironment
   rdf:type rdf:Property ;

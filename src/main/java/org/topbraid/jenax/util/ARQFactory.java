@@ -18,7 +18,6 @@
 package org.topbraid.jenax.util;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -164,14 +163,12 @@ public class ARQFactory {
 		    	perhapsAppend(queryString, prefix, ns, model);
 	    	}
 	    }
-	    Iterator<String> prefixes = model.getNsPrefixMap().keySet().iterator();
-	    while (prefixes.hasNext()) {
-	        String prefix = prefixes.next();
-	    	String namespace = JenaUtil.getNsPrefixURI(model, prefix);
-	        if(prefix.length() > 0 && namespace != null) {
-	        	queryString.append("PREFIX " + prefix + ": <" + namespace + ">\n");
-	        }
-	    }
+	    
+	    Map<String, String> map = model.getNsPrefixMap();
+	    map.forEach((prefix,namespace)->{
+	        if ( ! prefix.isEmpty() && namespace != null )
+	            queryString.append("PREFIX " + prefix + ": <" + namespace + ">\n");
+	    });
 	    return queryString.toString();
 	}
 	
@@ -231,12 +228,12 @@ public class ARQFactory {
 	    		pm.setNsPrefix(prefix, ns);
 	    	}
 	    }
-	    for(String prefix : model.getNsPrefixMap().keySet()) {
-	    	String namespace = JenaUtil.getNsPrefixURI(model, prefix);
-	        if(prefix.length() > 0 && namespace != null) {
-	        	pm.setNsPrefix(prefix, namespace);
-	        }
-	    }
+
+	    // Get all the prefixes from the model at once.
+	    Map<String, String> map = model.getNsPrefixMap();
+	    map.remove("");
+	    pm.setNsPrefixes(map);
+	    
 		return doCreateQuery(partialQuery, pm);
 	}
 
@@ -390,10 +387,15 @@ public class ARQFactory {
 	 * Returns a new DatasetImpl by default but may be overloaded in subclasses.
 	 * For example, TopBraid delegates this to the currently open Graphs.
 	 * @param defaultModel  the default Model of the Dataset
-	 * @return the Dataset or null
+	 * @return the Dataset
 	 */
 	public Dataset getDataset(Model defaultModel) {
-		return new DatasetImpl(defaultModel);
+		if(defaultModel != null) {
+			return new DatasetImpl(defaultModel);
+		}
+		else {
+			return new DatasetImpl(JenaUtil.createMemoryModel());
+		}
 	}
 	
 	

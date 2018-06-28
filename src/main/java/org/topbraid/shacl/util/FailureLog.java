@@ -16,6 +16,8 @@
  */
 package org.topbraid.shacl.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.topbraid.shacl.vocabulary.SH;
 
 /**
@@ -25,6 +27,8 @@ import org.topbraid.shacl.vocabulary.SH;
  * @author Holger Knublauch
  */
 public class FailureLog {
+	
+	private Logger logger = LoggerFactory.getLogger(FailureLog.class);
 
 	private static FailureLog singleton = new FailureLog();
 	
@@ -38,6 +42,11 @@ public class FailureLog {
 	
 	
 	public void logFailure(String message) {
-		System.err.println(SH.NAME + " Validation Failure: " + message);
+		logger.error(SH.NAME + " Failure: " + message);
+	}
+	
+	
+	public void logWarning(String message) {
+		logger.warn(SH.NAME + " Warning: " + message);
 	}
 }

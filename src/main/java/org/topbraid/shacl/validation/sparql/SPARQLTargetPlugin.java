@@ -32,6 +32,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.topbraid.jenax.util.ARQFactory;
 import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.model.SHParameterizableTarget;
+import org.topbraid.shacl.util.ExecutionPlatform;
 import org.topbraid.shacl.validation.SHACLException;
 import org.topbraid.shacl.validation.TargetPlugin;
 import org.topbraid.shacl.vocabulary.SH;
@@ -40,7 +41,7 @@ public class SPARQLTargetPlugin implements TargetPlugin {
 
 	@Override
 	public boolean canExecuteTarget(Resource target) {
-		return target.hasProperty(SH.select);
+		return target.hasProperty(SH.select) && ExecutionPlatform.canExecute(target);
 	}
 
 	
@@ -64,7 +65,7 @@ public class SPARQLTargetPlugin implements TargetPlugin {
 			parameterizableTarget.addBindings(bindings);
 		}
 		try(QueryExecution qexec = SPARQLSubstitutions.createQueryExecution(query, dataset, bindings)) {
-		    Set<RDFNode> results = new HashSet<RDFNode>();
+		    Set<RDFNode> results = new HashSet<>();
 		    ResultSet rs = qexec.execSelect();
 		    List<String> varNames = rs.getResultVars();
 		    while(rs.hasNext()) {
@@ -122,8 +123,7 @@ public class SPARQLTargetPlugin implements TargetPlugin {
 			}
 			try(QueryExecution qexec = SPARQLSubstitutions.createQueryExecution(query, dataset, bindings)) {
 			    ResultSet rs = qexec.execSelect();
-			    boolean hasNext = rs.hasNext();
-			    return hasNext;
+			    return rs.hasNext();
 			}
 		}
 	}
@@ -132,7 +132,7 @@ public class SPARQLTargetPlugin implements TargetPlugin {
 	private static Query getSPARQLWithSelect(Resource host) {
 		String sparql = JenaUtil.getStringProperty(host, SH.select);
 		if(sparql == null) {
-			throw new SHACLException("Missing sh:sparql at " + host);
+			throw new SHACLException("Missing sh:select at " + host);
 		}
 		try {
 			return ARQFactory.get().createQuery(SPARQLSubstitutions.withPrefixes(sparql, host));

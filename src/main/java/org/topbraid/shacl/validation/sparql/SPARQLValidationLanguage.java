@@ -16,7 +16,9 @@
  */
 package org.topbraid.shacl.validation.sparql;
 
+import org.apache.jena.rdf.model.Resource;
 import org.topbraid.shacl.engine.Constraint;
+import org.topbraid.shacl.util.ExecutionPlatform;
 import org.topbraid.shacl.validation.ConstraintExecutor;
 import org.topbraid.shacl.validation.ValidationLanguage;
 import org.topbraid.shacl.vocabulary.SH;
@@ -32,7 +34,8 @@ public class SPARQLValidationLanguage implements ValidationLanguage {
 	
 	@Override
 	public boolean canExecute(Constraint constraint) {
-		return constraint.getComponent().getValidator(SH.SPARQLExecutable, constraint.getContext()) != null;
+		Resource validator = constraint.getComponent().getValidator(SH.SPARQLExecutable, constraint.getContext());
+		return validator != null && ExecutionPlatform.canExecute(validator); 
 	}
 
 	

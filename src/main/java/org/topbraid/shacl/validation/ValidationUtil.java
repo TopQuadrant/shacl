@@ -41,17 +41,8 @@ import org.topbraid.shacl.vocabulary.TOSH;
  */
 public class ValidationUtil {
 
-	/**
-	 * Validates a given data Model against all shapes from a given shapes Model.
-	 * If the shapesModel does not include the system graph triples then these will be added.
-	 * Entailment regimes are applied prior to validation.
-	 * @param dataModel  the data Model
-	 * @param shapesModel  the shapes Model
-	 * @param validateShapes  true to also validate any shapes in the data Model (false is faster)
-	 * @return an instance of sh:ValidationReport in a results Model
-	 */
-	public static Resource validateModel(Model dataModel, Model shapesModel, boolean validateShapes) {
-		
+	
+	public static ValidationEngine createValidationEngine(Model dataModel, Model shapesModel, boolean validateShapes) {
 		// Ensure that the SHACL, DASH and TOSH graphs are present in the shapes Model
 		if(!shapesModel.contains(TOSH.hasShape, RDF.type, (RDFNode)null)) { // Heuristic
 			Model unionModel = SHACLSystemModel.getSHACLModel();
@@ -75,7 +66,22 @@ public class ValidationUtil {
 		if(!validateShapes) {
 			shapesGraph.setShapeFilter(new ExcludeMetaShapesFilter());
 		}
-		ValidationEngine engine = ValidationEngineFactory.get().create(dataset, shapesGraphURI, shapesGraph, null);
+		return ValidationEngineFactory.get().create(dataset, shapesGraphURI, shapesGraph, null);
+	}
+
+	
+	/**
+	 * Validates a given data Model against all shapes from a given shapes Model.
+	 * If the shapesModel does not include the system graph triples then these will be added.
+	 * Entailment regimes are applied prior to validation.
+	 * @param dataModel  the data Model
+	 * @param shapesModel  the shapes Model
+	 * @param validateShapes  true to also validate any shapes in the data Model (false is faster)
+	 * @return an instance of sh:ValidationReport in a results Model
+	 */
+	public static Resource validateModel(Model dataModel, Model shapesModel, boolean validateShapes) {
+		
+		ValidationEngine engine = createValidationEngine(dataModel, shapesModel, validateShapes);
 		try {
 			engine.applyEntailments();
 			return engine.validateAll();

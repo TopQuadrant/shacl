@@ -37,6 +37,20 @@ dash:RootClassConstraintComponent
 dash:StemConstraintComponent-stem
   sh:group tosh:StringBasedConstraintPropertyGroup ;
 .
+dash:SymmetricConstraintComponent
+  dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
+  dash:propertySuggestionGenerator [
+      rdf:type dash:SPARQLUpdateSuggestionGenerator ;
+      sh:message "Add symmetric value." ;
+      sh:order "0"^^xsd:decimal ;
+      sh:prefixes <http://topbraid.org/tosh> ;
+      sh:update """INSERT {
+    $value $predicate $focusNode .
+}
+WHERE {
+}""" ;
+    ] ;
+.
 <http://spinrdf.org/sp#>
   tosh:systemNamespace "true"^^xsd:boolean ;
 .
@@ -84,14 +98,14 @@ tosh:AboutPropertyGroup
 .
 tosh:CardinalityConstraintPropertyGroup
   rdf:type sh:PropertyGroup ;
-  rdfs:label "Cardinality" ;
+  rdfs:label "Number of Values" ;
   sh:order 2 ;
 .
 tosh:ComplexConstraintPropertyGroup
   rdf:type sh:PropertyGroup ;
   tosh:editGroupDescription "Most edit fields in this section currently require Turtle source code, esp to enter blank node expressions. To reference existing shapes via their URI, enter them as <URI>." ;
   tosh:openable "true"^^xsd:boolean ;
-  rdfs:label "Complex Constraints" ;
+  rdfs:label "Complex Constraint Expressions" ;
   sh:order 9 ;
 .
 tosh:ConstraintMetadataPropertyGroup
@@ -114,7 +128,7 @@ WHERE {
 tosh:DisplayPropertyGroup
   rdf:type sh:PropertyGroup ;
   rdfs:comment "A group for properties that are primarily for display purposes (names, ordering etc)." ;
-  rdfs:label "Display" ;
+  rdfs:label "Display Settings" ;
   sh:order 1 ;
 .
 tosh:MemberShapeConstraintComponent
@@ -164,7 +178,7 @@ tosh:PropertyGroupShape
 tosh:PropertyPairConstraintPropertyGroup
   rdf:type sh:PropertyGroup ;
   tosh:openable "true"^^xsd:boolean ;
-  rdfs:label "Property Pairs" ;
+  rdfs:label "Relationship to Other Properties" ;
   sh:order 6 ;
 .
 tosh:PropertyShapeShape
@@ -361,7 +375,7 @@ tosh:ShapeShape-severity
 tosh:StringBasedConstraintPropertyGroup
   rdf:type sh:PropertyGroup ;
   tosh:openable "true"^^xsd:boolean ;
-  rdfs:label "String Constraints" ;
+  rdfs:label "Constraints for Strings and Text" ;
   sh:order 7 ;
 .
 tosh:SystemNamespaceShape
@@ -381,6 +395,17 @@ WHERE {
 			} )) .
 }""" ;
     ] ;
+.
+tosh:TeamworkPlatform
+  rdf:type dash:ExecutionPlatform ;
+  dash:includedExecutionPlatform tosh:TopBraidPlatform ;
+  rdfs:comment "The platform consisting of TopBraid plus any teamwork features used by TopBraid EDG." ;
+  rdfs:label "Teamwork platform" ;
+.
+tosh:TopBraidPlatform
+  rdf:type dash:ExecutionPlatform ;
+  rdfs:comment "The platform consisting of TopBraid." ;
+  rdfs:label "TopBraid platform" ;
 .
 tosh:UseDeclaredDatatypeConstraintComponent
   rdf:type sh:ConstraintComponent ;
@@ -427,14 +452,14 @@ WHERE {
 tosh:ValueRangeConstraintPropertyGroup
   rdf:type sh:PropertyGroup ;
   tosh:openable "true"^^xsd:boolean ;
-  rdfs:label "Value Range" ;
+  rdfs:label "Min/Max Values" ;
   sh:order 5 ;
 .
 tosh:ValueTypeConstraintPropertyGroup
   rdf:type sh:PropertyGroup ;
   tosh:editGroupDescription "Hint: Use \"or\" under Complex Constraints to represent choices between multiple value types." ;
   rdfs:comment "A property group for constraint parameters that restrict the value types of values." ;
-  rdfs:label "Value Type" ;
+  rdfs:label "Type of Values" ;
   sh:order 3 ;
 .
 tosh:countShapesWithMatchResult
@@ -725,6 +750,31 @@ sh:AndConstraintComponent-and
 sh:ClassConstraintComponent
   dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
   dash:propertySuggestionGenerator tosh:ReplaceWithDefaultValueSuggestionGenerator ;
+  dash:propertySuggestionGenerator [
+      rdf:type dash:SPARQLUpdateSuggestionGenerator ;
+      sh:message "Set type of {$value} to {$class}" ;
+      sh:prefixes <http://topbraid.org/tosh> ;
+      sh:select """SELECT ?class
+WHERE {
+    GRAPH $shapesGraph {
+		$sourceShape sh:class ?class .
+	}
+	FILTER NOT EXISTS {
+		?class dash:abstract true .
+	}
+}""" ;
+      sh:update """DELETE {
+    $value rdf:type ?oldType .
+}
+INSERT {
+    $value rdf:type $class .
+}
+WHERE {
+    OPTIONAL {
+		$value rdf:type ?oldType .
+	}
+}""" ;
+    ] ;
 .
 sh:ClassConstraintComponent-class
   sh:group tosh:ValueTypeConstraintPropertyGroup ;

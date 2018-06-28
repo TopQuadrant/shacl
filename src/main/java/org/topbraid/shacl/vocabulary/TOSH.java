@@ -33,7 +33,11 @@ public class TOSH {
 
     public final static String PREFIX = "tosh";
 
-    
+
+    public final static Resource TeamworkPlatform = ResourceFactory.createResource(NS + "TeamworkPlatform");
+
+    public final static Resource TopBraidPlatform = ResourceFactory.createResource(NS + "TopBraidPlatform");
+
     public final static Resource evalExpr = ResourceFactory.createResource(NS + "evalExpr");
     
     public final static Resource hasShape = ResourceFactory.createResource(NS + "hasShape");

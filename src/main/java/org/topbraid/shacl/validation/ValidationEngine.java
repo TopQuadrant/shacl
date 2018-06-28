@@ -379,7 +379,7 @@ public class ValidationEngine extends AbstractEngine {
 			}
 		}
 		else {
-			FailureLog.get().logFailure("No suitable validator found for constraint " + constraint);
+			FailureLog.get().logWarning("No suitable validator found for constraint " + constraint);
 		}
 	}
 }

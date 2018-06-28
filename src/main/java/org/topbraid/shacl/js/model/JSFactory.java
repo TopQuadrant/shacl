@@ -20,10 +20,10 @@ import java.util.Map;
 
 import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.datatypes.TypeMapper;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
-import org.apache.jena.vocabulary.XSD;
 import org.topbraid.jenax.util.JenaDatatypes;
 
 public class JSFactory {
@@ -90,7 +90,7 @@ public class JSFactory {
 			return JenaDatatypes.createInteger((Integer)obj).asNode();
 		}
 		else if(obj instanceof Number) {
-			return NodeFactory.createLiteral(obj.toString(), TypeMapper.getInstance().getSafeTypeByName(XSD.decimal.getURI()));
+			return NodeFactory.createLiteral(obj.toString(), XSDDatatype.XSDdecimal);
 		}
 		else if(obj instanceof Boolean) {
 			return ((Boolean)obj) ? JenaDatatypes.TRUE.asNode() : JenaDatatypes.FALSE.asNode();

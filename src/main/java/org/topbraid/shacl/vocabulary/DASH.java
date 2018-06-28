@@ -36,6 +36,8 @@ public class DASH {
 
 	public final static Resource DefaultValueTypeRule = ResourceFactory.createResource(NS + "DefaultValueTypeRule");
 
+    public final static Resource ExecutionPlatform = ResourceFactory.createResource(NS + "ExecutionPlatform");
+
     public final static Resource FailureResult = ResourceFactory.createResource(NS + "FailureResult");
     
     public final static Resource FailureTestCaseResult = ResourceFactory.createResource(NS + "FailureTestCaseResult");
@@ -96,6 +98,8 @@ public class DASH {
     public final static Property expectedResultIsTTL = ResourceFactory.createProperty(NS + "expectedResultIsTTL");
 
     public final static Property expression = ResourceFactory.createProperty(NS + "expression");
+    
+    public final static Property includedExecutionPlatform = ResourceFactory.createProperty(NS + "includedExecutionPlatform");
 
     public final static Property includeSuggestions = ResourceFactory.createProperty(NS + "includeSuggestions");
     
@@ -104,6 +108,8 @@ public class DASH {
     public final static Property private_ = ResourceFactory.createProperty(NS + "private");
     
     public final static Property propertySuggestionGenerator = ResourceFactory.createProperty(NS + "propertySuggestionGenerator");
+    
+    public final static Property requiredExecutionPlatform = ResourceFactory.createProperty(NS + "requiredExecutionPlatform");
 
     public final static Property rootClass = ResourceFactory.createProperty(NS + "rootClass");
 

@@ -68,6 +68,11 @@ public abstract class AbstractSPARQLExecutor implements ConstraintExecutor {
 		this.queryString = getSPARQL(constraint);
 		try {
 			this.query = ARQFactory.get().createQuery(queryString);
+			Resource path = constraint.getShapeResource().getPath();
+			if(path != null && path.isAnon()) {
+				String pathString = SHACLPaths.getPathString(JenaUtil.getResourceProperty(constraint.getShapeResource(), SH.path));
+				query = SPARQLSubstitutions.substitutePaths(query, pathString, constraint.getShapeResource().getModel());
+			}
 		}
 		catch(QueryParseException ex) {
 			throw new SHACLException("Invalid SPARQL constraint (" + ex.getLocalizedMessage() + "):\n" + queryString);
@@ -88,14 +93,8 @@ public abstract class AbstractSPARQLExecutor implements ConstraintExecutor {
 		bindings.add(SH.shapesGraphVar.getVarName(), ResourceFactory.createResource(engine.getShapesGraphURI().toString()));
 		
 		Resource path = constraint.getShapeResource().getPath();
-		if(path != null) {
-			if(path.isAnon()) {
-				String pathString = SHACLPaths.getPathString(JenaUtil.getResourceProperty(constraint.getShapeResource(), SH.path));
-				query = SPARQLSubstitutions.substitutePaths(query, pathString, constraint.getShapeResource().getModel());
-			}
-			else {
-				bindings.add(SH.PATHVar.getName(), path);
-			}
+		if(path != null && path.isURIResource()) {
+			bindings.add(SH.PATHVar.getName(), path);
 		}
 		
 		URI oldShapesGraphURI = HasShapeFunction.getShapesGraphURI();

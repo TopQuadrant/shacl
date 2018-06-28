@@ -16,12 +16,13 @@
  */
 package org.topbraid.shacl.rules;
 
+import java.util.Iterator;
 import java.util.List;
 
+import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QuerySolutionMap;
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
@@ -60,9 +61,10 @@ public class SPARQLRule extends Rule {
 			QuerySolutionMap bindings = new QuerySolutionMap();
 			bindings.add(SH.thisVar.getVarName(), focusNode);
 			try(QueryExecution qexec = ARQFactory.get().createQueryExecution(query, ruleEngine.getDataset(), bindings)) {
-				Model constructed = qexec.execConstruct();
-				for(Statement s : constructed.listStatements().toList()) {
-					ruleEngine.infer(s.asTriple(), this, shape);
+				Iterator<Triple> it = qexec.execConstructTriples();
+				while(it.hasNext()) {
+					Triple triple = it.next();
+					ruleEngine.infer(triple, this, shape);
 				}
 			}
 		}

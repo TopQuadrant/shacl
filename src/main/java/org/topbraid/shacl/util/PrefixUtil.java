@@ -19,11 +19,10 @@ package org.topbraid.shacl.util;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.jena.datatypes.TypeMapper;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.OWL;
-import org.apache.jena.vocabulary.XSD;
 import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.vocabulary.SH;
 
@@ -38,7 +37,7 @@ public class PrefixUtil {
 		Resource declaration = ontology.getModel().createResource(namespace + SH.PrefixDeclaration.getLocalName(), SH.PrefixDeclaration);
 		ontology.addProperty(SH.declare, declaration);
 		declaration.addProperty(SH.prefix, prefix);
-		declaration.addProperty(SH.namespace, ResourceFactory.createTypedLiteral(namespace, TypeMapper.getInstance().getSafeTypeByName(XSD.anyURI.getURI())));
+		declaration.addProperty(SH.namespace, ResourceFactory.createTypedLiteral(namespace, XSDDatatype.XSDanyURI));
 		return declaration;
 	}
 	

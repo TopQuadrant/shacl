@@ -57,7 +57,11 @@ public class CurrentThreadFunctions {
 
 	private FunctionFactory getFunctionFactoryFromModel(String uri) {
 		Resource functionResource = model.getResource(uri);
-		FunctionFactory arqFunction = DeclarativeFunctionDrivers.get().create(functionResource);
+		DeclarativeFunctionDrivers drivers = DeclarativeFunctionDrivers.get();
+		if (drivers == null) {
+			return null;
+		}
+		FunctionFactory arqFunction = drivers.create(functionResource);
 		if(arqFunction != null) {
 			functionsCache.put(uri, arqFunction);
 			return arqFunction;

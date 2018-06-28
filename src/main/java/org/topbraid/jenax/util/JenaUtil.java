@@ -592,9 +592,8 @@ public class JenaUtil {
 
 	
 	/**
-	 * Overcomes a bug in Jena: if the base model does not declare a default namespace then the
-	 * default namespace of an import is returned!
-	 * 
+	 * Overcomes a design mismatch with Jena: if the base model does not declare a default namespace then the
+	 * default namespace of an import is returned - this is not desirable for TopBraid-like scenarios.
 	 * @param model the Model to operate on
 	 * @param prefix the prefix to get the URI of
 	 * @return the URI of prefix

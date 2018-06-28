@@ -45,7 +45,7 @@ public class JSGraph {
 	
 	public void close() {
 		if(!openIterators.isEmpty()) {
-			FailureLog.get().logFailure("JavaScript graph session ended but " + openIterators.size() + " iterators have not been closed. Make sure to close them programmatically to avoid resource leaks and locking problems.");
+			FailureLog.get().logWarning("JavaScript graph session ended but " + openIterators.size() + " iterators have not been closed. Make sure to close them programmatically to avoid resource leaks and locking problems.");
 		}
 		closeIterators();
 	}
