@@ -138,10 +138,8 @@ To push them up to central.maven, go to https://oss.sonatype.org/
 * Find repo (it's open) `orgtopbraid....`
 * Check it ("content" tab)
 * Close it, at which point the checking rules run.
-* Refresh the webpage until rule checkign completes.
+* Refresh the webpage until rule checking completes.
 * If all is good, click "release" at the top.
-
-Note from 1.0.1: this happened automatically. The rules ran as part of `release:perform`.
 
 The release artifacts end up in "Repositories -> Releases -> org.topbraid".
 
