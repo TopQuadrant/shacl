@@ -35,13 +35,9 @@ import org.topbraid.jenax.util.JenaDatatypes;
 import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.arq.SHACLPaths;
 import org.topbraid.shacl.engine.ShapesGraph;
-import org.topbraid.shacl.engine.filters.ExcludeMetaShapesFilter;
 import org.topbraid.shacl.util.ModelPrinter;
 import org.topbraid.shacl.util.SHACLUtil;
-import org.topbraid.shacl.validation.ValidationEngine;
-import org.topbraid.shacl.validation.ValidationEngineFactory;
-import org.topbraid.shacl.validation.ValidationSuggestionGenerator;
-import org.topbraid.shacl.validation.ValidationSuggestionGeneratorFactory;
+import org.topbraid.shacl.validation.*;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 
@@ -100,10 +96,13 @@ public class GraphValidationTestCaseType implements TestCaseType {
 			URI shapesGraphURI = SHACLUtil.withShapesGraph(dataset);
 
 			ShapesGraph shapesGraph = new ShapesGraph(dataset.getNamedModel(shapesGraphURI.toString()));
+
+			ValidationEngineConfiguration configuration = new ValidationEngineConfiguration();
 			if(!getResource().hasProperty(DASH.validateShapes, JenaDatatypes.TRUE)) {
-				shapesGraph.setShapeFilter(new ExcludeMetaShapesFilter());
+				configuration.setValidateShapes(false);
 			}
 			ValidationEngine validationEngine = ValidationEngineFactory.get().create(dataset, shapesGraphURI, shapesGraph, null);
+			validationEngine.setConfiguration(configuration);
 			validationEngine.applyEntailments();
 			Resource actualReport = validationEngine.validateAll();
 			Model actualResults = actualReport.getModel();

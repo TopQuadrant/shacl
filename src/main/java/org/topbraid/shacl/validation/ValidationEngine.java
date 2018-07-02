@@ -16,34 +16,18 @@
  */
 package org.topbraid.shacl.validation;
 
-import java.net.URI;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.function.Predicate;
-
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.rdf.model.Literal;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.vocabulary.RDF;
 import org.topbraid.jenax.util.ExceptionUtil;
 import org.topbraid.jenax.util.JenaDatatypes;
 import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.arq.SHACLPaths;
-import org.topbraid.shacl.engine.AbstractEngine;
-import org.topbraid.shacl.engine.Constraint;
-import org.topbraid.shacl.engine.Shape;
-import org.topbraid.shacl.engine.ShapesGraph;
+import org.topbraid.shacl.engine.*;
+import org.topbraid.shacl.engine.filters.ExcludeMetaShapesFilter;
 import org.topbraid.shacl.js.SHACLScriptEngineManager;
 import org.topbraid.shacl.util.FailureLog;
 import org.topbraid.shacl.util.SHACLPreferences;
@@ -51,6 +35,11 @@ import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.validation.sparql.SPARQLSubstitutions;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
+
+import java.net.URI;
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * A ValidationEngine uses a given shapes graph (represented via an instance of VShapesGraph)
@@ -60,7 +49,7 @@ import org.topbraid.shacl.vocabulary.SH;
  * 
  * @author Holger Knublauch
  */
-public class ValidationEngine extends AbstractEngine {
+public class ValidationEngine extends AbstractEngine implements ConfigurableEngine {
 	
 	private Predicate<RDFNode> focusNodeFilter;
 	
@@ -68,7 +57,11 @@ public class ValidationEngine extends AbstractEngine {
 	
 	private Resource report;
 
-	
+	protected ValidationEngineConfiguration configuration;
+
+	private int violationsCount = 0;
+
+
 	/**
 	 * Constructs a new ValidationEngine.
 	 * @param dataset  the Dataset to operate on
@@ -78,6 +71,7 @@ public class ValidationEngine extends AbstractEngine {
 	 */
 	protected ValidationEngine(Dataset dataset, URI shapesGraphURI, ShapesGraph shapesGraph, Resource report) {
 		super(dataset, shapesGraph, shapesGraphURI);
+		setConfiguration(new ValidationEngineConfiguration());
 		if(report == null) {
 			Model reportModel = JenaUtil.createMemoryModel();
 			reportModel.setNsPrefixes(dataset.getDefaultModel());
@@ -113,10 +107,22 @@ public class ValidationEngine extends AbstractEngine {
 		if(focusNode != null) {
 			result.addProperty(SH.focusNode, focusNode);
 		}
+
+		checkMaximumNumberFailures(constraint);
+
 		return result;
 	}
-	
-	
+
+	private void checkMaximumNumberFailures(Constraint constraint) {
+		if (constraint.getShapeResource().getSeverity() == SH.Violation) {
+			this.violationsCount++;
+			if (configuration.getValidationErrorBatch() != -1 && violationsCount == configuration.getValidationErrorBatch()) {
+				throw new MaximumNumberViolations(violationsCount);
+			}
+		}
+	}
+
+
 	/**
 	 * Gets the validation report as a Resource in the report Model.
 	 * @return the report Resource
@@ -265,6 +271,9 @@ public class ValidationEngine extends AbstractEngine {
 				}
 			}
 		}
+		catch(MaximumNumberViolations ex) {
+			// ignore
+		}
 		finally {
 			SHACLScriptEngineManager.end(nested);
 		}
@@ -380,6 +389,19 @@ public class ValidationEngine extends AbstractEngine {
 		}
 		else {
 			FailureLog.get().logWarning("No suitable validator found for constraint " + constraint);
+		}
+	}
+
+	@Override
+	public ValidationEngineConfiguration getConfiguration() {
+		return configuration;
+	}
+
+	@Override
+	public void setConfiguration(ValidationEngineConfiguration configuration) {
+		this.configuration = configuration;
+		if(!configuration.getValidateShapes()) {
+			shapesGraph.setShapeFilter(new ExcludeMetaShapesFilter());
 		}
 	}
 }
