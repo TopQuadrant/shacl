@@ -40,11 +40,13 @@ import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.validation.*;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
+import org.topbraid.shacl.vocabulary.SHEXT;
 
 public class GraphValidationTestCaseType implements TestCaseType {
 
 	public final static List<Property> IGNORED_PROPERTIES = Arrays.asList(new Property[] {
 		SH.message, // For TopBraid's suggestions
+		SHEXT.targetCount, // TODO: Find a way to add an SPARQL statement to check this
 		SH.resultMessage,
 		DASH.suggestionGroup
 	});

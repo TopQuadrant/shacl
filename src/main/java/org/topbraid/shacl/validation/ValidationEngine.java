@@ -35,6 +35,7 @@ import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.validation.sparql.SPARQLSubstitutions;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
+import org.topbraid.shacl.vocabulary.SHEXT;
 
 import java.net.URI;
 import java.util.*;
@@ -211,8 +212,7 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 		this.focusNodeFilter = value;
 	}
 	
-	
-	public void updateConforms() {
+	public void updateConforms(int targeted) {
 		boolean conforms = true;
 		StmtIterator it = report.listProperties(SH.result);
 		while(it.hasNext()) {
@@ -223,6 +223,7 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 				break;
 			}
 		}
+		report.addProperty(SHEXT.targetCount, JenaDatatypes.createInteger(targeted));
 		report.removeAll(SH.conforms);
 		report.addProperty(SH.conforms, conforms ? JenaDatatypes.TRUE : JenaDatatypes.FALSE);
 	}
@@ -234,6 +235,8 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 	 * @return an instance of sh:ValidationReport in the results Model
 	 */
 	public Resource validateAll() throws InterruptedException {
+		int targeted = 0;
+
 		boolean nested = SHACLScriptEngineManager.begin();
 		try {
 			List<Shape> rootShapes = shapesGraph.getRootShapes();
@@ -259,6 +262,7 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 				if(!focusNodes.isEmpty()) {
 					if(!shapesGraph.isIgnored(shape.getShapeResource().asNode()) && !shape.getShapeResource().isDeactivated()) {
 						for(Constraint constraint : shape.getConstraints()) {
+							targeted++;
 							validateNodesAgainstConstraint(focusNodes, constraint);
 						}
 					}
@@ -277,7 +281,7 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 		finally {
 			SHACLScriptEngineManager.end(nested);
 		}
-		updateConforms();
+		updateConforms(targeted);
 		return report;
 	}
 	
