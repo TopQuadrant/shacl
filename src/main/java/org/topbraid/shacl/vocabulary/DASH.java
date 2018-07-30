@@ -95,6 +95,8 @@ public class DASH {
     
     public final static Property expectedResult = ResourceFactory.createProperty(NS + "expectedResult");
     
+    public final static Property expectedResultIsJSON = ResourceFactory.createProperty(NS + "expectedResultIsJSON");
+    
     public final static Property expectedResultIsTTL = ResourceFactory.createProperty(NS + "expectedResultIsTTL");
 
     public final static Property expression = ResourceFactory.createProperty(NS + "expression");

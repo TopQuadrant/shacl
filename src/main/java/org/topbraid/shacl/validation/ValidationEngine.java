@@ -51,13 +51,13 @@ import java.util.function.Predicate;
  */
 public class ValidationEngine extends AbstractEngine implements ConfigurableEngine {
 	
+	private ValidationEngineConfiguration configuration;
+	
 	private Predicate<RDFNode> focusNodeFilter;
 	
 	private Function<RDFNode,String> labelFunction = (node -> node.toString());
 	
 	private Resource report;
-
-	protected ValidationEngineConfiguration configuration;
 
 	private int violationsCount = 0;
 
@@ -242,6 +242,7 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 			}
 			int i = 0;
 			for(Shape shape : rootShapes) {
+
 				if(monitor != null) {
 					monitor.subTask("Shape " + (++i) + ": " + getLabelFunction().apply(shape.getShapeResource()));
 				}
@@ -257,7 +258,7 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 					focusNodes = filteredFocusNodes;
 				}
 				if(!focusNodes.isEmpty()) {
-					if(!shapesGraph.isIgnored(shape.getShapeResource().asNode()) && !shape.getShapeResource().isDeactivated()) {
+					if(!shapesGraph.isIgnored(shape.getShapeResource().asNode())) {
 						for(Constraint constraint : shape.getConstraints()) {
 							validateNodesAgainstConstraint(focusNodes, constraint);
 						}
@@ -371,7 +372,7 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 	}
 	
 	
-	private void validateNodesAgainstConstraint(List<RDFNode> focusNodes, Constraint constraint) {
+	protected void validateNodesAgainstConstraint(List<RDFNode> focusNodes, Constraint constraint) {
 		ConstraintExecutor executor = constraint.getExecutor();
 		if(executor != null) {
 			if(SHACLPreferences.isProduceFailuresMode()) {

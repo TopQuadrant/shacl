@@ -96,14 +96,14 @@ public class ShapesGraph {
 	
 	
 	/**
-	 * Gets all shapes that declare a target and pass the provided filter.
+	 * Gets all non-deactivated shapes that declare a target and pass the provided filter.
 	 * @return the root shapes
 	 */
 	public List<Shape> getRootShapes() {
 		if(rootShapes == null) {
 			
 			// Collect all shapes, as identified by target and/or type
-			Set<Resource> candidates = new HashSet<Resource>();
+			Set<Resource> candidates = new HashSet<>();
 			candidates.addAll(shapesModel.listSubjectsWithProperty(SH.target).toList());
 			candidates.addAll(shapesModel.listSubjectsWithProperty(SH.targetClass).toList());
 			candidates.addAll(shapesModel.listSubjectsWithProperty(SH.targetNode).toList());
@@ -124,7 +124,7 @@ public class ShapesGraph {
 			this.rootShapes = new LinkedList<Shape>();
 			for(Resource candidate : candidates) {
 				SHShape shape = SHFactory.asShape(candidate);
-				if(shapeFilter == null || shapeFilter.test(shape)) {
+				if(!shape.isDeactivated() && (shapeFilter == null || shapeFilter.test(shape))) {
 					this.rootShapes.add(getShape(shape.asNode()));
 				}
 			}
@@ -141,11 +141,6 @@ public class ShapesGraph {
 		}
 		return shape;
 	}
-	
-	
-	public boolean isIgnoredConstraint(Constraint constraint) {
-		return constraintFilter != null && !constraintFilter.test(constraint);
-	}
 
 
 	public boolean isIgnored(Node shapeNode) {
@@ -154,6 +149,11 @@ public class ShapesGraph {
 		}
 		SHShape shape = SHFactory.asShape(shapesModel.asRDFNode(shapeNode));
 		return !shapeFilter.test(shape);
+	}
+	
+	
+	public boolean isIgnoredConstraint(Constraint constraint) {
+		return constraintFilter != null && !constraintFilter.test(constraint);
 	}
 	
 	

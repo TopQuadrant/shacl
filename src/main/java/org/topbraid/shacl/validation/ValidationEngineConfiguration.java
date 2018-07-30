@@ -1,16 +1,17 @@
 package org.topbraid.shacl.validation;
 
 /**
- * Configures the behaviour of the validation engine
+ * Configures the behavior of the validation engine.
  */
 public class ValidationEngineConfiguration {
+	
+	// By default validate shapes
+	private boolean validateShapes = true;
 
     // By default collect all possible errors
     private int validationErrorBatch = -1;
 
-    // By default validate shapes
-    private boolean validateShapes = true;
-
+    
     /**
      * Maximum number of validations before returning the report
      * @return number of validations or -1 to mean all validations
@@ -33,7 +34,9 @@ public class ValidationEngineConfiguration {
      * Should the engine validates shapes
      * @return boolean flag for shapes validation
      */
-    public boolean getValidateShapes() { return validateShapes; }
+    public boolean getValidateShapes() { 
+    	return validateShapes; 
+    }
 
     /**
      * Sets an option for the engine to validate shapes
