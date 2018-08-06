@@ -69,6 +69,8 @@ public class SH {
 
     public final static Resource MinLengthConstraintComponent = ResourceFactory.createResource(NS + "MinLengthConstraintComponent");
 
+    public final static Resource NodeConstraintComponent = ResourceFactory.createResource(NS + "NodeConstraintComponent");
+
     public final static Resource NodeKindConstraintComponent = ResourceFactory.createResource(NS + "NodeKindConstraintComponent");
 
     public final static Resource NodeShape = ResourceFactory.createResource(NS + "NodeShape");

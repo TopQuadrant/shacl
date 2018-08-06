@@ -51,6 +51,18 @@ import java.util.function.Predicate;
  */
 public class ValidationEngine extends AbstractEngine implements ConfigurableEngine {
 	
+	// The currently active ValidationEngine for cases where no direct pointer can be acquired, e.g. from HasShapeFunction
+	private static ThreadLocal<ValidationEngine> current = new ThreadLocal<>();
+	
+	public static ValidationEngine getCurrent() {
+		return current.get();
+	}
+	
+	public static void setCurrent(ValidationEngine value) {
+		current.set(value);
+	}
+	
+	
 	private ValidationEngineConfiguration configuration;
 	
 	private Predicate<RDFNode> focusNodeFilter;
@@ -322,12 +334,15 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 			Shape vs = shapesGraph.getShape(shape);
 			if(!vs.getShapeResource().isDeactivated()) {
 				boolean nested = SHACLScriptEngineManager.begin();
+				ValidationEngine oldEngine = current.get();
+				current.set(this);
 				try {
 					for(Constraint constraint : vs.getConstraints()) {
 						validateNodesAgainstConstraint(focusNodes, constraint);
 					}
 				}
 				finally {
+					current.set(oldEngine);
 					SHACLScriptEngineManager.end(nested);
 				}
 			}

@@ -53,9 +53,6 @@ import org.topbraid.shacl.vocabulary.SH;
 
 public abstract class AbstractSPARQLExecutor implements ConstraintExecutor {
 	
-	// Flag to generate sh:details for all violations.
-	public static boolean createDetails = false;
-	
 	// Flag to generate dash:SuccessResults for all violations.
 	public static boolean createSuccessResults = false;
 	
@@ -224,7 +221,7 @@ public abstract class AbstractSPARQLExecutor implements ConstraintExecutor {
 							result.addProperty(SH.value, focusNode);
 						}
 						
-						if(createDetails) {
+						if(engine.getConfiguration().getReportDetails()) {
 							addDetails(result, nestedResults);
 						}
 					}
@@ -235,7 +232,7 @@ public abstract class AbstractSPARQLExecutor implements ConstraintExecutor {
 				if(SH.SPARQLConstraintComponent.equals(constraint.getComponent())) {
 					success.addProperty(SH.sourceConstraint, constraint.getParameterValue());
 				}
-				if(createDetails) {
+				if(engine.getConfiguration().getReportDetails()) {
 					addDetails(success, nestedResults);
 				}
 			}

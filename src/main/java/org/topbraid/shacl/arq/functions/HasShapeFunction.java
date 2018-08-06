@@ -37,8 +37,8 @@ import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.util.FailureLog;
 import org.topbraid.shacl.util.RecursionGuard;
 import org.topbraid.shacl.validation.DefaultShapesGraphProvider;
+import org.topbraid.shacl.validation.ValidationEngine;
 import org.topbraid.shacl.validation.ValidationEngineFactory;
-import org.topbraid.shacl.validation.sparql.AbstractSPARQLExecutor;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 
@@ -122,7 +122,7 @@ public class HasShapeFunction extends AbstractFunction3 {
 						throw new ExprEvalException("Propagating failure from nested shapes");
 					}
 
-					if(AbstractSPARQLExecutor.createDetails) {
+					if(ValidationEngine.getCurrent() != null && ValidationEngine.getCurrent().getConfiguration().getReportDetails()) {
 						boolean result = true;
 						for(Resource r : results.listSubjectsWithProperty(RDF.type, SH.ValidationResult).toList()) {
 							if(!results.contains(null, SH.detail, r)) {
@@ -161,8 +161,11 @@ public class HasShapeFunction extends AbstractFunction3 {
 			sg = new ShapesGraph(shapesModel);
 			shapesGraph.set(sg);
 		}
-		return ValidationEngineFactory.get().
-				create(dataset, sgURI, sg, null).
+		ValidationEngine engine = ValidationEngineFactory.get().create(dataset, sgURI, sg, null);
+		if(ValidationEngine.getCurrent() != null) {
+			engine.setConfiguration(ValidationEngine.getCurrent().getConfiguration());
+		}
+		return engine.
 				validateNodesAgainstShape(Collections.singletonList(focusNode), shape.asNode()).
 				getModel();
 	}
