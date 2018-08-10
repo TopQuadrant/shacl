@@ -13,6 +13,9 @@ public class ValidationEngineConfiguration {
 
     // By default collect all possible errors
     private int validationErrorBatch = -1;
+
+    // By default use the ValidationEngineFactory to construct a ValidationEngine
+    private ValidationEngineConstructor engineConstructor = ValidationEngineFactory.get();
     
     
     /**
@@ -66,6 +69,24 @@ public class ValidationEngineConfiguration {
      */
     public ValidationEngineConfiguration setValidateShapes(boolean validateShapes) {
         this.validateShapes = validateShapes;
+        return this;
+    }
+
+    /**
+     * The customized ValidationEngine constructor
+     * @return boolean flag for shapes validation
+     */
+    public ValidationEngineConstructor getEngineConstructor() {
+        return engineConstructor;
+    }
+
+    /**
+     * Sets an option for constructing a customized ValidationEngine
+     * @param engineConstructor the template to construct ValidationEngine
+     * @return current configuration after modification
+     */
+    public ValidationEngineConfiguration setEngineConstructor(ValidationEngineConstructor engineConstructor) {
+        this.engineConstructor = engineConstructor;
         return this;
     }
 }

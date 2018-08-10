@@ -68,7 +68,7 @@ public class ValidationUtil {
 
 		ShapesGraph shapesGraph = new ShapesGraph(shapesModel);
 
-		ValidationEngine engine = ValidationEngineFactory.get().create(dataset, shapesGraphURI, shapesGraph, null);
+		ValidationEngine engine = configuration.getEngineConstructor().create(dataset, shapesGraphURI, shapesGraph, null);
 		engine.setConfiguration(configuration);
 		return engine;
 	}
