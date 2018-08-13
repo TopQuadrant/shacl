@@ -39,6 +39,7 @@ class PropertyConstraintExecutor implements ConstraintExecutor {
 			for(RDFNode focusNode : focusNodes) {
 				List<RDFNode> valueNodes = engine.getValueNodes(constraint, focusNode);
 				executeHelper(engine, valueNodes, propertyShape);
+				engine.checkCanceled();
 			}
 		}
 		else {

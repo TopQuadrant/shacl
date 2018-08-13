@@ -111,6 +111,7 @@ public abstract class AbstractSPARQLExecutor implements ConstraintExecutor {
 				bindings.add(SH.thisVar.getVarName(), focusNode); // Overwrite any previous binding
 				QueryExecution qexec = SPARQLSubstitutions.createQueryExecution(query, engine.getDataset(), bindings);
 				executeSelectQuery(engine, constraint, messageHolder, nestedResults, focusNode, qexec, bindings);
+				engine.checkCanceled();
 			}			
 			if(ExecStatisticsManager.get().isRecording()) {
 				long endTime = System.currentTimeMillis();

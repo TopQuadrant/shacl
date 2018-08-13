@@ -408,11 +408,13 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 		}
 	}
 
+
 	@Override
 	public ValidationEngineConfiguration getConfiguration() {
 		return configuration;
 	}
 
+	
 	@Override
 	public void setConfiguration(ValidationEngineConfiguration configuration) {
 		this.configuration = configuration;

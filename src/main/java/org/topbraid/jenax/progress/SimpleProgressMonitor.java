@@ -26,9 +26,11 @@ package org.topbraid.jenax.progress;
  */
 public class SimpleProgressMonitor implements ProgressMonitor {
 	
-	private String name;
+	private boolean canceled;
 	
 	private int currentWork;
+	
+	private String name;
 	
 	private int totalWork;
 	
@@ -54,7 +56,7 @@ public class SimpleProgressMonitor implements ProgressMonitor {
 	
 	@Override
     public boolean isCanceled() {
-		return false;
+		return canceled;
 	}
 	
 	
@@ -65,6 +67,7 @@ public class SimpleProgressMonitor implements ProgressMonitor {
 	
 	@Override
 	public void setCanceled(boolean value) {
+		this.canceled = value;
 	}
 
 

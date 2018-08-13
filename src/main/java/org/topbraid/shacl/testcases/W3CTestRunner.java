@@ -47,7 +47,6 @@ import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.arq.SHACLPaths;
 import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.engine.filters.CoreConstraintFilter;
-import org.topbraid.shacl.engine.filters.ExcludeMetaShapesFilter;
 import org.topbraid.shacl.util.ModelPrinter;
 import org.topbraid.shacl.validation.ValidationEngine;
 import org.topbraid.shacl.validation.ValidationEngineConfiguration;

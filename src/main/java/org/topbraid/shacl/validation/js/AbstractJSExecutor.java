@@ -80,6 +80,7 @@ public abstract class AbstractJSExecutor implements ConstraintExecutor {
 			
 			long startTime = System.currentTimeMillis();
 			for(RDFNode theFocusNode : focusNodes) {
+				validationEngine.checkCanceled();
 				Object resultObj;
 				bindings.add(SH.thisVar.getVarName(), theFocusNode);
 				

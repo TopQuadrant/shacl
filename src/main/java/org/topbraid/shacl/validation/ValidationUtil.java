@@ -30,7 +30,6 @@ import org.apache.jena.vocabulary.RDF;
 import org.topbraid.jenax.util.ARQFactory;
 import org.topbraid.shacl.arq.SHACLFunctions;
 import org.topbraid.shacl.engine.ShapesGraph;
-import org.topbraid.shacl.engine.filters.ExcludeMetaShapesFilter;
 import org.topbraid.shacl.util.SHACLSystemModel;
 import org.topbraid.shacl.vocabulary.TOSH;
 
@@ -46,16 +45,10 @@ public class ValidationUtil {
 		return createValidationEngine(dataModel, shapesModel, new ValidationEngineConfiguration().setValidateShapes(validateShapes));
 	}
 
+	
 	public static ValidationEngine createValidationEngine(Model dataModel, Model shapesModel, ValidationEngineConfiguration configuration) {
-		// Ensure that the SHACL, DASH and TOSH graphs are present in the shapes Model
-		if(!shapesModel.contains(TOSH.hasShape, RDF.type, (RDFNode)null)) { // Heuristic
-			Model unionModel = SHACLSystemModel.getSHACLModel();
-			MultiUnion unionGraph = new MultiUnion(new Graph[] {
-				unionModel.getGraph(),
-				shapesModel.getGraph()
-			});
-			shapesModel = ModelFactory.createModelForGraph(unionGraph);
-		}
+
+		shapesModel = ensureToshTriplesExist(shapesModel);
 
 		// Make sure all sh:Functions are registered
 		SHACLFunctions.registerFunctions(shapesModel);
@@ -74,6 +67,20 @@ public class ValidationUtil {
 	}
 
 
+	public static Model ensureToshTriplesExist(Model shapesModel) {
+		// Ensure that the SHACL, DASH and TOSH graphs are present in the shapes Model
+		if(!shapesModel.contains(TOSH.hasShape, RDF.type, (RDFNode)null)) { // Heuristic
+			Model unionModel = SHACLSystemModel.getSHACLModel();
+			MultiUnion unionGraph = new MultiUnion(new Graph[] {
+				unionModel.getGraph(),
+				shapesModel.getGraph()
+			});
+			shapesModel = ModelFactory.createModelForGraph(unionGraph);
+		}
+		return shapesModel;
+	}
+
+
 	/**
 	 * Validates a given data Model against all shapes from a given shapes Model.
 	 * If the shapesModel does not include the system graph triples then these will be added.
@@ -87,6 +94,7 @@ public class ValidationUtil {
 		return validateModel(dataModel, shapesModel, new ValidationEngineConfiguration().setValidateShapes(validateShapes));
 	}
 
+	
 	/**
 	 * Validates a given data Model against all shapes from a given shapes Model.
 	 * If the shapesModel does not include the system graph triples then these will be added.

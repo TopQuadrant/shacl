@@ -34,6 +34,7 @@ public class ExpressionConstraintExecutor implements ConstraintExecutor {
 		// TODO: optimize, currently produces a new NodeExpression each time
 		NodeExpression expr = NodeExpressionFactory.get().create(constraint.getParameterValue());
 		for(RDFNode focusNode : focusNodes) {
+			engine.checkCanceled();
 			for(RDFNode valueNode : engine.getValueNodes(constraint, focusNode)) {
 				List<RDFNode> results = expr.eval(valueNode, engine);
 				if(results.size() != 1 || !JenaDatatypes.TRUE.equals(results.get(0))) {

@@ -62,6 +62,13 @@ public abstract class AbstractEngine implements NodeExpressionContext {
 	}
 	
 	
+	public void checkCanceled() {
+		if(monitor != null && monitor.isCanceled()) {
+			throw new SHACLCanceledException();
+		}
+	}
+	
+	
 	@Override
     public Dataset getDataset() {
 		return dataset;
