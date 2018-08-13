@@ -30,7 +30,7 @@ import org.topbraid.shacl.engine.ShapesGraph;
  * 
  * @author Holger Knublauch
  */
-public class ValidationEngineFactory {
+public class ValidationEngineFactory implements ValidationEngineConstructor {
 
 	private static ValidationEngineFactory singleton = new ValidationEngineFactory();
 	
