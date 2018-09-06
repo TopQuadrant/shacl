@@ -37,7 +37,7 @@ public class SHACLSystemModel {
 	private static Model shaclModel;
 	
 	
-	public static Model getSHACLModel() {
+	public static synchronized Model getSHACLModel() {
 		if(shaclModel == null) {
 			
 			shaclModel = JenaUtil.createDefaultModel();
