@@ -16,18 +16,57 @@
  */
 package org.topbraid.shacl.expr;
 
-public abstract class ComplexNodeExpression extends NodeExpression {
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.jena.rdf.model.RDFNode;
+
+public abstract class ComplexNodeExpression extends AbstractNodeExpression {
 	
-	public abstract void appendLabel(AppendContext context, String targetVarName);
+	protected ComplexNodeExpression(RDFNode expr) {
+		super(expr);
+	}
 	
 	
 	@Override
-	public String toString() {
+	public String getFunctionalSyntax() {
+		String str = getTypeId() + "(";
+		List<String> args = getFunctionalSyntaxArguments();
+		Iterator<String> it = args.iterator();
+		while(it.hasNext()) {
+			String next = it.next();
+			str += next;
+			if(it.hasNext()) {
+				str += ", ";
+			}
+		}
+		return str + ")";
+	}
+	
+	
+	public abstract List<String> getFunctionalSyntaxArguments();
+
+
+
+	public abstract void appendSPARQL(AppendContext context, String targetVarName);
+
+	
+	protected void appendSPARQL(AppendContext context, String targetVarName, NodeExpression expr) {
+		if(expr instanceof AtomicNodeExpression) {
+			context.append("BIND(" + expr.toString() + " AS ?" + targetVarName + ") .\n");
+		}
+		else {
+			((ComplexNodeExpression)expr).appendSPARQL(context, targetVarName);
+		}
+	}
+	
+	
+	public String getSPARQL() {
 		StringBuffer sb = new StringBuffer();
 		AppendContext context = new AppendContext(sb);
 		context.append("{\n");
 		context.increaseIndent();
-		appendLabel(context, "result");
+		appendSPARQL(context, "result");
 		context.decreaseIndent();
 		context.append("}");
 		return sb.toString();

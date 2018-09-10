@@ -34,6 +34,10 @@ public class TOSH {
     public final static String PREFIX = "tosh";
 
 
+    public final static Resource count = ResourceFactory.createResource(NS + "count");
+
+    public final static Resource NodeProcessor = ResourceFactory.createResource(NS + "NodeProcessor");
+
     public final static Resource TeamworkPlatform = ResourceFactory.createResource(NS + "TeamworkPlatform");
 
     public final static Resource TopBraidPlatform = ResourceFactory.createResource(NS + "TopBraidPlatform");
@@ -46,6 +50,9 @@ public class TOSH {
     
     public final static Resource targetContains = ResourceFactory.createResource(NS + "targetContains");
 
+    public final static Resource values = ResourceFactory.createResource(NS + "values");
+
+    
     public final static Property editWidget = ResourceFactory.createProperty(NS + "editWidget");
 
     public final static Property searchWidget = ResourceFactory.createProperty(NS + "searchWidget");

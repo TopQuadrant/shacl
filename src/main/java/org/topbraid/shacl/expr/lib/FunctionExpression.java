@@ -14,7 +14,7 @@
  *  See the NOTICE file distributed with this work for additional
  *  information regarding copyright ownership.
  */
-package org.topbraid.shacl.expr;
+package org.topbraid.shacl.expr.lib;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -36,37 +36,68 @@ import org.apache.jena.sparql.function.Function;
 import org.apache.jena.sparql.function.FunctionEnv;
 import org.apache.jena.sparql.function.FunctionFactory;
 import org.apache.jena.sparql.function.FunctionRegistry;
+import org.apache.jena.sparql.sse.ItemList;
+import org.apache.jena.sparql.sse.builders.BuilderExpr;
 import org.apache.jena.sparql.util.Context;
 import org.apache.jena.sparql.util.ExprUtils;
+import org.apache.jena.sparql.util.FmtUtils;
 import org.apache.jena.sparql.util.NodeFactoryExtra;
+import org.apache.jena.util.iterator.ExtendedIterator;
+import org.apache.jena.util.iterator.WrappedIterator;
 import org.topbraid.jenax.functions.OptionalArgsFunction;
 import org.topbraid.jenax.util.RDFLabels;
+import org.topbraid.shacl.expr.AppendContext;
+import org.topbraid.shacl.expr.ComplexNodeExpression;
+import org.topbraid.shacl.expr.NodeExpression;
+import org.topbraid.shacl.expr.NodeExpressionContext;
+import org.topbraid.shacl.expr.NodeExpressionVisitor;
+import org.topbraid.shacl.expr.SNEL;
+import org.topbraid.shacl.vocabulary.SPARQL;
 
 public class FunctionExpression extends ComplexNodeExpression {
 	
 	private List<NodeExpression> args;
+	
+	private static MyBuilderExpr bob = new MyBuilderExpr() ;
 	
 	private Expr expr;
 	
 	private Resource function;
 	
 	
-	public FunctionExpression(Resource function, List<NodeExpression> args) {
+	public FunctionExpression(RDFNode expr, Resource function, List<NodeExpression> args) {
+		
+		super(expr);
+		
 		this.args = args;
 		this.function = function;
 		
-		StringBuffer sb = new StringBuffer();
-		sb.append("<");
-		sb.append(function);
-		sb.append(">(");
-		for(int i = 0; i < args.size(); i++) {
-			if(i > 0) {
-				sb.append(",");
+		if(function.getNameSpace().equals(SPARQL.NS)) {
+			ItemList il = new ItemList();
+			il.add(function.asNode());
+			for(int i = 0; i < args.size(); i++) {
+				il.add(Var.alloc("a" + i));
 			}
-			sb.append("?a" + i);
+			BuilderExpr.Build build = bob.getBuild(function.getLocalName());
+			if(build == null) {
+				throw new IllegalArgumentException("Unknown SPARQL built-in " + function.getLocalName());
+			}
+			this.expr = build.make(il);
 		}
-		sb.append(")");
-		this.expr = ExprUtils.parse(sb.toString());
+		else {
+			StringBuffer sb = new StringBuffer();
+			sb.append("<");
+			sb.append(function);
+			sb.append(">(");
+			for(int i = 0; i < args.size(); i++) {
+				if(i > 0) {
+					sb.append(",");
+				}
+				sb.append("?a" + i);
+			}
+			sb.append(")");
+			this.expr = ExprUtils.parse(sb.toString());
+		}
 	}
 	
 	
@@ -78,7 +109,7 @@ public class FunctionExpression extends ComplexNodeExpression {
 				if(varName == null) {
 					varName = context.getNextVarName();
 				}
-				((ComplexNodeExpression)arg).appendLabel(context, varName + (i + 1));
+				((ComplexNodeExpression)arg).appendSPARQL(context, varName + (i + 1));
 			}
 		}
 		return varName;
@@ -105,7 +136,7 @@ public class FunctionExpression extends ComplexNodeExpression {
 
 	
 	@Override
-	public void appendLabel(AppendContext context, String targetVarName) {
+	public void appendSPARQL(AppendContext context, String targetVarName) {
 		String varName = appendBindings(context);
 		context.indent();
 		context.append("BIND(");
@@ -117,7 +148,7 @@ public class FunctionExpression extends ComplexNodeExpression {
 
 
 	@Override
-	public List<RDFNode> eval(RDFNode focusNode, NodeExpressionContext context) {
+	public ExtendedIterator<RDFNode> eval(RDFNode focusNode, NodeExpressionContext context) {
 		List<RDFNode> results = new LinkedList<>();
 		
 		Context cxt = ARQ.getContext().copy();
@@ -135,10 +166,10 @@ public class FunctionExpression extends ComplexNodeExpression {
 		List<List<RDFNode>> as = new LinkedList<>();
 		for(int i = 0; i < args.size(); i++) {
 			NodeExpression expr = args.get(i);
-			List<RDFNode> a = expr.eval(focusNode, context);
+			List<RDFNode> a = expr.eval(focusNode, context).toList();
 			if(a.isEmpty()) {
 				if(opt == null || !opt.isOptionalArg(i)) {
-					return results;
+					return WrappedIterator.create(results.iterator());
 				}
 			}
 			else {
@@ -176,6 +207,48 @@ public class FunctionExpression extends ComplexNodeExpression {
 			catch(ExprEvalException ex) {
 			}
 		}
+		return WrappedIterator.create(results.iterator());
+	}
+	
+	
+	public Resource getFunction() {
+		return function;
+	}
+
+
+	@Override
+	public List<String> getFunctionalSyntaxArguments() {
+		List<String> results = new LinkedList<>();
+		results.add(FmtUtils.stringForRDFNode(function));
+		for(NodeExpression arg : args) {
+			results.add(arg.getFunctionalSyntax());
+		}
 		return results;
+	}
+	
+	
+	@Override
+	public List<NodeExpression> getInputExpressions() {
+		return args;
+	}
+
+
+	@Override
+	public SNEL getTypeId() {
+		return SNEL.function;
+	}
+
+
+	@Override
+	public void visit(NodeExpressionVisitor visitor) {
+		visitor.visit(this);
+	}
+	
+	
+	private static class MyBuilderExpr extends BuilderExpr {
+		
+		BuilderExpr.Build getBuild(String name) {
+			return dispatch.get(name);
+		}
 	}
 }

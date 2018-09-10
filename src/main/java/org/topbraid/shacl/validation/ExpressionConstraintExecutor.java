@@ -36,7 +36,7 @@ public class ExpressionConstraintExecutor implements ConstraintExecutor {
 		for(RDFNode focusNode : focusNodes) {
 			engine.checkCanceled();
 			for(RDFNode valueNode : engine.getValueNodes(constraint, focusNode)) {
-				List<RDFNode> results = expr.eval(valueNode, engine);
+				List<RDFNode> results = expr.eval(valueNode, engine).toList();
 				if(results.size() != 1 || !JenaDatatypes.TRUE.equals(results.get(0))) {
 					Resource result = engine.createResult(SH.ValidationResult, constraint, focusNode);
 					result.addProperty(SH.value, valueNode);

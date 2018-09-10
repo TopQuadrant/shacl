@@ -31,6 +31,9 @@ dash:NonRecursiveConstraintComponent
       sh:group tosh:RelationshipPropertyGroup ;
     ] ;
 .
+dash:PrimaryKeyConstraintComponent-uriStart
+  tosh:editWidget swa:PlainTextFieldEditor ;
+.
 dash:RootClassConstraintComponent
   dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
 .
@@ -131,6 +134,12 @@ tosh:DisplayPropertyGroup
   rdfs:label "Display Settings" ;
   sh:order 1 ;
 .
+tosh:InferencesPropertyGroup
+  rdf:type sh:PropertyGroup ;
+  tosh:openable "true"^^xsd:boolean ;
+  rdfs:label "Inferences" ;
+  sh:order "11"^^xsd:decimal ;
+.
 tosh:MemberShapeConstraintComponent
   rdf:type sh:ConstraintComponent ;
   rdfs:comment "Can be used to specify constraints on the members of a given list, assuming that the given sh:property has rdf:Lists as values. A violation is reported for each member of the list that does not comply with the constraints specified by the given shape." ;
@@ -166,6 +175,12 @@ tosh:OtherConstraintPropertyGroup
   rdfs:label "Other Constraints" ;
   sh:order 10 ;
 .
+tosh:PrimaryKeyPropertyGroup
+  rdf:type sh:PropertyGroup ;
+  tosh:openable "true"^^xsd:boolean ;
+  rdfs:label "Primary Key" ;
+  sh:order 6.5 ;
+.
 tosh:PropertyGroupShape
   rdf:type sh:NodeShape ;
   rdfs:label "Property group shape" ;
@@ -184,6 +199,27 @@ tosh:PropertyPairConstraintPropertyGroup
 tosh:PropertyShapeShape
   rdf:type sh:NodeShape ;
   rdfs:label "Property shape shape" ;
+  sh:property [
+      rdf:type sh:PropertyShape ;
+      sh:path sh:values ;
+      tosh:editWidget swa:SourceCodeEditor ;
+      tosh:viewWidget <http://topbraid.org/tosh.ui#ValuesExpressionDiagramViewer> ;
+      sh:group tosh:InferencesPropertyGroup ;
+      sh:name "values" ;
+      sh:order "1"^^xsd:decimal ;
+      sh:sparql [
+          sh:message "sh:values must be accompanied by a sh:path that is an IRI." ;
+          sh:prefixes <http://topbraid.org/tosh> ;
+          sh:select """SELECT $this ?value
+WHERE {
+	$this $PATH ?value .
+    FILTER NOT EXISTS {
+		$this sh:path ?path .
+		FILTER isIRI(?path)
+	}
+}""" ;
+        ] ;
+    ] ;
   sh:property [
       sh:path tosh:editWidget ;
       tosh:editWidget <http://topbraid.org/swaeditor#WidgetDropDownEditor> ;
@@ -1196,4 +1232,84 @@ sh:XoneConstraintComponent-xone
   tosh:viewWidget swa:SourceCodeViewer ;
   sh:group tosh:ComplexConstraintPropertyGroup ;
   sh:order 13 ;
+.
+sh:count
+  rdf:type rdf:Property ;
+  rdfs:comment "Resources with values for sh:count are node expressions that produce an xsd:integer counting all values of the associated node expression."@en ;
+  rdfs:isDefinedBy sh: ;
+  rdfs:label "count"@en ;
+.
+sh:desc
+  rdf:type rdf:Property ;
+  rdfs:comment "For sh:orderBy node expressions, sh:desc can be set to true to indicate descending order (defaulting to ascending)."@en ;
+  rdfs:isDefinedBy sh: ;
+  rdfs:label "desc"@en ;
+.
+sh:distinct
+  rdf:type rdf:Property ;
+  rdfs:comment "Resources with values for sh:distinct are node expressions that drop any duplicate values from the associated node expression."@en ;
+  rdfs:isDefinedBy sh: ;
+  rdfs:label "distinct"@en ;
+.
+sh:groupConcat
+  rdf:type rdf:Property ;
+  rdfs:comment "Resources with values for sh:groupConcat are node expressions that produce an xsd:string consisting of the concatenation of all values of the associated node expression, possibly separated by the value of sh:separator."@en ;
+  rdfs:isDefinedBy sh: ;
+  rdfs:label "group concat"@en ;
+.
+sh:limit
+  rdf:type rdf:Property ;
+  rdfs:comment "Resources with values N for sh:limit are node expressions that produce only the first N values of the associated node expression sh:nodes."@en ;
+  rdfs:isDefinedBy sh: ;
+  rdfs:label "limit"@en ;
+  rdfs:range xsd:integer ;
+.
+sh:max
+  rdf:type rdf:Property ;
+  rdfs:comment "Resources with values for sh:max are node expressions that produce the maximum value of the associated node expression."@en ;
+  rdfs:isDefinedBy sh: ;
+  rdfs:label "max"@en ;
+.
+sh:min
+  rdf:type rdf:Property ;
+  rdfs:comment "Resources with values for sh:min are node expressions that produce the minimum value of the associated node expression."@en ;
+  rdfs:isDefinedBy sh: ;
+  rdfs:label "min"@en ;
+.
+sh:minus
+  rdf:type rdf:Property ;
+  rdfs:comment "Resources with values for sh:minus are node expressions that produce all values of the associated node expression sh:nodes except those that are returned by the sh:minus expression."@en ;
+  rdfs:isDefinedBy sh: ;
+  rdfs:label "minus"@en ;
+.
+sh:offset
+  rdf:type rdf:Property ;
+  rdfs:comment "Resources with values N for sh:offset are node expressions that produce only all values of the associated node expression sh:nodes after the first N values have been skipped."@en ;
+  rdfs:isDefinedBy sh: ;
+  rdfs:label "offset"@en ;
+  rdfs:range xsd:integer ;
+.
+sh:orderBy
+  rdf:type rdf:Property ;
+  rdfs:comment "Resources with a value for sh:orderBy are node expressions that produce all values of the associated node expression sh:nodes ordered by the given node expression (applied to each result value). Use sh:desc=true for descending order."@en ;
+  rdfs:isDefinedBy sh: ;
+  rdfs:label "orderBy"@en ;
+.
+sh:separator
+  rdf:type rdf:Property ;
+  rdfs:comment "For sh:concat node expressions, sh:separator can represent a separator string such as \", \" to be placed in between results."@en ;
+  rdfs:isDefinedBy sh: ;
+  rdfs:label "separator"@en ;
+.
+sh:sum
+  rdf:type rdf:Property ;
+  rdfs:comment "Resources with values for sh:sum are node expressions that produce the sum of all values of the associated node expression."@en ;
+  rdfs:isDefinedBy sh: ;
+  rdfs:label "sum"@en ;
+.
+sh:values
+  rdf:type rdf:Property ;
+  rdfs:comment "Links a property shape with one or more SHACL node expressions that are used to determine the values of the associated predicate based on the current focus node. Only valid for property shapes where the sh:path is an IRI."@en ;
+  rdfs:isDefinedBy sh: ;
+  rdfs:label "values"@en ;
 .

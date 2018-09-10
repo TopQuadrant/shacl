@@ -33,6 +33,7 @@ import org.topbraid.shacl.arq.functions.IsInTargetOfFunction;
 import org.topbraid.shacl.arq.functions.IsValidForDatatypeFunction;
 import org.topbraid.shacl.arq.functions.IsValidLangTagFunction;
 import org.topbraid.shacl.arq.functions.TargetContainsPFunction;
+import org.topbraid.shacl.arq.functions.ValuesPFunction;
 import org.topbraid.shacl.model.impl.SHConstraintComponentImpl;
 import org.topbraid.shacl.model.impl.SHJSConstraintImpl;
 import org.topbraid.shacl.model.impl.SHJSExecutableImpl;
@@ -89,6 +90,7 @@ public class SHFactory {
 		FunctionRegistry.get().put("http://spinrdf.org/spif#isValidForDatatype", IsValidForDatatypeFunction.class);
 		FunctionRegistry.get().put("http://spinrdf.org/spif#isValidLangTag", IsValidLangTagFunction.class);
 		PropertyFunctionRegistry.get().put(TOSH.evalExpr.getURI(), EvalExprPFunction.class);
+		PropertyFunctionRegistry.get().put(TOSH.values.getURI(), ValuesPFunction.class);
 		PropertyFunctionRegistry.get().put(TOSH.targetContains.getURI(), TargetContainsPFunction.class);
     }
 	

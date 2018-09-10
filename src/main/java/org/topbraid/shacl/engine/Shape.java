@@ -107,6 +107,11 @@ public class Shape {
 	}
 	
 	
+	public ShapesGraph getShapesGraph() {
+		return shapesGraph;
+	}
+	
+	
 	private boolean isComplete(List<SHParameter> params) {
 		for(SHParameter param : params) {
 			if(!param.isOptional() && !shape.hasProperty(param.getPredicate())) {

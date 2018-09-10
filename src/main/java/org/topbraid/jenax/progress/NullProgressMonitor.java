@@ -16,7 +16,7 @@
  */
 package org.topbraid.jenax.progress;
 
-
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * A ProgressMonitor that doesn't "do" anything.
@@ -26,11 +26,11 @@ package org.topbraid.jenax.progress;
  */
 public class NullProgressMonitor implements ProgressMonitor {
 	
-	private boolean canceled;
+	private AtomicBoolean canceled = new AtomicBoolean();
 
 	@Override
 	public boolean isCanceled() {
-		return canceled;
+		return canceled.get();
 	}
 
 	@Override
@@ -43,7 +43,7 @@ public class NullProgressMonitor implements ProgressMonitor {
 
 	@Override
 	public void setCanceled(boolean value) {
-		this.canceled = value;
+		canceled.set(value);
 	}
 
 	@Override

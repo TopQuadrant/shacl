@@ -17,8 +17,7 @@
 package org.topbraid.shacl.arq.functions;
 
 import java.net.URI;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Iterator;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
@@ -34,6 +33,7 @@ import org.apache.jena.sparql.engine.iterator.QueryIterExtendByVar;
 import org.apache.jena.sparql.expr.ExprEvalException;
 import org.apache.jena.sparql.pfunction.PropFuncArg;
 import org.apache.jena.sparql.pfunction.PropertyFunctionBase;
+import org.apache.jena.util.iterator.ExtendedIterator;
 import org.topbraid.jenax.util.ARQFactory;
 import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.expr.NodeExpression;
@@ -73,7 +73,7 @@ public class EvalExprPFunction extends PropertyFunctionBase {
 		ShapesGraph[] shapesGraph = new ShapesGraph[1];
 		
 		NodeExpression n = NodeExpressionFactory.get().create(model.asRDFNode(exprNode));
-		List<RDFNode> results = n.eval(model.asRDFNode(focusNode), new NodeExpressionContext() {
+		ExtendedIterator<RDFNode> it = n.eval(model.asRDFNode(focusNode), new NodeExpressionContext() {
 			
 			@Override
 			public URI getShapesGraphURI() {
@@ -94,11 +94,8 @@ public class EvalExprPFunction extends PropertyFunctionBase {
 			}
 		});
 		
-		List<Node> nodes = new LinkedList<>();
-		for(RDFNode rdfNode : results) {
-			nodes.add(rdfNode.asNode());
-		}
+		Iterator<Node> nit = it.mapWith(rdfNode -> rdfNode.asNode());
 
-		return new QueryIterExtendByVar(binding, (Var) argObject.getArg(), nodes.iterator(), execCxt);
+		return new QueryIterExtendByVar(binding, (Var) argObject.getArg(), nit, execCxt);
 	}
 }

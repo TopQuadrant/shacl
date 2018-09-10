@@ -19,14 +19,13 @@ package org.topbraid.jenax.progress;
 
 
 /**
- * A simple implementation of ProgressMonitor that prints messages
- * to System.out.
+ * A simple implementation of ProgressMonitor that prints messages to System.out.
  *
  * @author Holger Knublauch
  */
 public class SimpleProgressMonitor implements ProgressMonitor {
 	
-	private boolean canceled;
+	private volatile boolean canceled;
 	
 	private int currentWork;
 	

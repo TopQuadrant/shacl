@@ -42,6 +42,8 @@ import org.topbraid.jenax.util.RDFLabels;
 import org.topbraid.shacl.engine.AbstractEngine;
 import org.topbraid.shacl.engine.Shape;
 import org.topbraid.shacl.engine.ShapesGraph;
+import org.topbraid.shacl.expr.NodeExpression;
+import org.topbraid.shacl.expr.NodeExpressionFactory;
 import org.topbraid.shacl.util.OrderComparator;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.validation.ValidationEngine;
@@ -76,6 +78,14 @@ public class RuleEngine extends AbstractEngine {
 		for(Shape shape : shapesGraph.getRootShapes()) {
 			if(shape.getShapeResource().hasProperty(SH.rule)) {
 				ruleShapes.add(shape);
+			}
+			else {
+				for(Resource ps : JenaUtil.getResourceProperties(shape.getShapeResource(), SH.property)) {
+					if(ps.hasProperty(SH.values)) {
+						ruleShapes.add(shape);
+						break;
+					}
+				}
 			}
 		}
 		executeShapes(ruleShapes, null);
@@ -158,7 +168,7 @@ public class RuleEngine extends AbstractEngine {
 					flushPending();
 				}
 				List<Resource> conditions = rule2Conditions.get(rule);
-				if(!conditions.isEmpty()) {
+				if(conditions != null && !conditions.isEmpty()) {
 					List<RDFNode> filtered = new LinkedList<>();
 					for(RDFNode targetNode : targetNodes) {
 						if(nodeConformsToAllShapes(targetNode, conditions)) {
@@ -188,7 +198,7 @@ public class RuleEngine extends AbstractEngine {
 				long duration = (endTime - startTime);
 				String queryText = rule.toString();
 				ExecStatisticsManager.get().add(Collections.singletonList(
-						new ExecStatistics(queryText, queryText, duration, startTime, rule.getResource().asNode())));
+						new ExecStatistics(queryText, queryText, duration, startTime, rule.getContextNode())));
 			}
 			else {
 				rule.execute(this, focusNodes, shape);
@@ -209,11 +219,10 @@ public class RuleEngine extends AbstractEngine {
 
 
 	private List<Rule> getShapeRules(Shape shape) {
-		List<Rule> rules = shape2Rules.get(shape);
-		if(rules == null) {
-			rules = new LinkedList<>();
+		return shape2Rules.computeIfAbsent(shape, s2 -> {
+			List<Rule> rules = new LinkedList<>();
 			shape2Rules.put(shape, rules);
-			List<Resource> raws = new LinkedList<Resource>();
+			List<Resource> raws = new LinkedList<>();
 			for(Statement s : shape.getShapeResource().listProperties(SH.rule).toList()) {
 				if(s.getObject().isResource() && !s.getResource().hasProperty(SH.deactivated, JenaDatatypes.TRUE)) {
 					raws.add(s.getResource());
@@ -230,8 +239,17 @@ public class RuleEngine extends AbstractEngine {
 				List<Resource> conditions = JenaUtil.getResourceProperties(raw, SH.condition);
 				rule2Conditions.put(rule, conditions);
 			}
-		}
-		return rules;
+			for(Resource ps : JenaUtil.getResourceProperties(shape.getShapeResource(), SH.property)) {
+				Resource path = JenaUtil.getResourceProperty(ps, SH.path);
+				if(path != null && path.isURIResource()) {
+					for(Statement s : ps.listProperties(SH.values).toList()) {
+						NodeExpression expr = NodeExpressionFactory.get().create(s.getObject());
+						rules.add(new ValuesRule(expr, path.asNode(), false));
+					}
+				}
+			}
+			return rules;
+		});
 	}
 	
 	

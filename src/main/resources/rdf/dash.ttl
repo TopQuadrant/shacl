@@ -167,9 +167,13 @@ dash:DASHJSLibrary
 .
 dash:DateOrDateTime
   rdf:type rdf:List ;
-  rdf:first xsd:date ;
+  rdf:first [
+      sh:datatype xsd:date ;
+    ] ;
   rdf:rest (
-      xsd:dateTime
+      [
+        sh:datatype xsd:dateTime ;
+      ]
     ) ;
   rdfs:comment "An rdf:List that can be used in property constraints as value for sh:or to indicate that all values of a property must be either xsd:date or xsd:dateTime." ;
   rdfs:label "Date or date time" ;
@@ -265,6 +269,22 @@ dash:GraphValidationTestCase
   rdfs:comment "A test case that performs SHACL constraint validation on the whole graph and compares the results with the expected validation results stored with the test case. By default this excludes meta-validation (i.e. the validation of the shape definitions themselves). If that's desired, set dash:validateShapes to true." ;
   rdfs:label "Graph validation test case" ;
   rdfs:subClassOf dash:ValidationTestCase ;
+.
+dash:HTMLOrStringOrLangString
+  rdf:type rdf:List ;
+  rdf:first [
+      sh:datatype rdf:HTML ;
+    ] ;
+  rdf:rest (
+      [
+        sh:datatype xsd:string ;
+      ]
+      [
+        sh:datatype rdf:langString ;
+      ]
+    ) ;
+  rdfs:comment "An rdf:List that can be used in property constraints as value for sh:or to indicate that all values of a property must be either rdf:HTML, xsd:string or rdf:langString." ;
+  rdfs:label "HTML or string or langString" ;
 .
 dash:HasValueWithClassConstraintComponent
   rdf:type sh:ConstraintComponent ;
@@ -483,8 +503,8 @@ dash:PrimaryKeyConstraintComponent-uriStart
   rdf:type sh:Parameter ;
   sh:path dash:uriStart ;
   sh:datatype xsd:string ;
-  sh:description "The start of the URIs of well-formed resources." ;
-  sh:group tosh:OtherConstraintPropertyGroup ;
+  sh:description "The start of the URIs of well-formed resources. If specified then the associated property/path serves as \"primary key\" for all target nodes (instances). All such target nodes need to have a URI that starts with the given string, followed by the URI-encoded value of the primary key property." ;
+  sh:group tosh:PrimaryKeyPropertyGroup ;
   sh:name "URI start" ;
 .
 dash:QueryTestCase
@@ -572,9 +592,13 @@ dash:StemConstraintComponent-stem
 .
 dash:StringOrLangString
   rdf:type rdf:List ;
-  rdf:first xsd:string ;
+  rdf:first [
+      sh:datatype xsd:string ;
+    ] ;
   rdf:rest (
-      rdf:langString
+      [
+        sh:datatype rdf:langString ;
+      ]
     ) ;
   rdfs:comment "An rdf:List that can be used in property constraints as value for sh:or to indicate that all values of a property must be either xsd:string or rdf:langString." ;
   rdfs:label "String or langString" ;
@@ -827,6 +851,12 @@ dash:expectedResult
   rdfs:comment "The expected result(s) of a test case. The value range of this property is different for each kind of test cases." ;
   rdfs:domain dash:TestCase ;
   rdfs:label "expected result" ;
+.
+dash:expectedResultIsJSON
+  rdf:type rdf:Property ;
+  rdfs:comment "A flag to indicate that the expected result represents a JSON string. If set to true, then tests would compare JSON structures (regardless of whitespaces) instead of actual syntax." ;
+  rdfs:label "expected result is JSON" ;
+  rdfs:range xsd:boolean ;
 .
 dash:expectedResultIsTTL
   rdf:type rdf:Property ;

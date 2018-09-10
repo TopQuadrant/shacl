@@ -28,6 +28,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.sparql.expr.ExprEvalException;
+import org.apache.jena.vocabulary.RDFS;
 import org.topbraid.jenax.progress.ProgressMonitor;
 import org.topbraid.jenax.util.ExceptionUtil;
 import org.topbraid.jenax.util.JenaUtil;
@@ -41,7 +42,7 @@ import org.topbraid.shacl.model.SHJSExecutable;
 import org.topbraid.shacl.validation.SHACLException;
 import org.topbraid.shacl.vocabulary.SH;
 
-class JSRule extends Rule {
+class JSRule extends AbstractRule {
 	
 	
 	JSRule(Resource rule) {
@@ -119,7 +120,7 @@ class JSRule extends Rule {
 	
 	@Override
     public String toString() {
-		String label = getLabel();
+		String label = JenaUtil.getStringProperty(getResource(), RDFS.label);
 		if(label == null) {
 			Statement s = getResource().getProperty(SH.jsFunctionName);
 			if(s != null && s.getObject().isLiteral()) {
