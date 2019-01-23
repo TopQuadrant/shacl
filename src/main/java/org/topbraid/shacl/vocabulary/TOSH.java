@@ -59,6 +59,9 @@ public class TOSH {
 
     public final static Property useDeclaredDatatype = ResourceFactory.createProperty(NS + "useDeclaredDatatype");
 
+    // Note this property may be deleted in future versions
+    public final static Property viewGadget = ResourceFactory.createProperty(NS + "viewGadget");
+
     public final static Property viewWidget = ResourceFactory.createProperty(NS + "viewWidget");
 
 

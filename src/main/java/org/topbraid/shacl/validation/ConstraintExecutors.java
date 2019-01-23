@@ -112,6 +112,11 @@ public class ConstraintExecutors {
 	}
 	
 	
+	public void removeSpecialExecutor(Resource constraintComponent) {
+		specialExecutors.remove(constraintComponent);
+	}
+
+	
 	/**
 	 * Can be used to make the JavaScript engine the preferred implementation over SPARQL.
 	 * By default, SPARQL is preferred.

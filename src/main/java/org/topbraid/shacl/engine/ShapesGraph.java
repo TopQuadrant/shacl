@@ -53,6 +53,8 @@ public class ShapesGraph {
 	
 	private Predicate<Constraint> constraintFilter;
 	
+	private Map<Node,Map<Node,NodeExpression>> defaultValueMap = new ConcurrentHashMap<>();
+	
 	private Map<Property,SHConstraintComponent> parametersMap = new ConcurrentHashMap<>();
 	
 	private List<Shape> rootShapes;
@@ -142,6 +144,16 @@ public class ShapesGraph {
 	
 	
 	/**
+	 * Gets a Map from (node) shapes to NodeExpressions derived from sh:defaultValue statements.
+	 * @param predicate  the predicate to infer
+	 * @return a Map or null if the predicate is not mentioned in any inferences
+	 */
+	public Map<Node,NodeExpression> getDefaultValueNodeExpressionsMap(Resource predicate) {
+		return getExpressionsMap(defaultValueMap, predicate, SH.defaultValue);
+	}
+	
+	
+	/**
 	 * Gets a Map from (node) shapes to NodeExpressions derived from sh:values statements.
 	 * Can be used to efficiently figure out how to infer the values of a given instance, based on the rdf:types
 	 * of the instance.
@@ -149,21 +161,26 @@ public class ShapesGraph {
 	 * @return a Map or null if the predicate is not mentioned in any inferences
 	 */
 	public Map<Node,NodeExpression> getValuesNodeExpressionsMap(Resource predicate) {
+		return getExpressionsMap(valuesMap, predicate, SH.values);
+	}
+	
+	
+	private Map<Node,NodeExpression> getExpressionsMap(Map<Node,Map<Node,NodeExpression>> valuesMap, Resource predicate, Property systemPredicate) {
 		return valuesMap.computeIfAbsent(predicate.asNode(), p -> {
 			
 			Map<Node,List<NodeExpression>> map = new HashMap<>();
 			StmtIterator it = shapesModel.listStatements(null, SH.path, predicate);
 			while(it.hasNext()) {
 				Resource ps = it.next().getSubject();
-				if(ps.hasProperty(SH.values) && !ps.hasProperty(SH.deactivated, JenaDatatypes.TRUE)) {
+				if(ps.hasProperty(systemPredicate) && !ps.hasProperty(SH.deactivated, JenaDatatypes.TRUE)) {
 					StmtIterator nit = shapesModel.listStatements(null, SH.property, ps);
 					while(nit.hasNext()) {
 						Resource nodeShape = nit.next().getSubject();
 						if(!nodeShape.hasProperty(SH.deactivated, JenaDatatypes.TRUE)) {
 							Node shapeNode = nodeShape.asNode();
-							addExpressions(map, ps, shapeNode);
+							addExpressions(map, ps, shapeNode, systemPredicate);
 							for(Resource targetClass : JenaUtil.getResourceProperties(nodeShape, SH.targetClass)) {
-								addExpressions(map, ps, targetClass.asNode());
+								addExpressions(map, ps, targetClass.asNode(), systemPredicate);
 							}
 						}
 					}
@@ -191,10 +208,10 @@ public class ShapesGraph {
 	}
 
 
-	private void addExpressions(Map<Node, List<NodeExpression>> map, Resource ps, Node shapeNode) {
+	private void addExpressions(Map<Node, List<NodeExpression>> map, Resource ps, Node shapeNode, Property systemPredicate) {
 		map.computeIfAbsent(shapeNode, n -> {
 			List<NodeExpression> exprs = new LinkedList<>();
-			StmtIterator vit = ps.listProperties(SH.values);
+			StmtIterator vit = ps.listProperties(systemPredicate);
 			while(vit.hasNext()) {
 				RDFNode expr = vit.next().getObject();
 				NodeExpression nodeExpression = NodeExpressionFactory.get().create(expr);

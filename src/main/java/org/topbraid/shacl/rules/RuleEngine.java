@@ -54,6 +54,9 @@ import org.topbraid.shacl.vocabulary.SH;
  * A SHACL Rules engine with a pluggable architecture for different execution languages
  * including Triple rules, SPARQL rules and JavaScript rules.
  * 
+ * In preparation for inclusion into SHACL 1.1, this engine also supports sh:values rules,
+ * see https://www.topquadrant.com/graphql/values.html.
+ * 
  * @author Holger Knublauch
  */
 public class RuleEngine extends AbstractEngine {
@@ -240,11 +243,13 @@ public class RuleEngine extends AbstractEngine {
 				rule2Conditions.put(rule, conditions);
 			}
 			for(Resource ps : JenaUtil.getResourceProperties(shape.getShapeResource(), SH.property)) {
-				Resource path = JenaUtil.getResourceProperty(ps, SH.path);
-				if(path != null && path.isURIResource()) {
-					for(Statement s : ps.listProperties(SH.values).toList()) {
-						NodeExpression expr = NodeExpressionFactory.get().create(s.getObject());
-						rules.add(new ValuesRule(expr, path.asNode(), false));
+				if(!ps.hasProperty(SH.deactivated, JenaDatatypes.TRUE)) {
+					Resource path = JenaUtil.getResourceProperty(ps, SH.path);
+					if(path != null && path.isURIResource()) {
+						for(Statement s : ps.listProperties(SH.values).toList()) {
+							NodeExpression expr = NodeExpressionFactory.get().create(s.getObject());
+							rules.add(new ValuesRule(expr, path.asNode(), false));
+						}
 					}
 				}
 			}

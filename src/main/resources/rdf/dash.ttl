@@ -12,7 +12,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 <http://datashapes.org/dash>
-  rdf:type owl:Ontology ;
+  a owl:Ontology ;
   rdfs:comment """DASH defines SPARQL-based validators for many SHACL Core constraint components. These are (among others) utilized by TopBraid and its API. Note that constraint components that require validation of nested shapes (such as sh:node) are not implementable without a function such as tosh:hasShape.
 
 DASH is also a SHACL library for frequently needed features and design patterns. All features in this library are 100% standards compliant and will work on any engine that fully supports SHACL.""" ;
@@ -49,13 +49,13 @@ DASH is also a SHACL library for frequently needed features and design patterns.
     ] ;
 .
 dash:AllObjects
-  rdf:type dash:AllObjectsTarget ;
+  a dash:AllObjectsTarget ;
   rdfs:comment "A reusable instance of dash:AllObjectsTarget." ;
   rdfs:label "All objects" ;
 .
 dash:AllObjectsTarget
-  rdf:type sh:JSTargetType ;
-  rdf:type sh:SPARQLTargetType ;
+  a sh:JSTargetType ;
+  a sh:SPARQLTargetType ;
   rdfs:comment "A target containing all objects in the data graph as focus nodes." ;
   rdfs:label "All objects target" ;
   rdfs:subClassOf sh:Target ;
@@ -69,13 +69,13 @@ WHERE {
 }""" ;
 .
 dash:AllSubjects
-  rdf:type dash:AllSubjectsTarget ;
+  a dash:AllSubjectsTarget ;
   rdfs:comment "A reusable instance of dash:AllSubjectsTarget." ;
   rdfs:label "All subjects" ;
 .
 dash:AllSubjectsTarget
-  rdf:type sh:JSTargetType ;
-  rdf:type sh:SPARQLTargetType ;
+  a sh:JSTargetType ;
+  a sh:SPARQLTargetType ;
   rdfs:comment "A target containing all subjects in the data graph as focus nodes." ;
   rdfs:label "All subjects target" ;
   rdfs:subClassOf sh:Target ;
@@ -89,17 +89,17 @@ WHERE {
 }""" ;
 .
 dash:ClosedByTypesConstraintComponent
-  rdf:type sh:ConstraintComponent ;
+  a sh:ConstraintComponent ;
   rdfs:comment "A constraint component that can be used to declare that focus nodes are \"closed\" based on their rdf:types, meaning that focus nodes may only have values for the properties that are explicitly enumerated via sh:property/sh:path in property constraints at their rdf:types and the superclasses of those. This assumes that the type classes are also shapes." ;
   rdfs:label "Closed by types constraint component" ;
   sh:nodeValidator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateClosedByTypesNode" ;
       sh:jsLibrary dash:DASHJSLibrary ;
       sh:message "Property is not among those permitted for any of the types" ;
     ] ;
   sh:nodeValidator [
-      rdf:type sh:SPARQLSelectValidator ;
+      a sh:SPARQLSelectValidator ;
       sh:message "Property {?path} is not among those permitted for any of the types" ;
       sh:prefixes <http://datashapes.org/dash> ;
       sh:select """SELECT $this (?predicate AS ?path) ?value
@@ -120,25 +120,25 @@ WHERE {
   sh:targetClass sh:NodeShape ;
 .
 dash:ClosedByTypesConstraintComponent-closedByTypes
-  rdf:type sh:Parameter ;
+  a sh:Parameter ;
   sh:path dash:closedByTypes ;
   sh:datatype xsd:boolean ;
   sh:description "True to indicate that the focus nodes are closed by their types. A constraint violation is reported for each property value of the focus node where the property is not among those that are explicitly declared via sh:property/sh:path in any of the rdf:types of the focus node (and their superclasses). The property rdf:type is always permitted." ;
 .
 dash:CoExistsWithConstraintComponent
-  rdf:type sh:ConstraintComponent ;
-  dash:localConstraint "true"^^xsd:boolean ;
+  a sh:ConstraintComponent ;
+  dash:localConstraint true ;
   rdfs:comment "A constraint component that can be used to express a constraint on property shapes so that if the property path has any value then the given property must also have a value, and vice versa." ;
   rdfs:label "Co-exists-with constraint component" ;
   sh:message "Values must co-exist with values of {$coExistsWith}" ;
   sh:parameter dash:CoExistsWithConstraintComponent-coExistsWith ;
   sh:propertyValidator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateCoExistsWith" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
   sh:propertyValidator [
-      rdf:type sh:SPARQLSelectValidator ;
+      a sh:SPARQLSelectValidator ;
       sh:prefixes <http://datashapes.org/dash> ;
       sh:select """SELECT $this
 WHERE {
@@ -154,19 +154,19 @@ WHERE {
   sh:targetClass sh:PropertyShape ;
 .
 dash:CoExistsWithConstraintComponent-coExistsWith
-  rdf:type sh:Parameter ;
+  a sh:Parameter ;
   sh:path dash:coExistsWith ;
   sh:class rdf:Property ;
   sh:nodeKind sh:IRI ;
 .
 dash:DASHJSLibrary
-  rdf:type sh:JSLibrary ;
+  a sh:JSLibrary ;
   rdfs:label "DASH JavaScript library" ;
   sh:jsLibrary dash:RDFQueryJSLibrary ;
   sh:jsLibraryURL "http://datashapes.org/js/dash.js"^^xsd:anyURI ;
 .
 dash:DateOrDateTime
-  rdf:type rdf:List ;
+  a rdf:List ;
   rdf:first [
       sh:datatype xsd:date ;
     ] ;
@@ -179,7 +179,7 @@ dash:DateOrDateTime
   rdfs:label "Date or date time" ;
 .
 dash:DefaultValueTypeRule
-  rdf:type sh:SPARQLConstructExecutable ;
+  a sh:SPARQLConstructExecutable ;
   rdfs:comment """
 		A resource encapsulating a query that can be used to construct rdf:type triples for certain untyped nodes
 		that are an object in a triple where the predicate has a sh:defaultValueType.
@@ -198,25 +198,25 @@ dash:DefaultValueTypeRule
 		""" ;
 .
 dash:ExecutionPlatform
-  rdf:type rdfs:Class ;
+  a rdfs:Class ;
   rdfs:comment "An platform (such as TopBraid) that may have features needed to execute, for example, SPARQL queries." ;
   rdfs:label "Execution platform" ;
   rdfs:subClassOf rdfs:Resource ;
 .
 dash:FailureResult
-  rdf:type rdfs:Class ;
+  a rdfs:Class ;
   rdfs:comment "A result representing a validation failure such as an unsupported recursion." ;
   rdfs:label "Failure result" ;
   rdfs:subClassOf sh:AbstractResult ;
 .
 dash:FailureTestCaseResult
-  rdf:type rdfs:Class ;
+  a rdfs:Class ;
   rdfs:comment "Represents a failure of a test case." ;
   rdfs:label "Failure test case result" ;
   rdfs:subClassOf dash:TestCaseResult ;
 .
 dash:FunctionTestCase
-  rdf:type rdfs:Class ;
+  a rdfs:Class ;
   rdfs:comment "A test case that verifies that a given SPARQL expression produces a given, expected result." ;
   rdfs:label "Function test case" ;
   rdfs:subClassOf dash:TestCase ;
@@ -235,13 +235,13 @@ dash:FunctionTestCase
     ] ;
 .
 dash:GraphStoreTestCase
-  rdf:type rdfs:Class ;
-  rdf:type sh:NodeShape ;
+  a rdfs:Class ;
+  a sh:NodeShape ;
   rdfs:comment "A test case that can be used to verify that an RDF file could be loaded (from a file) and that the resulting RDF graph is equivalent to a given TTL file." ;
   rdfs:label "Graph store test case" ;
   rdfs:subClassOf dash:TestCase ;
   sh:property [
-      rdf:type sh:PropertyShape ;
+      a sh:PropertyShape ;
       sh:path dash:expectedResult ;
       sh:datatype xsd:string ;
       sh:description "The expected RDF graph, as a Turtle string." ;
@@ -249,7 +249,7 @@ dash:GraphStoreTestCase
       sh:minCount 1 ;
     ] ;
   sh:property [
-      rdf:type sh:PropertyShape ;
+      a sh:PropertyShape ;
       sh:path dash:uri ;
       sh:datatype xsd:anyURI ;
       sh:description "The URI of the graph to load." ;
@@ -259,19 +259,19 @@ dash:GraphStoreTestCase
     ] ;
 .
 dash:GraphUpdate
-  rdf:type rdfs:Class ;
+  a rdfs:Class ;
   rdfs:comment "A suggestion consisting of added and/or deleted triples, represented as rdf:Statements via dash:addedTriple and dash:deletedTriple." ;
   rdfs:label "Graph update" ;
   rdfs:subClassOf dash:Suggestion ;
 .
 dash:GraphValidationTestCase
-  rdf:type rdfs:Class ;
+  a rdfs:Class ;
   rdfs:comment "A test case that performs SHACL constraint validation on the whole graph and compares the results with the expected validation results stored with the test case. By default this excludes meta-validation (i.e. the validation of the shape definitions themselves). If that's desired, set dash:validateShapes to true." ;
   rdfs:label "Graph validation test case" ;
   rdfs:subClassOf dash:ValidationTestCase ;
 .
 dash:HTMLOrStringOrLangString
-  rdf:type rdf:List ;
+  a rdf:List ;
   rdf:first [
       sh:datatype rdf:HTML ;
     ] ;
@@ -287,18 +287,18 @@ dash:HTMLOrStringOrLangString
   rdfs:label "HTML or string or langString" ;
 .
 dash:HasValueWithClassConstraintComponent
-  rdf:type sh:ConstraintComponent ;
+  a sh:ConstraintComponent ;
   rdfs:comment "A constraint component that can be used to express a constraint on property shapes so that one of the values of the property path must be an instance of a given class." ;
   rdfs:label "Has value with class constraint component" ;
   sh:message "At least one of the values must be an instance of class {$hasValueWithClass}" ;
   sh:parameter dash:HasValueWithClassConstraintComponent-hasValueWithClass ;
   sh:propertyValidator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateHasValueWithClass" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
   sh:propertyValidator [
-      rdf:type sh:SPARQLSelectValidator ;
+      a sh:SPARQLSelectValidator ;
       sh:prefixes <http://datashapes.org/dash> ;
       sh:select """SELECT $this
 WHERE {
@@ -312,14 +312,14 @@ WHERE {
   sh:targetClass sh:PropertyShape ;
 .
 dash:HasValueWithClassConstraintComponent-hasValueWithClass
-  rdf:type sh:Parameter ;
+  a sh:Parameter ;
   sh:path dash:hasValueWithClass ;
   sh:class rdfs:Class ;
   sh:nodeKind sh:IRI ;
 .
 dash:InferencingTestCase
-  rdf:type rdfs:Class ;
-  rdf:type sh:NodeShape ;
+  a rdfs:Class ;
+  a sh:NodeShape ;
   rdfs:comment "A test case to verify whether an inferencing engine is producing identical results to those stored as expected results." ;
   rdfs:label "Inferencing test case" ;
   rdfs:subClassOf dash:TestCase ;
@@ -330,7 +330,7 @@ dash:InferencingTestCase
     ] ;
 .
 dash:JSTestCase
-  rdf:type rdfs:Class ;
+  a rdfs:Class ;
   rdfs:comment "A test case that calls a given JavaScript function like a sh:JSFunction and compares its result with the dash:expectedResult." ;
   rdfs:label "JavaScript test case" ;
   rdfs:subClassOf dash:TestCase ;
@@ -343,7 +343,7 @@ dash:JSTestCase
     ] ;
 .
 dash:ListNodeShape
-  rdf:type sh:NodeShape ;
+  a sh:NodeShape ;
   rdfs:comment "Defines constraints on what it means for a node to be a node within a well-formed RDF list. Note that this does not check whether the rdf:rest items are also well-formed lists as this would lead to unsupported recursion." ;
   rdfs:label "List node shape" ;
   sh:or (
@@ -376,7 +376,7 @@ dash:ListNodeShape
     ) ;
 .
 dash:ListShape
-  rdf:type sh:NodeShape ;
+  a sh:NodeShape ;
   rdfs:comment """Defines constraints on what it means for a node to be a well-formed RDF list.
 
 The focus node must either be rdf:nil or not recursive. Furthermore, this shape uses dash:ListNodeShape as a \"helper\" to walk through all members of the whole list (including itself).""" ;
@@ -393,7 +393,7 @@ The focus node must either be rdf:nil or not recursive. Furthermore, this shape 
             sh:path [
                 sh:oneOrMorePath rdf:rest ;
               ] ;
-            dash:nonRecursive "true"^^xsd:boolean ;
+            dash:nonRecursive true ;
           ] ;
       ]
     ) ;
@@ -406,7 +406,7 @@ The focus node must either be rdf:nil or not recursive. Furthermore, this shape 
     ] ;
 .
 dash:NonRecursiveConstraintComponent
-  rdf:type sh:ConstraintComponent ;
+  a sh:ConstraintComponent ;
   rdfs:comment """Used to state that a property or path must not point back to itself.
 
 For example, \"a person cannot have itself as parent\" can be expressed by setting dash:nonRecursive=true for a given sh:path.
@@ -416,12 +416,12 @@ To express that a person cannot have itself among any of its (recursive) parents
   sh:message "Points back at itself (recursively)" ;
   sh:parameter dash:NonRecursiveConstraintComponent-nonRecursive ;
   sh:propertyValidator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateNonRecursiveProperty" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
   sh:propertyValidator [
-      rdf:type sh:SPARQLSelectValidator ;
+      a sh:SPARQLSelectValidator ;
       sh:prefixes <http://datashapes.org/dash> ;
       sh:select """SELECT DISTINCT $this ($this AS ?value)
 WHERE {
@@ -434,43 +434,43 @@ WHERE {
   sh:targetClass sh:PropertyShape ;
 .
 dash:NonRecursiveConstraintComponent-nonRecursive
-  rdf:type sh:Parameter ;
+  a sh:Parameter ;
   sh:path dash:nonRecursive ;
   sh:datatype xsd:boolean ;
   sh:maxCount 1 ;
   sh:name "non-recursive" ;
 .
 dash:None
-  rdf:type sh:NodeShape ;
+  a sh:NodeShape ;
   rdfs:comment "A Shape that is no node can conform to." ;
   rdfs:label "None" ;
   sh:in () ;
 .
 dash:ParameterConstraintComponent
-  rdf:type sh:ConstraintComponent ;
+  a sh:ConstraintComponent ;
   rdfs:comment "A constraint component that can be used to verify that all value nodes conform to the given Parameter."@en ;
   rdfs:label "Parameter constraint component"@en ;
   sh:parameter dash:ParameterConstraintComponent-parameter ;
 .
 dash:ParameterConstraintComponent-parameter
-  rdf:type sh:Parameter ;
+  a sh:Parameter ;
   sh:path sh:parameter ;
 .
 dash:PrimaryKeyConstraintComponent
-  rdf:type sh:ConstraintComponent ;
-  dash:localConstraint "true"^^xsd:boolean ;
+  a sh:ConstraintComponent ;
+  dash:localConstraint true ;
   rdfs:comment "Enforces a constraint that the given property (sh:path) serves as primary key for all resources in the target of the shape. If a property has been declared to be the primary key then each resource must have exactly one value for that property. Furthermore, the URIs of those resources must start with a given string (dash:uriStart), followed by the URL-encoded primary key value. For example if dash:uriStart is \"http://example.org/country-\" and the primary key for an instance is \"de\" then the URI must be \"http://example.org/country-de\". Finally, as a result of the URI policy, there can not be any other resource with the same value under the same primary key policy." ;
   rdfs:label "Primary key constraint component" ;
   sh:labelTemplate "The property {?predicate} is the primary key and URIs start with {?uriStart}" ;
   sh:message "Violation of primary key constraint" ;
   sh:parameter dash:PrimaryKeyConstraintComponent-uriStart ;
   sh:propertyValidator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validatePrimaryKeyProperty" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
   sh:propertyValidator [
-      rdf:type sh:SPARQLSelectValidator ;
+      a sh:SPARQLSelectValidator ;
       sh:prefixes <http://datashapes.org/dash> ;
       sh:select """SELECT DISTINCT $this
 WHERE {
@@ -500,7 +500,7 @@ WHERE {
   sh:targetClass sh:PropertyShape ;
 .
 dash:PrimaryKeyConstraintComponent-uriStart
-  rdf:type sh:Parameter ;
+  a sh:Parameter ;
   sh:path dash:uriStart ;
   sh:datatype xsd:string ;
   sh:description "The start of the URIs of well-formed resources. If specified then the associated property/path serves as \"primary key\" for all target nodes (instances). All such target nodes need to have a URI that starts with the given string, followed by the URI-encoded value of the primary key property." ;
@@ -508,8 +508,8 @@ dash:PrimaryKeyConstraintComponent-uriStart
   sh:name "URI start" ;
 .
 dash:QueryTestCase
-  rdf:type rdfs:Class ;
-  rdf:type sh:NodeShape ;
+  a rdfs:Class ;
+  a sh:NodeShape ;
   rdfs:comment "A test case running a given SPARQL SELECT query and comparing its results with those stored as JSON Result Set in the expected result property." ;
   rdfs:label "Query test case" ;
   rdfs:subClassOf dash:TestCase ;
@@ -532,12 +532,12 @@ dash:QueryTestCase
     ] ;
 .
 dash:RDFQueryJSLibrary
-  rdf:type sh:JSLibrary ;
+  a sh:JSLibrary ;
   rdfs:label "rdfQuery JavaScript Library" ;
   sh:jsLibraryURL "http://datashapes.org/js/rdfquery.js"^^xsd:anyURI ;
 .
 dash:RootClassConstraintComponent
-  rdf:type sh:ConstraintComponent ;
+  a sh:ConstraintComponent ;
   rdfs:comment "A constraint component defining the parameter dash:rootClass, which restricts the values to be either the root class itself or one of its subclasses. This is typically used in conjunction with properties that have rdfs:Class as their type." ;
   rdfs:label "Root class constraint component" ;
   sh:labelTemplate "Root class {$rootClass}" ;
@@ -546,13 +546,13 @@ dash:RootClassConstraintComponent
   sh:targetClass sh:PropertyShape ;
   sh:validator dash:hasRootClass ;
   sh:validator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateRootClass" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
 .
 dash:RootClassConstraintComponent-rootClass
-  rdf:type sh:Parameter ;
+  a sh:Parameter ;
   sh:path dash:rootClass ;
   sh:class rdfs:Class ;
   sh:description "The root class." ;
@@ -560,7 +560,7 @@ dash:RootClassConstraintComponent-rootClass
   sh:nodeKind sh:IRI ;
 .
 dash:SPARQLUpdateSuggestionGenerator
-  rdf:type rdfs:Class ;
+  a rdfs:Class ;
   rdfs:comment """A SuggestionGenerator based on a SPARQL UPDATE query (sh:update), producing an instance of dash:GraphUpdate. The INSERTs become dash:addedTriple and the DELETEs become dash:deletedTriple. The WHERE clause operates on the data graph with the pre-bound variables $subject, $predicate and $object, as well as the other pre-bound variables for the parameters of the constraint.
 
 In many cases, there may be multiple possible suggestions to fix a problem. For example, with sh:maxLength there are many ways to slice a string. In those cases, the system will first iterate through the result variables from a SELECT query (sh:select) and apply these results as pre-bound variables into the UPDATE query.""" ;
@@ -570,8 +570,8 @@ In many cases, there may be multiple possible suggestions to fix a problem. For 
   rdfs:subClassOf sh:SPARQLUpdateExecutable ;
 .
 dash:StemConstraintComponent
-  rdf:type sh:ConstraintComponent ;
-  dash:staticConstraint "true"^^xsd:boolean ;
+  a sh:ConstraintComponent ;
+  dash:staticConstraint true ;
   rdfs:comment "A constraint component that can be used to verify that every value node is an IRI and the IRI starts with a given string value."@en ;
   rdfs:label "Stem constraint component"@en ;
   sh:labelTemplate "Value needs to have stem {$stem}" ;
@@ -580,18 +580,18 @@ dash:StemConstraintComponent
   sh:targetClass sh:Shape ;
   sh:validator dash:hasStem ;
   sh:validator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateStem" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
 .
 dash:StemConstraintComponent-stem
-  rdf:type sh:Parameter ;
+  a sh:Parameter ;
   sh:path dash:stem ;
   sh:datatype xsd:string ;
 .
 dash:StringOrLangString
-  rdf:type rdf:List ;
+  a rdf:List ;
   rdf:first [
       sh:datatype xsd:string ;
     ] ;
@@ -604,14 +604,14 @@ dash:StringOrLangString
   rdfs:label "String or langString" ;
 .
 dash:SubSetOfConstraintComponent
-  rdf:type sh:ConstraintComponent ;
-  dash:localConstraint "true"^^xsd:boolean ;
+  a sh:ConstraintComponent ;
+  dash:localConstraint true ;
   rdfs:comment "A constraint component that can be used to state that the set of value nodes must be a subset of the value of a given property." ;
   rdfs:label "Sub set of constraint component" ;
   sh:message "Must be one of the values of {$subSetOf}" ;
   sh:parameter dash:SubSetOfConstraintComponent-subSetOf ;
   sh:propertyValidator [
-      rdf:type sh:SPARQLAskValidator ;
+      a sh:SPARQLAskValidator ;
       sh:ask """ASK {
     $this $subSetOf $value .
 }""" ;
@@ -619,62 +619,62 @@ dash:SubSetOfConstraintComponent
     ] ;
   sh:targetClass sh:PropertyShape ;
   sh:validator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateSubSetOf" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
 .
 dash:SubSetOfConstraintComponent-subSetOf
-  rdf:type sh:Parameter ;
+  a sh:Parameter ;
   sh:path dash:subSetOf ;
   sh:class rdf:Property ;
   sh:description "A property (of the focus node) that must (at least) have all values from the set of value nodes." ;
 .
 dash:SuccessResult
-  rdf:type rdfs:Class ;
+  a rdfs:Class ;
   rdfs:comment "A result representing a successfully validated constraint." ;
   rdfs:label "Success result" ;
   rdfs:subClassOf sh:AbstractResult ;
 .
 dash:SuccessTestCaseResult
-  rdf:type rdfs:Class ;
+  a rdfs:Class ;
   rdfs:comment "Represents a successful run of a test case." ;
   rdfs:label "Success test case result" ;
   rdfs:subClassOf dash:TestCaseResult ;
 .
 dash:Suggestion
-  rdf:type rdfs:Class ;
-  dash:abstract "true"^^xsd:boolean ;
+  a rdfs:Class ;
+  dash:abstract true ;
   rdfs:comment "Base class of suggestions that modify a graph to \"fix\" the source of a validation result." ;
   rdfs:label "Suggestion" ;
   rdfs:subClassOf rdfs:Resource ;
 .
 dash:SuggestionGenerator
-  rdf:type rdfs:Class ;
-  dash:abstract "true"^^xsd:boolean ;
+  a rdfs:Class ;
+  dash:abstract true ;
   rdfs:comment "Base class of objects that can generate suggestions (added or deleted triples) for a validation result of a given constraint component." ;
   rdfs:label "Suggestion generator" ;
   rdfs:subClassOf rdfs:Resource ;
 .
 dash:SuggestionResult
-  rdf:type rdfs:Class ;
+  a rdfs:Class ;
   rdfs:comment "Class of results that have been produced as suggestions, not through SHACL validation. How the actual results are produced is up to implementers. Each instance of this class should have values for sh:focusNode, sh:resultMessage, sh:resultSeverity (suggested default: sh:Info), and dash:suggestion to point at one or more suggestions." ;
   rdfs:label "Suggestion result" ;
   rdfs:subClassOf sh:AbstractResult ;
 .
 dash:SymmetricConstraintComponent
-  rdf:type sh:ConstraintComponent ;
+  a sh:ConstraintComponent ;
   rdfs:comment "A contraint component for property shapes to validate that a property is symmetric. For symmetric properties, if A relates to B then B must relate to A." ;
   rdfs:label "Symmetric constraint component" ;
   sh:message "Symmetric value expected" ;
   sh:parameter dash:SymmetricConstraintComponent-symmetric ;
   sh:propertyValidator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateSymmetric" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
   sh:propertyValidator [
-      rdf:type sh:SPARQLSelectValidator ;
+      a sh:SPARQLSelectValidator ;
       sh:prefixes <http://datashapes.org/dash> ;
       sh:select """SELECT $this ?value {
 	FILTER ($symmetric) .
@@ -687,21 +687,21 @@ dash:SymmetricConstraintComponent
   sh:targetClass sh:PropertyShape ;
 .
 dash:SymmetricConstraintComponent-symmetric
-  rdf:type sh:Parameter ;
+  a sh:Parameter ;
   sh:path dash:symmetric ;
   sh:datatype xsd:boolean ;
   sh:group tosh:RelationshipPropertyGroup ;
 .
 dash:TestCase
-  rdf:type rdfs:Class ;
-  dash:abstract "true"^^xsd:boolean ;
+  a rdfs:Class ;
+  dash:abstract true ;
   rdfs:comment "A test case to verify that a (SHACL-based) feature works as expected." ;
   rdfs:label "Test case" ;
   rdfs:subClassOf rdfs:Resource ;
 .
 dash:TestCaseResult
-  rdf:type rdfs:Class ;
-  dash:abstract "true"^^xsd:boolean ;
+  a rdfs:Class ;
+  dash:abstract true ;
   rdfs:comment "Base class for results produced by running test cases." ;
   rdfs:label "Test case result" ;
   rdfs:subClassOf sh:AbstractResult ;
@@ -724,27 +724,27 @@ dash:TestCaseResult
     ] ;
 .
 dash:TestEnvironment
-  rdf:type rdfs:Class ;
-  dash:abstract "true"^^xsd:boolean ;
+  a rdfs:Class ;
+  dash:abstract true ;
   rdfs:comment "Abstract base class for test environments, holding information on how to set up a test case." ;
   rdfs:label "Test environment" ;
   rdfs:subClassOf rdfs:Resource ;
 .
 dash:UniqueValueForClassConstraintComponent
-  rdf:type sh:ConstraintComponent ;
+  a sh:ConstraintComponent ;
   dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
   rdfs:comment "A constraint component that can be used to state that the values of a property must be unique for all instances of a given class (and its subclasses)." ;
   rdfs:label "Unique value for class constraint component" ;
   sh:labelTemplate "Values must be unique among all instances of {?uniqueValueForClass}" ;
   sh:parameter dash:UniqueValueForClassConstraintComponent-uniqueValueForClass ;
   sh:propertyValidator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateUniqueValueForClass" ;
       sh:jsLibrary dash:DASHJSLibrary ;
       sh:message "Value {?value} must be unique but is also used by {?other}" ;
     ] ;
   sh:propertyValidator [
-      rdf:type sh:SPARQLSelectValidator ;
+      a sh:SPARQLSelectValidator ;
       sh:message "Value {?value} must be unique but is also used by {?other}" ;
       sh:prefixes <http://datashapes.org/dash> ;
       sh:select """SELECT DISTINCT $this ?value ?other
@@ -761,15 +761,15 @@ WHERE {
   sh:targetClass sh:PropertyShape ;
 .
 dash:UniqueValueForClassConstraintComponent-uniqueValueForClass
-  rdf:type sh:Parameter ;
+  a sh:Parameter ;
   sh:path dash:uniqueValueForClass ;
   sh:class rdfs:Class ;
   sh:nodeKind sh:IRI ;
 .
 dash:ValidationTestCase
-  rdf:type rdfs:Class ;
-  rdf:type sh:NodeShape ;
-  dash:abstract "true"^^xsd:boolean ;
+  a rdfs:Class ;
+  a sh:NodeShape ;
+  dash:abstract true ;
   rdfs:comment "Abstract superclass for test cases concerning SHACL constraint validation. Future versions may add new kinds of validatin test cases, e.g. to validate a single resource only." ;
   rdfs:label "Validation test case" ;
   rdfs:subClassOf dash:TestCase ;
@@ -781,52 +781,55 @@ dash:ValidationTestCase
     ] ;
 .
 dash:abstract
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:comment "Indicates that a class is \"abstract\" and cannot be used in asserted rdf:type triples. Only non-abstract subclasses of abstract classes should be instantiated directly." ;
   rdfs:domain rdfs:Class ;
   rdfs:label "abstract" ;
   rdfs:range xsd:boolean ;
 .
 dash:addedTriple
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:comment "May link a dash:GraphUpdate with one or more triples (represented as instances of rdf:Statement) that should be added to fix the source of the result." ;
   rdfs:domain dash:GraphUpdate ;
   rdfs:label "added triple" ;
   rdfs:range rdf:Statement ;
 .
+dash:all
+  rdfs:comment "Represents all users/roles, for example as a possible value of the default view for role property." ;
+.
 dash:applicableToClass
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:comment "Can be used to state that a shape is applicable to instances of a given class. This is a softer statement than \"target class\": a target means that all instances of the class must conform to the shape. Being applicable to simply means that the shape may apply to (some) instances of the class. This information can be used by algorithms or humans." ;
   rdfs:domain sh:Shape ;
   rdfs:label "applicable to class" ;
   rdfs:range rdfs:Class ;
 .
 dash:cachable
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:comment "If set to true then the results of the SHACL function can be cached in between invocations with the same arguments. In other words, they are stateless and do not depend on triples in any graph, or the current time stamp etc." ;
   rdfs:domain sh:Function ;
   rdfs:label "cachable" ;
   rdfs:range xsd:boolean ;
 .
 dash:closedByTypes
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:label "closed by types" ;
 .
 dash:coExistsWith
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:comment "Specifies a property that must have a value whenever the property path has a value, and must have no value whenever the property path has no value." ;
   rdfs:label "co-exists with" ;
   rdfs:range rdf:Property ;
 .
 dash:composite
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:comment "Can be used to indicate that a property/path represented by a property constraint represents a composite relationship. In a composite relationship, the life cycle of a \"child\" object (value of the property/path) depends on the \"parent\" object (focus node). If the parent gets deleted, then the child objects should be deleted, too. Tools may use dash:composite (if set to true) to implement cascading delete operations." ;
   rdfs:domain sh:PropertyShape ;
   rdfs:label "composite" ;
   rdfs:range xsd:boolean ;
 .
 dash:defaultValueType
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:comment """
 		Links a property with a default value type.
 		The default value type is assumed to be the <code>rdf:type</code> of values of the property
@@ -839,41 +842,47 @@ dash:defaultValueType
   rdfs:range rdfs:Class ;
   owl:versionInfo "Note this property may get removed in future versions. It is a left-over from a previous design in SHACL." ;
 .
+dash:defaultViewForRole
+  a rdf:Property ;
+  rdfs:comment "Links a node shape with the roles for which it shall be used as default view. User interfaces can use these values to select how to present a given RDF resource. The values of this property are URIs representing a group of users or agents. There is a dedicated URI dash:all representing all users." ;
+  rdfs:domain sh:NodeShape ;
+  rdfs:label "default view for role" ;
+.
 dash:deletedTriple
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:comment "May link a dash:GraphUpdate result with one or more triples (represented as instances of rdf:Statement) that should be deleted to fix the source of the result." ;
   rdfs:domain dash:GraphUpdate ;
   rdfs:label "deleted triple" ;
   rdfs:range rdf:Statement ;
 .
 dash:expectedResult
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:comment "The expected result(s) of a test case. The value range of this property is different for each kind of test cases." ;
   rdfs:domain dash:TestCase ;
   rdfs:label "expected result" ;
 .
 dash:expectedResultIsJSON
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:comment "A flag to indicate that the expected result represents a JSON string. If set to true, then tests would compare JSON structures (regardless of whitespaces) instead of actual syntax." ;
   rdfs:label "expected result is JSON" ;
   rdfs:range xsd:boolean ;
 .
 dash:expectedResultIsTTL
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:comment "A flag to indicate that the expected result represents an RDF graph encoded as a Turtle file. If set to true, then tests would compare graphs instead of actual syntax." ;
   rdfs:domain dash:TestCase ;
   rdfs:label "expected result is Turtle" ;
   rdfs:range xsd:boolean ;
 .
 dash:fixed
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:comment "Can be used to mark that certain validation results have already been fixed." ;
   rdfs:domain sh:ValidationResult ;
   rdfs:label "fixed" ;
   rdfs:range xsd:boolean ;
 .
 dash:hasClass
-  rdf:type sh:SPARQLAskValidator ;
+  a sh:SPARQLAskValidator ;
   rdfs:label "has class" ;
   sh:ask """
 		ASK {
@@ -884,21 +893,21 @@ dash:hasClass
   sh:prefixes <http://datashapes.org/dash> ;
 .
 dash:hasMaxExclusive
-  rdf:type sh:SPARQLAskValidator ;
-  rdfs:comment "Checks whether a given node (?value) has value less than (<) the provided ?maxExclusive. Returns false if this cannot be determined, e.g. because values do not have comparable types." ;
+  a sh:SPARQLAskValidator ;
+  rdfs:comment "Checks whether a given node (?value) has a value less than (<) the provided ?maxExclusive. Returns false if this cannot be determined, e.g. because values do not have comparable types." ;
   rdfs:label "has max exclusive" ;
   sh:ask "ASK { FILTER ($value < $maxExclusive) }" ;
   sh:prefixes <http://datashapes.org/dash> ;
 .
 dash:hasMaxInclusive
-  rdf:type sh:SPARQLAskValidator ;
-  rdfs:comment "Checks whether a given node (?value) has value less than or equal to (<=) the provided ?maxInclusive. Returns false if this cannot be determined, e.g. because values do not have comparable types." ;
+  a sh:SPARQLAskValidator ;
+  rdfs:comment "Checks whether a given node (?value) has a value less than or equal to (<=) the provided ?maxInclusive. Returns false if this cannot be determined, e.g. because values do not have comparable types." ;
   rdfs:label "has max inclusive" ;
   sh:ask "ASK { FILTER ($value <= $maxInclusive) }" ;
   sh:prefixes <http://datashapes.org/dash> ;
 .
 dash:hasMaxLength
-  rdf:type sh:SPARQLAskValidator ;
+  a sh:SPARQLAskValidator ;
   rdfs:comment "Checks whether a given string (?value) has a length within a given maximum string length." ;
   rdfs:label "has max length" ;
   sh:ask """
@@ -909,21 +918,21 @@ dash:hasMaxLength
   sh:prefixes <http://datashapes.org/dash> ;
 .
 dash:hasMinExclusive
-  rdf:type sh:SPARQLAskValidator ;
+  a sh:SPARQLAskValidator ;
   rdfs:comment "Checks whether a given node (?value) has value greater than (>) the provided ?minExclusive. Returns false if this cannot be determined, e.g. because values do not have comparable types." ;
   rdfs:label "has min exclusive" ;
   sh:ask "ASK { FILTER ($value > $minExclusive) }" ;
   sh:prefixes <http://datashapes.org/dash> ;
 .
 dash:hasMinInclusive
-  rdf:type sh:SPARQLAskValidator ;
+  a sh:SPARQLAskValidator ;
   rdfs:comment "Checks whether a given node (?value) has value greater than or equal to (>=) the provided ?minInclusive. Returns false if this cannot be determined, e.g. because values do not have comparable types." ;
   rdfs:label "has min inclusive" ;
   sh:ask "ASK { FILTER ($value >= $minInclusive) }" ;
   sh:prefixes <http://datashapes.org/dash> ;
 .
 dash:hasMinLength
-  rdf:type sh:SPARQLAskValidator ;
+  a sh:SPARQLAskValidator ;
   rdfs:comment "Checks whether a given string (?value) has a length within a given minimum string length." ;
   rdfs:label "has min length" ;
   sh:ask """
@@ -934,7 +943,7 @@ dash:hasMinLength
   sh:prefixes <http://datashapes.org/dash> ;
 .
 dash:hasNodeKind
-  rdf:type sh:SPARQLAskValidator ;
+  a sh:SPARQLAskValidator ;
   rdfs:comment "Checks whether a given node (?value) has a given sh:NodeKind (?nodeKind). For example, sh:hasNodeKind(42, sh:Literal) = true." ;
   rdfs:label "has node kind" ;
   sh:ask """
@@ -947,14 +956,14 @@ dash:hasNodeKind
   sh:prefixes <http://datashapes.org/dash> ;
 .
 dash:hasPattern
-  rdf:type sh:SPARQLAskValidator ;
+  a sh:SPARQLAskValidator ;
   rdfs:comment "Checks whether the string representation of a given node (?value) matches a given regular expression (?pattern). Returns false if the value is a blank node." ;
   rdfs:label "has pattern" ;
   sh:ask "ASK { FILTER (!isBlank($value) && IF(bound($flags), regex(str($value), $pattern, $flags), regex(str($value), $pattern))) }" ;
   sh:prefixes <http://datashapes.org/dash> ;
 .
 dash:hasRootClass
-  rdf:type sh:SPARQLAskValidator ;
+  a sh:SPARQLAskValidator ;
   rdfs:label "has root class" ;
   sh:ask """ASK {
     $value rdfs:subClassOf* $rootClass .
@@ -962,33 +971,33 @@ dash:hasRootClass
   sh:prefixes <http://datashapes.org/dash> ;
 .
 dash:hasStem
-  rdf:type sh:SPARQLAskValidator ;
+  a sh:SPARQLAskValidator ;
   rdfs:comment "Checks whether a given node is an IRI starting with a given stem." ;
   rdfs:label "has stem" ;
   sh:ask "ASK { FILTER (isIRI($value) && STRSTARTS(str($value), $stem)) }" ;
   sh:prefixes <http://datashapes.org/dash> ;
 .
 dash:hasValueWithClass
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:comment "Specifies a constraint that at least one of the value nodes must be an instance of a given class." ;
   rdfs:label "has value with class" ;
   rdfs:range rdfs:Class ;
 .
 dash:height
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:comment "The height." ;
   rdfs:label "height" ;
   rdfs:range xsd:integer ;
 .
 dash:includedExecutionPlatform
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:comment "Can be used to state that one (subject) execution platform includes all features of another platform (object)." ;
   rdfs:domain dash:ExecutionPlatform ;
   rdfs:label "included execution platform" ;
   rdfs:range dash:ExecutionPlatform ;
 .
 dash:isDeactivated
-  rdf:type sh:SPARQLFunction ;
+  a sh:SPARQLFunction ;
   rdfs:comment "Checks whether a given shape or constraint has been marked as \"deactivated\" using sh:deactivated." ;
   rdfs:label "is deactivated" ;
   sh:ask """ASK {
@@ -1003,7 +1012,7 @@ dash:isDeactivated
   sh:returnType xsd:boolean ;
 .
 dash:isIn
-  rdf:type sh:SPARQLAskValidator ;
+  a sh:SPARQLAskValidator ;
   rdfs:label "is in" ;
   sh:ask """
 		ASK {
@@ -1015,7 +1024,7 @@ dash:isIn
   sh:prefixes <http://datashapes.org/dash> ;
 .
 dash:isLanguageIn
-  rdf:type sh:SPARQLAskValidator ;
+  a sh:SPARQLAskValidator ;
   rdfs:label "is language in" ;
   sh:ask """
 		ASK {
@@ -1030,8 +1039,8 @@ dash:isLanguageIn
   sh:prefixes <http://datashapes.org/dash> ;
 .
 dash:isNodeKindBlankNode
-  rdf:type sh:SPARQLFunction ;
-  dash:cachable "true"^^xsd:boolean ;
+  a sh:SPARQLFunction ;
+  dash:cachable true ;
   rdfs:comment "Checks if a given sh:NodeKind is one that includes BlankNodes." ;
   rdfs:label "is NodeKind BlankNode" ;
   sh:ask """ASK {
@@ -1048,8 +1057,8 @@ dash:isNodeKindBlankNode
   sh:returnType xsd:boolean ;
 .
 dash:isNodeKindIRI
-  rdf:type sh:SPARQLFunction ;
-  dash:cachable "true"^^xsd:boolean ;
+  a sh:SPARQLFunction ;
+  dash:cachable true ;
   rdfs:comment "Checks if a given sh:NodeKind is one that includes IRIs." ;
   rdfs:label "is NodeKind IRI" ;
   sh:ask """ASK {
@@ -1066,8 +1075,8 @@ dash:isNodeKindIRI
   sh:returnType xsd:boolean ;
 .
 dash:isNodeKindLiteral
-  rdf:type sh:SPARQLFunction ;
-  dash:cachable "true"^^xsd:boolean ;
+  a sh:SPARQLFunction ;
+  dash:cachable true ;
   rdfs:comment "Checks if a given sh:NodeKind is one that includes Literals." ;
   rdfs:label "is NodeKind Literal" ;
   sh:ask """ASK {
@@ -1084,7 +1093,7 @@ dash:isNodeKindLiteral
   sh:returnType xsd:boolean ;
 .
 dash:localConstraint
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:comment """Can be set to true for those constraint components where the validation does not require to visit any other triples than the shape definitions and the direct property values of the focus node mentioned in the property constraints. Examples of this include sh:minCount and sh:hasValue.
 
 Constraint components that are marked as such can be optimized by engines, e.g. they can be evaluated client-side at form submission time, without having to make a round-trip to a server, assuming the client has downloaded a complete snapshot of the resource.
@@ -1095,31 +1104,31 @@ Any component marked with dash:staticConstraint is also a dash:localConstraint."
   rdfs:range xsd:boolean ;
 .
 dash:propertySuggestionGenerator
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:comment "Links the constraint component with instances of dash:SuggestionGenerator that may be used to produce suggestions for a given validation result that was produced by a property constraint." ;
   rdfs:domain sh:ConstraintComponent ;
   rdfs:label "property suggestion generator" ;
   rdfs:range dash:SuggestionGenerator ;
 .
 dash:requiredExecutionPlatform
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:comment "Links a SPARQL executable with the platforms that it can be executed on. This can be used by a SHACL implementation to determine whether a constraint validator or rule shall be ignored based on the current platform. For example, if a SPARQL query uses a function or magic property that is only available in TopBraid then a non-TopBraid platform can ignore the constraint (or simply always return no validation results). If this property has no value then the assumption is that the execution will succeed. As soon as one value exists, the assumption is that the engine supports at least one of the given platforms." ;
   rdfs:domain sh:SPARQLExecutable ;
   rdfs:label "required execution platform" ;
   rdfs:range dash:ExecutionPlatform ;
 .
 dash:rootClass
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:label "root class" ;
 .
 dash:shape
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:comment "States that a subject resource has a given shape. This property can, for example, be used to capture results of SHACL validation on static data." ;
   rdfs:label "shape" ;
   rdfs:range sh:Shape ;
 .
 dash:staticConstraint
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:comment """Can be set to true for those constraint components where the validation does not require to visit any other triples than the parameters. Examples of this include sh:datatype or sh:nodeKind, where no further triples need to be queried to determine the result.
 
 Constraint components that are marked as such can be optimized by engines, e.g. they can be evaluated client-side at form submission time, without having to make a round-trip to a server.""" ;
@@ -1128,64 +1137,64 @@ Constraint components that are marked as such can be optimized by engines, e.g. 
   rdfs:range xsd:boolean ;
 .
 dash:stem
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:comment "Specifies a string value that the IRI of the value nodes must start with."@en ;
   rdfs:label "stem"@en ;
   rdfs:range xsd:string ;
 .
 dash:subSetOf
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:label "sub set of" ;
 .
 dash:suggestion
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:comment "Can be used to link a result with one or more suggestions on how to address or improve the underlying issue." ;
   rdfs:domain sh:AbstractResult ;
   rdfs:label "suggestion" ;
   rdfs:range dash:Suggestion ;
 .
 dash:suggestionConfidence
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:comment "An optional confidence between 0% and 100%. Suggestions with 100% confidence are strongly recommended. Can be used to sort recommended updates." ;
   rdfs:domain dash:Suggestion ;
   rdfs:label "suggestion confidence" ;
   rdfs:range xsd:decimal ;
 .
 dash:suggestionGenerator
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:comment "Links a sh:SPARQLConstraint or sh:JSConstraint with instances of dash:SuggestionGenerator that may be used to produce suggestions for a given validation result that was produced by the constraint." ;
   rdfs:label "suggestion generator" ;
   rdfs:range dash:SuggestionGenerator ;
 .
 dash:suggestionGroup
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:comment "Can be used to link a suggestion with the group identifier to which it belongs. By default this is a link to the dash:SuggestionGenerator, but in principle this could be any value." ;
   rdfs:domain dash:Suggestion ;
   rdfs:label "suggestion" ;
 .
 dash:symmetric
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:comment "True to declare that the associated property path is symmetric." ;
   rdfs:label "symmetric" ;
 .
 dash:testEnvironment
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:comment "Can be used by TestCases to point at a resource with information on how to set up the execution environment prior to execution." ;
   rdfs:domain dash:TestCase ;
   rdfs:label "test environment" ;
   rdfs:range dash:TestEnvironment ;
 .
 dash:testModifiesEnvironment
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:comment "Indicates whether this test modifies the specified dash:testEnvironment. If set to true then a test runner can make sure to wipe out the previous environment, while leaving it false (or undefined) means that the test runner can reuse the environment from the previous test case. As setting up and tearing down tests is sometimes slow, this flag can significantly accelerate test execution." ;
   rdfs:domain dash:TestCase ;
   rdfs:label "test modifies environment" ;
   rdfs:range xsd:boolean ;
 .
 dash:toString
-  rdf:type sh:JSFunction ;
-  rdf:type sh:SPARQLFunction ;
-  dash:cachable "true"^^xsd:boolean ;
+  a sh:JSFunction ;
+  a sh:SPARQLFunction ;
+  dash:cachable true ;
   rdfs:comment "Returns a literal with datatype xsd:string that has the input value as its string. If the input value is an (URI) resource then its URI will be used." ;
   rdfs:label "to string" ;
   sh:jsFunctionName "dash_toString" ;
@@ -1204,18 +1213,18 @@ WHERE {
 }""" ;
 .
 dash:uniqueValueForClass
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:label "unique value for class" ;
 .
 dash:validateShapes
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:comment "True to also validate the shapes itself (i.e. parameter declarations)." ;
   rdfs:domain dash:GraphValidationTestCase ;
   rdfs:label "validate shapes" ;
   rdfs:range xsd:boolean ;
 .
 dash:valueCount
-  rdf:type sh:SPARQLFunction ;
+  a sh:SPARQLFunction ;
   rdfs:comment "Computes the number of objects for a given subject/predicate combination." ;
   rdfs:label "value count" ;
   sh:parameter [
@@ -1242,34 +1251,34 @@ dash:valueCount
 """ ;
 .
 dash:width
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:comment "The width." ;
   rdfs:label "width" ;
   rdfs:range xsd:integer ;
 .
 dash:x
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:comment "The x position." ;
   rdfs:label "x" ;
   rdfs:range xsd:integer ;
 .
 dash:y
-  rdf:type rdf:Property ;
+  a rdf:Property ;
   rdfs:comment "The y position." ;
   rdfs:label "y" ;
   rdfs:range xsd:integer ;
 .
 owl:Class
-  rdf:type rdfs:Class ;
+  a rdfs:Class ;
   rdfs:subClassOf rdfs:Class ;
 .
 sh:AbstractResult
-  dash:abstract "true"^^xsd:boolean ;
+  dash:abstract true ;
 .
 sh:AndConstraintComponent
   sh:targetClass sh:Shape ;
   sh:validator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateAnd" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
@@ -1279,16 +1288,16 @@ sh:ClassConstraintComponent
   sh:targetClass sh:Shape ;
   sh:validator dash:hasClass ;
   sh:validator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateClass" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
 .
 sh:ClosedConstraintComponent
-  dash:localConstraint "true"^^xsd:boolean ;
+  dash:localConstraint true ;
   sh:labelTemplate "Closed shape: only the enumerated properties can be used" ;
   sh:nodeValidator [
-      rdf:type sh:SPARQLSelectValidator ;
+      a sh:SPARQLSelectValidator ;
       sh:message "Predicate {?path} is not allowed (closed shape)" ;
       sh:prefixes <http://datashapes.org/dash> ;
       sh:select """
@@ -1312,19 +1321,19 @@ sh:ClosedConstraintComponent
     ] ;
   sh:targetClass sh:NodeShape ;
   sh:validator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateClosed" ;
       sh:jsLibrary dash:DASHJSLibrary ;
       sh:message "Predicate is not allowed (closed shape)" ;
     ] ;
 .
 sh:DatatypeConstraintComponent
-  dash:staticConstraint "true"^^xsd:boolean ;
+  dash:staticConstraint true ;
   sh:labelTemplate "Values must have datatype {$datatype}" ;
   sh:message "Value does not have datatype {$datatype}" ;
   sh:targetClass sh:Shape ;
   sh:validator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateDatatype" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
@@ -1333,16 +1342,16 @@ sh:DerivedValuesConstraintComponent
   sh:targetClass sh:PropertyShape ;
 .
 sh:DisjointConstraintComponent
-  dash:localConstraint "true"^^xsd:boolean ;
+  dash:localConstraint true ;
   sh:targetClass sh:Shape ;
   sh:validator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateDisjoint" ;
       sh:jsLibrary dash:DASHJSLibrary ;
       sh:message "Value node must not also be one of the values of {$disjoint}" ;
     ] ;
   sh:validator [
-      rdf:type sh:SPARQLAskValidator ;
+      a sh:SPARQLAskValidator ;
       sh:ask """
 		ASK {
 			FILTER NOT EXISTS {
@@ -1355,15 +1364,15 @@ sh:DisjointConstraintComponent
     ] ;
 .
 sh:EqualsConstraintComponent
-  dash:localConstraint "true"^^xsd:boolean ;
+  dash:localConstraint true ;
   sh:message "Must have same values as {$equals}" ;
   sh:nodeValidator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateEqualsNode" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
   sh:nodeValidator [
-      rdf:type sh:SPARQLSelectValidator ;
+      a sh:SPARQLSelectValidator ;
       sh:prefixes <http://datashapes.org/dash> ;
       sh:select """
 		SELECT DISTINCT $this ?value
@@ -1381,12 +1390,12 @@ sh:EqualsConstraintComponent
 		""" ;
     ] ;
   sh:propertyValidator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateEqualsProperty" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
   sh:propertyValidator [
-      rdf:type sh:SPARQLSelectValidator ;
+      a sh:SPARQLSelectValidator ;
       sh:prefixes <http://datashapes.org/dash> ;
       sh:select """
 		SELECT DISTINCT $this ?value
@@ -1419,16 +1428,16 @@ sh:Function
     ] ;
 .
 sh:HasValueConstraintComponent
-  dash:localConstraint "true"^^xsd:boolean ;
+  dash:localConstraint true ;
   sh:labelTemplate "Must have value {$hasValue}" ;
   sh:nodeValidator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateHasValueNode" ;
       sh:jsLibrary dash:DASHJSLibrary ;
       sh:message "Value must be {$hasValue}" ;
     ] ;
   sh:nodeValidator [
-      rdf:type sh:SPARQLAskValidator ;
+      a sh:SPARQLAskValidator ;
       sh:ask """ASK {
     FILTER ($value = $hasValue)
 }""" ;
@@ -1436,13 +1445,13 @@ sh:HasValueConstraintComponent
       sh:prefixes <http://datashapes.org/dash> ;
     ] ;
   sh:propertyValidator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateHasValueProperty" ;
       sh:jsLibrary dash:DASHJSLibrary ;
       sh:message "Missing expected value {$hasValue}" ;
     ] ;
   sh:propertyValidator [
-      rdf:type sh:SPARQLSelectValidator ;
+      a sh:SPARQLSelectValidator ;
       sh:message "Missing expected value {$hasValue}" ;
       sh:prefixes <http://datashapes.org/dash> ;
       sh:select """
@@ -1455,42 +1464,42 @@ sh:HasValueConstraintComponent
   sh:targetClass sh:Shape ;
 .
 sh:InConstraintComponent
-  dash:localConstraint "true"^^xsd:boolean ;
+  dash:localConstraint true ;
   sh:labelTemplate "Value must be in {$in}" ;
   sh:message "Value is not in {$in}" ;
   sh:targetClass sh:Shape ;
   sh:validator dash:isIn ;
   sh:validator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateIn" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
 .
 sh:JSExecutable
-  dash:abstract "true"^^xsd:boolean ;
+  dash:abstract true ;
 .
 sh:LanguageInConstraintComponent
-  dash:localConstraint "true"^^xsd:boolean ;
+  dash:localConstraint true ;
   sh:labelTemplate "Language must match any of {$languageIn}" ;
   sh:message "Language does not match any of {$languageIn}" ;
   sh:targetClass sh:Shape ;
   sh:validator dash:isLanguageIn ;
   sh:validator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateLanguageIn" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
 .
 sh:LessThanConstraintComponent
-  dash:localConstraint "true"^^xsd:boolean ;
+  dash:localConstraint true ;
   sh:message "Value is not < value of {$lessThan}" ;
   sh:propertyValidator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateLessThanProperty" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
   sh:propertyValidator [
-      rdf:type sh:SPARQLSelectValidator ;
+      a sh:SPARQLSelectValidator ;
       sh:prefixes <http://datashapes.org/dash> ;
       sh:select """
 		SELECT $this ?value
@@ -1505,15 +1514,15 @@ sh:LessThanConstraintComponent
   sh:targetClass sh:PropertyShape ;
 .
 sh:LessThanOrEqualsConstraintComponent
-  dash:localConstraint "true"^^xsd:boolean ;
+  dash:localConstraint true ;
   sh:message "Value is not <= value of {$lessThanOrEquals}" ;
   sh:propertyValidator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateLessThanOrEqualsProperty" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
   sh:propertyValidator [
-      rdf:type sh:SPARQLSelectValidator ;
+      a sh:SPARQLSelectValidator ;
       sh:prefixes <http://datashapes.org/dash> ;
       sh:select """
 		SELECT DISTINCT $this ?value
@@ -1528,16 +1537,16 @@ sh:LessThanOrEqualsConstraintComponent
   sh:targetClass sh:PropertyShape ;
 .
 sh:MaxCountConstraintComponent
-  dash:localConstraint "true"^^xsd:boolean ;
+  dash:localConstraint true ;
   sh:labelTemplate "Must not have more than {$maxCount} values" ;
   sh:message "More than {$maxCount} values" ;
   sh:propertyValidator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateMaxCountProperty" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
   sh:propertyValidator [
-      rdf:type sh:SPARQLSelectValidator ;
+      a sh:SPARQLSelectValidator ;
       sh:prefixes <http://datashapes.org/dash> ;
       sh:select """
 		SELECT $this
@@ -1551,52 +1560,52 @@ sh:MaxCountConstraintComponent
   sh:targetClass sh:PropertyShape ;
 .
 sh:MaxExclusiveConstraintComponent
-  dash:staticConstraint "true"^^xsd:boolean ;
+  dash:staticConstraint true ;
   sh:labelTemplate "Value must be < {$maxExclusive}" ;
   sh:message "Value is not < {$maxExclusive}" ;
   sh:targetClass sh:Shape ;
   sh:validator dash:hasMaxExclusive ;
   sh:validator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateMaxExclusive" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
 .
 sh:MaxInclusiveConstraintComponent
-  dash:staticConstraint "true"^^xsd:boolean ;
+  dash:staticConstraint true ;
   sh:labelTemplate "Value must be <= {$maxInclusive}" ;
   sh:message "Value is not <= {$maxInclusive}" ;
   sh:targetClass sh:Shape ;
   sh:validator dash:hasMaxInclusive ;
   sh:validator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateMaxInclusive" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
 .
 sh:MaxLengthConstraintComponent
-  dash:staticConstraint "true"^^xsd:boolean ;
+  dash:staticConstraint true ;
   sh:labelTemplate "Value must not have more than {$maxLength} characters" ;
   sh:message "Value has more than {$maxLength} characters" ;
   sh:targetClass sh:Shape ;
   sh:validator dash:hasMaxLength ;
   sh:validator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateMaxLength" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
 .
 sh:MinCountConstraintComponent
-  dash:localConstraint "true"^^xsd:boolean ;
+  dash:localConstraint true ;
   sh:labelTemplate "Must have at least {$minCount} values" ;
-  sh:message "Less than {$minCount} values" ;
+  sh:message "Fewer than {$minCount} values" ;
   sh:propertyValidator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateMinCountProperty" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
   sh:propertyValidator [
-      rdf:type sh:SPARQLSelectValidator ;
+      a sh:SPARQLSelectValidator ;
       sh:prefixes <http://datashapes.org/dash> ;
       sh:select """
 		SELECT $this
@@ -1612,37 +1621,37 @@ sh:MinCountConstraintComponent
   sh:targetClass sh:PropertyShape ;
 .
 sh:MinExclusiveConstraintComponent
-  dash:staticConstraint "true"^^xsd:boolean ;
+  dash:staticConstraint true ;
   sh:labelTemplate "Value must be > {$minExclusive}" ;
   sh:message "Value is not > {$minExclusive}" ;
   sh:targetClass sh:Shape ;
   sh:validator dash:hasMinExclusive ;
   sh:validator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateMinExclusive" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
 .
 sh:MinInclusiveConstraintComponent
-  dash:staticConstraint "true"^^xsd:boolean ;
+  dash:staticConstraint true ;
   sh:labelTemplate "Value must be >= {$minInclusive}" ;
   sh:message "Value is not >= {$minInclusive}" ;
   sh:targetClass sh:Shape ;
   sh:validator dash:hasMinInclusive ;
   sh:validator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateMinInclusive" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
 .
 sh:MinLengthConstraintComponent
-  dash:staticConstraint "true"^^xsd:boolean ;
+  dash:staticConstraint true ;
   sh:labelTemplate "Value must have less than {$minLength} characters" ;
   sh:message "Value has less than {$minLength} characters" ;
   sh:targetClass sh:Shape ;
   sh:validator dash:hasMinLength ;
   sh:validator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateMinLength" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
@@ -1651,19 +1660,19 @@ sh:NodeConstraintComponent
   sh:message "Value does not have shape {$node}" ;
   sh:targetClass sh:Shape ;
   sh:validator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateNode" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
 .
 sh:NodeKindConstraintComponent
-  dash:staticConstraint "true"^^xsd:boolean ;
+  dash:staticConstraint true ;
   sh:labelTemplate "Value must have node kind {$nodeKind}" ;
   sh:message "Value does not have node kind {$nodeKind}" ;
   sh:targetClass sh:Shape ;
   sh:validator dash:hasNodeKind ;
   sh:validator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateNodeKind" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
@@ -1673,7 +1682,7 @@ sh:NotConstraintComponent
   sh:message "Value does have shape {$not}" ;
   sh:targetClass sh:Shape ;
   sh:validator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateNot" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
@@ -1681,22 +1690,22 @@ sh:NotConstraintComponent
 sh:OrConstraintComponent
   sh:targetClass sh:Shape ;
   sh:validator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateOr" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
 .
 sh:Parameterizable
-  dash:abstract "true"^^xsd:boolean ;
+  dash:abstract true ;
 .
 sh:PatternConstraintComponent
-  dash:staticConstraint "true"^^xsd:boolean ;
+  dash:staticConstraint true ;
   sh:labelTemplate "Value must match pattern \"{$pattern}\"" ;
   sh:message "Value does not match pattern \"{$pattern}\"" ;
   sh:targetClass sh:Shape ;
   sh:validator dash:hasPattern ;
   sh:validator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validatePattern" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
@@ -1705,54 +1714,54 @@ sh:QualifiedMaxCountConstraintComponent
   sh:labelTemplate "No more than {$qualifiedMaxCount} values can have shape {$qualifiedValueShape}" ;
   sh:message "More than {$qualifiedMaxCount} values have shape {$qualifiedValueShape}" ;
   sh:propertyValidator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateQualifiedMaxCountProperty" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
   sh:targetClass sh:PropertyShape ;
 .
 sh:QualifiedMinCountConstraintComponent
-  sh:labelTemplate "No less than {$qualifiedMinCount} values can have shape {$qualifiedValueShape}" ;
-  sh:message "Less than {$qualifiedMinCount} values have shape {$qualifiedValueShape}" ;
+  sh:labelTemplate "No fewer than {$qualifiedMinCount} values can have shape {$qualifiedValueShape}" ;
+  sh:message "Fewer than {$qualifiedMinCount} values have shape {$qualifiedValueShape}" ;
   sh:propertyValidator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateQualifiedMinCountProperty" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
   sh:targetClass sh:PropertyShape ;
 .
 sh:Rule
-  dash:abstract "true"^^xsd:boolean ;
+  dash:abstract true ;
 .
 sh:Rules
-  rdf:type rdfs:Resource ;
+  a rdfs:Resource ;
   rdfs:comment "The SHACL rules entailment regime." ;
   rdfs:label "SHACL Rules" ;
   rdfs:seeAlso <https://www.w3.org/TR/shacl-af/#Rules> ;
 .
 sh:SPARQLExecutable
-  dash:abstract "true"^^xsd:boolean ;
+  dash:abstract true ;
 .
 sh:Shape
-  dash:abstract "true"^^xsd:boolean ;
+  dash:abstract true ;
 .
 sh:Target
-  dash:abstract "true"^^xsd:boolean ;
+  dash:abstract true ;
 .
 sh:TargetType
-  dash:abstract "true"^^xsd:boolean ;
+  dash:abstract true ;
 .
 sh:UniqueLangConstraintComponent
-  dash:localConstraint "true"^^xsd:boolean ;
+  dash:localConstraint true ;
   sh:labelTemplate "No language can be used more than once" ;
   sh:message "Language \"{?lang}\" used more than once" ;
   sh:propertyValidator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateUniqueLangProperty" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
   sh:propertyValidator [
-      rdf:type sh:SPARQLSelectValidator ;
+      a sh:SPARQLSelectValidator ;
       sh:prefixes <http://datashapes.org/dash> ;
       sh:select """
 		SELECT DISTINCT $this ?lang
@@ -1773,12 +1782,12 @@ sh:UniqueLangConstraintComponent
   sh:targetClass sh:PropertyShape ;
 .
 sh:Validator
-  dash:abstract "true"^^xsd:boolean ;
+  dash:abstract true ;
 .
 sh:XoneConstraintComponent
   sh:targetClass sh:Shape ;
   sh:validator [
-      rdf:type sh:JSValidator ;
+      a sh:JSValidator ;
       sh:jsFunctionName "validateXone" ;
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;

@@ -34,6 +34,8 @@ public class DASH {
     public final static String PREFIX = "dash";
 
 
+	public final static Resource all = ResourceFactory.createResource(NS + "all");
+
 	public final static Resource DefaultValueTypeRule = ResourceFactory.createResource(NS + "DefaultValueTypeRule");
 
     public final static Resource ExecutionPlatform = ResourceFactory.createResource(NS + "ExecutionPlatform");
@@ -89,7 +91,9 @@ public class DASH {
 
     public final static Property composite = ResourceFactory.createProperty(NS + "composite");
 
-	public final static Property defaultValueType = ResourceFactory.createProperty(NS + "defaultValueType");
+    public final static Property defaultValueType = ResourceFactory.createProperty(NS + "defaultValueType");
+
+    public final static Property defaultViewForRole = ResourceFactory.createProperty(NS + "defaultViewForRole");
     
     public final static Property deletedTriple = ResourceFactory.createProperty(NS + "deletedTriple");
     

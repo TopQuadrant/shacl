@@ -21,7 +21,9 @@ import java.io.IOException;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.util.FileUtils;
+import org.topbraid.jenax.util.JenaDatatypes;
 import org.topbraid.shacl.validation.ValidationUtil;
+import org.topbraid.shacl.vocabulary.SH;
 
 /**
  * Stand-alone utility to perform constraint validation of a given file.
@@ -47,5 +49,10 @@ public class Validate extends AbstractTool {
 		}
 		Resource report = ValidationUtil.validateModel(dataModel, shapesModel, true);
 		report.getModel().write(System.out, FileUtils.langTurtle);
+
+		if(report.hasProperty(SH.conforms, JenaDatatypes.FALSE)) {
+			// See https://github.com/TopQuadrant/shacl/issues/56
+			System.exit(1);
+		}
 	}
 }

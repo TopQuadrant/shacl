@@ -22,12 +22,12 @@ import org.apache.jena.rdf.model.Statement;
 import org.topbraid.shacl.vocabulary.SH;
 
 public abstract class AbstractRule implements Rule {
-	
+
 	private Number order;
-	
+
 	private Resource resource;
-	
-	
+
+
 	protected AbstractRule(Resource resource) {
 		this.resource = resource;
 		order = 0;
@@ -36,27 +36,28 @@ public abstract class AbstractRule implements Rule {
 			order = (Number) s.getLiteral().getValue();
 		}
 	}
-	
-	
+
+
 	@Override
 	public Node getContextNode() {
 		return resource.asNode();
 	}
-	
-	
+
+
 	public String getLabelStart(String type) {
 		Number index = getOrder();
 		int conditionCount = getResource().listProperties(SH.condition).toList().size();
-		return type + " rule (" + (index.doubleValue() == 0 ? "0" : index) + 
+		return type + " rule (" + (index.doubleValue() == 0 ? "0" : index) +
 				(conditionCount > 0 ? (", with " + conditionCount + " conditions") : "") + "): ";
 	}
-	
-	
-	public Number getOrder() {
+
+
+	@Override
+    public Number getOrder() {
 		return order;
 	}
-	
-	
+
+
 	public Resource getResource() {
 		return resource;
 	}

@@ -41,7 +41,7 @@ import org.topbraid.shacl.expr.lib.DistinctExpression;
  * An object that computes the values of a sh:path node expression.
  * This implements consistent handling of inferred values.
  * 
- * Inferences are currently limited to simple forward paths consisting of a single predicate.
+ * Inferences are limited to simple forward paths consisting of a single predicate.
  * 
  * @author Holger Knublauch
  */
@@ -83,16 +83,16 @@ public class PathEvaluator {
 	public ExtendedIterator<RDFNode> eval(RDFNode focusNode, NodeExpressionContext context) {
 		if(input == null) {
 			ExtendedIterator<RDFNode> asserted = evalFocusNode(focusNode, context);
-			return withInferences(asserted, focusNode, context);
+			return withDefaultValues(withInferences(asserted, focusNode, context), focusNode, context);
 		}
 		else {
 			Iterator<RDFNode> it = input.eval(focusNode, context);
 			if(it.hasNext()) {
 				RDFNode first = it.next();
-				ExtendedIterator<RDFNode> result = withInferences(evalFocusNode(first, context), first, context);
+				ExtendedIterator<RDFNode> result = withDefaultValues(withInferences(evalFocusNode(first, context), first, context), first, context);
 				while(it.hasNext()) {
 					RDFNode n = it.next();
-					result = result.andThen(withInferences(evalFocusNode(n, context), n, context));
+					result = result.andThen(withDefaultValues(withInferences(evalFocusNode(n, context), n, context), first, context));
 				}
 				return result;
 			}
@@ -121,8 +121,8 @@ public class PathEvaluator {
 	
 	/**
 	 * Checks if the values of this may be inferred.
-	 * This is the case if this uses a single forward property path and there are any sh:values statements on that predicate
-	 * in the provided shapes graph.
+	 * This is the case if this uses a single forward property path and there are any sh:values or sh:defaultValue statements on
+	 * that predicate in the provided shapes graph.
 	 * The actual computation on whether the values are inferred depends on the actual focus node, which is why this is
 	 * only a "maybe".
 	 * This function may be used to exclude optimizations that are possible if we know that no inferences can exist.
@@ -131,8 +131,7 @@ public class PathEvaluator {
 	 */
 	public boolean isMaybeInferred(ShapesGraph shapesGraph) {
 		if(predicate != null && !isInverse) {
-			Map<Node,NodeExpression> map = shapesGraph.getValuesNodeExpressionsMap(predicate);
-			return map != null;
+			return shapesGraph.getValuesNodeExpressionsMap(predicate) != null || shapesGraph.getDefaultValueNodeExpressionsMap(predicate) != null;
 		}
 		else {
 			return false;
@@ -168,6 +167,37 @@ public class PathEvaluator {
 			List<RDFNode> results = new LinkedList<>();
 			SHACLPaths.addValueNodes(focusNode.inModel(context.getDataset().getDefaultModel()), jenaPath, results);
 			return WrappedIterator.create(results.iterator());
+		}
+	}
+	
+	
+	private ExtendedIterator<RDFNode> withDefaultValues(ExtendedIterator<RDFNode> base, RDFNode focusNode, NodeExpressionContext context) {
+		if(isInverse || predicate == null || base.hasNext()) {
+			return base;
+		}
+		else {
+			Map<Node,NodeExpression> map = context.getShapesGraph().getDefaultValueNodeExpressionsMap(predicate);
+			if(map != null) {
+				ExtendedIterator<RDFNode> result = WrappedIterator.emptyIterator();
+				int count = 0;
+				for(Resource type : JenaUtil.getAllTypes((Resource)focusNode)) {
+					NodeExpression expr = map.get(type.asNode());
+					if(expr != null) {
+						result = result.andThen(expr.eval(focusNode, context));
+						count++;
+					}
+				}
+				if(count > 1) {
+					// Filter out duplicates in case multiple sh:defaultValue expressions exist
+					return DistinctExpression.distinct(result);
+				}
+				else {
+					return result;
+				}
+			}
+			else {
+				return base;
+			}
 		}
 	}
 	

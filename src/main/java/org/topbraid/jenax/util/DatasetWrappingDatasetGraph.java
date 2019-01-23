@@ -168,8 +168,7 @@ public class DatasetWrappingDatasetGraph extends DatasetGraphBase {
 
 	@Override
 	public void removeGraph(Node graphName) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+		dataset.removeNamedModel(graphName.getURI());
 	}
 
 	@Override

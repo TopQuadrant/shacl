@@ -356,8 +356,16 @@ public class SHACLUtil {
 		return null;
 	}
 
-	
+
+	// Simplified to only check for sh:property and sh:parameter (not sh:node etc)
 	public static Resource getResourceDefaultType(Resource resource) {
+		if(resource.getModel().contains(null, SH.property, resource)) {
+			return SH.PropertyShape.inModel(resource.getModel());
+		}
+		else if(resource.getModel().contains(null, SH.parameter, resource)) {
+			return SH.Parameter.inModel(resource.getModel());
+		}
+		/*
 		StmtIterator it = resource.getModel().listStatements(null, null, resource);
 		try {
 			while(it.hasNext()) {
@@ -370,7 +378,7 @@ public class SHACLUtil {
 		}
 		finally {
 			it.close();
-		}
+		}*/
 		return null;
 	}
 	

@@ -16,6 +16,8 @@
  */
 package org.topbraid.shacl.model;
 
+import java.util.List;
+
 import org.apache.jena.enhanced.BuiltinPersonalities;
 import org.apache.jena.enhanced.Personality;
 import org.apache.jena.rdf.model.RDFNode;
@@ -244,16 +246,17 @@ public class SHFactory {
 			Resource resource = (Resource) node;
 			
 			// Return true if this has sh:Parameterizable as its metaclass
-			for(Resource type : JenaUtil.getTypes(resource)) {
+			List<Resource> types = JenaUtil.getTypes(resource);
+			for(Resource type : types) {
 				if(JenaUtil.hasIndirectType(type, SH.Parameterizable)) {
 					return true;
 				}
 			}
 			
 			// If this is a typeless node, check for defaultType of incoming references
-			if(!resource.hasProperty(RDF.type)) {
-				Resource dt = SHACLUtil.getResourceDefaultType(resource);
-				if(dt != null && JenaUtil.hasIndirectType(dt, SH.Parameterizable)) {
+			if(types.isEmpty()) {
+				Resource defaultType = SHACLUtil.getResourceDefaultType(resource);
+				if(defaultType != null && JenaUtil.hasIndirectType(defaultType, SH.Parameterizable)) {
 					return true;
 				}
 			}

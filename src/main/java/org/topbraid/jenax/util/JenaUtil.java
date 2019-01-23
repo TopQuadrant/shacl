@@ -59,6 +59,7 @@ import org.apache.jena.sparql.engine.binding.BindingHashMap;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprTransform;
 import org.apache.jena.sparql.expr.ExprTransformer;
+import org.apache.jena.sparql.expr.nodevalue.NodeFunctions;
 import org.apache.jena.sparql.graph.NodeTransform;
 import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransform;
 import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformSubst;
@@ -463,6 +464,53 @@ public class JenaUtil {
 
 
 	/**
+	 * For a given subject resource and a given collection of (label/comment) properties this finds the most
+	 * suitable value of either property for a given list of languages (usually from the current user's preferences).
+	 * For example, if the user's languages are [ "en-AU" ] then the function will prefer "mate"@en-AU over
+	 * "friend"@en and never return "freund"@de.  The function falls back to literals that have no language
+	 * if no better literal has been found.
+	 * @param resource  the subject resource
+	 * @param langs  the allowed languages
+	 * @param properties  the properties to check
+	 * @return the best suitable value or null
+	 */
+	public static Literal getBestStringLiteral(Resource resource, List<String> langs, Iterable<Property> properties) {
+		Literal label = null;
+		int bestLang = -1;
+		for(Property predicate : properties) {
+			StmtIterator it = resource.listProperties(predicate);
+			while(it.hasNext()) {
+				RDFNode object = it.next().getObject();
+				if(object.isLiteral()) {
+					Literal literal = (Literal)object;
+					String lang = literal.getLanguage();
+					if(lang.length() == 0 && label == null) {
+						label = literal;
+					}
+					else {
+						// 1) Never use a less suitable language
+						// 2) Never replace an already existing label (esp: skos:prefLabel) unless new lang is better
+						// 3) Fall back to more special languages if no other was found (e.g. use en-GB if only "en" is accepted)
+						int startLang = bestLang < 0 ? langs.size() - 1 : (label != null ? bestLang - 1 : bestLang);
+						for(int i = startLang; i >= 0; i--) {
+							String langi = langs.get(i);
+							if(langi.equals(lang)) {
+								label = literal;
+								bestLang = i;
+							}
+							else if(lang.contains("-") && NodeFunctions.langMatches(lang, langi) && label == null) {
+								label = literal;
+							}
+						}
+					}
+				}
+			}
+		}
+		return label;
+	}
+
+
+	/**
 	 * Gets the "first" declared rdfs:range of a given property.
 	 * If multiple ranges exist, the behavior is undefined.
 	 * Note that this method does not consider ranges defined on
@@ -732,7 +780,10 @@ public class JenaUtil {
 	
 	public static List<Graph> getSubGraphs(MultiUnion union) {
 		List<Graph> results = new LinkedList<>();
-		results.add(union.getBaseGraph());
+		Graph baseGraph = union.getBaseGraph();
+		if(baseGraph != null) {
+			results.add(baseGraph);
+		}
 		results.addAll(union.getSubGraphs());
 		return results;
 	}
