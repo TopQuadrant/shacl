@@ -30,7 +30,8 @@ public abstract class ComplexNodeExpression extends AbstractNodeExpression {
 	
 	@Override
 	public String getFunctionalSyntax() {
-		String str = getTypeId() + "(";
+		String str = getFunctionalSyntaxName();
+		str += "(";
 		List<String> args = getFunctionalSyntaxArguments();
 		Iterator<String> it = args.iterator();
 		while(it.hasNext()) {
@@ -40,35 +41,15 @@ public abstract class ComplexNodeExpression extends AbstractNodeExpression {
 				str += ", ";
 			}
 		}
-		return str + ")";
+		str += ")";
+		return str;
+	}
+
+
+	protected String getFunctionalSyntaxName() {
+		return getTypeId().toString();
 	}
 	
 	
 	public abstract List<String> getFunctionalSyntaxArguments();
-
-
-
-	public abstract void appendSPARQL(AppendContext context, String targetVarName);
-
-	
-	protected void appendSPARQL(AppendContext context, String targetVarName, NodeExpression expr) {
-		if(expr instanceof AtomicNodeExpression) {
-			context.append("BIND(" + expr.toString() + " AS ?" + targetVarName + ") .\n");
-		}
-		else {
-			((ComplexNodeExpression)expr).appendSPARQL(context, targetVarName);
-		}
-	}
-	
-	
-	public String getSPARQL() {
-		StringBuffer sb = new StringBuffer();
-		AppendContext context = new AppendContext(sb);
-		context.append("{\n");
-		context.increaseIndent();
-		appendSPARQL(context, "result");
-		context.decreaseIndent();
-		context.append("}");
-		return sb.toString();
-	}
 }

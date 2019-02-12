@@ -9,11 +9,9 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.topbraid.shacl.expr.AbstractInputExpression;
-import org.topbraid.shacl.expr.AppendContext;
 import org.topbraid.shacl.expr.NodeExpression;
 import org.topbraid.shacl.expr.NodeExpressionContext;
 import org.topbraid.shacl.expr.NodeExpressionVisitor;
-import org.topbraid.shacl.expr.SNEL;
 
 /**
  * A sh:minus expression.
@@ -39,17 +37,6 @@ public class MinusExpression extends AbstractInputExpression {
 		return getInput().eval(focusNode, context).filterDrop(n -> sans.contains(n));
 	}
 
-	
-	@Override
-	public void appendSPARQL(AppendContext context, String targetVarName) {
-		appendSPARQL(context, targetVarName, getInput());
-		context.append("MINUS {\n");
-		context.increaseIndent();
-		appendSPARQL(context, targetVarName, minus);
-		context.decreaseIndent();
-		context.append("}");
-	}
-
 
 	@Override
 	public List<String> getFunctionalSyntaxArguments() {
@@ -73,8 +60,8 @@ public class MinusExpression extends AbstractInputExpression {
 
 
 	@Override
-	public SNEL getTypeId() {
-		return SNEL.minus;
+	public String getTypeId() {
+		return "minus";
 	}
 	
 	

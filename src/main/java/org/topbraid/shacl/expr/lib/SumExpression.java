@@ -9,11 +9,9 @@ import org.apache.jena.sparql.expr.nodevalue.XSDFuncOp;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.util.iterator.WrappedIterator;
 import org.topbraid.shacl.expr.AbstractInputExpression;
-import org.topbraid.shacl.expr.AppendContext;
 import org.topbraid.shacl.expr.NodeExpression;
 import org.topbraid.shacl.expr.NodeExpressionContext;
 import org.topbraid.shacl.expr.NodeExpressionVisitor;
-import org.topbraid.shacl.expr.SNEL;
 
 /**
  * Implements support for sh:sum.
@@ -51,14 +49,8 @@ public class SumExpression extends AbstractInputExpression {
 	
 	
 	@Override
-	public SNEL getTypeId() {
-		return SNEL.sum;
-	}
-
-
-	@Override
-	public void appendSPARQL(AppendContext context, String targetVarName) {
-		throw new UnsupportedOperationException("Not yet implemented");
+	public String getTypeId() {
+		return "sum";
 	}
 	
 	

@@ -54,6 +54,8 @@ public class TOSH {
 
     
     public final static Property editWidget = ResourceFactory.createProperty(NS + "editWidget");
+    
+    public final static Property javaMethod = ResourceFactory.createProperty(NS + "javaMethod");
 
     public final static Property searchWidget = ResourceFactory.createProperty(NS + "searchWidget");
 

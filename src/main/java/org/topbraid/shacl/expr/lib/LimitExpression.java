@@ -8,12 +8,17 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.util.iterator.WrappedIterator;
 import org.topbraid.shacl.expr.AbstractInputExpression;
-import org.topbraid.shacl.expr.AppendContext;
 import org.topbraid.shacl.expr.NodeExpression;
 import org.topbraid.shacl.expr.NodeExpressionContext;
 import org.topbraid.shacl.expr.NodeExpressionVisitor;
-import org.topbraid.shacl.expr.SNEL;
 
+/**
+ * Implements support for sh:limit.
+ * 
+ * This node expression type is not part of the SHACL-AF 1.0 document, but a candidate for 1.1.
+ * 
+ * @author Holger Knublauch
+ */
 public class LimitExpression extends AbstractInputExpression {
 	
 	private int limit;
@@ -22,12 +27,6 @@ public class LimitExpression extends AbstractInputExpression {
 	public LimitExpression(RDFNode expr, NodeExpression input, int limit) {
 		super(expr, input);
 		this.limit = limit;
-	}
-	
-	
-	@Override
-	public void appendSPARQL(AppendContext context, String targetVarName) {
-		throw new UnsupportedOperationException("Not yet implemented");
 	}
 
 	
@@ -77,8 +76,8 @@ public class LimitExpression extends AbstractInputExpression {
 
 	
 	@Override
-	public SNEL getTypeId() {
-		return SNEL.limit;
+	public String getTypeId() {
+		return "limit";
 	}
 	
 	

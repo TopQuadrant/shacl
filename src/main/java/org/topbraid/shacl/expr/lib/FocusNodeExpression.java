@@ -26,7 +26,6 @@ import org.topbraid.shacl.expr.AbstractNodeExpression;
 import org.topbraid.shacl.expr.AtomicNodeExpression;
 import org.topbraid.shacl.expr.NodeExpressionContext;
 import org.topbraid.shacl.expr.NodeExpressionVisitor;
-import org.topbraid.shacl.expr.SNEL;
 import org.topbraid.shacl.vocabulary.SH;
 
 public class FocusNodeExpression extends AbstractNodeExpression implements AtomicNodeExpression {
@@ -55,8 +54,8 @@ public class FocusNodeExpression extends AbstractNodeExpression implements Atomi
 
 	
 	@Override
-	public SNEL getTypeId() {
-		return SNEL.focusNode;
+	public String getTypeId() {
+		return "focusNode";
 	}
 
 

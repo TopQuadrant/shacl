@@ -1279,11 +1279,29 @@ sh:distinct
   rdfs:isDefinedBy sh: ;
   rdfs:label "distinct"@en ;
 .
+sh:else
+  a rdf:Property ;
+  rdfs:comment "Links an sh:if node expression with the values that shall be returned if the condition is false."@en ;
+  rdfs:isDefinedBy sh: ;
+  rdfs:label "else"@en ;
+.
+sh:exists
+  a rdf:Property ;
+  rdfs:comment "Resources with values for sh:exists are node expressions that produce true if the associated node expression has any values, and false otherwise."@en ;
+  rdfs:isDefinedBy sh: ;
+  rdfs:label "exists"@en ;
+.
 sh:groupConcat
   a rdf:Property ;
   rdfs:comment "Resources with values for sh:groupConcat are node expressions that produce an xsd:string consisting of the concatenation of all values of the associated node expression, possibly separated by the value of sh:separator."@en ;
   rdfs:isDefinedBy sh: ;
   rdfs:label "group concat"@en ;
+.
+sh:if
+  a rdf:Property ;
+  rdfs:comment "Resources with values for sh:if are node expressions that produce either the results of sh:then or sh:else depending on whether the associated node expression produces the list [ true ]."@en ;
+  rdfs:isDefinedBy sh: ;
+  rdfs:label "if"@en ;
 .
 sh:limit
   a rdf:Property ;
@@ -1334,6 +1352,12 @@ sh:sum
   rdfs:comment "Resources with values for sh:sum are node expressions that produce the sum of all values of the associated node expression."@en ;
   rdfs:isDefinedBy sh: ;
   rdfs:label "sum"@en ;
+.
+sh:then
+  a rdf:Property ;
+  rdfs:comment "Links an sh:if node expression with the values that shall be returned if the condition is true."@en ;
+  rdfs:isDefinedBy sh: ;
+  rdfs:label "then"@en ;
 .
 sh:values
   a rdf:Property ;

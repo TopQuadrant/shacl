@@ -23,12 +23,10 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.util.iterator.NullIterator;
-import org.topbraid.shacl.expr.AppendContext;
 import org.topbraid.shacl.expr.ComplexNodeExpression;
 import org.topbraid.shacl.expr.NodeExpression;
 import org.topbraid.shacl.expr.NodeExpressionContext;
 import org.topbraid.shacl.expr.NodeExpressionVisitor;
-import org.topbraid.shacl.expr.SNEL;
 
 public class UnionExpression extends ComplexNodeExpression {
 	
@@ -38,35 +36,6 @@ public class UnionExpression extends ComplexNodeExpression {
 	public UnionExpression(RDFNode expr, List<NodeExpression> inputs) {
 		super(expr);
 		this.inputs = inputs;
-	}
-	
-	
-	@Override
-	public void appendSPARQL(AppendContext context, String targetVarName) {
-		for(int i = 0; i < inputs.size(); i++) {
-			if(i > 0) {
-				context.indent();
-				context.append("UNION\n ");
-			}
-			context.indent();
-			context.append("{\n");
-			context.increaseIndent();
-			NodeExpression input = inputs.get(i);
-			if(input instanceof ComplexNodeExpression) {
-				((ComplexNodeExpression)input).appendSPARQL(context, targetVarName);
-			}
-			else {
-				context.indent();
-				context.append("BIND (");
-				context.append(input.toString());
-				context.append(" AS ?");
-				context.append(targetVarName);
-				context.append(") .\n");
-			}
-			context.decreaseIndent();
-			context.indent();
-			context.append("}\n");
-		}
 	}
 
 	
@@ -117,8 +86,8 @@ public class UnionExpression extends ComplexNodeExpression {
 
 
 	@Override
-	public SNEL getTypeId() {
-		return SNEL.union;
+	public String getTypeId() {
+		return "union";
 	}
 	
 	

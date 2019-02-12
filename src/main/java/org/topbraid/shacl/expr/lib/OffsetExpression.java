@@ -7,11 +7,9 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.topbraid.shacl.expr.AbstractInputExpression;
-import org.topbraid.shacl.expr.AppendContext;
 import org.topbraid.shacl.expr.NodeExpression;
 import org.topbraid.shacl.expr.NodeExpressionContext;
 import org.topbraid.shacl.expr.NodeExpressionVisitor;
-import org.topbraid.shacl.expr.SNEL;
 
 public class OffsetExpression extends AbstractInputExpression {
 	
@@ -21,12 +19,6 @@ public class OffsetExpression extends AbstractInputExpression {
 	public OffsetExpression(RDFNode expr, NodeExpression input, int offset) {
 		super(expr, input);
 		this.offset = offset;
-	}
-	
-	
-	@Override
-	public void appendSPARQL(AppendContext context, String targetVarName) {
-		throw new UnsupportedOperationException("Not yet implemented");
 	}
 
 	
@@ -58,8 +50,8 @@ public class OffsetExpression extends AbstractInputExpression {
 	
 	
 	@Override
-	public SNEL getTypeId() {
-		return SNEL.offset;
+	public String getTypeId() {
+		return "offset";
 	}
 	
 	

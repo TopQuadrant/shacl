@@ -26,7 +26,6 @@ import org.topbraid.shacl.expr.AbstractNodeExpression;
 import org.topbraid.shacl.expr.AtomicNodeExpression;
 import org.topbraid.shacl.expr.NodeExpressionContext;
 import org.topbraid.shacl.expr.NodeExpressionVisitor;
-import org.topbraid.shacl.expr.SNEL;
 
 public class ConstantTermExpression extends AbstractNodeExpression implements AtomicNodeExpression {
 	
@@ -43,13 +42,13 @@ public class ConstantTermExpression extends AbstractNodeExpression implements At
 	
 	@Override
 	public String getFunctionalSyntax() {
-		return FmtUtils.stringForRDFNode(getRDFNode());
+		return FmtUtils.stringForNode(getRDFNode().asNode(), getRDFNode().getModel());
 	}
 	
 	
 	@Override
-	public SNEL getTypeId() {
-		return SNEL.constant;
+	public String getTypeId() {
+		return "constant";
 	}
 
 

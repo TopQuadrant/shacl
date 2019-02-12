@@ -14,11 +14,9 @@ import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.util.iterator.WrappedIterator;
 import org.topbraid.shacl.expr.AbstractInputExpression;
-import org.topbraid.shacl.expr.AppendContext;
 import org.topbraid.shacl.expr.NodeExpression;
 import org.topbraid.shacl.expr.NodeExpressionContext;
 import org.topbraid.shacl.expr.NodeExpressionVisitor;
-import org.topbraid.shacl.expr.SNEL;
 
 public class OrderByExpression extends AbstractInputExpression {
 	
@@ -31,12 +29,6 @@ public class OrderByExpression extends AbstractInputExpression {
 		super(expr, input);
 		this.comparator = comparator;
 		this.descending = descending;
-	}
-
-	
-	@Override
-	public void appendSPARQL(AppendContext context, String targetVarName) {
-		throw new UnsupportedOperationException("Not yet implemented");
 	}
 
 	
@@ -104,8 +96,8 @@ public class OrderByExpression extends AbstractInputExpression {
 
 
 	@Override
-	public SNEL getTypeId() {
-		return SNEL.orderBy;
+	public String getTypeId() {
+		return "orderBy";
 	}
 	
 	

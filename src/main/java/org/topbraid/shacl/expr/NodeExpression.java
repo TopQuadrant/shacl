@@ -76,7 +76,7 @@ public interface NodeExpression {
 	RDFNode getRDFNode();
 	
 	
-	SNEL getTypeId();
+	String getTypeId();
 	
 	
 	/**

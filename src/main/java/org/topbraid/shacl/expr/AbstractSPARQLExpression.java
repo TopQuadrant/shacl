@@ -88,10 +88,4 @@ public abstract class AbstractSPARQLExpression extends AbstractInputExpression {
 	public String getQueryString() {
 		return queryString;
 	}
-
-
-	@Override
-	public void appendSPARQL(AppendContext context, String targetVarName) {
-		throw new UnsupportedOperationException("Not implemented yet.");
-	}
 }

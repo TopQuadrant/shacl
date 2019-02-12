@@ -34,13 +34,15 @@ import org.topbraid.jenax.util.ARQFactory;
 import org.topbraid.jenax.util.JenaDatatypes;
 import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.expr.lib.AskExpression;
-import org.topbraid.shacl.expr.lib.GroupConcatExpression;
 import org.topbraid.shacl.expr.lib.ConstantTermExpression;
 import org.topbraid.shacl.expr.lib.CountExpression;
 import org.topbraid.shacl.expr.lib.DistinctExpression;
+import org.topbraid.shacl.expr.lib.ExistsExpression;
 import org.topbraid.shacl.expr.lib.FilterShapeExpression;
 import org.topbraid.shacl.expr.lib.FocusNodeExpression;
 import org.topbraid.shacl.expr.lib.FunctionExpression;
+import org.topbraid.shacl.expr.lib.GroupConcatExpression;
+import org.topbraid.shacl.expr.lib.IfExpression;
 import org.topbraid.shacl.expr.lib.IntersectionExpression;
 import org.topbraid.shacl.expr.lib.LimitExpression;
 import org.topbraid.shacl.expr.lib.MaxExpression;
@@ -74,15 +76,23 @@ public class NodeExpressionFactory {
 			return new CountExpression(resource, nodes);
 		});
 		
-		constructors.put(SH.distinct, (resource, count) -> {
-			NodeExpression nodes = get().create(count);
+		constructors.put(SH.distinct, (resource, distinct) -> {
+			NodeExpression nodes = get().create(distinct);
 			return new DistinctExpression(resource, nodes);
 		});
 		
+		constructors.put(SH.exists, (resource, exists) -> {
+			NodeExpression nodes = get().create(exists);
+			return new ExistsExpression(resource, nodes);
+		});
+		
 		constructors.put(SH.filterShape, (resource, filterShape) -> {
-			Statement nodesS = resource.getProperty(SH.nodes);
-			if(filterShape instanceof Resource && nodesS != null) {
-				NodeExpression nodes = get().create(nodesS.getObject());
+			if(filterShape instanceof Resource) {
+				NodeExpression nodes = null;
+				Statement nodesS = resource.getProperty(SH.nodes);
+				if(nodesS != null) {
+					nodes = get().create(nodesS.getObject());
+				}
 				return new FilterShapeExpression(resource, nodes, (Resource) filterShape);
 			}
 			else {
@@ -90,9 +100,18 @@ public class NodeExpressionFactory {
 			}
 		});
 		
-		constructors.put(SH.groupConcat, (resource, concat) -> {
-			NodeExpression nodes = get().create(concat);
+		constructors.put(SH.groupConcat, (resource, groupConcat) -> {
+			NodeExpression nodes = get().create(groupConcat);
 			return new GroupConcatExpression(resource, nodes, JenaUtil.getStringProperty(resource, SH.separator));
+		});
+		
+		constructors.put(SH.if_, (resource, if_) -> {
+			NodeExpression nodes = get().create(if_);
+			Statement thenS = resource.getProperty(SH.then); 
+			NodeExpression then = thenS != null ? get().create(thenS.getObject()) : null;
+			Statement elseS = resource.getProperty(SH.else_); 
+			NodeExpression else_ = elseS != null ? get().create(elseS.getObject()) : null;
+			return new IfExpression(resource, nodes, then, else_);
 		});
 		
 		constructors.put(SH.intersection, (resource, intersection) -> {
@@ -206,6 +225,18 @@ public class NodeExpressionFactory {
 	
 	public static void set(NodeExpressionFactory value) {
 		singleton = value;
+	}
+	
+
+	/**
+	 * Installs a new kind of node expression as a 3rd party extension.
+	 * The node expression is identified by a "key" predicate (e.g. sh:sum identifies the built-in sum node expressions).
+	 * @param predicate  the key predicate
+	 * @param function  a factory function that takes the node expression's blank node and the value of the key property as input
+	 *                  and produces a new instance of NodeExpression
+	 */
+	public void addPlugin(Property predicate, BiFunction<Resource,RDFNode,NodeExpression> function) {
+		constructors.put(predicate, function);
 	}
 	
 	

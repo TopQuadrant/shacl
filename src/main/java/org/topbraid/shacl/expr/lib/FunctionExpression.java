@@ -45,13 +45,10 @@ import org.apache.jena.sparql.util.NodeFactoryExtra;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.util.iterator.WrappedIterator;
 import org.topbraid.jenax.functions.OptionalArgsFunction;
-import org.topbraid.jenax.util.RDFLabels;
-import org.topbraid.shacl.expr.AppendContext;
 import org.topbraid.shacl.expr.ComplexNodeExpression;
 import org.topbraid.shacl.expr.NodeExpression;
 import org.topbraid.shacl.expr.NodeExpressionContext;
 import org.topbraid.shacl.expr.NodeExpressionVisitor;
-import org.topbraid.shacl.expr.SNEL;
 import org.topbraid.shacl.vocabulary.SPARQL;
 
 public class FunctionExpression extends ComplexNodeExpression {
@@ -98,52 +95,6 @@ public class FunctionExpression extends ComplexNodeExpression {
 			sb.append(")");
 			this.expr = ExprUtils.parse(sb.toString());
 		}
-	}
-	
-	
-	public String appendBindings(AppendContext context) {
-		String varName = null;
-		for(int i = 0; i < args.size(); i++) {
-			NodeExpression arg = args.get(i);
-			if(arg instanceof ComplexNodeExpression) {
-				if(varName == null) {
-					varName = context.getNextVarName();
-				}
-				((ComplexNodeExpression)arg).appendSPARQL(context, varName + (i + 1));
-			}
-		}
-		return varName;
-	}
-
-
-	private void appendCall(AppendContext context, String varName) {
-		context.append(RDFLabels.get().getLabel(function));
-		context.append("(");
-		for(int i = 0; i < args.size(); i++) {
-			NodeExpression arg = args.get(i);
-			if(i > 0) {
-				context.append(", ");
-			}
-			if(arg instanceof ComplexNodeExpression) {
-				context.append("?" + varName + (i + 1));
-			}
-			else {
-				context.append(arg.toString());
-			}
-		}
-		context.append(")");
-	}
-
-	
-	@Override
-	public void appendSPARQL(AppendContext context, String targetVarName) {
-		String varName = appendBindings(context);
-		context.indent();
-		context.append("BIND(");
-		appendCall(context, varName);
-		context.append(" AS ?");
-		context.append(targetVarName);
-		context.append(") .\n");
 	}
 
 
@@ -234,8 +185,8 @@ public class FunctionExpression extends ComplexNodeExpression {
 
 
 	@Override
-	public SNEL getTypeId() {
-		return SNEL.function;
+	public String getTypeId() {
+		return "function";
 	}
 
 

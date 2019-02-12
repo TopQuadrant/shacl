@@ -28,14 +28,10 @@ import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.arq.SHACLPaths;
 import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.expr.AbstractInputExpression;
-import org.topbraid.shacl.expr.AppendContext;
-import org.topbraid.shacl.expr.AtomicNodeExpression;
-import org.topbraid.shacl.expr.ComplexNodeExpression;
 import org.topbraid.shacl.expr.NodeExpression;
 import org.topbraid.shacl.expr.NodeExpressionContext;
 import org.topbraid.shacl.expr.NodeExpressionVisitor;
 import org.topbraid.shacl.expr.PathEvaluator;
-import org.topbraid.shacl.expr.SNEL;
 import org.topbraid.shacl.vocabulary.SH;
 
 public class PathExpression extends AbstractInputExpression {
@@ -60,36 +56,6 @@ public class PathExpression extends AbstractInputExpression {
 			eval = new PathEvaluator(JenaUtil.asProperty(path));
 		}
 		eval.setInput(input);
-	}
-
-	
-	@Override
-	public void appendSPARQL(AppendContext context, String targetVarName) {
-		NodeExpression input = getInput();
-		if(input instanceof ComplexNodeExpression) {
-			String varName = context.getNextVarName();
-			((ComplexNodeExpression)input).appendSPARQL(context, varName);
-			context.indent();
-			context.append("?" + varName);
-			context.append(" ");
-			context.append(SHACLPaths.getPathString(path));
-			context.append(" ");
-			context.append("?" + targetVarName);
-		}
-		else {
-			context.indent();
-			if(input instanceof AtomicNodeExpression) {
-				context.append(input.toString());
-			}
-			else {
-				context.append("$this");
-			}
-			context.append(" ");
-			context.append(SHACLPaths.getPathString(path));
-			context.append(" ");
-			context.append("?" + targetVarName);
-		}
-		context.append(" .\n");
 	}
 
 
@@ -156,8 +122,8 @@ public class PathExpression extends AbstractInputExpression {
 	
 	
 	@Override
-	public SNEL getTypeId() {
-		return SNEL.path;
+	public String getTypeId() {
+		return "path";
 	}
 
 

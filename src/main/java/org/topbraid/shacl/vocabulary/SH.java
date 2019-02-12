@@ -352,8 +352,14 @@ public class SH {
 	public final static Property desc = ResourceFactory.createProperty(NS + "desc");
     
 	public final static Property distinct = ResourceFactory.createProperty(NS + "distinct");
+
+    public final static Property else_ = ResourceFactory.createProperty(NS + "else");
+
+    public final static Property exists = ResourceFactory.createProperty(NS + "exists");
 	
 	public final static Property groupConcat = ResourceFactory.createProperty(NS + "groupConcat");
+
+    public final static Property if_ = ResourceFactory.createProperty(NS + "if");
     
 	public final static Property limit = ResourceFactory.createProperty(NS + "limit");
     
@@ -370,6 +376,8 @@ public class SH {
 	public final static Property separator = ResourceFactory.createProperty(NS + "separator");
     
 	public final static Property sum = ResourceFactory.createProperty(NS + "sum");
+
+    public final static Property then = ResourceFactory.createProperty(NS + "then");
     
 	public final static Property values = ResourceFactory.createProperty(NS + "values");
 

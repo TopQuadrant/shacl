@@ -9,11 +9,9 @@ import org.apache.jena.util.iterator.ClosableIterator;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.util.iterator.NiceIterator;
 import org.topbraid.shacl.expr.AbstractInputExpression;
-import org.topbraid.shacl.expr.AppendContext;
 import org.topbraid.shacl.expr.NodeExpression;
 import org.topbraid.shacl.expr.NodeExpressionContext;
 import org.topbraid.shacl.expr.NodeExpressionVisitor;
-import org.topbraid.shacl.expr.SNEL;
 
 /**
  * Implements support for sh:distinct.
@@ -34,12 +32,6 @@ public class DistinctExpression extends AbstractInputExpression {
 	public ExtendedIterator<RDFNode> eval(RDFNode focusNode, NodeExpressionContext context) {
     	return distinct(evalInput(focusNode, context));
 	}
-
-	
-	@Override
-	public void appendSPARQL(AppendContext context, String targetVarName) {
-		throw new UnsupportedOperationException("Not yet implemented");
-	}
 	
 	
 	@Override
@@ -49,8 +41,8 @@ public class DistinctExpression extends AbstractInputExpression {
 
 
 	@Override
-	public SNEL getTypeId() {
-		return SNEL.distinct;
+	public String getTypeId() {
+		return "distinct";
 	}
 
 	

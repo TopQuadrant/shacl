@@ -23,15 +23,10 @@ import java.util.List;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.util.iterator.ExtendedIterator;
-import org.topbraid.jenax.util.RDFLabels;
 import org.topbraid.shacl.expr.AbstractInputExpression;
-import org.topbraid.shacl.expr.AppendContext;
-import org.topbraid.shacl.expr.AtomicNodeExpression;
-import org.topbraid.shacl.expr.ComplexNodeExpression;
 import org.topbraid.shacl.expr.NodeExpression;
 import org.topbraid.shacl.expr.NodeExpressionContext;
 import org.topbraid.shacl.expr.NodeExpressionVisitor;
-import org.topbraid.shacl.expr.SNEL;
 import org.topbraid.shacl.validation.ValidationEngine;
 import org.topbraid.shacl.validation.ValidationEngineFactory;
 
@@ -41,33 +36,8 @@ public class FilterShapeExpression extends AbstractInputExpression {
 	
 	
 	public FilterShapeExpression(RDFNode expr, NodeExpression nodes, Resource filterShape) {
-		super(expr, nodes);
+		super(expr, nodes == null ? new FocusNodeExpression() : nodes);
 		this.filterShape = filterShape;
-	}
-	
-
-	@Override
-	public void appendSPARQL(AppendContext context, String targetVarName) {
-		NodeExpression nodes = getInput();
-		if(nodes instanceof ComplexNodeExpression) {
-			((ComplexNodeExpression)nodes).appendSPARQL(context, targetVarName);
-		}
-		context.indent();
-		context.append("FILTER tosh:hasShape(");
-		if(nodes instanceof AtomicNodeExpression) {
-			context.append(nodes.toString());
-		}
-		else {
-			context.append("?" + targetVarName);
-		}
-		context.append(", ");
-		if(filterShape.isURIResource()) {
-			context.append(RDFLabels.get().getLabel(filterShape));
-		}
-		else {
-			context.append("_:" + filterShape.asNode().getBlankNodeLabel());
-		}
-		context.append(") .\n");
 	}
 
 
@@ -92,14 +62,26 @@ public class FilterShapeExpression extends AbstractInputExpression {
 	
 	
 	@Override
+	public List<NodeExpression> getInputExpressions() {
+		List<NodeExpression> is = super.getInputExpressions();
+		if(is.size() == 1 && is.get(0) instanceof FocusNodeExpression) {
+			return Collections.emptyList();
+		}
+		else {
+			return is;
+		}
+	}
+
+
+	@Override
 	public Resource getOutputShape(Resource contextShape) {
 		return getInput().getOutputShape(contextShape);
 	}
 
 	
 	@Override
-	public SNEL getTypeId() {
-		return SNEL.filterShape;
+	public String getTypeId() {
+		return "filterShape";
 	}
 
 

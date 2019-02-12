@@ -5,7 +5,6 @@ import org.apache.jena.rdf.model.Resource;
 import org.topbraid.shacl.expr.AbstractSPARQLExpression;
 import org.topbraid.shacl.expr.NodeExpression;
 import org.topbraid.shacl.expr.NodeExpressionVisitor;
-import org.topbraid.shacl.expr.SNEL;
 
 /**
  * Node expressions based on a SPARQL ASK query, identified by sh:ask.
@@ -22,8 +21,8 @@ public class AskExpression extends AbstractSPARQLExpression {
 	
 	
 	@Override
-	public SNEL getTypeId() {
-		return SNEL.ask;
+	public String getTypeId() {
+		return "ask";
 	}
 
 

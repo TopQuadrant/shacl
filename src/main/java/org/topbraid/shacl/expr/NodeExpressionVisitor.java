@@ -1,13 +1,15 @@
 package org.topbraid.shacl.expr;
 
 import org.topbraid.shacl.expr.lib.AskExpression;
-import org.topbraid.shacl.expr.lib.GroupConcatExpression;
 import org.topbraid.shacl.expr.lib.ConstantTermExpression;
 import org.topbraid.shacl.expr.lib.CountExpression;
 import org.topbraid.shacl.expr.lib.DistinctExpression;
+import org.topbraid.shacl.expr.lib.ExistsExpression;
 import org.topbraid.shacl.expr.lib.FilterShapeExpression;
 import org.topbraid.shacl.expr.lib.FocusNodeExpression;
 import org.topbraid.shacl.expr.lib.FunctionExpression;
+import org.topbraid.shacl.expr.lib.GroupConcatExpression;
+import org.topbraid.shacl.expr.lib.IfExpression;
 import org.topbraid.shacl.expr.lib.IntersectionExpression;
 import org.topbraid.shacl.expr.lib.LimitExpression;
 import org.topbraid.shacl.expr.lib.MaxExpression;
@@ -32,11 +34,15 @@ public interface NodeExpressionVisitor {
 	
 	void visit(DistinctExpression expr);
 	
+	void visit(ExistsExpression expr);
+	
 	void visit(FilterShapeExpression expr);
 	
 	void visit(FocusNodeExpression expr);
 	
 	void visit(FunctionExpression expr);
+	
+	void visit(IfExpression expr);
 	
 	void visit(IntersectionExpression expr);
 	
@@ -59,4 +65,6 @@ public interface NodeExpressionVisitor {
 	void visit(SumExpression expr);
 	
 	void visit(UnionExpression expr);
+
+	void visitOther(NodeExpression expr);
 }

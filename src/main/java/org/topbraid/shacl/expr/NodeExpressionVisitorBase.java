@@ -1,13 +1,15 @@
 package org.topbraid.shacl.expr;
 
 import org.topbraid.shacl.expr.lib.AskExpression;
-import org.topbraid.shacl.expr.lib.GroupConcatExpression;
 import org.topbraid.shacl.expr.lib.ConstantTermExpression;
 import org.topbraid.shacl.expr.lib.CountExpression;
 import org.topbraid.shacl.expr.lib.DistinctExpression;
+import org.topbraid.shacl.expr.lib.ExistsExpression;
 import org.topbraid.shacl.expr.lib.FilterShapeExpression;
 import org.topbraid.shacl.expr.lib.FocusNodeExpression;
 import org.topbraid.shacl.expr.lib.FunctionExpression;
+import org.topbraid.shacl.expr.lib.GroupConcatExpression;
+import org.topbraid.shacl.expr.lib.IfExpression;
 import org.topbraid.shacl.expr.lib.IntersectionExpression;
 import org.topbraid.shacl.expr.lib.LimitExpression;
 import org.topbraid.shacl.expr.lib.MaxExpression;
@@ -43,6 +45,10 @@ public class NodeExpressionVisitorBase implements NodeExpressionVisitor {
 	}
 
 	@Override
+	public void visit(ExistsExpression expr) {
+	}
+
+	@Override
 	public void visit(FilterShapeExpression expr) {
 	}
 
@@ -52,6 +58,10 @@ public class NodeExpressionVisitorBase implements NodeExpressionVisitor {
 
 	@Override
 	public void visit(FunctionExpression expr) {
+	}
+
+	@Override
+	public void visit(IfExpression expr) {
 	}
 
 	@Override
@@ -96,5 +106,9 @@ public class NodeExpressionVisitorBase implements NodeExpressionVisitor {
 
 	@Override
 	public void visit(UnionExpression expr) {
+	}
+	
+	@Override
+	public void visitOther(NodeExpression expr) {
 	}
 }

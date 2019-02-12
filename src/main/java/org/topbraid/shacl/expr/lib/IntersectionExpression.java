@@ -26,12 +26,10 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.util.iterator.WrappedIterator;
-import org.topbraid.shacl.expr.AppendContext;
 import org.topbraid.shacl.expr.ComplexNodeExpression;
 import org.topbraid.shacl.expr.NodeExpression;
 import org.topbraid.shacl.expr.NodeExpressionContext;
 import org.topbraid.shacl.expr.NodeExpressionVisitor;
-import org.topbraid.shacl.expr.SNEL;
 
 public class IntersectionExpression extends ComplexNodeExpression {
 	
@@ -41,43 +39,6 @@ public class IntersectionExpression extends ComplexNodeExpression {
 	public IntersectionExpression(RDFNode expr, List<NodeExpression> inputs) {
 		super(expr);
 		this.inputs = inputs;
-	}
-
-	
-	@Override
-	public void appendSPARQL(AppendContext context, String targetVarName) {
-		String varName = context.getNextVarName();
-		for(int i = 0; i < inputs.size(); i++) {
-			NodeExpression input = inputs.get(i);
-			if(input instanceof ComplexNodeExpression) {
-				((ComplexNodeExpression)input).appendSPARQL(context, varName + (i + 1));
-			}
-			else {
-				context.indent();
-				context.append("BIND (");
-				context.append(input.toString());
-				context.append(" AS ?");
-				context.append(varName + (i + 1));
-				context.append(") .\n");
-			}
-		}
-		context.indent();
-		context.append("FILTER (bound(?");
-		context.append(varName);
-		context.append("1) ");
-		for(int i = 1; i < inputs.size(); i++) {
-			context.append(" && ?");
-			context.append(varName + (i + 1));
-			context.append("=?");
-			context.append(varName + "1");
-		}
-		context.append(") .\n");
-		context.indent();
-		context.append("BIND (?");
-		context.append(varName);
-		context.append("1 AS ?");
-		context.append(targetVarName);
-		context.append(") .\n");
 	}
 
 
@@ -136,8 +97,8 @@ public class IntersectionExpression extends ComplexNodeExpression {
 
 
 	@Override
-	public SNEL getTypeId() {
-		return SNEL.intersection;
+	public String getTypeId() {
+		return "intersection";
 	}
 	
 	

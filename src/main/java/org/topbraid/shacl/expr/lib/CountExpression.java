@@ -8,11 +8,9 @@ import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.util.iterator.WrappedIterator;
 import org.topbraid.jenax.util.JenaDatatypes;
 import org.topbraid.shacl.expr.AbstractInputExpression;
-import org.topbraid.shacl.expr.AppendContext;
 import org.topbraid.shacl.expr.NodeExpression;
 import org.topbraid.shacl.expr.NodeExpressionContext;
 import org.topbraid.shacl.expr.NodeExpressionVisitor;
-import org.topbraid.shacl.expr.SNEL;
 
 /**
  * Implements support for sh:count.
@@ -42,14 +40,8 @@ public class CountExpression extends AbstractInputExpression {
 	
 	
 	@Override
-	public void appendSPARQL(AppendContext context, String targetVarName) {
-		throw new UnsupportedOperationException("Not yet implemented");
-	}
-	
-	
-	@Override
-	public SNEL getTypeId() {
-		return SNEL.count;
+	public String getTypeId() {
+		return "count";
 	}
 	
 	

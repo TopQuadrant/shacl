@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiFunction;
 
 import org.apache.jena.enhanced.EnhGraph;
 import org.apache.jena.graph.Factory;
@@ -475,10 +476,15 @@ public class JenaUtil {
 	 * @return the best suitable value or null
 	 */
 	public static Literal getBestStringLiteral(Resource resource, List<String> langs, Iterable<Property> properties) {
+		return getBestStringLiteral(resource, langs, properties, (r,p) -> r.listProperties(p));
+	}
+	
+	
+	public static Literal getBestStringLiteral(Resource resource, List<String> langs, Iterable<Property> properties, BiFunction<Resource,Property,Iterator<Statement>> getter) {
 		Literal label = null;
 		int bestLang = -1;
 		for(Property predicate : properties) {
-			StmtIterator it = resource.listProperties(predicate);
+			Iterator<Statement> it = getter.apply(resource, predicate);
 			while(it.hasNext()) {
 				RDFNode object = it.next().getObject();
 				if(object.isLiteral()) {
