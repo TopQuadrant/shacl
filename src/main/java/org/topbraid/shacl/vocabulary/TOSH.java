@@ -53,6 +53,8 @@ public class TOSH {
     public final static Resource values = ResourceFactory.createResource(NS + "values");
 
     
+    public final static Property closed = ResourceFactory.createProperty(NS + "closed");
+    
     public final static Property editWidget = ResourceFactory.createProperty(NS + "editWidget");
     
     public final static Property javaMethod = ResourceFactory.createProperty(NS + "javaMethod");

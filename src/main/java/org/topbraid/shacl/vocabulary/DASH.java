@@ -97,6 +97,8 @@ public class DASH {
     
     public final static Property deletedTriple = ResourceFactory.createProperty(NS + "deletedTriple");
     
+    public final static Property detailsGraph = ResourceFactory.createProperty(NS + "detailsGraph");
+    
     public final static Property expectedResult = ResourceFactory.createProperty(NS + "expectedResult");
     
     public final static Property expectedResultIsJSON = ResourceFactory.createProperty(NS + "expectedResultIsJSON");

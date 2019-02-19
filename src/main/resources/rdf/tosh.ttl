@@ -534,6 +534,14 @@ tosh:ValueTypeConstraintPropertyGroup
   rdfs:label "Type of Values" ;
   sh:order 3 ;
 .
+tosh:closed
+  a rdf:Property ;
+  a owl:DeprecatedProperty ;
+  rdfs:comment "If set to true, then the corresponding form section will be closed by default." ;
+  rdfs:domain sh:PropertyGroup ;
+  rdfs:label "closed" ;
+  rdfs:range xsd:boolean ;
+.
 tosh:countShapesWithMatchResult
   a sh:SPARQLFunction ;
   rdfs:comment "Counts the number of shapes from a given rdf:List (?arg2) defined in a given shapes graph (?arg3) where tosh:hasShape returns the provided match value (true or false, ?arg4) for a given focus node (?arg1). The function produces a failure if one of the shapes validated to a failure." ;
@@ -645,15 +653,19 @@ tosh:isInTargetOf
 .
 tosh:open
   a rdf:Property ;
-  rdfs:comment "If set to true, then the corresponding form section will be open by default. This only has an effect if sh:openable is set to true as well." ;
-  rdfs:domain sh:PropertyGroup ;
+  a owl:DeprecatedProperty ;
+  rdfs:comment """DEPRECATED: This flag is only used by SWA forms. With the new forms of 6.2 onwards, all form sections are open by default, but you can use tosh:closed to state otherwise.
+
+If set to true, then the corresponding form section will be open by default. This only has an effect if sh:openable is set to true as well.""" ;
   rdfs:label "open" ;
   rdfs:range xsd:boolean ;
 .
 tosh:openable
   a rdf:Property ;
-  rdfs:comment "If set to true, then the corresponding form section shall be openable/closable (and show up closed)." ;
-  rdfs:domain sh:PropertyGroup ;
+  a owl:DeprecatedProperty ;
+  rdfs:comment """DEPRECATED - this was only used by the SWA-based forms that were default before 6.2. In the new forms, all sections are openable.
+
+If set to true, then the corresponding form section shall be openable/closable (and show up closed).""" ;
   rdfs:label "openable" ;
   rdfs:range xsd:boolean ;
 .

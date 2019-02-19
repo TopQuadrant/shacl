@@ -35,6 +35,7 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.graph.compose.MultiUnion;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
+import org.apache.jena.query.ARQ;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -54,18 +55,30 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.rdf.model.impl.PropertyImpl;
 import org.apache.jena.rdf.model.impl.StmtIteratorImpl;
 import org.apache.jena.shared.PrefixMapping;
+import org.apache.jena.sparql.ARQConstants;
+import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.engine.ExecutionContext;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.binding.BindingHashMap;
+import org.apache.jena.sparql.engine.binding.BindingRoot;
+import org.apache.jena.sparql.expr.E_Function;
 import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.expr.ExprEvalException;
+import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.expr.ExprTransform;
 import org.apache.jena.sparql.expr.ExprTransformer;
+import org.apache.jena.sparql.expr.ExprVar;
+import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.expr.nodevalue.NodeFunctions;
+import org.apache.jena.sparql.function.FunctionEnv;
 import org.apache.jena.sparql.graph.NodeTransform;
 import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransform;
 import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformSubst;
 import org.apache.jena.sparql.syntax.syntaxtransform.ExprTransformNodeElement;
 import org.apache.jena.sparql.syntax.syntaxtransform.QueryTransformOps;
+import org.apache.jena.sparql.util.Context;
+import org.apache.jena.sparql.util.NodeFactoryExtra;
 import org.apache.jena.sparql.util.NodeUtils;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
@@ -1101,9 +1114,8 @@ public class JenaUtil {
 	 * @return the result of the function call
 	 */
 	public static Node invokeFunction0(Resource function, Dataset dataset) {
-	    final String expression = "<" + function + ">()";
-	    QuerySolutionMap initialBinding = new QuerySolutionMap();
-	    return invokeExpression(expression, initialBinding, dataset);
+		ExprList args = new ExprList();
+		return invokeFunction(function, args, dataset);
 	}
 
 
@@ -1116,10 +1128,9 @@ public class JenaUtil {
 	 * @return the result of the function call
 	 */
 	public static Node invokeFunction1(Resource function, RDFNode argument, Dataset dataset) {
-	    final String expression = "<" + function + ">(?arg1)";
-	    QuerySolutionMap initialBinding = new QuerySolutionMap();
-	    initialBinding.add("arg1", argument);
-	    return invokeExpression(expression, initialBinding, dataset);
+		ExprList args = new ExprList();
+		args.add(argument != null ? NodeValue.makeNode(argument.asNode()) : new ExprVar("arg1"));
+		return invokeFunction(function, args, dataset);
 	}
 
 
@@ -1138,15 +1149,10 @@ public class JenaUtil {
 	 * @return the result of the function call
 	 */
 	public static Node invokeFunction2(Resource function, RDFNode argument1, RDFNode argument2, Dataset dataset) {
-	    final String expression = "<" + function + ">(?arg1, ?arg2)";
-	    QuerySolutionMap initialBinding = new QuerySolutionMap();
-	    if(argument1 != null) {
-	    	initialBinding.add("arg1", argument1);
-	    }
-	    if(argument2 != null) {
-	    	initialBinding.add("arg2", argument2);
-	    }
-	    return invokeExpression(expression, initialBinding, dataset);
+		ExprList args = new ExprList();
+		args.add(argument1 != null ? NodeValue.makeNode(argument1.asNode()) : new ExprVar("arg1"));
+		args.add(argument2 != null ? NodeValue.makeNode(argument2.asNode()) : new ExprVar("arg2"));
+		return invokeFunction(function, args, dataset);
 	}
 
 
@@ -1156,17 +1162,34 @@ public class JenaUtil {
 
 
 	public static Node invokeFunction3(Resource function, RDFNode argument1, RDFNode argument2, RDFNode argument3, Dataset dataset) {
-		
-	    final String expression = "<" + function + ">(?arg1, ?arg2, ?arg3)";
-	    QuerySolutionMap initialBinding = new QuerySolutionMap();
-	    initialBinding.add("arg1", argument1);
-	    if(argument2 != null) {
-	    	initialBinding.add("arg2", argument2);
+		ExprList args = new ExprList();
+		args.add(argument1 != null ? NodeValue.makeNode(argument1.asNode()) : new ExprVar("arg1"));
+		args.add(argument2 != null ? NodeValue.makeNode(argument2.asNode()) : new ExprVar("arg2"));
+		args.add(argument3 != null ? NodeValue.makeNode(argument3.asNode()) : new ExprVar("arg3"));
+		return invokeFunction(function, args, dataset);
+	}
+	
+	
+	private static Node invokeFunction(Resource function, ExprList args, Dataset dataset) {
+
+		if (dataset == null) {
+	        dataset = ARQFactory.get().getDataset(ModelFactory.createDefaultModel());
 	    }
-		if(argument3 != null) {
-			initialBinding.add("arg3", argument3);
+		
+		E_Function expr = new E_Function(function.getURI(), args);
+		DatasetGraph dsg = dataset.asDatasetGraph();
+		Context cxt = ARQ.getContext().copy();
+		cxt.set(ARQConstants.sysCurrentTime, NodeFactoryExtra.nowAsDateTime());
+		FunctionEnv env = new ExecutionContext(cxt, dsg.getDefaultGraph(), dsg, null);
+		try {
+			NodeValue r = expr.eval(BindingRoot.create(), env);
+			if(r != null) {
+				return r.asNode();
+			}
 		}
-	    return invokeExpression(expression, initialBinding, dataset);
+		catch(ExprEvalException ex) {
+		}
+		return null;
 	}
 
 

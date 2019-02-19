@@ -855,6 +855,15 @@ dash:deletedTriple
   rdfs:label "deleted triple" ;
   rdfs:range rdf:Statement ;
 .
+dash:detailsGraph
+  a rdf:Property ;
+  rdfs:comment """Can be used to link a SHACL property shape with a SHACL node expression that produces the URIs of one or more graphs that contain further RDF triples for the value nodes delivered by the property. This can be used to inform a processor that it should switch to another data graph when the user wants to retrieve more information about a value.
+
+The node expressions are evaluated with the focus node as input. (It is unclear whether there are also cases where the result may be different for each specific value, in which case the node expression would need a second input argument).
+
+This property should be regarded as an \"annotation\", i.e. it does not have any impact on validation or other built-in SHACL features. However, selected tools may want to use this information.""" ;
+  rdfs:label "details graph" ;
+.
 dash:expectedResult
   a rdf:Property ;
   rdfs:comment "The expected result(s) of a test case. The value range of this property is different for each kind of test cases." ;
