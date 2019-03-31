@@ -16,17 +16,36 @@
  */
 package org.topbraid.shacl.validation;
 
+import java.net.URI;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
+
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.rdf.model.*;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.vocabulary.RDF;
 import org.topbraid.jenax.util.ExceptionUtil;
 import org.topbraid.jenax.util.JenaDatatypes;
 import org.topbraid.jenax.util.JenaUtil;
+import org.topbraid.jenax.util.RDFLabels;
 import org.topbraid.shacl.arq.SHACLPaths;
-import org.topbraid.shacl.engine.*;
+import org.topbraid.shacl.engine.AbstractEngine;
+import org.topbraid.shacl.engine.ConfigurableEngine;
+import org.topbraid.shacl.engine.Constraint;
+import org.topbraid.shacl.engine.Shape;
+import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.engine.filters.ExcludeMetaShapesFilter;
 import org.topbraid.shacl.js.SHACLScriptEngineManager;
 import org.topbraid.shacl.util.FailureLog;
@@ -35,11 +54,6 @@ import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.validation.sparql.SPARQLSubstitutions;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
-
-import java.net.URI;
-import java.util.*;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 /**
  * A ValidationEngine uses a given shapes graph (represented via an instance of VShapesGraph)
@@ -67,7 +81,7 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 	
 	private Predicate<RDFNode> focusNodeFilter;
 	
-	private Function<RDFNode,String> labelFunction = (node -> node.toString());
+	private Function<RDFNode,String> labelFunction = (node -> RDFLabels.get().getNodeLabel(node));
 	
 	private Resource report;
 
