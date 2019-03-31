@@ -191,7 +191,9 @@ public abstract class AbstractJSExecutor implements ConstraintExecutor {
 			if(!(Boolean)resultObj) {
 				Resource result = createValidationResult(engine, constraint, focusNode);
 				if(valueNode != null) {
-					result.addProperty(SH.value, valueNode);
+					if(!SH.HasValueConstraintComponent.equals(constraint.getComponent())) { // See https://github.com/w3c/data-shapes/issues/111
+						result.addProperty(SH.value, valueNode);
+					}
 				}
 				addDefaultMessages(engine, constraint, messageHolder, constraint.getComponent(), result, bindings, null);
 			}

@@ -27,7 +27,6 @@ ex:GraphValidationTestCase
           sh:resultSeverity sh:Violation ;
           sh:sourceConstraintComponent sh:HasValueConstraintComponent ;
           sh:sourceShape ex:TestShape ;
-          sh:value "Invalid String" ;
         ] ;
     ] ;
 .

@@ -53,6 +53,8 @@ public class SH {
 
     public final static Resource DatatypeConstraintComponent = ResourceFactory.createResource(NS + "DatatypeConstraintComponent");
 
+    public final static Resource HasValueConstraintComponent = ResourceFactory.createResource(NS + "HasValueConstraintComponent");
+
     public final static Resource Info = ResourceFactory.createResource(NS + "Info");
 
     public final static Resource IRI = ResourceFactory.createResource(NS + "IRI");

@@ -214,12 +214,14 @@ public abstract class AbstractSPARQLExecutor implements ConstraintExecutor {
 							result.addProperty(SH.resultPath, SHACLPaths.clonePath(basePath, result.getModel()));
 						}
 						
-						RDFNode selectValue = sol.get(SH.valueVar.getVarName());
-						if(selectValue != null) {
-							result.addProperty(SH.value, selectValue);
-						}
-						else if(SH.NodeShape.equals(constraint.getContext())) {
-							result.addProperty(SH.value, focusNode);
+						if(!SH.HasValueConstraintComponent.equals(constraint.getComponent())) { // See https://github.com/w3c/data-shapes/issues/111
+							RDFNode selectValue = sol.get(SH.valueVar.getVarName());
+							if(selectValue != null) {
+								result.addProperty(SH.value, selectValue);
+							}
+							else if(SH.NodeShape.equals(constraint.getContext())) {
+								result.addProperty(SH.value, focusNode);
+							}
 						}
 						
 						if(engine.getConfiguration().getReportDetails()) {
