@@ -95,6 +95,12 @@
       <version>${ver.slf4j}</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.topbraid</groupId>
+      <artifactId>antlr-shaded</artifactId>
+      <version>4.5.3</version>
+    </dependency>
+
     <!-- Logging : <optional> so the application chooses the provider for slf4j -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -113,6 +119,13 @@
     </dependency>
 
   </dependencies>
+  
+  <repositories>
+    <repository>
+      <id>org.topbraid.antlr</id>
+      <url>file://${basedir}/lib</url>
+    </repository>
+  </repositories>
 
   <build>
     <plugins>

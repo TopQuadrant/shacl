@@ -88,6 +88,23 @@ WHERE {
     ?this ?anyP ?anyO .
 }""" ;
 .
+dash:AutoCompleteEditor
+  a dash:Editor ;
+  rdfs:comment "An auto-complete field to enter the label of instances of a class. This is the fallback editor for any URI resource if no other editors are more suitable." ;
+  rdfs:label "Auto-complete editor" ;
+.
+dash:BlankNodeViewer
+  a dash:Viewer ;
+  rdfs:comment "A Viewer for blank nodes, rendering as the label of the blank node." ;
+  rdfs:label "Blank node Viewer" ;
+.
+dash:BooleanSelectEditor
+  a dash:Editor ;
+  rdfs:comment """An editor for boolean literals, rendering as a select box with values true and false.
+
+Also displays the current value (such as \"1\"^^xsd:boolean), but only allows to switch to true or false.""" ;
+  rdfs:label "Boolean select editor" ;
+.
 dash:ClosedByTypesConstraintComponent
   a sh:ConstraintComponent ;
   rdfs:comment "A constraint component that can be used to declare that focus nodes are \"closed\" based on their rdf:types, meaning that focus nodes may only have values for the properties that are explicitly enumerated via sh:property/sh:path in property constraints at their rdf:types and the superclasses of those. This assumes that the type classes are also shapes." ;
@@ -178,6 +195,16 @@ dash:DateOrDateTime
   rdfs:comment "An rdf:List that can be used in property constraints as value for sh:or to indicate that all values of a property must be either xsd:date or xsd:dateTime." ;
   rdfs:label "Date or date time" ;
 .
+dash:DatePickerEditor
+  a dash:Editor ;
+  rdfs:comment "An editor for xsd:date literals, offering a calendar-like date picker." ;
+  rdfs:label "Date picker editor" ;
+.
+dash:DateTimePickerEditor
+  a dash:Editor ;
+  rdfs:comment "An editor for xsd:dateTime literals, offering a calendar-like date picker including a time selector." ;
+  rdfs:label "Date time picker editor" ;
+.
 dash:DefaultValueTypeRule
   a sh:SPARQLConstructExecutable ;
   rdfs:comment """
@@ -196,6 +223,23 @@ dash:DefaultValueTypeRule
 			FILTER (NOT EXISTS { ?node a ?anyType }) .
 		}
 		""" ;
+.
+dash:DetailsViewer
+  a dash:Viewer ;
+  rdfs:comment "A Viewer for resources that shows the details of the value using its default view shape as a nested form-like display." ;
+  rdfs:label "Details Viewer" ;
+.
+dash:Editor
+  a rdfs:Class ;
+  a sh:NodeShape ;
+  rdfs:comment "The class of widgets for editing value nodes." ;
+  rdfs:label "Editor" ;
+  rdfs:subClassOf dash:Widget ;
+.
+dash:EnumSelectEditor
+  a dash:Editor ;
+  rdfs:comment "A drop-down editor for enumerated values (typically based on sh:in lists)." ;
+  rdfs:label "Enum select editor" ;
 .
 dash:ExecutionPlatform
   a rdfs:Class ;
@@ -286,6 +330,11 @@ dash:HTMLOrStringOrLangString
   rdfs:comment "An rdf:List that can be used in property constraints as value for sh:or to indicate that all values of a property must be either rdf:HTML, xsd:string or rdf:langString." ;
   rdfs:label "HTML or string or langString" ;
 .
+dash:HTMLViewer
+  a dash:Viewer ;
+  rdfs:comment "A Viewer for HTML encoded text from rdf:HTML literals, rendering as parsed HTML DOM elements. Also displays the language if the HTML has a lang attribute on its root DOM element." ;
+  rdfs:label "HTML Viewer" ;
+.
 dash:HasValueWithClassConstraintComponent
   a sh:ConstraintComponent ;
   rdfs:comment "A constraint component that can be used to express a constraint on property shapes so that one of the values of the property path must be an instance of a given class." ;
@@ -317,6 +366,20 @@ dash:HasValueWithClassConstraintComponent-hasValueWithClass
   sh:class rdfs:Class ;
   sh:nodeKind sh:IRI ;
 .
+dash:HyperlinkViewer
+  a dash:Viewer ;
+  rdfs:comment """A Viewer for literals or URI resources, rendering as a hyperlink to a URL.
+
+For literals it assumes the lexical form is the URL. For URI resources it should display the human-readable resource label to the user.
+
+This is often used as default viewer for xsd:anyURI literals. Unsupported for blank nodes.""" ;
+  rdfs:label "Hyperlink Viewer" ;
+.
+dash:ImageViewer
+  a dash:Viewer ;
+  rdfs:comment "A Viewer for URI values that are recognized as images by a browser, rendering as an image." ;
+  rdfs:label "Image Viewer" ;
+.
 dash:InferencingTestCase
   a rdfs:Class ;
   a sh:NodeShape ;
@@ -328,6 +391,11 @@ dash:InferencingTestCase
       sh:description "The expected inferred triples, represented by instances of rdfs:Statement." ;
       sh:name "expected result" ;
     ] ;
+.
+dash:InstancesSelectEditor
+  a dash:Editor ;
+  rdfs:comment "A drop-down editor for all instances of the target class (based on sh:class of the property)." ;
+  rdfs:label "Instances select editor" ;
 .
 dash:JSTestCase
   a rdfs:Class ;
@@ -341,6 +409,16 @@ dash:JSTestCase
       sh:maxCount 1 ;
       sh:name "expected result" ;
     ] ;
+.
+dash:LabelViewer
+  a dash:Viewer ;
+  rdfs:comment "A Viewer for URI resources, rendering as a hyperlink to that URI based on the display label of the resource. Also includes other ways of interacting with the URI such as opening a nested summary display." ;
+  rdfs:label "Label Viewer" ;
+.
+dash:LangStringViewer
+  a dash:Viewer ;
+  rdfs:comment "A Viewer for literals with a language tag, rendering as the text plus a language indicator." ;
+  rdfs:label "LangString Viewer" ;
 .
 dash:ListNodeShape
   a sh:NodeShape ;
@@ -404,6 +482,11 @@ The focus node must either be rdf:nil or not recursive. Furthermore, this shape 
       rdfs:comment "Each list member (including this node) must be have the shape dash:ListNodeShape." ;
       sh:node dash:ListNodeShape ;
     ] ;
+.
+dash:LiteralViewer
+  a dash:Viewer ;
+  rdfs:comment "A simple viewer for literals, rendering the lexical form of the value." ;
+  rdfs:label "Literal viewer" ;
 .
 dash:NonRecursiveConstraintComponent
   a sh:ConstraintComponent ;
@@ -504,7 +587,6 @@ dash:PrimaryKeyConstraintComponent-uriStart
   sh:path dash:uriStart ;
   sh:datatype xsd:string ;
   sh:description "The start of the URIs of well-formed resources. If specified then the associated property/path serves as \"primary key\" for all target nodes (instances). All such target nodes need to have a URI that starts with the given string, followed by the URI-encoded value of the primary key property." ;
-  sh:group tosh:PrimaryKeyPropertyGroup ;
   sh:name "URI start" ;
 .
 dash:QueryTestCase
@@ -535,6 +617,11 @@ dash:RDFQueryJSLibrary
   a sh:JSLibrary ;
   rdfs:label "rdfQuery JavaScript Library" ;
   sh:jsLibraryURL "http://datashapes.org/js/rdfquery.js"^^xsd:anyURI ;
+.
+dash:RichTextEditor
+  a dash:Editor ;
+  rdfs:comment "A rich text editor to enter the lexical value of a literal and a drop down to select language. The selected language is stored in the HTML lang attribute of the root node in the HTML DOM tree." ;
+  rdfs:label "Rich text editor" ;
 .
 dash:RootClassConstraintComponent
   a sh:ConstraintComponent ;
@@ -568,6 +655,35 @@ In many cases, there may be multiple possible suggestions to fix a problem. For 
   rdfs:subClassOf dash:SuggestionGenerator ;
   rdfs:subClassOf sh:SPARQLSelectExecutable ;
   rdfs:subClassOf sh:SPARQLUpdateExecutable ;
+.
+dash:SingleLineConstraintComponent
+  a sh:ConstraintComponent ;
+  rdfs:comment """A constraint component that can be used to declare that all values that are literals must have a lexical form that contains no line breaks ('\\n' or '\\r').
+
+User interfaces may use the dash:singleLine flag to prefer a text field over a (multi-line) text area.""" ;
+  rdfs:label "Single line constraint component" ;
+  sh:message "Must not contain line breaks." ;
+  sh:parameter [
+      a sh:Parameter ;
+      sh:path dash:singleLine ;
+      sh:datatype xsd:boolean ;
+      sh:description "True to state that the lexical form of literal value nodes must not contain any line breaks. False to state that line breaks are explicitly permitted." ;
+      sh:group tosh:StringBasedConstraintPropertyGroup ;
+      sh:name "single line" ;
+    ] ;
+  sh:targetClass sh:PropertyShape ;
+  sh:validator [
+      a sh:JSValidator ;
+      sh:jsFunctionName "validateSingleLine" ;
+      sh:jsLibrary dash:DASHJSLibrary ;
+    ] ;
+  sh:validator [
+      a sh:SPARQLAskValidator ;
+      sh:ask """ASK {
+    FILTER (!$singleLine || !isLiteral($value) || (!contains(str($value), '\\n') && !contains(str($value), '\\r')))
+}""" ;
+      sh:prefixes <http://datashapes.org/dash> ;
+    ] ;
 .
 dash:StemConstraintComponent
   a sh:ConstraintComponent ;
@@ -690,7 +806,6 @@ dash:SymmetricConstraintComponent-symmetric
   a sh:Parameter ;
   sh:path dash:symmetric ;
   sh:datatype xsd:boolean ;
-  sh:group tosh:RelationshipPropertyGroup ;
 .
 dash:TestCase
   a rdfs:Class ;
@@ -729,6 +844,33 @@ dash:TestEnvironment
   rdfs:comment "Abstract base class for test environments, holding information on how to set up a test case." ;
   rdfs:label "Test environment" ;
   rdfs:subClassOf rdfs:Resource ;
+.
+dash:TextAreaEditor
+  a dash:Editor ;
+  rdfs:comment "A multi-line text area to enter the value of a literal." ;
+  rdfs:label "Text area editor" ;
+.
+dash:TextAreaWithLangEditor
+  a dash:Editor ;
+  rdfs:comment "A multi-line text area to enter the value of a literal and a drop down to select a language." ;
+  rdfs:label "Text area with lang editor" ;
+.
+dash:TextFieldEditor
+  a dash:Editor ;
+  rdfs:comment """A simple input field to enter the value of a literal, without the ability to change language or datatype.
+
+This is the fallback editor for any literal if no other editors are more suitable.""" ;
+  rdfs:label "Text field editor" ;
+.
+dash:TextFieldWithLangEditor
+  a dash:Editor ;
+  rdfs:comment "A single-line input field to enter the value of a literal and a drop down to select language, which is mandatory unless xsd:string is among the permissible datatypes." ;
+  rdfs:label "Text field with lang editor" ;
+.
+dash:URIViewer
+  a dash:Viewer ;
+  rdfs:comment "A Viewer for URI resources, rendering as a hyperlink to that URI. Also includes other ways of interacting with the URI such as opening a nested summary display." ;
+  rdfs:label "URI Viewer" ;
 .
 dash:UniqueValueForClassConstraintComponent
   a sh:ConstraintComponent ;
@@ -779,6 +921,26 @@ dash:ValidationTestCase
       sh:description "The expected validation report." ;
       sh:name "expected result" ;
     ] ;
+.
+dash:ValueTableViewer
+  a dash:Viewer ;
+  rdfs:comment "A viewer that renders all values of a given property as a table, with one value per row, and the columns defined by the shape that is the sh:node or sh:class of the property." ;
+  rdfs:label "Value table viewer" ;
+.
+dash:Viewer
+  a rdfs:Class ;
+  a sh:NodeShape ;
+  rdfs:comment "The class of widgets for viewing value nodes." ;
+  rdfs:label "Viewer" ;
+  rdfs:subClassOf dash:Widget ;
+.
+dash:Widget
+  a rdfs:Class ;
+  a sh:NodeShape ;
+  dash:abstract true ;
+  rdfs:comment "Base class of user interface components that can be used to display or edit value nodes." ;
+  rdfs:label "Widget" ;
+  rdfs:subClassOf rdfs:Resource ;
 .
 dash:abstract
   a rdf:Property ;
@@ -855,6 +1017,15 @@ dash:deletedTriple
   rdfs:label "deleted triple" ;
   rdfs:range rdf:Statement ;
 .
+dash:detailsEndpoint
+  a rdf:Property ;
+  rdfs:comment """Can be used to link a SHACL property shape with the URL of a SPARQL endpoint that may contain further RDF triples for the value nodes delivered by the property. This can be used to inform a processor that it should switch to values from an external graph when the user wants to retrieve more information about a value.
+
+This property should be regarded as an \"annotation\", i.e. it does not have any impact on validation or other built-in SHACL features. However, selected tools may want to use this information. One implementation strategy would be to periodically fetch the values specified by the sh:node or sh:class shape associated with the property, using the property shapes in that shape, and add the resulting triples into the main query graph.
+
+An example value is \"https://query.wikidata.org/sparql\".""" ;
+  rdfs:label "details endpoint" ;
+.
 dash:detailsGraph
   a rdf:Property ;
   rdfs:comment """Can be used to link a SHACL property shape with a SHACL node expression that produces the URIs of one or more graphs that contain further RDF triples for the value nodes delivered by the property. This can be used to inform a processor that it should switch to another data graph when the user wants to retrieve more information about a value.
@@ -863,6 +1034,13 @@ The node expressions are evaluated with the focus node as input. (It is unclear 
 
 This property should be regarded as an \"annotation\", i.e. it does not have any impact on validation or other built-in SHACL features. However, selected tools may want to use this information.""" ;
   rdfs:label "details graph" ;
+.
+dash:editor
+  a rdf:Property ;
+  rdfs:comment "Can be used to link a property shape with an editor, to state a preferred editing widget in user interfaces." ;
+  rdfs:domain sh:PropertyShape ;
+  rdfs:label "editor" ;
+  rdfs:range dash:Editor ;
 .
 dash:expectedResult
   a rdf:Property ;
@@ -1119,6 +1297,13 @@ dash:propertySuggestionGenerator
   rdfs:label "property suggestion generator" ;
   rdfs:range dash:SuggestionGenerator ;
 .
+dash:readOnly
+  a rdf:Property ;
+  rdfs:comment "Used as a hint for user interfaces that values of the associated property should not be editable." ;
+  rdfs:domain sh:PropertyShape ;
+  rdfs:label "read only" ;
+  rdfs:range xsd:boolean ;
+.
 dash:requiredExecutionPlatform
   a rdf:Property ;
   rdfs:comment "Links a SPARQL executable with the platforms that it can be executed on. This can be used by a SHACL implementation to determine whether a constraint validator or rule shall be ignored based on the current platform. For example, if a SPARQL query uses a function or magic property that is only available in TopBraid then a non-TopBraid platform can ignore the constraint (or simply always return no validation results). If this property has no value then the assumption is that the execution will succeed. As soon as one value exists, the assumption is that the engine supports at least one of the given platforms." ;
@@ -1135,6 +1320,11 @@ dash:shape
   rdfs:comment "States that a subject resource has a given shape. This property can, for example, be used to capture results of SHACL validation on static data." ;
   rdfs:label "shape" ;
   rdfs:range sh:Shape ;
+.
+dash:singleLine
+  a rdf:Property ;
+  rdfs:label "single line" ;
+  rdfs:range xsd:boolean ;
 .
 dash:staticConstraint
   a rdf:Property ;
@@ -1258,6 +1448,13 @@ dash:valueCount
     		$subject $predicate ?object .
 		}
 """ ;
+.
+dash:viewer
+  a rdf:Property ;
+  rdfs:comment "Can be used to link a property shape with a viewer, to state a preferred viewing widget in user interfaces." ;
+  rdfs:domain sh:PropertyShape ;
+  rdfs:label "viewer" ;
+  rdfs:range dash:Viewer ;
 .
 dash:width
   a rdf:Property ;

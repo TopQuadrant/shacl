@@ -242,7 +242,7 @@ public class NodeExpressionFactory {
 	
 	public NodeExpression create(RDFNode node) {
 		if(SH.this_.equals(node)) {
-			return new FocusNodeExpression();
+			return new FocusNodeExpression(node);
 		}
 		else if(node.isURIResource() || node.isLiteral()) {
 			return new ConstantTermExpression(node);

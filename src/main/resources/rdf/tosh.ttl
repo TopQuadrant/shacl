@@ -26,13 +26,13 @@ dash:HasValueWithClassConstraintComponent-hasValueWithClass
 .
 dash:NonRecursiveConstraintComponent
   dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
-  sh:property [
-      sh:path dash:nonRecursive ;
-      sh:group tosh:RelationshipPropertyGroup ;
-    ] ;
+.
+dash:NonRecursiveConstraintComponent-nonRecursive
+  sh:group tosh:RelationshipPropertyGroup ;
 .
 dash:PrimaryKeyConstraintComponent-uriStart
   tosh:editWidget swa:PlainTextFieldEditor ;
+  sh:group tosh:PrimaryKeyPropertyGroup ;
 .
 dash:RootClassConstraintComponent
   dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
@@ -53,6 +53,9 @@ dash:SymmetricConstraintComponent
 WHERE {
 }""" ;
     ] ;
+.
+dash:SymmetricConstraintComponent-symmetric
+  sh:group tosh:RelationshipPropertyGroup ;
 .
 <http://spinrdf.org/sp#>
   tosh:systemNamespace true ;
@@ -201,6 +204,14 @@ tosh:PropertyShapeShape
   rdfs:label "Property shape shape" ;
   sh:property [
       a sh:PropertyShape ;
+      sh:path dash:detailsEndpoint ;
+      sh:datatype xsd:string ;
+      sh:group tosh:RemoteValuesPropertyGroup ;
+      sh:maxCount 1 ;
+      sh:order "0"^^xsd:decimal ;
+    ] ;
+  sh:property [
+      a sh:PropertyShape ;
       sh:path sh:values ;
       tosh:editWidget swa:SourceCodeEditor ;
       tosh:viewWidget <http://topbraid.org/tosh.ui#ValuesExpressionDiagramViewer> ;
@@ -323,6 +334,17 @@ WHERE {
       sh:name "on property" ;
       sh:order 0 ;
     ] ;
+  sh:sparql [
+      sh:message "Property shapes cannot have both class and datatype constraints." ;
+      sh:prefixes <http://topbraid.org/tosh> ;
+      sh:select """SELECT $this
+WHERE {
+	FILTER EXISTS {
+    	$this sh:class ?class .
+		$this sh:datatype ?datatype .
+	}
+}""" ;
+    ] ;
   sh:targetClass sh:PropertyShape ;
 .
 tosh:RelationshipPropertyGroup
@@ -330,6 +352,11 @@ tosh:RelationshipPropertyGroup
   tosh:openable true ;
   rdfs:label "Relationship" ;
   sh:order 8 ;
+.
+tosh:RemoteValuesPropertyGroup
+  a sh:PropertyGroup ;
+  rdfs:label "Remote Values" ;
+  sh:order "12"^^xsd:decimal ;
 .
 tosh:ReplaceWithDefaultValueSuggestionGenerator
   a dash:SPARQLUpdateSuggestionGenerator ;
@@ -649,6 +676,26 @@ tosh:isInTargetOf
       sh:description "The shape that the node is supposed to be in the target of." ;
       sh:name "shape" ;
     ] ;
+  sh:returnType xsd:boolean ;
+.
+tosh:isSystemResource
+  a sh:SPARQLFunction ;
+  rdfs:comment "Checks if a given resource is from a namespace that is marked with tosh:systemNamespace true." ;
+  rdfs:label "is system resource" ;
+  sh:ask """ASK {
+    BIND (IRI(afn:namespace($resource)) AS ?namespace) .
+	FILTER (bound(?namespace) && EXISTS {
+		?namespace tosh:systemNamespace true .
+	})
+}""" ;
+  sh:parameter [
+      a sh:Parameter ;
+      sh:path tosh:resource ;
+      sh:description "The node to check." ;
+      sh:name "resource" ;
+      sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+  sh:prefixes <http://topbraid.org/tosh> ;
   sh:returnType xsd:boolean ;
 .
 tosh:open

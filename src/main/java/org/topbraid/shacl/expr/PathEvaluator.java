@@ -32,6 +32,7 @@ import org.apache.jena.sparql.path.P_Link;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.util.iterator.WrappedIterator;
+import org.apache.jena.vocabulary.RDFS;
 import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.arq.SHACLPaths;
 import org.topbraid.shacl.engine.ShapesGraph;
@@ -131,7 +132,7 @@ public class PathEvaluator {
 	 */
 	public boolean isMaybeInferred(ShapesGraph shapesGraph) {
 		if(predicate != null && !isInverse) {
-			return shapesGraph.getValuesNodeExpressionsMap(predicate) != null || shapesGraph.getDefaultValueNodeExpressionsMap(predicate) != null;
+			return !shapesGraph.getValuesNodeExpressionsMap(predicate).isEmpty() || !shapesGraph.getDefaultValueNodeExpressionsMap(predicate).isEmpty();
 		}
 		else {
 			return false;
@@ -177,7 +178,10 @@ public class PathEvaluator {
 		}
 		else {
 			Map<Node,NodeExpression> map = context.getShapesGraph().getDefaultValueNodeExpressionsMap(predicate);
-			if(map != null) {
+			if(map.isEmpty()) {
+				return base;
+			}
+			else {
 				ExtendedIterator<RDFNode> result = WrappedIterator.emptyIterator();
 				int count = 0;
 				for(Resource type : JenaUtil.getAllTypes((Resource)focusNode)) {
@@ -195,9 +199,6 @@ public class PathEvaluator {
 					return result;
 				}
 			}
-			else {
-				return base;
-			}
 		}
 	}
 	
@@ -205,11 +206,13 @@ public class PathEvaluator {
 	private ExtendedIterator<RDFNode> withInferences(ExtendedIterator<RDFNode> base, RDFNode focusNode, NodeExpressionContext context) {
 		if(predicate != null && !isInverse && focusNode.isResource()) {
 			Map<Node,NodeExpression> map = context.getShapesGraph().getValuesNodeExpressionsMap(predicate);
-			if(map != null) {
+			if(!map.isEmpty()) {
 				ExtendedIterator<RDFNode> result = base;
 				boolean assertedHasNext = base.hasNext();
 				boolean hasInferences = false;
 				int count = 0;
+				// TODO: support cases like metash:Resource (if it had no target): if the type has a sh:node then the value rules should be found
+				//       even if declared in the super-shape
 				for(Resource type : JenaUtil.getAllTypes((Resource)focusNode)) {
 					NodeExpression expr = map.get(type.asNode());
 					if(expr != null) {
@@ -217,6 +220,13 @@ public class PathEvaluator {
 						hasInferences = true;
 						count++;
 					}
+				}
+				if(!hasInferences && map.get(RDFS.Resource.asNode()) != null) {
+					// This is to support cases like generic schema even if no rdf:type is present or it doesn't reach rdfs:Resource in the hierarchy
+					NodeExpression expr = map.get(RDFS.Resource.asNode());
+					result = result.andThen(expr.eval(focusNode, context));
+					hasInferences = true;
+					count++;
 				}
 				if((assertedHasNext && hasInferences) || count > 1) {
 					// Filter out duplicates in case the graph contains materialized inferences

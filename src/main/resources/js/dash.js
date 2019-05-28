@@ -366,12 +366,39 @@ function validateRootClass($value, $rootClass) {
 	return $data.query().path($value, { zeroOrMore: T("rdfs:subClassOf") }, $rootClass).hasSolution();
 }
 
+function validateSingleLine($value, $singleLine) {
+	if($singleLine.lex == 'true' && $value.isLiteral() && ($value.lex.indexOf('\n') >= 0 || $value.lex.indexOf('\r') >= 0)) {
+		return false;
+	}
+	else {
+		return true;
+	}
+}
+
 function validateStem($value, $stem) {
 	return $value.isURI() && $value.uri.startsWith($stem.lex);
 }
 
 function validateSubSetOf($this, $subSetOf, $value) {
 	return $data.query().match($this, $subSetOf, $value).hasSolution();
+}
+
+function validateSymmetric($this, $path, $symmetric) {
+	var results = [];
+	if(T("true").equals($symmetric)) {
+		var path = toRDFQueryPath($path);
+		$data.query().
+			path($this, path, "?value").
+			filter(function(sol) {
+				return !$data.query().path(sol.value, path, $this).hasSolution();
+			}).
+			forEach(function(sol) {
+				results.push({
+					value: sol.value
+				})
+			});
+	}
+	return results;
 }
 
 function validateUniqueLangProperty($this, $uniqueLang, $path) {

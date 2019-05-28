@@ -29,6 +29,7 @@ import org.topbraid.shacl.expr.NodeExpressionContext;
 import org.topbraid.shacl.expr.NodeExpressionVisitor;
 import org.topbraid.shacl.validation.ValidationEngine;
 import org.topbraid.shacl.validation.ValidationEngineFactory;
+import org.topbraid.shacl.vocabulary.SH;
 
 public class FilterShapeExpression extends AbstractInputExpression {
 	
@@ -36,7 +37,7 @@ public class FilterShapeExpression extends AbstractInputExpression {
 	
 	
 	public FilterShapeExpression(RDFNode expr, NodeExpression nodes, Resource filterShape) {
-		super(expr, nodes == null ? new FocusNodeExpression() : nodes);
+		super(expr, nodes == null ? new FocusNodeExpression(SH.this_.inModel(expr.getModel())) : nodes);
 		this.filterShape = filterShape;
 	}
 
