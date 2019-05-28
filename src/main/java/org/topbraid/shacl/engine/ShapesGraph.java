@@ -41,6 +41,7 @@ import org.topbraid.shacl.expr.lib.UnionExpression;
 import org.topbraid.shacl.model.SHConstraintComponent;
 import org.topbraid.shacl.model.SHFactory;
 import org.topbraid.shacl.model.SHShape;
+import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 
 /**
@@ -50,6 +51,8 @@ import org.topbraid.shacl.vocabulary.SH;
  * @author Holger Knublauch
  */
 public class ShapesGraph {
+	
+	private final static Map<Node,NodeExpression> EMPTY = new HashMap<>();
 	
 	private Predicate<Constraint> constraintFilter;
 	
@@ -146,7 +149,7 @@ public class ShapesGraph {
 	/**
 	 * Gets a Map from (node) shapes to NodeExpressions derived from sh:defaultValue statements.
 	 * @param predicate  the predicate to infer
-	 * @return a Map or null if the predicate is not mentioned in any inferences
+	 * @return a Map which is empty if the predicate is not mentioned in any inferences
 	 */
 	public Map<Node,NodeExpression> getDefaultValueNodeExpressionsMap(Resource predicate) {
 		return getExpressionsMap(defaultValueMap, predicate, SH.defaultValue);
@@ -158,7 +161,7 @@ public class ShapesGraph {
 	 * Can be used to efficiently figure out how to infer the values of a given instance, based on the rdf:types
 	 * of the instance.
 	 * @param predicate  the predicate to infer
-	 * @return a Map or null if the predicate is not mentioned in any inferences
+	 * @return a Map which is empty if the predicate is not mentioned in any inferences
 	 */
 	public Map<Node,NodeExpression> getValuesNodeExpressionsMap(Resource predicate) {
 		return getExpressionsMap(valuesMap, predicate, SH.values);
@@ -182,13 +185,17 @@ public class ShapesGraph {
 							for(Resource targetClass : JenaUtil.getResourceProperties(nodeShape, SH.targetClass)) {
 								addExpressions(map, ps, targetClass.asNode(), systemPredicate);
 							}
+							for(Resource targetClass : JenaUtil.getResourceProperties(nodeShape, DASH.applicableToClass)) {
+								addExpressions(map, ps, targetClass.asNode(), systemPredicate);
+							}
 						}
 					}
 				}
 			}
 			
 			if(map.isEmpty()) {
-				return null;
+				// Return a non-null but empty value to avoid re-computation (null not supported by ConcurrentHashMap)
+				return EMPTY;
 			}
 			else {
 				Map<Node,NodeExpression> result = new HashMap<>();

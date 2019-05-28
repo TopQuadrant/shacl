@@ -97,7 +97,11 @@ public class DASH {
     
     public final static Property deletedTriple = ResourceFactory.createProperty(NS + "deletedTriple");
     
+    public final static Property detailsEndpoint = ResourceFactory.createProperty(NS + "detailsEndpoint");
+    
     public final static Property detailsGraph = ResourceFactory.createProperty(NS + "detailsGraph");
+    
+    public final static Property editor = ResourceFactory.createProperty(NS + "editor");
     
     public final static Property expectedResult = ResourceFactory.createProperty(NS + "expectedResult");
     
@@ -121,7 +125,13 @@ public class DASH {
 
     public final static Property rootClass = ResourceFactory.createProperty(NS + "rootClass");
 
+    public final static Property readOnly = ResourceFactory.createProperty(NS + "readOnly");
+    
+    public final static Property reifiableBy = ResourceFactory.createProperty(NS + "reifiableBy");
+
     public final static Property shape = ResourceFactory.createProperty(NS + "shape");
+    
+    public final static Property singleLine = ResourceFactory.createProperty(NS + "singleLine");
     
     public final static Property suggestion = ResourceFactory.createProperty(NS + "suggestion");
     
@@ -144,6 +154,8 @@ public class DASH {
     public final static Property uriStart = ResourceFactory.createProperty(NS + "uriStart");
     
     public final static Property validateShapes = ResourceFactory.createProperty(NS + "validateShapes");
+    
+    public final static Property viewer = ResourceFactory.createProperty(NS + "viewer");
     
     public final static Property x = ResourceFactory.createProperty(NS + "x");
     
