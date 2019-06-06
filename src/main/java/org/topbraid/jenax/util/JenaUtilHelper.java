@@ -40,6 +40,7 @@ public class JenaUtilHelper {
 	
 	/**
 	 * Return a multiunion.
+	 * @return the MultiUnion graph
 	 */
 	public MultiUnion createMultiUnion() {
 		return new MultiUnion();
@@ -48,6 +49,8 @@ public class JenaUtilHelper {
 	
 	/**
 	 * Return a multiunion, initialized with the given graphs.
+	 * @param graphs  the Graphs to convert
+	 * @return the MultiUnion graph
 	 */
 	public MultiUnion createMultiUnion(Iterator<Graph> graphs) {
 		return new MultiUnion(graphs);
@@ -56,6 +59,8 @@ public class JenaUtilHelper {
 	
 	/**
 	 * Return a multiunion, initialized with the given graphs.
+	 * @param graphs  the Graphs to convert
+	 * @return the MultiUnion graph
 	 */
 	public MultiUnion createMultiUnion(Graph[] graphs) {
 		return new MultiUnion(graphs);
@@ -64,6 +69,7 @@ public class JenaUtilHelper {
 	
 	/**
 	 * A memory graph with no reification.
+	 * @return the default Graph
 	 */
 	public Graph createDefaultGraph() {
 		return Factory.createDefaultGraph();
@@ -85,10 +91,6 @@ public class JenaUtilHelper {
 	}
 	
 	
-	/**
-	 * The default implementation does nothing. In TB this is enforced.
-	 * @param m
-	 */
 	public Model asReadOnlyModel(Model m) {
 		return m;
 	}

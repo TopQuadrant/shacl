@@ -113,6 +113,7 @@ public class QueryExecutionFactoryFilter {
     /**
      * Allow query printing to be switched on/off around specific sections of code that
      * are issuing queries.
+     * @param value  true to enable
      */
     public static void enableQueryPrinting(boolean value) {
         PRINT = value;

@@ -64,7 +64,7 @@ public class RDFLabels {
 	 * Gets a "human-readable" label for a given Resource.
 	 * This checks for any existing rdfs:label, otherwise falls back to
 	 * <code>getLabel()</code>.
-	 * @param resource
+	 * @param resource  the resource to get the label for
 	 * @return the label (never null)
 	 */
 	public String getCustomizedLabel(Resource resource) {

@@ -31,7 +31,7 @@ public class TestEnvironmentInitializers {
 	
 	/**
 	 * Installs a new initializer.
-	 * @param initializer
+	 * @param initializer  the initializer to install
 	 */
 	public static void add(TestEnvironmentInitializer initializer) {
 		initializers.add(initializer);
@@ -41,6 +41,7 @@ public class TestEnvironmentInitializers {
 	/**
 	 * Calls all initializers for the given TestCase before the test has been run.
 	 * @param testCase  the TestCase to initialize the environment for
+	 * @throws Exception if something went horribly wrong
 	 */
 	public static void initTestEnvironment(TestCase testCase) throws Exception {
 		for(TestEnvironmentInitializer initializer : initializers) {
@@ -52,6 +53,7 @@ public class TestEnvironmentInitializers {
 	/**
 	 * Calls all initializers for the given TestCase after the test has been run.
 	 * @param testCase  the TestCase to restore the old environment for
+	 * @throws Exception if something went horribly wrong
 	 */
 	public static void restoreOriginalEnvironment(TestCase testCase) throws Exception {
 		for(TestEnvironmentInitializer initializer : initializers) {

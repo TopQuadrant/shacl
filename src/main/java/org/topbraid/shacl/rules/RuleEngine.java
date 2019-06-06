@@ -100,7 +100,7 @@ public class RuleEngine extends AbstractEngine {
 	 * focus node or all target nodes of the shapes.
 	 * @param ruleShapes  the shapes to execute
 	 * @param focusNode  the (optional) focus node or null for all target nodes
-	 * @throws InterruptedException
+	 * @throws InterruptedException  if the monitor has canceled this
 	 */
 	public void executeShapes(List<Shape> ruleShapes, RDFNode focusNode) throws InterruptedException {
 

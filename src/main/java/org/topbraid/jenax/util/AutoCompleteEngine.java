@@ -23,6 +23,7 @@ public interface AutoCompleteEngine {
 	 * @param prefix  the prefix string that was entered
 	 * @param count  the max number of results to return or -1
 	 * @param offset  the offset from which to start returning values
+	 * @param filter  an optional additional filter to drop results
 	 * @return an ordered list of triples with the resources as subjects and their labels as objects
 	 */
 	List<Triple> getResults(Graph graph, Node typeNode, String[] langs, String prefix, int count, int offset, Predicate<Node> filter);

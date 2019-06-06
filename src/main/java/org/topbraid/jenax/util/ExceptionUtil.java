@@ -34,6 +34,7 @@ public class ExceptionUtil {
 	 * to throwing an Error.
 	 *
 	 * @param t The underlying problem.
+	 * @return Never returns, return type is for idiom "throw throwUnchecked();" to clarify that next line is not reached.
 	 * @throws Error If there is an underlying Error
 	 * @throws RuntimeException Otherwise
 	 */
@@ -85,6 +86,7 @@ public class ExceptionUtil {
 	 * @param clazz The class of exception to look for. This clazz must not be abstract and must have
 	 * either a no element constructor or a constructor with one argument being a throwable.
 	 * @param  <EX> The type of exception thrown by the constructor of V
+	 * @return Never returns, return type is for idiom "throw throwUnchecked();" to clarify that next line is not reached.
 	 * @throws Error If there is an underlying Error
 	 * @throws RuntimeException If there is an underlying RuntimeException and no exception of type EX
 	 * @throws EX If there is an appropriate exception or otherwise

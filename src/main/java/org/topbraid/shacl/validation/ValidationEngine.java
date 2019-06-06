@@ -258,6 +258,7 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 	 * Validates all target nodes against all of their shapes.
 	 * To further narrow down which nodes to validate, use {{@link #setFocusNodeFilter(Predicate)}.
 	 * @return an instance of sh:ValidationReport in the results Model
+	 * @throws InterruptedException if the monitor has canceled this
 	 */
 	public Resource validateAll() throws InterruptedException {
 		boolean nested = SHACLScriptEngineManager.begin();
@@ -313,6 +314,7 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 	 * Validates a given focus node against all of the shapes that have matching targets.
 	 * @param focusNode  the node to validate
 	 * @return an instance of sh:ValidationReport in the results Model
+	 * @throws InterruptedException if the monitor has canceled this
 	 */
 	public Resource validateNode(Node focusNode) throws InterruptedException {
 		

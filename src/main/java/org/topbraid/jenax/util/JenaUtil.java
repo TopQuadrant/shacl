@@ -134,9 +134,9 @@ public class JenaUtil {
 	/**
 	 * Populates a result set of resources reachable from a subject via zero or more steps with a given predicate.
 	 * Implementation note: the results set need only implement {@link Collection#add(Object)}.
-	 * @param results   The transitive objects reached from subject via triples with the given predicate
-	 * @param subject
-	 * @param predicate
+	 * @param results  The transitive objects reached from subject via triples with the given predicate
+	 * @param subject  the subject to start traversal at
+	 * @param predicate  the predicate to walk
 	 */
 	public static void addTransitiveObjects(Set<Resource> results, Resource subject, Property predicate) {
 		helper.setGraphReadOptimization(true);
@@ -239,9 +239,12 @@ public class JenaUtil {
 	
 	/**
 	 * Returns a set of resources reachable from an object via one or more reversed steps with a given predicate.
+	 * @param object  the object to start traversal at
+	 * @param predicate  the predicate to walk
+	 * @param monitor  an optional progress monitor to allow cancelation
+	 * @return the reached resources
 	 */
-	public static Set<Resource> getAllTransitiveSubjects(Resource object, Property predicate,
-			ProgressMonitor monitor) {
+	public static Set<Resource> getAllTransitiveSubjects(Resource object, Property predicate, ProgressMonitor monitor) {
 		Set<Resource> set = new HashSet<>();
 		helper.setGraphReadOptimization(true);
 		try {
@@ -415,7 +418,9 @@ public class JenaUtil {
 	
 	/**
 	 * Returns a set of resources reachable from a subject via one or more steps with a given predicate.
-	 * 
+	 * @param subject  the subject to start at
+	 * @param predicate  the predicate to traverse
+	 * @return the reached resources
 	 */
 	public static Set<Resource> getAllTransitiveObjects(Resource subject, Property predicate) {
 		Set<Resource> set = new HashSet<>();
@@ -627,6 +632,7 @@ public class JenaUtil {
 	 * returns a value for a given Function.
 	 * @param cls  the class to start at
 	 * @param function  the Function to execute on each class
+	 * @param T  the requested result type
 	 * @return the "first" non-null value, or null
 	 */
 	public static <T> T getNearest(Resource cls, java.util.function.Function<Resource,T> function) {
@@ -1021,7 +1027,7 @@ public class JenaUtil {
 	/**
 	 * This indicates that no further changes to the model are needed.
 	 * Some implementations may give runtime exceptions if this is violated.
-	 * @param m
+	 * @param m  the Model to get as a read-only variant
 	 * @return A read-only model
 	 */
 	public static Model asReadOnlyModel(Model m) {
@@ -1032,7 +1038,7 @@ public class JenaUtil {
 	/**
 	 * This indicates that no further changes to the graph are needed.
 	 * Some implementations may give runtime exceptions if this is violated.
-	 * @param g
+	 * @param g  the Graph to get as a read-only variant
 	 * @return a read-only graph
 	 */
 	public static Graph asReadOnlyGraph(Graph g) {
@@ -1055,7 +1061,7 @@ public class JenaUtil {
 	 * 
 	 * Note: Unstable - don't use outside of TopBraid.
 	 * 
-	 * @param onOrOff
+	 * @param onOrOff  true to switch on
 	 */
 	public static void setGraphReadOptimization(boolean onOrOff) {
 		helper.setGraphReadOptimization(onOrOff);

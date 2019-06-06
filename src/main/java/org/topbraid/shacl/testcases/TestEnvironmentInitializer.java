@@ -28,6 +28,7 @@ public interface TestEnvironmentInitializer {
 	 * If this initializer feels responsible for the provided dash:TestEnvironment resource,
 	 * it should make the necessary adjustments to the current working environment.
 	 * @param testCase  the specific test case instance to execute
+	 * @throws Exception if something went horribly wrong
 	 */
 	void prepareTestEnvironment(TestCase testCase) throws Exception;
 	
@@ -41,6 +42,7 @@ public interface TestEnvironmentInitializer {
 	 * in sequence, without interruptions.
 	 * This means that the initializer instance may use private fields to store temp data.
 	 * @param testCase  the specific test case instance to execute
+	 * @throws Exception if something went horribly wrong
 	 */
 	void restoreOriginalEnvironment(TestCase testCase) throws Exception;
 }

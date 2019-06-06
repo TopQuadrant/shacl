@@ -447,6 +447,7 @@ public class SHACLUtil {
 	 * Gets all nodes from a given sh:target.
 	 * @param target  the value of sh:target (parameterizable or SPARQL target)
 	 * @param dataset  the dataset to operate on
+	 * @return an Iterable over the resources
 	 */
 	public static Iterable<RDFNode> getResourcesInTarget(Resource target, Dataset dataset) {
 		Resource type = JenaUtil.getType(target);

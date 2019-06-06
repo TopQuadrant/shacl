@@ -33,6 +33,7 @@ public interface ValidationSuggestionGenerator {
 	 * Adds dash:suggestion triples for all result resource in the given results Model.
 	 * @param results  the results Model
 	 * @param maxCount  the maximum number of suggestions to produce per result
+	 * @param labelFunction  an optional function producing labels of nodes
 	 * @return the number of suggestions that were created
 	 */
 	int addSuggestions(Model results, int maxCount, Function<RDFNode,String> labelFunction);
@@ -42,6 +43,7 @@ public interface ValidationSuggestionGenerator {
 	 * Adds dash:suggestion triples for a given result resource.
 	 * @param result  the sh:ValidationResult to add the suggestions to
 	 * @param maxCount  the maximum number of suggestions to produce
+	 * @param labelFunction  an optional function producing labels of nodes
 	 * @return the number of suggestions that were created
 	 */
 	int addSuggestions(Resource result, int maxCount, Function<RDFNode,String> labelFunction);

@@ -46,6 +46,7 @@ public abstract class AbstractEngine implements NodeExpressionContext {
 	 * Should be called prior to validation.
 	 * Throws an Exception if unsupported entailments are found.
 	 * If multiple sh:entailments are present then their order is undefined but they all get applied.
+	 * @throws InterruptedException if the monitor has canceled it
 	 */
 	public void applyEntailments() throws InterruptedException {
 		Model shapesModel = dataset.getNamedModel(shapesGraphURI.toString());

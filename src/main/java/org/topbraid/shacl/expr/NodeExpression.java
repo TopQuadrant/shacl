@@ -63,7 +63,7 @@ public interface NodeExpression {
 	 * Gets the shape of the output data (if known), based on a context shape.
 	 * For example, for a path expression it would try to infer the output shape from the sh:class or sh:node
 	 * of the property (path).
-	 * @param context shape  the shape where the evaluation would start, e.g. the node shape of the sh:values statement
+	 * @param contextShape  the shape where the evaluation would start, e.g. the node shape of the sh:values statement
 	 * @return an output shape or null if unknown
 	 */
 	Resource getOutputShape(Resource contextShape);
