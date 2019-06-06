@@ -632,7 +632,7 @@ public class JenaUtil {
 	 * returns a value for a given Function.
 	 * @param cls  the class to start at
 	 * @param function  the Function to execute on each class
-	 * @param T  the requested result type
+	 * @param <T>  the requested result type
 	 * @return the "first" non-null value, or null
 	 */
 	public static <T> T getNearest(Resource cls, java.util.function.Function<Resource,T> function) {
