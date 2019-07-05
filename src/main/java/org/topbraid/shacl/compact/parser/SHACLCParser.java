@@ -2,11 +2,11 @@
 
 	package org.topbraid.shacl.compact.parser;
 
-import org.topbraid.shaded.antlr.v4.runtime.atn.*;
-import org.topbraid.shaded.antlr.v4.runtime.dfa.DFA;
-import org.topbraid.shaded.antlr.v4.runtime.*;
-import org.topbraid.shaded.antlr.v4.runtime.misc.*;
-import org.topbraid.shaded.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.misc.*;
+import org.antlr.v4.runtime.tree.*;
 import java.util.List;
 import java.util.Iterator;
 import java.util.ArrayList;

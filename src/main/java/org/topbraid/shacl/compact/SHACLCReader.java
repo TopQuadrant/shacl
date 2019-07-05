@@ -9,9 +9,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.topbraid.shaded.antlr.v4.runtime.ANTLRInputStream;
-import org.topbraid.shaded.antlr.v4.runtime.CommonTokenStream;
-import org.topbraid.shaded.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.apache.jena.atlas.web.ContentType;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;

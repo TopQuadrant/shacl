@@ -70,6 +70,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <ver.jena>3.11.0</ver.jena>
     <ver.junit>4.12</ver.junit>
+    <ver.antlr>4.5.3</ver.antlr>
     <ver.slf4j>1.7.26</ver.slf4j>
     <ver.log4j1>1.2.17</ver.log4j1>
   </properties>
@@ -96,9 +97,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.topbraid</groupId>
-      <artifactId>antlr-shaded</artifactId>
-      <version>4.5.3</version>
+      <groupId>org.antlr</groupId>
+      <artifactId>antlr4-runtime</artifactId>
+      <version>${ver.antlr}</version>
     </dependency>
 
     <!-- Logging : <optional> so the application chooses the provider for slf4j -->
@@ -120,13 +121,6 @@
 
   </dependencies>
   
-  <repositories>
-    <repository>
-      <id>org.topbraid.antlr</id>
-      <url>file://${basedir}/lib</url>
-    </repository>
-  </repositories>
-
   <build>
     <plugins>
 
