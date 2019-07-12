@@ -2,8 +2,8 @@
 
 	package org.topbraid.shacl.compact.parser;
 
-import org.topbraid.shaded.antlr.v4.runtime.misc.NotNull;
-import org.topbraid.shaded.antlr.v4.runtime.tree.ParseTreeListener;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
  * This interface defines a complete listener for a parse tree produced by
