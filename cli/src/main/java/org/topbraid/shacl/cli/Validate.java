@@ -14,16 +14,19 @@
  *  See the NOTICE file distributed with this work for additional
  *  information regarding copyright ownership.
  */
-package org.topbraid.shacl.tools;
+package org.topbraid.shacl.cli;
 
 import java.io.IOException;
 
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.util.FileUtils;
-import org.topbraid.shacl.rules.RuleUtil;
+import org.topbraid.jenax.util.JenaDatatypes;
+import org.topbraid.shacl.validation.ValidationUtil;
+import org.topbraid.shacl.vocabulary.SH;
 
 /**
- * Stand-alone utility to perform inferences based on SHACL rules from a given file.
+ * Stand-alone utility to perform constraint validation of a given file.
  *
  * Example arguments:
  * 
@@ -31,10 +34,10 @@ import org.topbraid.shacl.rules.RuleUtil;
  * 
  * @author Holger Knublauch
  */
-public class Infer extends AbstractTool {
+public class Validate extends AbstractTool {
 	
 	public static void main(String[] args) throws IOException {
-		new Infer().run(args);
+		new Validate().run(args);
 	}
 	
 	
@@ -44,7 +47,12 @@ public class Infer extends AbstractTool {
 		if(shapesModel == null) {
 			shapesModel = dataModel;
 		}
-		Model results = RuleUtil.executeRules(dataModel, shapesModel, null, null);
-		results.write(System.out, FileUtils.langTurtle);
+		Resource report = ValidationUtil.validateModel(dataModel, shapesModel, true);
+		report.getModel().write(System.out, FileUtils.langTurtle);
+
+		if(report.hasProperty(SH.conforms, JenaDatatypes.FALSE)) {
+			// See https://github.com/TopQuadrant/shacl/issues/56
+			System.exit(1);
+		}
 	}
 }

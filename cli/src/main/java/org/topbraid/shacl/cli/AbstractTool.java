@@ -14,7 +14,7 @@
  *  See the NOTICE file distributed with this work for additional
  *  information regarding copyright ownership.
  */
-package org.topbraid.shacl.tools;
+package org.topbraid.shacl.cli;
 
 import java.io.File;
 import java.io.FileInputStream;
