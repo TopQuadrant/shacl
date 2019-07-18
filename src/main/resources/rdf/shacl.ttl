@@ -1,3 +1,7 @@
+## W3C SOFTWARE AND DOCUMENT NOTICE AND LICENSE
+## https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document
+## --------
+
 # W3C Shapes Constraint Language (SHACL) Vocabulary
 # Version from 2017-07-20
 
@@ -1525,7 +1529,8 @@ sh:condition
 
 sh:TripleRule
 	a rdfs:Class ;
-	rdfs:label "A rule based on triple (subject, predicate, object) pattern."@en ;
+	rdfs:label "Triple rule"@en ;
+	rdfs:comment "A rule based on triple (subject, predicate, object) pattern."@en ;
 	rdfs:subClassOf sh:Rule ;
 	rdfs:isDefinedBy sh: .
 
