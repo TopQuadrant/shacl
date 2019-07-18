@@ -404,6 +404,10 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 	
 	
 	protected void validateNodesAgainstConstraint(List<RDFNode> focusNodes, Constraint constraint) {
+		if(configuration != null && configuration.isSkippedConstraintComponent(constraint.getComponent())) {
+			return;
+		}
+		
 		ConstraintExecutor executor = constraint.getExecutor();
 		if(executor != null) {
 			if(SHACLPreferences.isProduceFailuresMode()) {

@@ -1,5 +1,10 @@
 package org.topbraid.shacl.validation;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.apache.jena.rdf.model.Resource;
+
 /**
  * Configures the behavior of the validation engine.
  */
@@ -7,6 +12,9 @@ public class ValidationEngineConfiguration {
 	
 	// By default don't produce sh:detail
 	private boolean reportDetails = false;
+	
+	// By default validate all constraints
+	private Set<Resource> skippedConstraintComponents = new HashSet<>();
 	
 	// By default validate shapes
 	private boolean validateShapes = true;
@@ -67,5 +75,18 @@ public class ValidationEngineConfiguration {
     public ValidationEngineConfiguration setValidateShapes(boolean validateShapes) {
         this.validateShapes = validateShapes;
         return this;
+    }
+    
+    /**
+     * Checks whether the engine should skip constraints of a given constraint component.
+     * @param component  the constraint component
+     * @return true  if component shall be skipped
+     */
+    public boolean isSkippedConstraintComponent(Resource component) {
+    	return skippedConstraintComponents.contains(component);
+    }
+    
+    public void addSkippedConstraintComponent(Resource component) {
+    	skippedConstraintComponents.add(component);
     }
 }

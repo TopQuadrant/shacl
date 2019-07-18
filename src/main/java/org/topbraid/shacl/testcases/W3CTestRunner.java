@@ -89,7 +89,7 @@ public class W3CTestRunner {
 		earl.add(EARL_SUBJECT, DOAP.developer, EARL_AUTHOR);
 		earl.add(EARL_SUBJECT, DOAP.name, "TopBraid SHACL API");
 		
-		collectItems(rootManifest, "urn:root/");
+		collectItems(rootManifest, "urn:x:root/");
 	}
 	
 	
@@ -172,7 +172,7 @@ public class W3CTestRunner {
 		
 		
 		public Resource getEARLResource() {
-			return ResourceFactory.createResource("urn:x-shacl-test:" + entry.getURI().substring("urn:root".length()));
+			return ResourceFactory.createResource("urn:x-shacl-test:" + entry.getURI().substring("urn:x:root".length()));
 		}
 		
 		
@@ -209,7 +209,7 @@ public class W3CTestRunner {
 				File shapesFile = new File(manifestFile.getParentFile(), shapesGraphResource.getURI().substring(last + 1));
 				Model shapesModel = JenaUtil.createMemoryModel();
 				try {
-					shapesModel.read(new FileInputStream(shapesFile), "urn:x-dummy", FileUtils.langTurtle);
+					shapesModel.read(new FileInputStream(shapesFile), "urn:x:dummy", FileUtils.langTurtle);
 					shapesBaseGraph = shapesModel.getGraph();
 				} catch (FileNotFoundException e) {
 					ExceptionUtil.throwUnchecked(e);
@@ -231,7 +231,7 @@ public class W3CTestRunner {
 				File dataFile = new File(manifestFile.getParentFile(), dataGraph.getURI().substring(last + 1));
 				dataModel = JenaUtil.createMemoryModel();
 				try {
-					dataModel.read(new FileInputStream(dataFile), "urn:x-dummy", FileUtils.langTurtle);
+					dataModel.read(new FileInputStream(dataFile), "urn:x:dummy", FileUtils.langTurtle);
 				} catch (FileNotFoundException e) {
 					ExceptionUtil.throwUnchecked(e);
 				}

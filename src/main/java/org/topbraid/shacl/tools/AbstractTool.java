@@ -78,7 +78,7 @@ class AbstractTool {
 				OntModel dataModel = ModelFactory.createOntologyModel(spec);
 				File file = new File(dataFileName);
 				String lang = file.getName().endsWith(".shaclc") ? SHACLC.langName : FileUtils.langTurtle;
-				dataModel.read(new FileInputStream(file), "urn:x-base", lang);
+				dataModel.read(new FileInputStream(file), "urn:x:base", lang);
 				return dataModel;
 			}
 		}
@@ -95,7 +95,7 @@ class AbstractTool {
 				OntModel model = ModelFactory.createOntologyModel(spec);
 				File file = new File(fileName);
 				String lang = file.getName().endsWith(".shaclc") ? SHACLC.langName : FileUtils.langTurtle;
-				model.read(new FileInputStream(file), "urn:x-base", lang);
+				model.read(new FileInputStream(file), "urn:x:base", lang);
 				return model;
 			}
 		}

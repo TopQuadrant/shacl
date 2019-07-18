@@ -16,7 +16,9 @@
  */
 package org.topbraid.shacl.tools;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
@@ -37,7 +39,12 @@ import org.topbraid.shacl.vocabulary.SH;
 public class Validate extends AbstractTool {
 	
 	public static void main(String[] args) throws IOException {
-		new Validate().run(args);
+		// Temporarily redirect system.err to avoid SLF4J warning
+		PrintStream oldPS = System.err;
+		System.setErr(new PrintStream(new ByteArrayOutputStream()));
+		Validate validate = new Validate();
+		System.setErr(oldPS);
+		validate.run(args);
 	}
 	
 	

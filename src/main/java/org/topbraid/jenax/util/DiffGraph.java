@@ -159,7 +159,13 @@ public class DiffGraph extends TransparentWrappedGraph {
 		if (deletedTriples.isEmpty()) {
 			return base.isEmpty();
 		}
-		return find(Triple.ANY).hasNext();
+		ExtendedIterator<Triple> it = find(Triple.ANY);
+		try {
+			return !it.hasNext();
+		}
+		finally {
+			it.close();
+		}
 	}
 
 	
@@ -173,11 +179,11 @@ public class DiffGraph extends TransparentWrappedGraph {
 	public void performAdd(Triple t) {
     	if (deletedTriples.contains(t)) {
     		deletedTriples.remove(t);
-    		getEventManager().notifyAddTriple(this, t);
+    		// getEventManager().notifyAddTriple(this, t);
     	}
     	else if (containsByEquals(addedGraph,t) || containsByEquals(base, t) ) {
     		// notify even unsuccessful adds - see javadoc for graphlistener
-    		getEventManager().notifyAddTriple(this, t);
+    		// getEventManager().notifyAddTriple(this, t);
         }
     	else {
     		// addedGraph does notification for us.
@@ -194,11 +200,11 @@ public class DiffGraph extends TransparentWrappedGraph {
 		} 
 		else if ( containsByEquals(base, t) ) {
 			deletedTriples.add(t);
-			getEventManager().notifyDeleteTriple(this, t);
+			// getEventManager().notifyDeleteTriple(this, t);
 		} 
 		else {
 			// notify even unsuccessful deletes - see javadoc for graphlistener
-			getEventManager().notifyDeleteTriple(this, t);
+			// getEventManager().notifyDeleteTriple(this, t);
 			return;
 		}
 	}

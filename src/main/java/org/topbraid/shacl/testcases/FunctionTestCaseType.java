@@ -143,7 +143,7 @@ public class FunctionTestCaseType implements TestCaseType {
 			Model model = JenaUtil.createDefaultModel();
 			if(node.isLiteral()) {
 				String str = node.asLiteral().getLexicalForm();
-				model.read(new ByteArrayInputStream(str.getBytes()), "urn:x-dummy", FileUtils.langTurtle);
+				model.read(new ByteArrayInputStream(str.getBytes()), "urn:x:dummy", FileUtils.langTurtle);
 			}
 			return model.getGraph();
 		}

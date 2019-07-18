@@ -26,13 +26,13 @@ dash:HasValueWithClassConstraintComponent-hasValueWithClass
 .
 dash:NonRecursiveConstraintComponent
   dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
-.
-dash:NonRecursiveConstraintComponent-nonRecursive
-  sh:group tosh:RelationshipPropertyGroup ;
+  sh:property [
+      sh:path dash:nonRecursive ;
+      sh:group tosh:RelationshipPropertyGroup ;
+    ] ;
 .
 dash:PrimaryKeyConstraintComponent-uriStart
   tosh:editWidget swa:PlainTextFieldEditor ;
-  sh:group tosh:PrimaryKeyPropertyGroup ;
 .
 dash:RootClassConstraintComponent
   dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
@@ -53,9 +53,6 @@ dash:SymmetricConstraintComponent
 WHERE {
 }""" ;
     ] ;
-.
-dash:SymmetricConstraintComponent-symmetric
-  sh:group tosh:RelationshipPropertyGroup ;
 .
 <http://spinrdf.org/sp#>
   tosh:systemNamespace true ;
@@ -204,14 +201,6 @@ tosh:PropertyShapeShape
   rdfs:label "Property shape shape" ;
   sh:property [
       a sh:PropertyShape ;
-      sh:path dash:detailsEndpoint ;
-      sh:datatype xsd:string ;
-      sh:group tosh:RemoteValuesPropertyGroup ;
-      sh:maxCount 1 ;
-      sh:order "0"^^xsd:decimal ;
-    ] ;
-  sh:property [
-      a sh:PropertyShape ;
       sh:path sh:values ;
       tosh:editWidget swa:SourceCodeEditor ;
       tosh:viewWidget <http://topbraid.org/tosh.ui#ValuesExpressionDiagramViewer> ;
@@ -334,17 +323,6 @@ WHERE {
       sh:name "on property" ;
       sh:order 0 ;
     ] ;
-  sh:sparql [
-      sh:message "Property shapes cannot have both class and datatype constraints." ;
-      sh:prefixes <http://topbraid.org/tosh> ;
-      sh:select """SELECT $this
-WHERE {
-	FILTER EXISTS {
-    	$this sh:class ?class .
-		$this sh:datatype ?datatype .
-	}
-}""" ;
-    ] ;
   sh:targetClass sh:PropertyShape ;
 .
 tosh:RelationshipPropertyGroup
@@ -352,11 +330,6 @@ tosh:RelationshipPropertyGroup
   tosh:openable true ;
   rdfs:label "Relationship" ;
   sh:order 8 ;
-.
-tosh:RemoteValuesPropertyGroup
-  a sh:PropertyGroup ;
-  rdfs:label "Remote Values" ;
-  sh:order "12"^^xsd:decimal ;
 .
 tosh:ReplaceWithDefaultValueSuggestionGenerator
   a dash:SPARQLUpdateSuggestionGenerator ;
@@ -561,14 +534,6 @@ tosh:ValueTypeConstraintPropertyGroup
   rdfs:label "Type of Values" ;
   sh:order 3 ;
 .
-tosh:closed
-  a rdf:Property ;
-  a owl:DeprecatedProperty ;
-  rdfs:comment "If set to true, then the corresponding form section will be closed by default." ;
-  rdfs:domain sh:PropertyGroup ;
-  rdfs:label "closed" ;
-  rdfs:range xsd:boolean ;
-.
 tosh:countShapesWithMatchResult
   a sh:SPARQLFunction ;
   rdfs:comment "Counts the number of shapes from a given rdf:List (?arg2) defined in a given shapes graph (?arg3) where tosh:hasShape returns the provided match value (true or false, ?arg4) for a given focus node (?arg1). The function produces a failure if one of the shapes validated to a failure." ;
@@ -678,41 +643,17 @@ tosh:isInTargetOf
     ] ;
   sh:returnType xsd:boolean ;
 .
-tosh:isSystemResource
-  a sh:SPARQLFunction ;
-  rdfs:comment "Checks if a given resource is from a namespace that is marked with tosh:systemNamespace true." ;
-  rdfs:label "is system resource" ;
-  sh:ask """ASK {
-    BIND (IRI(afn:namespace($resource)) AS ?namespace) .
-	FILTER (bound(?namespace) && EXISTS {
-		?namespace tosh:systemNamespace true .
-	})
-}""" ;
-  sh:parameter [
-      a sh:Parameter ;
-      sh:path tosh:resource ;
-      sh:description "The node to check." ;
-      sh:name "resource" ;
-      sh:nodeKind sh:BlankNodeOrIRI ;
-    ] ;
-  sh:prefixes <http://topbraid.org/tosh> ;
-  sh:returnType xsd:boolean ;
-.
 tosh:open
   a rdf:Property ;
-  a owl:DeprecatedProperty ;
-  rdfs:comment """DEPRECATED: This flag is only used by SWA forms. With the new forms of 6.2 onwards, all form sections are open by default, but you can use tosh:closed to state otherwise.
-
-If set to true, then the corresponding form section will be open by default. This only has an effect if sh:openable is set to true as well.""" ;
+  rdfs:comment "If set to true, then the corresponding form section will be open by default. This only has an effect if sh:openable is set to true as well." ;
+  rdfs:domain sh:PropertyGroup ;
   rdfs:label "open" ;
   rdfs:range xsd:boolean ;
 .
 tosh:openable
   a rdf:Property ;
-  a owl:DeprecatedProperty ;
-  rdfs:comment """DEPRECATED - this was only used by the SWA-based forms that were default before 6.2. In the new forms, all sections are openable.
-
-If set to true, then the corresponding form section shall be openable/closable (and show up closed).""" ;
+  rdfs:comment "If set to true, then the corresponding form section shall be openable/closable (and show up closed)." ;
+  rdfs:domain sh:PropertyGroup ;
   rdfs:label "openable" ;
   rdfs:range xsd:boolean ;
 .
@@ -1338,29 +1279,11 @@ sh:distinct
   rdfs:isDefinedBy sh: ;
   rdfs:label "distinct"@en ;
 .
-sh:else
-  a rdf:Property ;
-  rdfs:comment "Links an sh:if node expression with the values that shall be returned if the condition is false."@en ;
-  rdfs:isDefinedBy sh: ;
-  rdfs:label "else"@en ;
-.
-sh:exists
-  a rdf:Property ;
-  rdfs:comment "Resources with values for sh:exists are node expressions that produce true if the associated node expression has any values, and false otherwise."@en ;
-  rdfs:isDefinedBy sh: ;
-  rdfs:label "exists"@en ;
-.
 sh:groupConcat
   a rdf:Property ;
   rdfs:comment "Resources with values for sh:groupConcat are node expressions that produce an xsd:string consisting of the concatenation of all values of the associated node expression, possibly separated by the value of sh:separator."@en ;
   rdfs:isDefinedBy sh: ;
   rdfs:label "group concat"@en ;
-.
-sh:if
-  a rdf:Property ;
-  rdfs:comment "Resources with values for sh:if are node expressions that produce either the results of sh:then or sh:else depending on whether the associated node expression produces the list [ true ]."@en ;
-  rdfs:isDefinedBy sh: ;
-  rdfs:label "if"@en ;
 .
 sh:limit
   a rdf:Property ;
@@ -1411,12 +1334,6 @@ sh:sum
   rdfs:comment "Resources with values for sh:sum are node expressions that produce the sum of all values of the associated node expression."@en ;
   rdfs:isDefinedBy sh: ;
   rdfs:label "sum"@en ;
-.
-sh:then
-  a rdf:Property ;
-  rdfs:comment "Links an sh:if node expression with the values that shall be returned if the condition is true."@en ;
-  rdfs:isDefinedBy sh: ;
-  rdfs:label "then"@en ;
 .
 sh:values
   a rdf:Property ;

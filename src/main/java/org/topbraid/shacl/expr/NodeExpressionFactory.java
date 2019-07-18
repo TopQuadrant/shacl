@@ -251,16 +251,20 @@ public class NodeExpressionFactory {
 
 			Resource resource = node.asResource();
 			StmtIterator it = resource.listProperties();
-			while(it.hasNext()) {
-				Statement s = it.next();
-				BiFunction<Resource,RDFNode,NodeExpression> function = constructors.get(s.getPredicate());
-				if(function != null) {
-					NodeExpression expr = function.apply(resource, s.getObject());
-					if(expr != null) {
-						it.close();
-						return expr;
+			try {
+				while(it.hasNext()) {
+					Statement s = it.next();
+					BiFunction<Resource,RDFNode,NodeExpression> function = constructors.get(s.getPredicate());
+					if(function != null) {
+						NodeExpression expr = function.apply(resource, s.getObject());
+						if(expr != null) {
+							return expr;
+						}
 					}
 				}
+			}
+			finally {
+				it.close();
 			}
 			
 			Statement s = getFunctionStatement(resource);

@@ -80,6 +80,8 @@ public class DASH {
 
     public final static Resource ValidationTestCase = ResourceFactory.createResource(NS + "ValidationTestCase");
 
+    public final static Resource ValueTableViewer = ResourceFactory.createResource(NS + "ValueTableViewer");
+
 
     public final static Property abstract_ = ResourceFactory.createProperty(NS + "abstract");
     

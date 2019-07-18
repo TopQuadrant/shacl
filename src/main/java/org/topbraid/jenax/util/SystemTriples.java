@@ -80,7 +80,7 @@ public class SystemTriples {
 			org.topbraid.jenax.util.JenaUtil.initNamespaces(vocabulary.getGraph());
 			vocabulary.setNsPrefix("xsd", XSD.getURI());
 			InputStream ttl = SystemTriples.class.getResourceAsStream("/rdf/system-triples.ttl");
-			vocabulary.read(ttl, "urn:dummy", FileUtils.langTurtle);
+			vocabulary.read(ttl, "urn:x:dummy", FileUtils.langTurtle);
 			ensureSuperClasses(RDFS.Class, RDFS.Resource);
 			ensureSuperClasses(OWL.Class, OWL.Thing);
 			
