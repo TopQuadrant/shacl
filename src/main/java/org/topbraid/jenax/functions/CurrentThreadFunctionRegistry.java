@@ -18,14 +18,7 @@ package org.topbraid.jenax.functions;
 
 import java.util.Iterator;
 
-import org.apache.jena.query.ARQ;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.sparql.core.BasicPattern;
-import org.apache.jena.sparql.engine.ExecutionContext;
-import org.apache.jena.sparql.engine.QueryIterator;
-import org.apache.jena.sparql.engine.iterator.QueryIterBlockTriples;
-import org.apache.jena.sparql.engine.main.StageBuilder;
-import org.apache.jena.sparql.engine.main.StageGenerator;
 import org.apache.jena.sparql.function.FunctionFactory;
 import org.apache.jena.sparql.function.FunctionRegistry;
 
@@ -33,9 +26,6 @@ import org.apache.jena.sparql.function.FunctionRegistry;
  * An ARQ FunctionRegistry that can be used to associate functions
  * with Threads, so that additional functions from a given Model can
  * be made visible depending on the SPARQL query thread.
- * 
- * <p>Note that this concept only works if ARQ has been set to single
- * threading, which is done by the static block below.</p>
  * 
  * <p>The contract of this class is very strict to prevent memory leaks:
  * Users always need to make sure that unregister is called as soon
@@ -66,17 +56,6 @@ import org.apache.jena.sparql.function.FunctionRegistry;
  * @author Holger Knublauch
  */
 public class CurrentThreadFunctionRegistry extends FunctionRegistry {
-
-	static {
-		// Suppress multi-threading (PatternStage-stuff)
-		StageBuilder.setGenerator(ARQ.getContext(), new StageGenerator() {
-			@Override
-            public QueryIterator execute(BasicPattern pattern, QueryIterator input,
-					ExecutionContext execCxt) {
-				return QueryIterBlockTriples.create(input, pattern, execCxt);
-			}
-		});
-	}
 	
 	private static ThreadLocal<CurrentThreadFunctions> localFunctions = new ThreadLocal<>();
 	

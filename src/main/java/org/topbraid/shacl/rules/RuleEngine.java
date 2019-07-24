@@ -224,7 +224,6 @@ public class RuleEngine extends AbstractEngine {
 	private List<Rule> getShapeRules(Shape shape) {
 		return shape2Rules.computeIfAbsent(shape, s2 -> {
 			List<Rule> rules = new LinkedList<>();
-			shape2Rules.put(shape, rules);
 			List<Resource> raws = new LinkedList<>();
 			for(Statement s : shape.getShapeResource().listProperties(SH.rule).toList()) {
 				if(s.getObject().isResource() && !s.getResource().hasProperty(SH.deactivated, JenaDatatypes.TRUE)) {
