@@ -22,7 +22,7 @@
 
   <groupId>org.topbraid</groupId>
   <artifactId>shacl</artifactId>
-  <version>1.2.2-SNAPSHOT</version>
+  <version>1.2.1</version>
   <packaging>jar</packaging>
 
   <name>TopBraid SHACL API</name>
