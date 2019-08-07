@@ -16,7 +16,7 @@
  */
 package org.topbraid.shacl.validation;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.apache.jena.rdf.model.RDFNode;
 import org.topbraid.shacl.engine.Constraint;
@@ -31,5 +31,5 @@ import org.topbraid.shacl.engine.Constraint;
  */
 public interface ConstraintExecutor {
 
-	void executeConstraint(Constraint constraint, ValidationEngine engine, List<RDFNode> focusNodes);
+	void executeConstraint(Constraint constraint, ValidationEngine engine, Collection<RDFNode> focusNodes);
 }

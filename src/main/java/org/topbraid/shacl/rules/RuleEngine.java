@@ -45,7 +45,6 @@ import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.expr.NodeExpression;
 import org.topbraid.shacl.expr.NodeExpressionFactory;
 import org.topbraid.shacl.util.OrderComparator;
-import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.validation.ValidationEngine;
 import org.topbraid.shacl.validation.ValidationEngineFactory;
 import org.topbraid.shacl.vocabulary.SH;
@@ -139,7 +138,7 @@ public class RuleEngine extends AbstractEngine {
 	
 	public void executeShape(Shape shape, String baseMessage, RDFNode focusNode) throws InterruptedException {
 		
-		if(shape.getShapeResource().isDeactivated()) {
+		if(shape.isDeactivated()) {
 			return;
 		}
 		
@@ -153,7 +152,7 @@ public class RuleEngine extends AbstractEngine {
 			targetNodes = Collections.singletonList(focusNode);
 		}
 		else {
-			targetNodes = SHACLUtil.getTargetNodes(shape.getShapeResource(), dataset);
+			targetNodes = new ArrayList<>(shape.getTargetNodes(dataset));
 		}
 		
 		if(!targetNodes.isEmpty()) {

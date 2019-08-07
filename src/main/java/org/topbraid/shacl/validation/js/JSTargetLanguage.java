@@ -14,18 +14,24 @@
  *  See the NOTICE file distributed with this work for additional
  *  information regarding copyright ownership.
  */
-package org.topbraid.shacl.validation;
+package org.topbraid.shacl.validation.js;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.topbraid.shacl.model.SHParameterizableTarget;
+import org.topbraid.shacl.targets.CustomTargetLanguage;
+import org.topbraid.shacl.targets.Target;
+import org.topbraid.shacl.vocabulary.SH;
 
-public interface TargetPlugin {
-	
-	boolean canExecuteTarget(Resource target);
+public class JSTargetLanguage implements CustomTargetLanguage {
 
-	Iterable<RDFNode> executeTarget(Dataset dataset, Resource executable, SHParameterizableTarget parameterizableTarget);
+	@Override
+	public boolean canHandle(Resource executable) {
+		return executable.hasProperty(SH.jsFunctionName);
+	}
+
 	
-	boolean isNodeInTarget(RDFNode focusNode, Dataset dataset, Resource executable, SHParameterizableTarget parameterizableTarget);
+	@Override
+	public Target createTarget(Resource executable, SHParameterizableTarget parameterizableTarget) {
+		return new JSTarget(executable, parameterizableTarget);
+	}
 }

@@ -17,6 +17,7 @@
 package org.topbraid.shacl.validation.js;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -56,7 +57,7 @@ public class JSComponentExecutor extends AbstractJSExecutor {
 
 
 	@Override
-    protected List<RDFNode> getValueNodes(ValidationEngine validationEngine, Constraint constraint, QuerySolutionMap bindings, RDFNode focusNode) {
+    protected Collection<RDFNode> getValueNodes(ValidationEngine validationEngine, Constraint constraint, QuerySolutionMap bindings, RDFNode focusNode) {
 		SHConstraintComponent component = constraint.getComponent();
 		Resource context = constraint.getContext();
 		Resource validatorResource = component.getValidator(SH.JSValidator, context);

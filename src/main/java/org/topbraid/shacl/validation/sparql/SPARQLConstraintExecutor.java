@@ -16,6 +16,7 @@
  */
 package org.topbraid.shacl.validation.sparql;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -52,7 +53,7 @@ public class SPARQLConstraintExecutor extends AbstractSPARQLExecutor {
 
 	
 	@Override
-	public void executeConstraint(Constraint constraint, ValidationEngine engine, List<RDFNode> focusNodes) {
+	public void executeConstraint(Constraint constraint, ValidationEngine engine, Collection<RDFNode> focusNodes) {
 		
 		if(((Resource)constraint.getParameterValue()).hasProperty(SH.deactivated, JenaDatatypes.TRUE)) {
 			return;

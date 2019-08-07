@@ -14,13 +14,14 @@
  *  See the NOTICE file distributed with this work for additional
  *  information regarding copyright ownership.
  */
-package org.topbraid.shacl.validation;
+package org.topbraid.shacl.targets;
 
-import org.topbraid.shacl.engine.Constraint;
+import org.apache.jena.rdf.model.Resource;
+import org.topbraid.shacl.model.SHParameterizableTarget;
 
-public interface SpecialConstraintExecutorFactory {
+public interface CustomTargetLanguage {
 	
-	boolean canExecute(Constraint constraint);
-
-	ConstraintExecutor create(Constraint constraint);
+	boolean canHandle(Resource target);
+	
+	Target createTarget(Resource executable, SHParameterizableTarget parameterizableTarget);
 }

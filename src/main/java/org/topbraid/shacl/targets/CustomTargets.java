@@ -14,14 +14,14 @@
  *  See the NOTICE file distributed with this work for additional
  *  information regarding copyright ownership.
  */
-package org.topbraid.shacl.validation;
+package org.topbraid.shacl.targets;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.jena.rdf.model.Resource;
-import org.topbraid.shacl.validation.js.JSTargetPlugin;
-import org.topbraid.shacl.validation.sparql.SPARQLTargetPlugin;
+import org.topbraid.shacl.validation.js.JSTargetLanguage;
+import org.topbraid.shacl.validation.sparql.SPARQLTargetLanguage;
 
 /**
  * A singleton managing the available custom target plugins.
@@ -29,31 +29,31 @@ import org.topbraid.shacl.validation.sparql.SPARQLTargetPlugin;
  * 
  * @author Holger Knublauch
  */
-public class TargetPlugins {
+public class CustomTargets {
 
-	private static TargetPlugins singleton = new TargetPlugins();
+	private static CustomTargets singleton = new CustomTargets();
 	
-	public static TargetPlugins get() {
+	public static CustomTargets get() {
 		return singleton;
 	}
 	
 	
-	private final List<TargetPlugin> plugins = new LinkedList<>();
+	private final List<CustomTargetLanguage> languages = new LinkedList<>();
 	
-	TargetPlugins() {
+	CustomTargets() {
 		init();
 	}
 	
 	
-	public void addPlugin(TargetPlugin plugin) {
-		plugins.add(plugin);
+	public void addLanguage(CustomTargetLanguage plugin) {
+		languages.add(plugin);
 	}
 	
 	
-	public TargetPlugin getLanguageForTarget(Resource target) {
-		for(TargetPlugin plugin : plugins) {
-			if(plugin.canExecuteTarget(target)) {
-				return plugin;
+	public CustomTargetLanguage getLanguageForTarget(Resource executable) {
+		for(CustomTargetLanguage language : languages) {
+			if(language.canHandle(executable)) {
+				return language;
 			}
 		}
 		return null;
@@ -61,16 +61,16 @@ public class TargetPlugins {
 	
 	
 	private void init() {
-		addPlugin(new SPARQLTargetPlugin());
-		addPlugin(new JSTargetPlugin());
+		addLanguage(new SPARQLTargetLanguage());
+		addLanguage(new JSTargetLanguage());
 	}
 	
 	
 	public void setJSPreferred(boolean value) {
-		plugins.clear();
+		languages.clear();
 		if(value) {
-			addPlugin(new JSTargetPlugin());
-			addPlugin(new SPARQLTargetPlugin());
+			addLanguage(new JSTargetLanguage());
+			addLanguage(new SPARQLTargetLanguage());
 		}
 		else {
 			init();

@@ -16,7 +16,7 @@
  */
 package org.topbraid.shacl.validation.js;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.rdf.model.RDFNode;
@@ -37,7 +37,7 @@ import org.topbraid.shacl.vocabulary.SH;
 public class JSConstraintExecutor extends AbstractJSExecutor implements ConstraintExecutor {
 
 	@Override
-	public void executeConstraint(Constraint constraint, ValidationEngine validationEngine, List<RDFNode> focusNodes) {
+	public void executeConstraint(Constraint constraint, ValidationEngine validationEngine, Collection<RDFNode> focusNodes) {
 		
 		SHJSConstraint js = constraint.getParameterValue().as(SHJSConstraint.class);
 		
@@ -68,7 +68,7 @@ public class JSConstraintExecutor extends AbstractJSExecutor implements Constrai
 
 
 	@Override
-	protected List<RDFNode> getValueNodes(ValidationEngine validationEngine, Constraint constraint, QuerySolutionMap bindings, RDFNode focusNode) {
+	protected Collection<RDFNode> getValueNodes(ValidationEngine validationEngine, Constraint constraint, QuerySolutionMap bindings, RDFNode focusNode) {
 		return validationEngine.getValueNodes(constraint, focusNode);
 	}
 }

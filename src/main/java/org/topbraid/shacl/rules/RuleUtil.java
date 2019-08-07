@@ -19,7 +19,6 @@ package org.topbraid.shacl.rules;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.compose.MultiUnion;
@@ -36,6 +35,7 @@ import org.topbraid.shacl.engine.Shape;
 import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.js.SHACLScriptEngineManager;
 import org.topbraid.shacl.util.SHACLSystemModel;
+import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.shacl.vocabulary.TOSH;
 
@@ -109,7 +109,7 @@ public class RuleUtil {
 		
 		// Create Dataset that contains both the data model and the shapes model
 		// (here, using a temporary URI for the shapes graph)
-		URI shapesGraphURI = URI.create("urn:x-shacl-shapes-graph:" + UUID.randomUUID().toString());
+		URI shapesGraphURI = SHACLUtil.createRandomShapesGraphURI();
 		Dataset dataset = ARQFactory.get().getDataset(dataModel);
 		dataset.addNamedModel(shapesGraphURI.toString(), shapesModel);
 

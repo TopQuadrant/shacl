@@ -17,7 +17,6 @@
 package org.topbraid.shacl.validation;
 
 import java.net.URI;
-import java.util.UUID;
 
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.compose.MultiUnion;
@@ -31,6 +30,7 @@ import org.topbraid.jenax.util.ARQFactory;
 import org.topbraid.shacl.arq.SHACLFunctions;
 import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.util.SHACLSystemModel;
+import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.vocabulary.TOSH;
 
 /**
@@ -55,7 +55,7 @@ public class ValidationUtil {
 
 		// Create Dataset that contains both the data model and the shapes model
 		// (here, using a temporary URI for the shapes graph)
-		URI shapesGraphURI = URI.create("urn:x-shacl-shapes-graph:" + UUID.randomUUID().toString());
+		URI shapesGraphURI = SHACLUtil.createRandomShapesGraphURI();
 		Dataset dataset = ARQFactory.get().getDataset(dataModel);
 		dataset.addNamedModel(shapesGraphURI.toString(), shapesModel);
 

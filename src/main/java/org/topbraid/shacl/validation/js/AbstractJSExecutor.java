@@ -17,8 +17,8 @@
 package org.topbraid.shacl.validation.js;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.jena.graph.Node;
@@ -31,8 +31,6 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.topbraid.jenax.statistics.ExecStatistics;
 import org.topbraid.jenax.statistics.ExecStatisticsManager;
-import org.topbraid.jenax.util.JenaUtil;
-import org.topbraid.shacl.arq.SHACLPaths;
 import org.topbraid.shacl.engine.Constraint;
 import org.topbraid.shacl.js.JSGraph;
 import org.topbraid.shacl.js.JSScriptEngine;
@@ -53,7 +51,7 @@ public abstract class AbstractJSExecutor implements ConstraintExecutor {
 
 	
 	@Override
-	public void executeConstraint(Constraint constraint, ValidationEngine validationEngine, List<RDFNode> focusNodes) {
+	public void executeConstraint(Constraint constraint, ValidationEngine validationEngine, Collection<RDFNode> focusNodes) {
 		
 		JSScriptEngine jsEngine = SHACLScriptEngineManager.getCurrentEngine();
 		
@@ -84,9 +82,7 @@ public abstract class AbstractJSExecutor implements ConstraintExecutor {
 				Object resultObj;
 				bindings.add(SH.thisVar.getVarName(), theFocusNode);
 				
-				List<RDFNode> valueNodes = getValueNodes(validationEngine, constraint, bindings, theFocusNode);
-				
-				for(RDFNode valueNode : valueNodes) {
+				for(RDFNode valueNode : getValueNodes(validationEngine, constraint, bindings, theFocusNode)) {
 					bindings.add("value", valueNode);
 					resultObj = jsEngine.invokeFunction(functionName, bindings);
 					handleJSResultObject(resultObj, validationEngine, constraint, theFocusNode, valueNode, executable, bindings);
@@ -123,7 +119,7 @@ public abstract class AbstractJSExecutor implements ConstraintExecutor {
 	protected abstract SHJSExecutable getExecutable(Constraint constraint);
 
 	
-	protected abstract List<RDFNode> getValueNodes(ValidationEngine engine, Constraint constraint, QuerySolutionMap bindings, RDFNode focusNode);
+	protected abstract Collection<RDFNode> getValueNodes(ValidationEngine engine, Constraint constraint, QuerySolutionMap bindings, RDFNode focusNode);
 
 	
 	@SuppressWarnings("rawtypes")
@@ -165,13 +161,9 @@ public abstract class AbstractJSExecutor implements ConstraintExecutor {
 
 
 	private Resource createValidationResult(ValidationEngine engine, Constraint constraint, RDFNode focusNode) {
-		Resource result = engine.createResult(SH.ValidationResult, constraint, focusNode);
+		Resource result = engine.createValidationResult(constraint, focusNode, null, null);
 		if(SH.JSConstraintComponent.equals(constraint.getComponent())) {
 			result.addProperty(SH.sourceConstraint, constraint.getParameterValue());
-		}
-		Resource path = JenaUtil.getResourceProperty(constraint.getShapeResource(), SH.path);
-		if(path != null) {
-			result.addProperty(SH.resultPath, SHACLPaths.clonePath(path, result.getModel()));
 		}
 		return result;
 	}

@@ -17,9 +17,9 @@
 package org.topbraid.shacl.validation.sparql;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -82,7 +82,7 @@ public abstract class AbstractSPARQLExecutor implements ConstraintExecutor {
 
 	
 	@Override
-	public void executeConstraint(Constraint constraint, ValidationEngine engine, List<RDFNode> focusNodes) {
+	public void executeConstraint(Constraint constraint, ValidationEngine engine, Collection<RDFNode> focusNodes) {
 		
 		QuerySolutionMap bindings = new QuerySolutionMap();
 		addBindings(constraint, bindings);

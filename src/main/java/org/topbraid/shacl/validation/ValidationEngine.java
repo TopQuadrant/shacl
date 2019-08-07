@@ -17,24 +17,36 @@
 package org.topbraid.shacl.validation;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.sparql.path.P_Inverse;
+import org.apache.jena.sparql.path.P_Link;
 import org.apache.jena.sparql.path.Path;
+import org.apache.jena.sparql.path.eval.PathEval;
+import org.apache.jena.sparql.util.Context;
 import org.apache.jena.vocabulary.RDF;
 import org.topbraid.jenax.util.ExceptionUtil;
 import org.topbraid.jenax.util.JenaDatatypes;
@@ -48,9 +60,10 @@ import org.topbraid.shacl.engine.Shape;
 import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.engine.filters.ExcludeMetaShapesFilter;
 import org.topbraid.shacl.js.SHACLScriptEngineManager;
+import org.topbraid.shacl.targets.InstancesTarget;
+import org.topbraid.shacl.targets.Target;
 import org.topbraid.shacl.util.FailureLog;
 import org.topbraid.shacl.util.SHACLPreferences;
-import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.validation.sparql.SPARQLSubstitutions;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
@@ -76,6 +89,7 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 		current.set(value);
 	}
 	
+	private ClassesCache classesCache;
 	
 	private ValidationEngineConfiguration configuration;
 	
@@ -83,10 +97,14 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 	
 	private Function<RDFNode,String> labelFunction = (node -> RDFLabels.get().getNodeLabel(node));
 	
+	private Map<RDFNode,String> labelsCache = new ConcurrentHashMap<>();
+	
 	private Resource report;
-
+	
+	private Map<ValueNodesCacheKey,Collection<RDFNode>> valueNodes = new WeakHashMap<>();
+	
 	private int violationsCount = 0;
-
+	
 
 	/**
 	 * Constructs a new ValidationEngine.
@@ -124,10 +142,11 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 	}
 	
 	
+	// Note: does not set sh:path
 	public Resource createResult(Resource type, Constraint constraint, RDFNode focusNode) {
 		Resource result = report.getModel().createResource(type);
 		report.addProperty(SH.result, result);
-		result.addProperty(SH.resultSeverity, constraint.getShapeResource().getSeverity());
+		result.addProperty(SH.resultSeverity, constraint.getShape().getSeverity());
 		result.addProperty(SH.sourceConstraintComponent, constraint.getComponent());
 		result.addProperty(SH.sourceShape, constraint.getShapeResource());
 		if(focusNode != null) {
@@ -138,14 +157,44 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 
 		return result;
 	}
+	
+	
+	public Resource createValidationResult(Constraint constraint, RDFNode focusNode, RDFNode value, Supplier<String> defaultMessage) {
+		Resource result = createResult(SH.ValidationResult, constraint, focusNode);
+		if(value != null) {
+			result.addProperty(SH.value, value);
+		}
+		if(!constraint.getShape().isNodeShape()) {
+			result.addProperty(SH.resultPath, SHACLPaths.clonePath(constraint.getShapeResource().getPath(), result.getModel()));
+		}
+		Collection<RDFNode> messages = constraint.getShape().getMessages();
+		if(messages.size() > 0) {
+			messages.stream().forEach(message -> result.addProperty(SH.resultMessage, message));
+		}
+		else if(defaultMessage != null) {
+			result.addProperty(SH.resultMessage, defaultMessage.get());
+		}
+		return result;
+	}
 
+	
 	private void checkMaximumNumberFailures(Constraint constraint) {
-		if (constraint.getShapeResource().getSeverity() == SH.Violation) {
+		if (constraint.getShape().getSeverity() == SH.Violation) {
 			this.violationsCount++;
 			if (configuration.getValidationErrorBatch() != -1 && violationsCount == configuration.getValidationErrorBatch()) {
 				throw new MaximumNumberViolations(violationsCount);
 			}
 		}
+	}
+	
+	
+	public ClassesCache getClassesCache() {
+		return classesCache;
+	}
+	
+	
+	public String getLabel(RDFNode node) {
+		return labelsCache.computeIfAbsent(node, n -> getLabelFunction().apply(n));
 	}
 
 
@@ -166,22 +215,16 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 	 * @return a Set of shape resources
 	 */
 	private Set<Resource> getShapesForNode(RDFNode focusNode, Dataset dataset, Model shapesModel) {
-		Set<Resource> shapes = new HashSet<Resource>();
 
-		// sh:targetNode
-		shapes.addAll(shapesModel.listSubjectsWithProperty(SH.targetNode, focusNode).toList());
+		Set<Resource> shapes = new HashSet<>();
 		
-		// property targets
-		if(focusNode instanceof Resource) {
-			for(Statement s : shapesModel.listStatements(null, SH.targetSubjectsOf, (RDFNode)null).toList()) {
-				if(((Resource)focusNode).hasProperty(JenaUtil.asProperty(s.getResource()))) {
-					shapes.add(s.getSubject());
+		for(Shape rootShape : shapesGraph.getRootShapes()) {
+			for(Target target : rootShape.getTargets()) {
+				if(!(target instanceof InstancesTarget)) {
+					if(target.contains(dataset, focusNode)) {
+						shapes.add(rootShape.getShapeResource());
+					}
 				}
-			}
-		}
-		for(Statement s : shapesModel.listStatements(null, SH.targetObjectsOf, (RDFNode)null).toList()) {
-			if(focusNode.getModel().contains(null, JenaUtil.asProperty(s.getResource()), focusNode)) {
-				shapes.add(s.getSubject());
 			}
 		}
 		
@@ -197,33 +240,59 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 			}
 		}
 		
-		// sh:target
-		for(Statement s : shapesModel.listStatements(null, SH.target, (RDFNode)null).toList()) {
-			if(SHACLUtil.isInTarget(focusNode, dataset, s.getResource())) {
-				shapes.add(s.getSubject());
-			}
-		}
-		
 		return shapes;
 	}
 
 	
-	public List<RDFNode> getValueNodes(Constraint constraint, RDFNode focusNode) {
-		Resource path = JenaUtil.getResourceProperty(constraint.getShapeResource(), SH.path);
-		if(path == null) {
-			return Collections.singletonList(focusNode);
+	public Collection<RDFNode> getValueNodes(Constraint constraint, RDFNode focusNode) {
+		if(constraint.getShape().isNodeShape()) {
+			return Collections.singletonList(focusNode);			
 		}
 		else {
+			// We use a cache here because many shapes contains for example both sh:datatype and sh:minCount, and fetching
+			// the value nodes each time may be expensive, esp for sh:minCount/maxCount constraints.
+			ValueNodesCacheKey key = new ValueNodesCacheKey(focusNode, constraint.getShape().getPath());
+			return valueNodes.computeIfAbsent(key, k -> computeValueNodes(focusNode, constraint));
+		}
+	}
+
+	
+	private Collection<RDFNode> computeValueNodes(RDFNode focusNode, Constraint constraint) {
+		Property predicate = constraint.getShape().getPredicate();
+		if(predicate != null) {
 			List<RDFNode> results = new LinkedList<>();
-			Path jenaPath = constraint.getShape().getJenaPath();
-			if(jenaPath != null) {
-				SHACLPaths.addValueNodes(focusNode, jenaPath, results);
-			}
-			else {
-				SHACLPaths.addValueNodes(focusNode, JenaUtil.asProperty(path), results);
+			if(focusNode instanceof Resource) {
+				Iterator<Statement> it = ((Resource)focusNode).listProperties(predicate);
+				while(it.hasNext()) {
+					results.add(it.next().getObject());
+				}
 			}
 			return results;
 		}
+		else {
+			Path jenaPath = constraint.getShape().getJenaPath();
+			if(jenaPath instanceof P_Inverse && ((P_Inverse)jenaPath).getSubPath() instanceof P_Link) {
+				List<RDFNode> results = new LinkedList<>();
+				Property inversePredicate = ResourceFactory.createProperty(((P_Link)((P_Inverse)jenaPath).getSubPath()).getNode().getURI());
+				Iterator<Statement> it = focusNode.getModel().listStatements(null, inversePredicate, focusNode);
+				while(it.hasNext()) {
+					results.add(it.next().getSubject());
+				}
+				return results;					
+			}
+			Set<RDFNode> results = new HashSet<>();
+			Iterator<Node> it = PathEval.eval(focusNode.getModel().getGraph(), focusNode.asNode(), jenaPath, Context.emptyContext);
+			while(it.hasNext()) {
+				Node node = it.next();
+				results.add(focusNode.getModel().asRDFNode(node));
+			}
+			return results;
+		}
+	}
+	
+	
+	public void setClassesCache(ClassesCache value) {
+		this.classesCache = value;
 	}
 
 	
@@ -237,7 +306,6 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 		this.focusNodeFilter = value;
 	}
 	
-	
 	public void updateConforms() {
 		boolean conforms = true;
 		StmtIterator it = report.listProperties(SH.result);
@@ -249,7 +317,9 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 				break;
 			}
 		}
-		report.removeAll(SH.conforms);
+		if(report.hasProperty(SH.conforms)) {
+			report.removeAll(SH.conforms);
+		}
 		report.addProperty(SH.conforms, conforms ? JenaDatatypes.TRUE : JenaDatatypes.FALSE);
 	}
 
@@ -267,6 +337,10 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 			if(monitor != null) {
 				monitor.beginTask("Validating " + rootShapes.size() + " shapes", rootShapes.size());
 			}
+			if(classesCache == null) {
+				// If we are doing everything then the cache should be used, but not for individual nodes
+				classesCache = new ClassesCache();
+			}
 			int i = 0;
 			for(Shape shape : rootShapes) {
 
@@ -274,7 +348,7 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 					monitor.subTask("Shape " + (++i) + ": " + getLabelFunction().apply(shape.getShapeResource()));
 				}
 				
-				List<RDFNode> focusNodes = SHACLUtil.getTargetNodes(shape.getShapeResource(), dataset);
+				Collection<RDFNode> focusNodes = shape.getTargetNodes(dataset);
 				if(focusNodeFilter != null) {
 					List<RDFNode> filteredFocusNodes = new LinkedList<RDFNode>();
 					for(RDFNode focusNode : focusNodes) {
@@ -285,10 +359,8 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 					focusNodes = filteredFocusNodes;
 				}
 				if(!focusNodes.isEmpty()) {
-					if(!shapesGraph.isIgnored(shape.getShapeResource().asNode())) {
-						for(Constraint constraint : shape.getConstraints()) {
-							validateNodesAgainstConstraint(focusNodes, constraint);
-						}
+					for(Constraint constraint : shape.getConstraints()) {
+						validateNodesAgainstConstraint(focusNodes, constraint);
 					}
 				}
 				if(monitor != null) {
@@ -348,7 +420,7 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 	public Resource validateNodesAgainstShape(List<RDFNode> focusNodes, Node shape) {
 		if(!shapesGraph.isIgnored(shape)) {
 			Shape vs = shapesGraph.getShape(shape);
-			if(!vs.getShapeResource().isDeactivated()) {
+			if(!vs.isDeactivated()) {
 				boolean nested = SHACLScriptEngineManager.begin();
 				ValidationEngine oldEngine = current.get();
 				current.set(this);
@@ -380,7 +452,7 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 			report = JenaUtil.createMemoryModel().createResource();
 			try {
 				Shape vs = shapesGraph.getShape(shape);
-				if(!vs.getShapeResource().isDeactivated()) {
+				if(!vs.isDeactivated()) {
 					boolean nested = SHACLScriptEngineManager.begin();
 					try {
 						for(Constraint constraint : vs.getConstraints()) {
@@ -403,7 +475,7 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 	}
 	
 	
-	protected void validateNodesAgainstConstraint(List<RDFNode> focusNodes, Constraint constraint) {
+	protected void validateNodesAgainstConstraint(Collection<RDFNode> focusNodes, Constraint constraint) {
 		if(configuration != null && configuration.isSkippedConstraintComponent(constraint.getComponent())) {
 			return;
 		}
@@ -440,6 +512,42 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 		this.configuration = configuration;
 		if(!configuration.getValidateShapes()) {
 			shapesGraph.setShapeFilter(new ExcludeMetaShapesFilter());
+		}
+	}
+	
+	
+	private static class ValueNodesCacheKey {
+		
+		Resource path;
+		
+		RDFNode focusNode;
+		
+		
+		ValueNodesCacheKey(RDFNode focusNode, Resource path) {
+			this.path = path;
+			this.focusNode = focusNode;
+		}
+		
+		
+		public boolean equals(Object o) {
+			if(o instanceof ValueNodesCacheKey) {
+				return path.equals(((ValueNodesCacheKey)o).path) && focusNode.equals(((ValueNodesCacheKey)o).focusNode);
+			}
+			else {
+				return false;
+			}
+		}
+
+
+		@Override
+		public int hashCode() {
+			return path.hashCode() + focusNode.hashCode();
+		}
+		
+		
+		@Override
+		public String toString() {
+			return focusNode.toString() + " . " + path;
 		}
 	}
 }

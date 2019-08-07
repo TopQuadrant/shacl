@@ -38,6 +38,8 @@ public class DASH {
 
 	public final static Resource DefaultValueTypeRule = ResourceFactory.createResource(NS + "DefaultValueTypeRule");
 
+    public final static Resource Editor = ResourceFactory.createResource(NS + "Editor");
+
     public final static Resource ExecutionPlatform = ResourceFactory.createResource(NS + "ExecutionPlatform");
 
     public final static Resource FailureResult = ResourceFactory.createResource(NS + "FailureResult");
@@ -60,6 +62,8 @@ public class DASH {
 
     public final static Resource ListShape = ResourceFactory.createResource(NS + "ListShape");
 
+    public final static Resource NonRecursiveConstraintComponent = ResourceFactory.createResource(NS + "NonRecursiveConstraintComponent");
+
     public final static Resource QueryTestCase = ResourceFactory.createResource(NS + "QueryTestCase");
 
     public final static Resource ParameterConstraintComponent = ResourceFactory.createResource(NS + "ParameterConstraintComponent");
@@ -67,6 +71,8 @@ public class DASH {
     public final static Resource RDFQueryJSLibrary = ResourceFactory.createResource(NS + "RDFQueryJSLibrary");
 
     public final static Resource SPARQLUpdateSuggestionGenerator = ResourceFactory.createResource(NS + "SPARQLUpdateSuggestionGenerator");
+
+    public final static Resource SingleLineConstraintComponent = ResourceFactory.createResource(NS + "SingleLineConstraintComponent");
 
     public final static Resource SuccessResult = ResourceFactory.createResource(NS + "SuccessResult");
     
@@ -81,6 +87,10 @@ public class DASH {
     public final static Resource ValidationTestCase = ResourceFactory.createResource(NS + "ValidationTestCase");
 
     public final static Resource ValueTableViewer = ResourceFactory.createResource(NS + "ValueTableViewer");
+
+    public final static Resource Viewer = ResourceFactory.createResource(NS + "Viewer");
+
+    public final static Resource Widget = ResourceFactory.createResource(NS + "Widget");
 
 
     public final static Property abstract_ = ResourceFactory.createProperty(NS + "abstract");

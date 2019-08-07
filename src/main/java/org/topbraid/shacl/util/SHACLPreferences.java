@@ -1,8 +1,8 @@
 package org.topbraid.shacl.util;
 
 import org.topbraid.shacl.arq.SHACLFunctionDriver;
+import org.topbraid.shacl.targets.CustomTargets;
 import org.topbraid.shacl.validation.ConstraintExecutors;
-import org.topbraid.shacl.validation.TargetPlugins;
 
 /**
  * Manages global preferences related to SHACL processing.
@@ -41,7 +41,7 @@ public class SHACLPreferences {
 		jsPreferred = value;
 		ConstraintExecutors.get().setJSPreferred(value);
 		SHACLFunctionDriver.setJSPreferred(value);
-		TargetPlugins.get().setJSPreferred(value);
+		CustomTargets.get().setJSPreferred(value);
 	}
 	
 	

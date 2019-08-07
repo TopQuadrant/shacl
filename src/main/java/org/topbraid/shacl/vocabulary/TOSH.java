@@ -38,6 +38,12 @@ public class TOSH {
 
     public final static Resource NodeProcessor = ResourceFactory.createResource(NS + "NodeProcessor");
 
+    public final static Resource PropertyGroupShape = ResourceFactory.createResource(NS + "PropertyGroupShape");
+
+    public final static Resource PropertyShapeShape = ResourceFactory.createResource(NS + "PropertyShapeShape");
+
+    public final static Resource ShapeShape = ResourceFactory.createResource(NS + "ShapeShape");
+
     public final static Resource TeamworkPlatform = ResourceFactory.createResource(NS + "TeamworkPlatform");
 
     public final static Resource TopBraidPlatform = ResourceFactory.createResource(NS + "TopBraidPlatform");

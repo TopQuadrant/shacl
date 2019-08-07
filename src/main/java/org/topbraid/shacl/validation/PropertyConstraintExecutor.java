@@ -16,6 +16,7 @@
  */
 package org.topbraid.shacl.validation;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -33,11 +34,11 @@ import org.topbraid.shacl.util.RecursionGuard;
 class PropertyConstraintExecutor implements ConstraintExecutor {
 
 	@Override
-	public void executeConstraint(Constraint constraint, ValidationEngine engine, List<RDFNode> focusNodes) {
+	public void executeConstraint(Constraint constraint, ValidationEngine engine, Collection<RDFNode> focusNodes) {
 		Node propertyShape = constraint.getParameterValue().asNode();
 		if(constraint.getShapeResource().isPropertyShape()) {
 			for(RDFNode focusNode : focusNodes) {
-				List<RDFNode> valueNodes = engine.getValueNodes(constraint, focusNode);
+				Collection<RDFNode> valueNodes = engine.getValueNodes(constraint, focusNode);
 				executeHelper(engine, valueNodes, propertyShape);
 				engine.checkCanceled();
 			}
@@ -48,7 +49,7 @@ class PropertyConstraintExecutor implements ConstraintExecutor {
 	}
 
 	
-	private void executeHelper(ValidationEngine engine, List<RDFNode> valueNodes, Node propertyShape) {
+	private void executeHelper(ValidationEngine engine, Collection<RDFNode> valueNodes, Node propertyShape) {
 		List<RDFNode> doNodes = new LinkedList<>();
 		for(RDFNode focusNode : valueNodes) {
 			if(!RecursionGuard.start(focusNode.asNode(), propertyShape)) {

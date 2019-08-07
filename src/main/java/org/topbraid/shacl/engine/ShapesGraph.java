@@ -58,6 +58,8 @@ public class ShapesGraph {
 	
 	private Map<Node,Map<Node,NodeExpression>> defaultValueMap = new ConcurrentHashMap<>();
 	
+	private Map<Node,Boolean> ignoredShapes = new ConcurrentHashMap<>();
+	
 	private Map<Property,SHConstraintComponent> parametersMap = new ConcurrentHashMap<>();
 	
 	private List<Shape> rootShapes;
@@ -132,7 +134,7 @@ public class ShapesGraph {
 			this.rootShapes = new LinkedList<Shape>();
 			for(Resource candidate : candidates) {
 				SHShape shape = SHFactory.asShape(candidate);
-				if(!shape.isDeactivated() && (shapeFilter == null || shapeFilter.test(shape))) {
+				if(!shape.isDeactivated() && !isIgnored(shape.asNode())) {
 					this.rootShapes.add(getShape(shape.asNode()));
 				}
 			}
@@ -227,6 +229,11 @@ public class ShapesGraph {
 			return exprs;
 		});
 	}
+	
+	
+	public Model getShapesModel() {
+		return shapesModel;
+	}
 
 
 	public boolean isIgnored(Node shapeNode) {
@@ -234,8 +241,10 @@ public class ShapesGraph {
 			return false;
 		}
 		else {
-			SHShape shape = SHFactory.asShape(shapesModel.asRDFNode(shapeNode));
-			return !shapeFilter.test(shape);
+			return ignoredShapes.computeIfAbsent(shapeNode, node -> {				
+				SHShape shape = SHFactory.asShape(shapesModel.asRDFNode(shapeNode));
+				return !shapeFilter.test(shape);
+			});
 		}
 	}
 	

@@ -19,6 +19,7 @@ package org.topbraid.shacl.arq.functions;
 import java.net.URI;
 import java.util.Collections;
 
+import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
@@ -85,6 +86,11 @@ public class HasShapeFunction extends AbstractFunction3 {
 	
 	@Override
 	protected NodeValue exec(Node focusNode, Node shapeNode, Node recursionIsError, FunctionEnv env) {
+		return exec(focusNode, shapeNode, recursionIsError, env.getActiveGraph(), DatasetImpl.wrap(env.getDataset()));
+	}
+	
+	
+	public static NodeValue exec(Node focusNode, Node shapeNode, Node recursionIsError, Graph activeGraph, Dataset dataset) {
 
 		Boolean oldFlag = recursionIsErrorFlag.get();
 		if(JenaDatatypes.TRUE.asNode().equals(recursionIsError)) {
@@ -110,9 +116,8 @@ public class HasShapeFunction extends AbstractFunction3 {
 			else {
 				
 				try {
-					Model model = ModelFactory.createModelForGraph(env.getActiveGraph());
+					Model model = ModelFactory.createModelForGraph(activeGraph);
 					RDFNode resource = model.asRDFNode(focusNode);
-					Dataset dataset = DatasetImpl.wrap(env.getDataset());
 					Resource shape = (Resource) dataset.getDefaultModel().asRDFNode(shapeNode);
 					Model results = doRun(resource, shape, dataset);
 					if(resultsModelTL.get() != null) {
@@ -148,7 +153,7 @@ public class HasShapeFunction extends AbstractFunction3 {
 	}
 
 
-	private Model doRun(RDFNode focusNode, Resource shape, Dataset dataset) {
+	private static Model doRun(RDFNode focusNode, Resource shape, Dataset dataset) {
 		URI sgURI = shapesGraphURI.get();
 		ShapesGraph sg = shapesGraph.get();
 		if(sgURI == null) {
