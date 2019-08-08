@@ -242,6 +242,13 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 		
 		return shapes;
 	}
+	
+	
+	public List<ValidationResult> getValidationResults() {
+		List<ValidationResult> results = new LinkedList<>();
+		report.listProperties(SH.result).forEachRemaining(s -> results.add(new ResourceValidationResult(s.getResource())));
+		return results;
+	}
 
 	
 	public Collection<RDFNode> getValueNodes(Constraint constraint, RDFNode focusNode) {
