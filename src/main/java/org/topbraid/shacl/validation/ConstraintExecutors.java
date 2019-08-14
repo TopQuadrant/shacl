@@ -24,6 +24,7 @@ import java.util.function.Function;
 
 import org.apache.jena.rdf.model.Resource;
 import org.topbraid.shacl.engine.Constraint;
+import org.topbraid.shacl.validation.java.JavaConstraintExecutors;
 import org.topbraid.shacl.validation.js.JSConstraintExecutor;
 import org.topbraid.shacl.validation.js.JSValidationLanguage;
 import org.topbraid.shacl.validation.sparql.SPARQLConstraintExecutor;
@@ -55,7 +56,9 @@ public class ConstraintExecutors {
 		addSpecialExecutor(SH.JSConstraintComponent, constraint -> new JSConstraintExecutor());
 		addSpecialExecutor(SH.SPARQLConstraintComponent, constraint -> new SPARQLConstraintExecutor(constraint));
 		addSpecialExecutor(SH.ExpressionConstraintComponent, constraint -> new ExpressionConstraintExecutor());
-		
+
+		JavaConstraintExecutors.install(this);
+
 		addLanguage(SPARQLValidationLanguage.get());
 		addLanguage(JSValidationLanguage.get());
 	}

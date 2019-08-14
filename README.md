@@ -7,8 +7,6 @@ Contact: Holger Knublauch (holger@topquadrant.com)
 Can be used to perform SHACL constraint checking and rule inferencing in any Jena-based Java application.
 This API also serves as a reference implementation of the SHACL spec.
 
-**The code is not really optimized for performance, just for correctness. An optimized version of the code is used in the TopBraid products such as [TopBraid EDG](https://www.topquadrant.com/products/topbraid-enterprise-data-governance/)**
-
 Coverage:
 * [SHACL Core and SHACL-SPARQL validation](https://www.w3.org/TR/shacl/)
 * [SHACL Advanced Features (Rules etc)](https://www.w3.org/TR/shacl-af/)
