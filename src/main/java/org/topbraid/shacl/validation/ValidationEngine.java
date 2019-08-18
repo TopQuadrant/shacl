@@ -244,10 +244,8 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 	}
 	
 	
-	public List<ValidationResult> getValidationResults() {
-		List<ValidationResult> results = new LinkedList<>();
-		report.listProperties(SH.result).forEachRemaining(s -> results.add(new ResourceValidationResult(s.getResource())));
-		return results;
+	public ValidationReport getValidationReport() {
+		return new ResourceValidationReport(report);
 	}
 
 	

@@ -36,6 +36,14 @@ import org.topbraid.shacl.vocabulary.TOSH;
 /**
  * Convenience methods to perform SHACL validation.
  * 
+ * These methods are provided for convenience of simple use cases only but are often not the most efficient way
+ * of working with SHACL.  It is typically better to separate the creation of the ShapesGraph object from
+ * the ValidationEngine because the ShapesGraph can be reused across multiple validations, and serves as a "pre-compiled"
+ * data structure that is expensive to rebuild for each run.
+ * 
+ * Having separate calls also provides access to the other functions of the ValidationEngine object, such as
+ * <code>validateNode</code> and <code>getValidationReport</code>.
+ * 
  * @author Holger Knublauch
  */
 public class ValidationUtil {

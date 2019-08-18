@@ -1,7 +1,9 @@
 package org.topbraid.shacl.validation;
 
 import java.util.Collection;
+import java.util.List;
 
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.topbraid.jenax.util.JenaUtil;
@@ -26,7 +28,6 @@ public class ResourceValidationResult implements ValidationResult {
 	public RDFNode getFocusNode() {
 		return JenaUtil.getProperty(result, SH.focusNode);
 	}
-
 	
 	@Override
 	public String getMessage() {
@@ -43,6 +44,11 @@ public class ResourceValidationResult implements ValidationResult {
 		return JenaUtil.getResourceProperty(result, SH.resultPath);
 	}
 	
+	@Override
+	public List<RDFNode> getPropertyValues(Property predicate) {
+		return result.listProperties(predicate).mapWith(s -> s.getObject()).toList();
+	}
+
 	public Resource getResource() {
 		return result;
 	}
@@ -70,5 +76,18 @@ public class ResourceValidationResult implements ValidationResult {
 	@Override
 	public RDFNode getValue() {
 		return JenaUtil.getProperty(result, SH.value);
+	}
+
+
+	@Override
+	public int hashCode() {
+		return result.hashCode();
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		// This currently only checks equality with another instance of ResourceValidationResult
+		return obj instanceof ResourceValidationResult && result.equals(((ResourceValidationResult)obj).result);
 	}
 }
