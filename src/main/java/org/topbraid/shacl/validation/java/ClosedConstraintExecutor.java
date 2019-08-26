@@ -48,7 +48,7 @@ class ClosedConstraintExecutor extends AbstractNativeConstraintExecutor {
 					while(it.hasNext()) {
 						Statement s = it.next();
 						if(!allowedProperties.contains(s.getPredicate())) {
-							Resource result = engine.createValidationResult(constraint, focusNode, s.getObject(), () -> "Unexpected value for property " + engine.getLabelFunction().apply(s.getPredicate()));
+							Resource result = engine.createValidationResult(constraint, focusNode, s.getObject(), () -> "Predicate " + engine.getLabelFunction().apply(s.getPredicate()) + " is not allowed (closed shape)");
 							result.removeAll(SH.resultPath);
 							result.addProperty(SH.resultPath, s.getPredicate());
 						}
