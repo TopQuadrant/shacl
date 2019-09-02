@@ -33,11 +33,6 @@ public class VarFinder {
 	public static Set<String> varsMentioned(Query query) {
 		final Set<String> results = new HashSet<>();
 
-		// Recommended by Andy but does not work:
-		/*for(Object object : OpVars.allVars(Algebra.compile(query))) {
-			results.add(((Var)object).getName());
-		}*/
-
 		if(query.isSelectType()) {
 			for(Object var : query.getResultVars()) {
 				results.add((String)var);

@@ -141,6 +141,7 @@ public class DatasetWrappingDatasetGraph extends DatasetGraphBase {
 			return getGraph(quad.getGraph());
 		}
 	}
+
 	
 	@Override
 	public Lock getLock() {
@@ -171,11 +172,13 @@ public class DatasetWrappingDatasetGraph extends DatasetGraphBase {
 		dataset.removeNamedModel(graphName.getURI());
 	}
 
+	
 	@Override
 	public void begin(ReadWrite readWrite) {
 	    dataset.begin(readWrite);
 	}
 
+	
 	@Override
 	public void begin(TxnType type) {
 	    dataset.begin(type);
@@ -199,6 +202,7 @@ public class DatasetWrappingDatasetGraph extends DatasetGraphBase {
 	    return dataset.transactionType();
 	}
 
+	
 	@Override
 	public void commit() {
 		dataset.commit();

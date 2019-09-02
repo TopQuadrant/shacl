@@ -31,6 +31,8 @@ import org.apache.jena.util.iterator.ExtendedIterator;
 /**
  * Some utilities operating on Jena Node objects, bypassing the Model/RDFNode abstraction layer.
  * 
+ * There should be a cleaner and more complete API for this in the future.
+ * 
  * @author Holger Knublauch
  */
 public class JenaNodeUtil {

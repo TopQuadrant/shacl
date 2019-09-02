@@ -36,8 +36,6 @@ import org.apache.jena.vocabulary.XSD;
  * 
  * TopBraid and this API adds some extra triples (such as declaring
  * superclasses for each system class) that make life easier.
- * In order to expose those assumptions to 3rd party APIs, this is
- * part of the (open source) SHACL API.
  * 
  * @author Holger Knublauch
  */

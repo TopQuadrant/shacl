@@ -53,6 +53,4 @@ public class UpdateFactoryFilter {
 		if(update == null) return "null update query";
 		return update;
 	}	
-	
-
 }

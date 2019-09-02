@@ -7,6 +7,20 @@ import org.apache.jena.shared.PrefixMapping;
 
 public class PrefixUtils {
 
+    /**
+     * Make the {@code dstGraph} prefix map the same {@code srcGraph} prefix map,
+     * only making chnages where necessary.
+     * @param dstGraph  the destination graph
+     * @param srcGraph  the source graph
+     * @return false if no changes where made.
+     */ 
+    public static boolean alignPrefixMap(Graph dstGraph, Graph srcGraph) {
+        boolean changeMade1 = copyPrefixMap(dstGraph, srcGraph);
+        boolean changeMade2 = removeMissingPrefixes(dstGraph, srcGraph);
+        return changeMade1 | changeMade2 ;
+    }
+
+   
     /** 
      * Copy prefix mappings into {@code dstGraph} from {@code srcGraph},
      * checking whether the prefix mapping is already set.
@@ -27,7 +41,8 @@ public class PrefixUtils {
         }
         return changeMade;
     }
-    
+
+
     /** 
      * Remove prefix mappings from {@code dstGraph} that do not exist in {@code srcGraph}.
      * @param dstGraph  the destination graph
@@ -46,18 +61,5 @@ public class PrefixUtils {
             }
         }
         return changeMade;
-    }
-
-    /**
-     * Make the {@code dstGraph} prefix map the same {@code srcGraph} prefix map,
-     * only making chnages where necessary.
-     * @param dstGraph  the destination graph
-     * @param srcGraph  the source graph
-     * @return false if no changes where made.
-     */ 
-    public static boolean alignPrefixMap(Graph dstGraph, Graph srcGraph) {
-        boolean changeMade1 = copyPrefixMap(dstGraph, srcGraph);
-        boolean changeMade2 = removeMissingPrefixes(dstGraph, srcGraph);
-        return changeMade1 | changeMade2 ;
     }
 }

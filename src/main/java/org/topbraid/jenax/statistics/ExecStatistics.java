@@ -40,7 +40,7 @@ public class ExecStatistics {
 	
 	
 	/**
-	 * Creates a new SPINStatistics object.
+	 * Creates a new ExecStatistics object.
 	 * @param label  the label of the action that has been measured
 	 * @param queryText  the text of the query that was executed
 	 * @param duration  the total duration in ms
