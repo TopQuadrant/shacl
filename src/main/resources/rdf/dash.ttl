@@ -260,12 +260,14 @@ dash:FunctionTestCase
   rdfs:label "Function test case" ;
   rdfs:subClassOf dash:TestCase ;
   sh:property [
+      a sh:PropertyShape ;
       sh:path dash:expectedResult ;
       sh:description "The expected result of a function call." ;
       sh:maxCount 1 ;
       sh:name "expected result" ;
     ] ;
   sh:property [
+      a sh:PropertyShape ;
       sh:path dash:expression ;
       sh:description "A valid SPARQL expression calling the function to test." ;
       sh:maxCount 1 ;
@@ -382,6 +384,7 @@ dash:InferencingTestCase
   rdfs:label "Inferencing test case" ;
   rdfs:subClassOf dash:TestCase ;
   sh:property [
+      a sh:PropertyShape ;
       sh:path dash:expectedResult ;
       sh:description "The expected inferred triples, represented by instances of rdfs:Statement." ;
       sh:name "expected result" ;
@@ -399,6 +402,7 @@ dash:JSTestCase
   rdfs:subClassOf dash:TestCase ;
   rdfs:subClassOf sh:JSFunction ;
   sh:property [
+      a sh:PropertyShape ;
       sh:path dash:expectedResult ;
       sh:description "The expected result of the JavaScript function call, as an RDF node." ;
       sh:maxCount 1 ;
@@ -592,6 +596,7 @@ dash:QueryTestCase
   rdfs:subClassOf dash:TestCase ;
   rdfs:subClassOf sh:SPARQLSelectExecutable ;
   sh:property [
+      a sh:PropertyShape ;
       sh:path dash:expectedResult ;
       sh:datatype xsd:string ;
       sh:description "The expected result set, as a JSON string." ;
@@ -600,6 +605,7 @@ dash:QueryTestCase
       sh:name "expected result" ;
     ] ;
   sh:property [
+      a sh:PropertyShape ;
       sh:path sh:select ;
       sh:datatype xsd:string ;
       sh:description "The SPARQL SELECT query to execute." ;
@@ -612,6 +618,19 @@ dash:RDFQueryJSLibrary
   a sh:JSLibrary ;
   rdfs:label "rdfQuery JavaScript Library" ;
   sh:jsLibraryURL "http://datashapes.org/js/rdfquery.js"^^xsd:anyURI ;
+.
+dash:ReifiableByConstraintComponent
+  a sh:ConstraintComponent ;
+  rdfs:label "Reifiable-by constraint component" ;
+  sh:labelTemplate "Reifiable by {$reifiableBy}" ;
+  sh:parameter dash:ReifiableByConstraintComponent-reifiableBy ;
+.
+dash:ReifiableByConstraintComponent-reifiableBy
+  a sh:Parameter ;
+  sh:path dash:reifiableBy ;
+  sh:class sh:NodeShape ;
+  sh:description "Can be used to specify the node shape that may be applied to reified statements produced by a property shape. The property shape must have a URI resource as its sh:path. The values of this property must be node shapes. User interfaces can use this information to determine which properties to present to users when reified statements are explored or edited. Also, SHACL validators can use it to determine how to validate reified triples. Use dash:None to indicate that no reification should be permitted." ;
+  sh:nodeKind sh:IRI ;
 .
 dash:RichTextEditor
   a dash:Editor ;
@@ -640,6 +659,20 @@ dash:RootClassConstraintComponent-rootClass
   sh:description "The root class." ;
   sh:name "root class" ;
   sh:nodeKind sh:IRI ;
+.
+dash:SPARQLConstructTemplate
+  a rdfs:Class ;
+  rdfs:comment "Encapsulates one or more SPARQL CONSTRUCT queries that can be parameterized. Parameters will become pre-bound variables in the queries." ;
+  rdfs:label "SPARQL CONSTRUCT template" ;
+  rdfs:subClassOf sh:Parameterizable ;
+  rdfs:subClassOf sh:SPARQLConstructExecutable ;
+.
+dash:SPARQLSelectTemplate
+  a rdfs:Class ;
+  rdfs:comment "Encapsulates a SPARQL SELECT query that can be parameterized. Parameters will become pre-bound variables in the query." ;
+  rdfs:label "SPARQL SELECT template" ;
+  rdfs:subClassOf sh:Parameterizable ;
+  rdfs:subClassOf sh:SPARQLSelectExecutable ;
 .
 dash:SPARQLUpdateSuggestionGenerator
   a rdfs:Class ;
@@ -808,6 +841,13 @@ dash:TestCase
   rdfs:comment "A test case to verify that a (SHACL-based) feature works as expected." ;
   rdfs:label "Test case" ;
   rdfs:subClassOf rdfs:Resource ;
+  sh:property [
+      sh:path sh:deactivated ;
+      sh:datatype xsd:boolean ;
+      sh:description "If set to true, this test case will be skipped." ;
+      sh:maxCount 1 ;
+      sh:name "deactivated" ;
+    ] ;
 .
 dash:TestCaseResult
   a rdfs:Class ;
@@ -816,6 +856,7 @@ dash:TestCaseResult
   rdfs:label "Test case result" ;
   rdfs:subClassOf sh:AbstractResult ;
   sh:property [
+      a sh:PropertyShape ;
       sh:path dash:testCase ;
       sh:class dash:TestCase ;
       sh:description "The dash:TestCase that was executed." ;
@@ -824,6 +865,7 @@ dash:TestCaseResult
       sh:name "test case" ;
     ] ;
   sh:property [
+      a sh:PropertyShape ;
       sh:path dash:testGraph ;
       sh:class rdfs:Resource ;
       sh:description "The graph containing the test case." ;
@@ -916,6 +958,7 @@ dash:ValidationTestCase
   rdfs:label "Validation test case" ;
   rdfs:subClassOf dash:TestCase ;
   sh:property [
+      a sh:PropertyShape ;
       sh:path dash:expectedResult ;
       sh:class sh:ValidationReport ;
       sh:description "The expected validation report." ;
@@ -957,6 +1000,7 @@ dash:addedTriple
   rdfs:range rdf:Statement ;
 .
 dash:all
+  a rdfs:Resource ;
   rdfs:comment "Represents all users/roles, for example as a possible value of the default view for role property." ;
   rdfs:label "all" ;
 .
@@ -1177,6 +1221,13 @@ dash:height
   rdfs:label "height" ;
   rdfs:range xsd:integer ;
 .
+dash:hidden
+  a rdf:Property ;
+  rdfs:comment "Properties marked as readOnly do not appear in user interfaces, yet remain part of the shape for other purposes such as validation and GraphQL schemas." ;
+  rdfs:domain sh:PropertyShape ;
+  rdfs:label "hidden" ;
+  rdfs:range xsd:boolean ;
+.
 dash:includedExecutionPlatform
   a rdf:Property ;
   rdfs:comment "Can be used to state that one (subject) execution platform includes all features of another platform (object)." ;
@@ -1300,10 +1351,16 @@ dash:propertySuggestionGenerator
 .
 dash:readOnly
   a rdf:Property ;
-  rdfs:comment "Used as a hint for user interfaces that values of the associated property should not be editable." ;
+  rdfs:comment "Used as a hint for user interfaces that values of the associated property should not be editable. The values of this may be the boolean literals true or false or, more generally, a SHACL node expression that must evaluate to true or false." ;
   rdfs:domain sh:PropertyShape ;
   rdfs:label "read only" ;
-  rdfs:range xsd:boolean ;
+.
+dash:reifiableBy
+  a rdf:Property ;
+  rdfs:comment "Can be used to specify the node shape that may be applied to reified statements produced by a property shape. The property shape must have a URI resource as its sh:path. The values of this property must be node shapes. User interfaces can use this information to determine which properties to present to users when reified statements are explored or edited. Use dash:None to indicate that no reification should be permitted." ;
+  rdfs:domain sh:PropertyShape ;
+  rdfs:label "reifiable by" ;
+  rdfs:range sh:NodeShape ;
 .
 dash:requiredExecutionPlatform
   a rdf:Property ;
@@ -1545,9 +1602,6 @@ sh:DatatypeConstraintComponent
       sh:jsLibrary dash:DASHJSLibrary ;
     ] ;
 .
-sh:DerivedValuesConstraintComponent
-  sh:targetClass sh:PropertyShape ;
-.
 sh:DisjointConstraintComponent
   dash:localConstraint true ;
   sh:targetClass sh:Shape ;
@@ -1627,6 +1681,7 @@ sh:EqualsConstraintComponent
 .
 sh:Function
   sh:property [
+      a sh:PropertyShape ;
       sh:path dash:cachable ;
       sh:datatype xsd:boolean ;
       sh:description "True to indicate that this function will always return the same values for the same combination of arguments, regardless of the query graphs. Engines can use this information to cache and reuse previous function calls." ;

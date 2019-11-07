@@ -17,7 +17,6 @@
 package org.topbraid.shacl.testcases;
 
 import java.io.ByteArrayInputStream;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -43,7 +42,7 @@ import org.topbraid.shacl.testcases.context.TestCaseContext;
 import org.topbraid.shacl.testcases.context.TestCaseContextFactory;
 import org.topbraid.shacl.vocabulary.DASH;
 
-public class FunctionTestCaseType implements TestCaseType {
+public class FunctionTestCaseType extends TestCaseType {
 	
 	private static List<TestCaseContextFactory> contextFactories = new LinkedList<>();
 	static {
@@ -56,16 +55,17 @@ public class FunctionTestCaseType implements TestCaseType {
 	}
 
 
-	@Override
-	public Collection<TestCase> getTestCases(Model model, Resource graph) {
-		List<TestCase> results = new LinkedList<TestCase>();
-		for(Resource resource : JenaUtil.getAllInstances(model.getResource(DASH.FunctionTestCase.getURI()))) {
-			results.add(new FunctionTestCase(graph, resource));
-		}
-		return results;
+	public FunctionTestCaseType() {
+		super(DASH.FunctionTestCase);
 	}
 
-	
+
+	@Override
+	protected TestCase createTestCase(Resource graph, Resource resource) {
+		return new FunctionTestCase(graph, resource);
+	}
+
+
 	private static class FunctionTestCase extends TestCase {
 		
 		FunctionTestCase(Resource graph, Resource resource) {

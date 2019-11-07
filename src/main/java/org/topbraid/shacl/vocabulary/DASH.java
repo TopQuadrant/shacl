@@ -61,6 +61,8 @@ public class DASH {
     public final static Resource JSTestCase = ResourceFactory.createResource(NS + "JSTestCase");
 
     public final static Resource ListShape = ResourceFactory.createResource(NS + "ListShape");
+    
+    public final static Resource None = ResourceFactory.createResource(NS + "None");
 
     public final static Resource NonRecursiveConstraintComponent = ResourceFactory.createResource(NS + "NonRecursiveConstraintComponent");
 
@@ -69,6 +71,12 @@ public class DASH {
     public final static Resource ParameterConstraintComponent = ResourceFactory.createResource(NS + "ParameterConstraintComponent");
 
     public final static Resource RDFQueryJSLibrary = ResourceFactory.createResource(NS + "RDFQueryJSLibrary");
+
+    public final static Resource ReifiableByConstraintComponent = ResourceFactory.createResource(NS + "ReifiableByConstraintComponent");
+
+    public final static Resource SPARQLConstructTemplate = ResourceFactory.createResource(NS + "SPARQLConstructTemplate");
+
+    public final static Resource SPARQLSelectTemplate = ResourceFactory.createResource(NS + "SPARQLSelectTemplate");
 
     public final static Resource SPARQLUpdateSuggestionGenerator = ResourceFactory.createResource(NS + "SPARQLUpdateSuggestionGenerator");
 
@@ -122,6 +130,8 @@ public class DASH {
     public final static Property expectedResultIsTTL = ResourceFactory.createProperty(NS + "expectedResultIsTTL");
 
     public final static Property expression = ResourceFactory.createProperty(NS + "expression");
+
+    public final static Property hidden = ResourceFactory.createProperty(NS + "hidden");
     
     public final static Property includedExecutionPlatform = ResourceFactory.createProperty(NS + "includedExecutionPlatform");
 

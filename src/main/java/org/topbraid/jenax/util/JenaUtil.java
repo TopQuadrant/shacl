@@ -697,7 +697,11 @@ public class JenaUtil {
 		}
 	}
 	
-	
+
+	/**
+	 * @deprecated Use equivalent call <code>subject.getPropertyResourceValue(predicate)</code> instead.
+	 * @see Resource#getPropertyResourceValue(Property)
+	 */
 	public static Resource getResourceProperty(Resource subject, Property predicate) {
 		Statement s = subject.getProperty(predicate);
 		if(s != null && s.getObject().isResource()) {
@@ -838,7 +842,7 @@ public class JenaUtil {
 	 * @return the type or null
 	 */
 	public static Resource getType(Resource instance) {
-		return getResourceProperty(instance, RDF.type);
+		return instance.getPropertyResourceValue(RDF.type);
 	}
 	
 	

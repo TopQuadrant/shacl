@@ -16,13 +16,12 @@
  */
 package org.topbraid.shacl.testcases;
 
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
 import org.topbraid.jenax.util.JenaDatatypes;
-import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.testcases.context.TestCaseContext;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Resource;
 
 public abstract class TestCase implements Comparable<TestCase> {
 
@@ -39,8 +38,8 @@ public abstract class TestCase implements Comparable<TestCase> {
 	
 	@Override
 	public int compareTo(TestCase other) {
-		Resource env1 = JenaUtil.getResourceProperty(getResource(), DASH.testEnvironment);
-		Resource env2 = JenaUtil.getResourceProperty(other.getResource(), DASH.testEnvironment);
+		Resource env1 = getResource().getPropertyResourceValue(DASH.testEnvironment);
+		Resource env2 = other.getResource().getPropertyResourceValue(DASH.testEnvironment);
 		if(env1 != null) {
 			String uri1 = env1.getURI();
 			if(env2 != null) {
@@ -113,8 +112,8 @@ public abstract class TestCase implements Comparable<TestCase> {
 			return true;
 		}
 		
-		Resource e1 = JenaUtil.getResourceProperty(getResource(), DASH.testEnvironment);
-		Resource e2 = JenaUtil.getResourceProperty(other.getResource(), DASH.testEnvironment);
+		Resource e1 = getResource().getPropertyResourceValue(DASH.testEnvironment);
+		Resource e2 = other.getResource().getPropertyResourceValue(DASH.testEnvironment);
 		if(e1 != null && e2 != null) {
 			return !e1.equals(e2);
 		}

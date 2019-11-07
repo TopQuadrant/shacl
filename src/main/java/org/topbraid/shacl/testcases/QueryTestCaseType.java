@@ -18,7 +18,6 @@ package org.topbraid.shacl.testcases;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -42,7 +41,7 @@ import org.topbraid.shacl.testcases.context.TestCaseContextFactory;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 
-public class QueryTestCaseType implements TestCaseType {
+public class QueryTestCaseType extends TestCaseType {
 	
 	private static List<TestCaseContextFactory> contextFactories = new LinkedList<>();
 	static {
@@ -74,13 +73,14 @@ public class QueryTestCaseType implements TestCaseType {
 	}
 
 
+	public QueryTestCaseType() {
+		super(DASH.QueryTestCase);
+	}
+
+	
 	@Override
-	public Collection<TestCase> getTestCases(Model model, Resource graph) {
-		List<TestCase> results = new LinkedList<TestCase>();
-		for(Resource resource : JenaUtil.getAllInstances(model.getResource(DASH.QueryTestCase.getURI()))) {
-			results.add(new QueryTestCase(graph, resource));
-		}
-		return results;
+	protected TestCase createTestCase(Resource graph, Resource resource) {
+		return new QueryTestCase(graph, resource);
 	}
 
 	

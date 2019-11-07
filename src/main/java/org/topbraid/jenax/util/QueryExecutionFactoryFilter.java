@@ -16,7 +16,8 @@
  */
 package org.topbraid.jenax.util;
 
-import org.apache.commons.lang3.time.FastDateFormat ;
+import java.time.format.DateTimeFormatter;
+
 import org.apache.http.client.HttpClient ;
 import org.apache.jena.atlas.lib.DateTimeUtils ;
 import org.apache.jena.query.Dataset;
@@ -97,7 +98,7 @@ public class QueryExecutionFactoryFilter {
 		}
 	}
 	
-	private static FastDateFormat timestamp = FastDateFormat.getInstance("HH:mm:ss.SSS") ;
+	private static final DateTimeFormatter timestamp  = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
 	// Development support. Dynmically controlled print query.
 	private void printQuery(Query query, QuerySolution initialBinding) {
 	    if ( PRINT ) {

@@ -16,6 +16,7 @@
  */
 package org.topbraid.jenax.util;
 
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -157,5 +158,91 @@ public class ExceptionUtil {
 			}
 	    }
 		return null;
+	}
+
+	/**
+	 * Returns a shortened form of the given stack trace
+	 * by removing "boring" lines. The first "interesting" method
+	 * is given as an argument. All lines below in the stack trace,
+	 * that is, the caller of the "interesting" method, and its caller,
+	 * and so on, up to the origination point of the thread, are omitted.
+	 *
+	 * @param stackTrace The input stack trace, as produced by {@link #getStackTrace(Throwable)}
+	 * @param shallowestInterestingMethod A fully qualified method name, as it appears in a stack trace: org.example.MyClass.myMethod
+	 * @return A shortened stack trace that omits the callers of the class
+	 */
+	public static String shortenStackTrace(String stackTrace, String shallowestInterestingMethod) {
+		int idx = stackTrace.indexOf("\tat " + shallowestInterestingMethod + "(");
+		if (idx < 0) {
+			// Execution did not pass through our interesting boundary class.
+			// Return whole stack trace.
+			return stackTrace;
+		}
+		int boringStart = stackTrace.indexOf(System.lineSeparator(), idx);
+		if (boringStart < 0) {
+			// The interesting boundary class seems to be the
+			// last line of the stack trace. Return whole stack trace.
+			return stackTrace;
+		}
+		boringStart += System.lineSeparator().length();
+		StringBuilder result = new StringBuilder(stackTrace.substring(0, boringStart));
+		result.append("\t... Rest omitted");
+		result.append(System.lineSeparator());
+		int causeStart = stackTrace.indexOf("Caused by:", boringStart);
+		int suppressedStart = stackTrace.indexOf("Suppressed:", boringStart);
+		if (causeStart >= 0 || suppressedStart >= 0) {
+			result.append(stackTrace.substring(Math.max(causeStart, suppressedStart)));
+		}
+		return result.toString();
+	}
+
+	/**
+	 * Returns a shortened form of the given stack trace,
+	 * omitting lines related to the servlet container before entry
+	 * into the servlet implementation.
+	 *
+	 * @see #shortenStackTrace(String, String)
+	 */
+	public static String shortenStackTraceForServletCall(String stackTrace) {
+		return shortenStackTrace(stackTrace, "javax.servlet.http.HttpServlet.service");
+	}
+
+	/**
+	 * Returns a version of the given throwable that prints with
+	 * a shortened stack trace, omitting lines related to the servlet
+	 * container before entry into the servlet implementation.
+	 *
+	 * The resulting exception is only intended for printing/logging
+	 * its stack trace. It is not intended to be thrown or wrapped into
+	 * other exceptions.
+	 *
+	 * @see #shortenStackTrace(String, String)
+	 */
+	@SuppressWarnings("serial")
+	public static Throwable withServletContainerStackOmitted(Throwable t) {
+		if (t == null) return null;
+		return new Throwable(t) {
+			@Override
+			public synchronized void printStackTrace(PrintStream out) {
+				out.print(getShortenedStackTrace());
+			}
+			@Override
+			public synchronized void printStackTrace(PrintWriter out) {
+				out.print(getShortenedStackTrace());
+			}
+			@Override
+			public synchronized Throwable fillInStackTrace() {
+				// This doesn't need to have its own stack trace - better performance
+				return this;
+			}
+			private String getFullStackTrace() {
+				StringWriter writer = new StringWriter();
+				getCause().printStackTrace(new PrintWriter(writer));
+				return writer.getBuffer().toString();
+			}
+			private String getShortenedStackTrace() {
+				return shortenStackTraceForServletCall(getFullStackTrace());
+			}
+		};
 	}
 }

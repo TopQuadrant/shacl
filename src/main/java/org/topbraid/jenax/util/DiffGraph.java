@@ -29,7 +29,7 @@ public class DiffGraph extends TransparentWrappedGraph {
 	/**
 	 * This graph has additional triples that are not in the delegate.
 	 */
-	private GraphWithPerform addedGraph = new GraphMem();
+	protected GraphWithPerform addedGraph = new GraphMem();
 	
 	/**
 	 * This Set has triples that are in the delegate but are excluded
@@ -91,7 +91,7 @@ public class DiffGraph extends TransparentWrappedGraph {
 	// but sameValueAs then this code is incorrect.
 	// Specifically we should be able to show bugs with TDB which does
 	// something different from either equals or sameValueAs.
-	private boolean containsByEquals(Graph g,Triple t) {
+	protected boolean containsByEquals(Graph g,Triple t) {
 		ExtendedIterator<Triple> it = g.find(t);
 		try {
 			while (it.hasNext()) {

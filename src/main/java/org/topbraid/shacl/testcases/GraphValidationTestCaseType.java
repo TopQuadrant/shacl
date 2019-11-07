@@ -18,8 +18,6 @@ package org.topbraid.shacl.testcases;
 
 import java.net.URI;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.jena.query.Dataset;
@@ -37,11 +35,15 @@ import org.topbraid.shacl.arq.SHACLPaths;
 import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.util.ModelPrinter;
 import org.topbraid.shacl.util.SHACLUtil;
-import org.topbraid.shacl.validation.*;
+import org.topbraid.shacl.validation.ValidationEngine;
+import org.topbraid.shacl.validation.ValidationEngineConfiguration;
+import org.topbraid.shacl.validation.ValidationEngineFactory;
+import org.topbraid.shacl.validation.ValidationSuggestionGenerator;
+import org.topbraid.shacl.validation.ValidationSuggestionGeneratorFactory;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 
-public class GraphValidationTestCaseType implements TestCaseType {
+public class GraphValidationTestCaseType extends TestCaseType {
 
 	public final static List<Property> IGNORED_PROPERTIES = Arrays.asList(new Property[] {
 		SH.message, // For TopBraid's suggestions
@@ -71,16 +73,17 @@ public class GraphValidationTestCaseType implements TestCaseType {
 	}
 
 
-	@Override
-	public Collection<TestCase> getTestCases(Model model, Resource graph) {
-		List<TestCase> results = new LinkedList<TestCase>();
-		for(Resource resource : JenaUtil.getAllInstances(model.getResource(DASH.GraphValidationTestCase.getURI()))) {
-			results.add(new GraphValidationTestCase(graph, resource));
-		}
-		return results;
+	public GraphValidationTestCaseType() {
+		super(DASH.GraphValidationTestCase);
 	}
 
-	
+
+	@Override
+	protected TestCase createTestCase(Resource graph, Resource resource) {
+		return new GraphValidationTestCase(graph, resource);
+	}
+
+
 	private static class GraphValidationTestCase extends TestCase {
 		
 		GraphValidationTestCase(Resource graph, Resource resource) {
@@ -132,6 +135,11 @@ public class GraphValidationTestCaseType implements TestCaseType {
 					}
 					else {
 						expectedModel.add(t);
+						if(SH.detail.equals(t.getPredicate())) {
+							for(Statement n : t.getResource().listProperties().toList()) {
+								expectedModel.add(n);
+							}
+						}
 					}
 				}
 			}

@@ -16,10 +16,6 @@
  */
 package org.topbraid.shacl.testcases;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.apache.jena.query.ARQ;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -32,22 +28,21 @@ import org.apache.jena.sparql.function.FunctionRegistry;
 import org.topbraid.jenax.functions.CurrentThreadFunctionRegistry;
 import org.topbraid.jenax.functions.CurrentThreadFunctions;
 import org.topbraid.jenax.util.ARQFactory;
-import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.vocabulary.DASH;
 
-public class JSTestCaseType implements TestCaseType {
+public class JSTestCaseType extends TestCaseType {
 
-	@Override
-	public Collection<TestCase> getTestCases(Model model, Resource graph) {
-		List<TestCase> results = new LinkedList<TestCase>();
-		for(Resource resource : JenaUtil.getAllInstances(model.getResource(DASH.JSTestCase.getURI()))) {
-			results.add(new JSTestCase(graph, resource));
-		}
-		return results;
+	public JSTestCaseType() {
+		super(DASH.JSTestCase);
 	}
 
 
-	
+	@Override
+	protected TestCase createTestCase(Resource graph, Resource resource) {
+		return new JSTestCase(graph, resource);
+	}
+
+
 	private static class JSTestCase extends TestCase {
 		
 		JSTestCase(Resource graph, Resource resource) {
