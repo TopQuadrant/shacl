@@ -44,7 +44,7 @@ class ClassConstraintExecutor extends AbstractNativeConstraintExecutor {
 		else {			
 			ClassesCache cache = engine.getClassesCache();
 			if(cache != null) {
-				Predicate<Resource> pred = cache.getPredicate(classNode);
+				Predicate<Resource> pred = cache.getPredicate(classNode.inModel(valueNode.getModel()));
 				if(!pred.test((Resource)valueNode)) {
 					engine.createValidationResult(constraint, focusNode, valueNode, () -> "Value must be an instance of " + engine.getLabel(classNode));
 				}

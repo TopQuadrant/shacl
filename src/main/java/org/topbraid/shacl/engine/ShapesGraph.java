@@ -109,7 +109,7 @@ public class ShapesGraph {
 	 * Gets all non-deactivated shapes that declare a target and pass the provided filter.
 	 * @return the root shapes
 	 */
-	public List<Shape> getRootShapes() {
+	public synchronized List<Shape> getRootShapes() {
 		if(rootShapes == null) {
 			
 			// Collect all shapes, as identified by target and/or type
