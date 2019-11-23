@@ -71,4 +71,9 @@ public class SHResultImpl extends SHResourceImpl implements SHResult {
 	public Resource getSourceShape() {
 		return JenaUtil.getResourceProperty(this, SH.sourceShape);
 	}
+	
+	@Override
+	public Resource getResultSeverity() {
+		return JenaUtil.getResourceProperty(this, SH.resultSeverity);
+	}
 }

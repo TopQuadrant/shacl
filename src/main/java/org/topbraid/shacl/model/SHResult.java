@@ -40,4 +40,7 @@ public interface SHResult extends SHResource {
 	
 	
 	RDFNode getValue();
+	
+	
+	Resource getResultSeverity();
 }
