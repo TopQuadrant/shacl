@@ -50,30 +50,31 @@ public class SHResultImpl extends SHResourceImpl implements SHResult {
 
 	
 	@Override
-	public RDFNode getValue() {
-		return JenaUtil.getProperty(this, SH.value);
+	public Resource getSeverity() {
+		return getPropertyResourceValue(SH.resultSeverity);
 	}
 
 	
 	@Override
 	public Resource getSourceConstraint() {
-		return JenaUtil.getResourceProperty(this, SH.sourceConstraint);
+		return getPropertyResourceValue(SH.sourceConstraint);
 	}
 
 	
 	@Override
 	public Resource getSourceConstraintComponent() {
-		return JenaUtil.getResourceProperty(this, SH.sourceConstraintComponent);
+		return getPropertyResourceValue(SH.sourceConstraintComponent);
 	}
 
 	
 	@Override
 	public Resource getSourceShape() {
-		return JenaUtil.getResourceProperty(this, SH.sourceShape);
+		return getPropertyResourceValue(SH.sourceShape);
 	}
+
 	
 	@Override
-	public Resource getResultSeverity() {
-		return JenaUtil.getResourceProperty(this, SH.resultSeverity);
+	public RDFNode getValue() {
+		return JenaUtil.getProperty(this, SH.value);
 	}
 }

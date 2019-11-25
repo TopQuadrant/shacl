@@ -25,6 +25,12 @@ public interface SHResult extends SHResource {
 	
 	
 	RDFNode getFocusNode();
+	
+	
+	Resource getPath();
+	
+	
+	Resource getSeverity();
 
 	
 	Resource getSourceConstraint();
@@ -36,11 +42,5 @@ public interface SHResult extends SHResource {
 	Resource getSourceShape();
 	
 	
-	Resource getPath();
-	
-	
 	RDFNode getValue();
-	
-	
-	Resource getResultSeverity();
 }
