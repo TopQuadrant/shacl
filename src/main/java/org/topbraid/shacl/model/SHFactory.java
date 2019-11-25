@@ -51,6 +51,7 @@ import org.topbraid.shacl.model.impl.SHRuleImpl;
 import org.topbraid.shacl.model.impl.SHSPARQLConstraintImpl;
 import org.topbraid.shacl.model.impl.SHSPARQLFunctionImpl;
 import org.topbraid.shacl.model.impl.SHSPARQLTargetImpl;
+import org.topbraid.shacl.model.impl.SHValidationReportImpl;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.util.SimpleImplementation;
 import org.topbraid.shacl.vocabulary.DASH;
@@ -79,6 +80,7 @@ public class SHFactory {
     	p.add(SHParameterizableTarget.class, new SimpleImplementation(SH.Target.asNode(), SHParameterizableTargetImpl.class));
     	p.add(SHPropertyShape.class, new SimpleImplementation(SH.PropertyShape.asNode(), SHPropertyShapeImpl.class));
     	p.add(SHResult.class, new SimpleImplementation(SH.AbstractResult.asNode(), SHResultImpl.class));
+    	p.add(SHValidationReport.class, new SimpleImplementation(SH.ValidationReport.asNode(), SHValidationReportImpl.class));
     	p.add(SHRule.class, new SimpleImplementation(SH.Rule.asNode(), SHRuleImpl.class));
     	p.add(SHNodeShape.class, new SimpleImplementation(SH.NodeShape.asNode(), SHNodeShapeImpl.class));
 		p.add(SHSPARQLConstraint.class, new SimpleImplementation(SH.SPARQLConstraint.asNode(), SHSPARQLConstraintImpl.class));
@@ -139,6 +141,14 @@ public class SHFactory {
 	
 	public static SHSPARQLTarget asSPARQLTarget(RDFNode node) {
 		return node.as(SHSPARQLTarget.class);
+	}
+	
+	public static SHResult asResult(RDFNode node) {
+		return node.as(SHResult.class);
+	}
+	
+	public static SHValidationReport asValidationReport(RDFNode node) {
+		return node.as(SHValidationReport.class);
 	}
 	
 	
