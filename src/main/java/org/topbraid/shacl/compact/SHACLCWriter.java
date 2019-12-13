@@ -137,7 +137,7 @@ public class SHACLCWriter extends WriterGraphRIOTBase {
 	
 	
 	private void writeShape(IndentedWriter out, Resource shape) {
-		out.print("" + iri(shape));
+		out.print("shape " + iri(shape));
 		writeShapeBody(out, shape);
 	}
 	
