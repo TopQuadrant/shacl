@@ -76,8 +76,10 @@ public class SHACLCWriter extends WriterGraphRIOTBase {
 	
 	private void write(IndentedWriter out, Graph graph, PrefixMap prefixMap, String baseURI, Context context) {
 		Model model = ModelFactory.createModelForGraph(graph);
-		out.println("BASE <" + baseURI + ">");
-		out.println();
+		if(baseURI != null) {
+			out.println("BASE <" + baseURI + ">");
+			out.println();
+		}
 		writeImports(out, model.getResource(baseURI));
 		writePrefixes(out, prefixMap);
 		writeShapes(out, model);
@@ -137,7 +139,7 @@ public class SHACLCWriter extends WriterGraphRIOTBase {
 	
 	
 	private void writeShape(IndentedWriter out, Resource shape) {
-		out.print("" + iri(shape));
+		out.print("shape " + iri(shape));
 		writeShapeBody(out, shape);
 	}
 	
