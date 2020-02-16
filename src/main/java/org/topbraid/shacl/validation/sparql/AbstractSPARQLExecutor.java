@@ -67,7 +67,7 @@ public abstract class AbstractSPARQLExecutor implements ConstraintExecutor {
 			this.query = ARQFactory.get().createQuery(queryString);
 			Resource path = constraint.getShapeResource().getPath();
 			if(path != null && path.isAnon()) {
-				String pathString = SHACLPaths.getPathString(JenaUtil.getResourceProperty(constraint.getShapeResource(), SH.path));
+				String pathString = SHACLPaths.getPathString(constraint.getShapeResource().getPropertyResourceValue(SH.path));
 				query = SPARQLSubstitutions.substitutePaths(query, pathString, constraint.getShapeResource().getModel());
 			}
 		}
@@ -210,7 +210,7 @@ public abstract class AbstractSPARQLExecutor implements ConstraintExecutor {
 							result.addProperty(SH.resultPath, pathValue);
 						}
 						else if(constraint.getShapeResource().isPropertyShape()) {
-							Resource basePath = JenaUtil.getResourceProperty(constraint.getShapeResource(), SH.path);
+							Resource basePath = constraint.getShapeResource().getPropertyResourceValue(SH.path);
 							result.addProperty(SH.resultPath, SHACLPaths.clonePath(basePath, result.getModel()));
 						}
 						

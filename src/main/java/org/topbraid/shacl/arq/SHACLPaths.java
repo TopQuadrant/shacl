@@ -52,7 +52,6 @@ import org.apache.jena.sparql.util.Context;
 import org.apache.jena.sparql.util.FmtUtils;
 import org.apache.jena.vocabulary.RDF;
 import org.topbraid.jenax.util.ARQFactory;
-import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.vocabulary.SH;
 
 /**
@@ -135,26 +134,26 @@ public class SHACLPaths {
 			sb.append("^");
 			if(path.getProperty(SH.inversePath).getObject().isAnon()) {
 				sb.append("(");
-				appendPath(sb, JenaUtil.getResourceProperty(path, SH.inversePath));
+				appendPath(sb, path.getPropertyResourceValue(SH.inversePath));
 				sb.append(")");
 			}
 			else {
-				appendPath(sb, JenaUtil.getResourceProperty(path, SH.inversePath));
+				appendPath(sb, path.getPropertyResourceValue(SH.inversePath));
 			}
 		}
 		else if(path.hasProperty(SH.alternativePath)) {
-			appendNestedPath(sb, JenaUtil.getResourceProperty(path, SH.alternativePath), ALTERNATIVE_PATH_SEPARATOR);
+			appendNestedPath(sb, path.getPropertyResourceValue(SH.alternativePath), ALTERNATIVE_PATH_SEPARATOR);
 		}
 		else if(path.hasProperty(SH.zeroOrMorePath)) {
-			appendNestedPath(sb, JenaUtil.getResourceProperty(path, SH.zeroOrMorePath), SEQUENCE_PATH_SEPARATOR);
+			appendNestedPath(sb, path.getPropertyResourceValue(SH.zeroOrMorePath), SEQUENCE_PATH_SEPARATOR);
 			sb.append("*");
 		}
 		else if(path.hasProperty(SH.oneOrMorePath)) {
-			appendNestedPath(sb, JenaUtil.getResourceProperty(path, SH.oneOrMorePath), SEQUENCE_PATH_SEPARATOR);
+			appendNestedPath(sb, path.getPropertyResourceValue(SH.oneOrMorePath), SEQUENCE_PATH_SEPARATOR);
 			sb.append("+");
 		}
 		else if(path.hasProperty(SH.zeroOrOnePath)) {
-			appendNestedPath(sb, JenaUtil.getResourceProperty(path, SH.zeroOrOnePath), SEQUENCE_PATH_SEPARATOR);
+			appendNestedPath(sb, path.getPropertyResourceValue(SH.zeroOrOnePath), SEQUENCE_PATH_SEPARATOR);
 			sb.append("?");
 		}
 	}

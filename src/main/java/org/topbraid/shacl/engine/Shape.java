@@ -136,7 +136,7 @@ public class Shape {
 	}
 	
 	
-	public Iterable<Constraint> getConstraints() {
+	public synchronized Iterable<Constraint> getConstraints() {
 		if(constraints == null) {
 			constraints = new LinkedList<>();
 			Set<SHConstraintComponent> handled = new HashSet<>();
@@ -146,6 +146,7 @@ public class Shape {
 					List<SHParameter> params = component.getParameters();
 					if(params.size() == 1) {
 						Constraint constraint = new Constraint(this, component, params, s.getObject());
+						
 						if(!shapesGraph.isIgnoredConstraint(constraint)) {
 							constraints.add(constraint);
 						}
@@ -153,6 +154,7 @@ public class Shape {
 					else if(isComplete(params)) {
 						handled.add(component);
 						Constraint constraint = new Constraint(this, component, params, null);
+						
 						if(!shapesGraph.isIgnoredConstraint(constraint)) {
 							constraints.add(constraint);
 						}

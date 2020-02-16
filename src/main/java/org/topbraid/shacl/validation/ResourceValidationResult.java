@@ -41,7 +41,7 @@ public class ResourceValidationResult implements ValidationResult {
 
 	@Override
 	public Resource getPath() {
-		return JenaUtil.getResourceProperty(result, SH.resultPath);
+		return result.getPropertyResourceValue(SH.resultPath);
 	}
 	
 	@Override
@@ -55,22 +55,22 @@ public class ResourceValidationResult implements ValidationResult {
 
 	@Override
 	public Resource getSeverity() {
-		return JenaUtil.getResourceProperty(result, SH.resultSeverity);
+		return result.getPropertyResourceValue(SH.resultSeverity);
 	}
 
 	@Override
 	public Resource getSourceConstraint() {
-		return JenaUtil.getResourceProperty(result, SH.sourceConstraint);
+		return result.getPropertyResourceValue(SH.sourceConstraint);
 	}
 
 	@Override
 	public Resource getSourceConstraintComponent() {
-		return JenaUtil.getResourceProperty(result, SH.sourceConstraintComponent);
+		return result.getPropertyResourceValue(SH.sourceConstraintComponent);
 	}
 
 	@Override
 	public Resource getSourceShape() {
-		return JenaUtil.getResourceProperty(result, SH.sourceShape);
+		return result.getPropertyResourceValue(SH.sourceShape);
 	}
 
 	@Override

@@ -187,7 +187,7 @@ public class W3CTestRunner {
 		
 		
 		public Resource getStatus() {
-			return JenaUtil.getResourceProperty(entry, MF.status);
+			return entry.getPropertyResourceValue(MF.status);
 		}
 		
 		

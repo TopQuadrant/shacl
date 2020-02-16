@@ -76,10 +76,8 @@ public class SHACLCWriter extends WriterGraphRIOTBase {
 	
 	private void write(IndentedWriter out, Graph graph, PrefixMap prefixMap, String baseURI, Context context) {
 		Model model = ModelFactory.createModelForGraph(graph);
-		if ( baseURI != null ) {
-		    out.println("BASE <" + baseURI + ">");
-		    out.println();
-		}
+		out.println("BASE <" + baseURI + ">");
+		out.println();
 		writeImports(out, model.getResource(baseURI));
 		writePrefixes(out, prefixMap);
 		writeShapes(out, model);
@@ -139,7 +137,7 @@ public class SHACLCWriter extends WriterGraphRIOTBase {
 	
 	
 	private void writeShape(IndentedWriter out, Resource shape) {
-		out.print("shape " + iri(shape));
+		out.print("" + iri(shape));
 		writeShapeBody(out, shape);
 	}
 	
@@ -258,7 +256,7 @@ public class SHACLCWriter extends WriterGraphRIOTBase {
 	
 	
 	private String getPathString(Resource property) {
-		Resource path = JenaUtil.getResourceProperty(property, SH.path);
+		Resource path = property.getPropertyResourceValue(SH.path);
 		return SHACLPaths.getPathString(path);
 	}
 	
@@ -281,7 +279,7 @@ public class SHACLCWriter extends WriterGraphRIOTBase {
 				types.add("@" + iri(node));
 			}
 		}
-		Resource nodeKind = JenaUtil.getResourceProperty(property, SH.nodeKind);
+		Resource nodeKind = property.getPropertyResourceValue(SH.nodeKind);
 		if(nodeKind != null) {
 			types.add(nodeKind.getLocalName());
 		}

@@ -30,7 +30,7 @@ class ClosedConstraintExecutor extends AbstractNativeConstraintExecutor {
 			list.iterator().forEachRemaining(allowedProperties::add);
 		}
 		for(Resource ps : JenaUtil.getResourceProperties(constraint.getShapeResource(), SH.property)) {
-			Resource path = JenaUtil.getResourceProperty(ps, SH.path);
+			Resource path = ps.getPropertyResourceValue(SH.path);
 			if(path.isURIResource()) {
 				allowedProperties.add(path);
 			}

@@ -242,7 +242,7 @@ public class RuleEngine extends AbstractEngine {
 			}
 			for(Resource ps : JenaUtil.getResourceProperties(shape.getShapeResource(), SH.property)) {
 				if(!ps.hasProperty(SH.deactivated, JenaDatatypes.TRUE)) {
-					Resource path = JenaUtil.getResourceProperty(ps, SH.path);
+					Resource path = ps.getPropertyResourceValue(SH.path);
 					if(path != null && path.isURIResource()) {
 						for(Statement s : ps.listProperties(SH.values).toList()) {
 							NodeExpression expr = NodeExpressionFactory.get().create(s.getObject());

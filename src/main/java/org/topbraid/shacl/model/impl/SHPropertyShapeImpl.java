@@ -34,17 +34,17 @@ public class SHPropertyShapeImpl extends SHShapeImpl implements SHPropertyShape 
 	
 	@Override
 	public Resource getClassOrDatatype() {
-		Resource cls = JenaUtil.getResourceProperty(this, SH.class_);
+		Resource cls = getPropertyResourceValue(SH.class_);
 		if(cls != null) {
 			return cls;
 		}
 		else {
-			Resource datatype = JenaUtil.getResourceProperty(this, SH.datatype);
+			Resource datatype = getPropertyResourceValue(SH.datatype);
 			if(datatype != null) {
 				return datatype;
 			}
 			else {
-				Resource kind = JenaUtil.getResourceProperty(this, SH.nodeKind);
+				Resource kind = getPropertyResourceValue(SH.nodeKind);
 				if(SH.IRI.equals(kind) || SH.BlankNode.equals(kind)) {
 					return RDFS.Resource.inModel(getModel());
 				}
@@ -105,7 +105,7 @@ public class SHPropertyShapeImpl extends SHShapeImpl implements SHPropertyShape 
 
 	@Override
 	public Property getPredicate() {
-		Resource r = JenaUtil.getResourceProperty(this, SH.path);
+		Resource r = getPropertyResourceValue(SH.path);
 		if(r != null && r.isURIResource()) {
 			return JenaUtil.asProperty(r);
 		}

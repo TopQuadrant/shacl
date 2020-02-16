@@ -105,6 +105,13 @@ public class QueryTestCaseType extends TestCaseType {
 					String actual = createResultSetJSON(queryString, model);
 					JsonObject actualJSON = JSON.parse(actual);
 					if(!actualJSON.equals(expectedJSON)) {
+					    System.err.println("---- Test failure: "+testCase);
+					    System.err.println(queryString);
+					    System.err.println("---- Expected ----");
+					    System.err.println(expectedJSON);
+					    System.err.println("---- Actual ----");
+					    System.err.println(actual);
+					    System.err.println("----");
 						createFailure(results, "Mismatching result set. Actual: " + actual, context);
 						return;
 					}

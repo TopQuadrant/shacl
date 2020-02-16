@@ -98,11 +98,11 @@ public class PathExpression extends AbstractInputExpression {
 				return JenaUtil.getNearest(contextShape, c -> {
 					for(Resource ps : JenaUtil.getResourceProperties(c, SH.property)) {
 						if(ps.hasProperty(SH.path, path)) {
-							Resource node = JenaUtil.getResourceProperty(ps, SH.node);
+							Resource node = ps.getPropertyResourceValue(SH.node);
 							if(node != null && node.isURIResource()) {
 								return node;
 							}
-							Resource cls = JenaUtil.getResourceProperty(ps, SH.class_);
+							Resource cls = ps.getPropertyResourceValue(SH.class_);
 							if(cls != null && cls.isURIResource()) {
 								return cls;
 							}

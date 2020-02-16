@@ -9,7 +9,6 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
-import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.engine.Constraint;
 import org.topbraid.shacl.validation.ValidationEngine;
 import org.topbraid.shacl.vocabulary.SH;
@@ -25,7 +24,7 @@ class OrConstraintExecutor extends AbstractShapeListConstraintExecutor {
 		if(hasOnlyDatatypeConstraints()) {
 			datatypeURIs = new HashSet<String>();
 			for(Resource shape : shapes) {
-				Resource datatype = JenaUtil.getResourceProperty(shape, SH.datatype);
+				Resource datatype = shape.getPropertyResourceValue(SH.datatype);
 				datatypeURIs.add(datatype.getURI());
 			}
 		}

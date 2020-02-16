@@ -16,7 +16,6 @@
  */
 package org.topbraid.shacl.rules;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.jena.graph.Triple;
@@ -24,6 +23,7 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.vocabulary.RDFS;
 import org.topbraid.jenax.progress.ProgressMonitor;
 import org.topbraid.jenax.util.JenaUtil;
@@ -67,22 +67,22 @@ class TripleRule extends AbstractRule {
 				return;
 			}
 
-			Iterator<RDFNode> objects = object.eval(focusNode, ruleEngine);
+			ExtendedIterator<RDFNode> objects = object.eval(focusNode, ruleEngine);
 			if(objects.hasNext()) {
-				Iterator<RDFNode> subjects = subject.eval(focusNode, ruleEngine);
+				ExtendedIterator<RDFNode> subjects = subject.eval(focusNode, ruleEngine);
 				if(subjects.hasNext()) {
-					Iterator<RDFNode> predicates = predicate.eval(focusNode, ruleEngine);
+					ExtendedIterator<RDFNode> predicates = predicate.eval(focusNode, ruleEngine);
 					if(predicates.hasNext()) {
-						while(subjects.hasNext()) {
-							RDFNode subjectR = subjects.next();
+						List<RDFNode> ss = subjects.toList();
+						List<RDFNode> ps = predicates.toList();
+						List<RDFNode> os = objects.toList();
+						for(RDFNode subjectR : ss) {
 							if(subjectR.isResource()) {
 								Resource subject = (Resource) subjectR;
-								while(predicates.hasNext()) {
-									RDFNode predicateR = predicates.next();
+								for(RDFNode predicateR : ps) {
 									if(predicateR.isURIResource()) {
 										Property predicate = JenaUtil.asProperty((Resource)predicateR);
-										while(objects.hasNext()) {
-											RDFNode object = objects.next();
+										for(RDFNode object : os) {
 											ruleEngine.infer(Triple.create(subject.asNode(), predicate.asNode(), object.asNode()), this, shape);
 										}
 									}
