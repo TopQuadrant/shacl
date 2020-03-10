@@ -23,7 +23,7 @@ class XoneConstraintExecutor extends AbstractShapeListConstraintExecutor {
 			for(RDFNode valueNode : engine.getValueNodes(constraint, focusNode)) {
 				long count = shapes.stream().filter(shape -> {
 					Model nestedResults = hasShape(engine, constraint, focusNode, valueNode, shape, true);
-					return nestedResults != null;
+					return nestedResults == null;
 				}).count();
 				if(count != 1) {
 					engine.createValidationResult(constraint, focusNode, valueNode, () -> "Value has " + count + " shapes out of " + shapes.size() + " in the sh:xone enumeration");
