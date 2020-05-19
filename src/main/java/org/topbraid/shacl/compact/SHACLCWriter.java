@@ -199,7 +199,7 @@ public class SHACLCWriter extends WriterGraphRIOTBase {
 		
 		writeNestedShapes(out, property);
 		
-		out.println(" ;");
+		out.println(" .");
 	}
 
 
