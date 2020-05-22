@@ -118,6 +118,7 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 		setConfiguration(new ValidationEngineConfiguration());
 		if(report == null) {
 			Model reportModel = JenaUtil.createMemoryModel();
+			reportModel.setNsPrefixes(shapesGraph.getShapesModel());
 			reportModel.setNsPrefixes(dataset.getDefaultModel());
 			this.report = reportModel.createResource(SH.ValidationReport);
 		}
