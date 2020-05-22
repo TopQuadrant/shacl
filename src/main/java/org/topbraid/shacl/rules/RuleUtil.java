@@ -100,6 +100,8 @@ public class RuleUtil {
 		
 		if(inferencesModel == null) {
 			inferencesModel = JenaUtil.createDefaultModel();
+			inferencesModel.setNsPrefixes(dataModel);
+			inferencesModel.withDefaultMappings(shapesModel);
 			MultiUnion unionGraph = new MultiUnion(new Graph[] {
 				dataModel.getGraph(),
 				inferencesModel.getGraph()
