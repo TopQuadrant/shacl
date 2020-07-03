@@ -13,7 +13,7 @@ Coverage:
 * [SHACL JavaScript Extensions](https://www.w3.org/TR/shacl-js/)
 * [SHACL Compact Syntax](https://w3c.github.io/shacl/shacl-compact-syntax/)
 
-See [SHACL-JS](https://github.com/TopQuadrant/shacl-js) for a pure JavaScript implementation.
+This [Online SHACL Shape Validator](https://www.itb.ec.europa.eu/shacl/shacl/upload) uses the TopBraid SHACL API internally.
 
 The same code is used in the TopBraid products (currently aligned with the TopBraid 6.3 release).
 
