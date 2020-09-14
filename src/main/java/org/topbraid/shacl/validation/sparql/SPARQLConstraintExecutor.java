@@ -38,8 +38,13 @@ import org.topbraid.shacl.vocabulary.SH;
 
 public class SPARQLConstraintExecutor extends AbstractSPARQLExecutor {
 	
+	private boolean deactivated;
+
+	
 	public SPARQLConstraintExecutor(Constraint constraint) {
 		super(constraint);
+		
+		this.deactivated = ((Resource)constraint.getParameterValue()).hasProperty(SH.deactivated, JenaDatatypes.TRUE);
 		
 		Set<String> preBoundVars = new HashSet<>();
 		preBoundVars.add(SH.thisVar.getVarName());
@@ -55,7 +60,7 @@ public class SPARQLConstraintExecutor extends AbstractSPARQLExecutor {
 	@Override
 	public void executeConstraint(Constraint constraint, ValidationEngine engine, Collection<RDFNode> focusNodes) {
 		
-		if(((Resource)constraint.getParameterValue()).hasProperty(SH.deactivated, JenaDatatypes.TRUE)) {
+		if(deactivated) {
 			return;
 		}
 		

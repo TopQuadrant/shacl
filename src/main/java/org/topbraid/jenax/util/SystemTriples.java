@@ -103,7 +103,7 @@ public class SystemTriples {
 				}
 			}
 			
-			vocabulary.add(RDF.HTML, RDFS.label, "HTML");
+			// vocabulary.add(RDF.HTML, RDFS.label, "HTML");
 			
 			// Triples were formally in OWL 1, but dropped from OWL 2
 			vocabulary.add(RDFS.comment, RDF.type, OWL.AnnotationProperty);

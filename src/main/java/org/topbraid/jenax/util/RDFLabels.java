@@ -172,4 +172,42 @@ public class RDFLabels {
 			}
 		}
 	}
+
+
+	/**
+	 * Takes a string that is (likely) in camelCase and attempts to produce an un-camel-cased version of that.
+	 * Useful to generate labels from local names.
+	 * @param camelCase  the input String
+	 * @return the generated String
+	 */
+	public static String unCamelCase(String camelCase) {
+		StringBuffer result = new StringBuffer();
+		for (int i = 0; i < camelCase.length(); i++) {
+			char c = camelCase.charAt(i);
+			if(c == '_') {
+				result.append(' ');
+			}
+			else if (Character.isUpperCase(c)) {
+				if (i > 0 && Character.isLowerCase(camelCase.charAt(i - 1))) {
+					result.append(" ");
+					char newChar;
+					if (i < camelCase.length() - 1
+							&& Character.isUpperCase(camelCase.charAt(i + 1))) {
+						newChar = c;
+					}
+					else {
+						newChar = Character.toLowerCase(c);
+					}
+					result.append(newChar);
+				}
+				else {
+					result.append(c);
+				}
+			}
+			else {
+				result.append(c);
+			}
+		}
+		return result.toString();
+	}
 }

@@ -54,7 +54,7 @@ public abstract class AbstractNativeConstraintExecutor implements ConstraintExec
 				String message = constraint + " has produced a failure for focus node " + engine.getLabelFunction().apply(focusNode);
 				FailureLog.get().logFailure(message);
 				Resource result = nestedResults.createResource(DASH.FailureResult);
-				result.addProperty(SH.resultSeverity, constraint.getShape().getSeverity());
+				result.addProperty(SH.resultSeverity, constraint.getSeverity());
 				result.addProperty(SH.sourceConstraintComponent, constraint.getComponent());
 				result.addProperty(SH.sourceShape, constraint.getShapeResource());
 				result.addProperty(SH.focusNode, focusNode);

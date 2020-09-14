@@ -33,6 +33,7 @@ import org.topbraid.jenax.util.JenaDatatypes;
 import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.arq.SHACLPaths;
 import org.topbraid.shacl.engine.ShapesGraph;
+import org.topbraid.shacl.engine.ShapesGraphFactory;
 import org.topbraid.shacl.util.ModelPrinter;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.validation.ValidationEngine;
@@ -98,7 +99,7 @@ public class GraphValidationTestCaseType extends TestCaseType {
 			Dataset dataset = ARQFactory.get().getDataset(dataModel);
 			URI shapesGraphURI = SHACLUtil.withShapesGraph(dataset);
 
-			ShapesGraph shapesGraph = new ShapesGraph(dataset.getNamedModel(shapesGraphURI.toString()));
+			ShapesGraph shapesGraph = ShapesGraphFactory.get().createShapesGraph(dataset.getNamedModel(shapesGraphURI.toString()));
 
 			ValidationEngineConfiguration configuration = new ValidationEngineConfiguration();
 			if(!getResource().hasProperty(DASH.validateShapes, JenaDatatypes.TRUE)) {

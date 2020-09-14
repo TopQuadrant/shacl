@@ -37,6 +37,7 @@ import org.apache.jena.sparql.util.IterLib;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.topbraid.jenax.util.ARQFactory;
 import org.topbraid.shacl.engine.ShapesGraph;
+import org.topbraid.shacl.engine.ShapesGraphFactory;
 import org.topbraid.shacl.expr.NodeExpressionContext;
 import org.topbraid.shacl.expr.PathEvaluator;
 
@@ -75,7 +76,7 @@ public class ValuesPFunction extends PropertyFunctionBase {
 		Dataset dataset = ARQFactory.get().getDataset(model);
 		URI shapesGraphURI = URI.create("urn:x-topbraid:dummyShapesGraph");
 		dataset.addNamedModel(shapesGraphURI.toString(), model);
-		ShapesGraph shapesGraph = new ShapesGraph(model);
+		ShapesGraph shapesGraph = ShapesGraphFactory.get().createShapesGraph(model);
 		
 		PathEvaluator eval = new PathEvaluator(model.getProperty(predicateNode.getURI()));
 		

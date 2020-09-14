@@ -64,7 +64,7 @@ public class DiffGraph extends TransparentWrappedGraph {
 	
 	@Override
 	public boolean contains(Node s, Node p, Node o) {
-		return contains(Triple.create(s, p, o));
+		return contains(Triple.create(s == null ? Node.ANY : s, p == null ? Node.ANY : p, o == null ? Node.ANY : o));
 	}
 	
 	

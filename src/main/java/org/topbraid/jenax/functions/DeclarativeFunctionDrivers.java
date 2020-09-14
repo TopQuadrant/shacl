@@ -55,7 +55,7 @@ public class DeclarativeFunctionDrivers implements DeclarativeFunctionDriver {
 	}
 	
 	
-	private Map<Property,DeclarativeFunctionDriver> drivers = new HashMap<Property,DeclarativeFunctionDriver>();
+	private Map<Property,DeclarativeFunctionDriver> drivers = new HashMap<>();
 	
 	DeclarativeFunctionDrivers() {
 		register(SH.ask, new SHACLFunctionDriver());

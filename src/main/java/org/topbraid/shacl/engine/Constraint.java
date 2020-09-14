@@ -16,6 +16,7 @@
  */
 package org.topbraid.shacl.engine;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.jena.query.QuerySolutionMap;
@@ -49,6 +50,7 @@ public class Constraint {
 	private Shape shape;
 	
 	
+	// Should only be instantiated from ShapesGraph.createConstraint
 	public Constraint(Shape shape, SHConstraintComponent component, List<SHParameter> params, RDFNode parameterValue) {
 		this.component = component;
 		this.params = params;
@@ -99,10 +101,25 @@ public class Constraint {
 		}
 		return executor;
 	}
+
 	
+	public Collection<RDFNode> getMessages() {
+		return shape.getMessages();
+	}
+	
+	
+	public List<SHParameter> getParameters() {
+		return params;
+	}
+
 	
 	public RDFNode getParameterValue() {
 		return parameterValue;
+	}
+	
+	
+	public Resource getSeverity() {
+		return shape.getSeverity();
 	}
 	
 	

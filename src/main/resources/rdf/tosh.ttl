@@ -21,6 +21,10 @@ dash:CoExistsWithConstraintComponent-coExistsWith
   sh:group tosh:PropertyPairConstraintPropertyGroup ;
   sh:order "10"^^xsd:decimal ;
 .
+dash:DetailsEditor
+  dash:hidden true ;
+  owl:versionInfo "This is not yet supported by TopBraid." ;
+.
 dash:HasValueWithClassConstraintComponent-hasValueWithClass
   sh:group tosh:OtherConstraintPropertyGroup ;
 .
@@ -31,7 +35,6 @@ dash:NonRecursiveConstraintComponent-nonRecursive
   sh:group tosh:RelationshipPropertyGroup ;
 .
 dash:PrimaryKeyConstraintComponent-uriStart
-  tosh:editWidget swa:PlainTextFieldEditor ;
   sh:group tosh:PrimaryKeyPropertyGroup ;
 .
 dash:RootClassConstraintComponent
@@ -100,19 +103,19 @@ tosh:
 tosh:AboutPropertyGroup
   a sh:PropertyGroup ;
   rdfs:label "This Shape" ;
-  sh:order 0 ;
+  sh:order 0.0 ;
 .
 tosh:CardinalityConstraintPropertyGroup
   a sh:PropertyGroup ;
   rdfs:label "Number of Values" ;
-  sh:order 2 ;
+  sh:order 2.0 ;
 .
 tosh:ComplexConstraintPropertyGroup
   a sh:PropertyGroup ;
   tosh:editGroupDescription "Most edit fields in this section currently require Turtle source code, esp to enter blank node expressions. To reference existing shapes via their URI, enter them as <URI>." ;
   tosh:openable true ;
   rdfs:label "Complex Constraint Expressions" ;
-  sh:order 9 ;
+  sh:order 9.0 ;
 .
 tosh:ConstraintMetadataPropertyGroup
   a sh:PropertyGroup ;
@@ -123,7 +126,7 @@ tosh:DeleteTripleSuggestionGenerator
   rdfs:comment "Produces a suggestion that would delete the offending value in the validation result from the focus node." ;
   rdfs:label "Delete triple suggestion generator" ;
   sh:message "Delete the invalid statement" ;
-  sh:order 100 ;
+  sh:order 100.0 ;
   sh:update """DELETE {
 	$focusNode $predicate $value .
 }
@@ -131,17 +134,48 @@ WHERE {
 	$focusNode $predicate $value .
 }""" ;
 .
+tosh:DependentEnumSelectEditor
+  a dash:SingleEditor ;
+  rdfs:comment """A drop-down editor for enumerated values that are dynamically determined via a node shape that has sh:target dash:HasValueTarget.
+
+Example:
+
+states:USAddressShape
+  rdf:type sh:NodeShape ;
+  rdfs:label \"US Address shape\" ;
+  sh:property [
+      rdf:type sh:PropertyShape ;
+      sh:path states:state ;
+      sh:in (
+          \"AZ\"
+          \"CA\"
+          \"FL\"
+        ) ;
+    ] ;
+  sh:target [
+      rdf:type dash:HasValueTarget ;
+      dash:object \"USA\" ;
+      dash:predicate states:country ;
+    ] .
+""" ;
+  rdfs:label "Dependent enum select editor" ;
+.
 tosh:DisplayPropertyGroup
   a sh:PropertyGroup ;
   rdfs:comment "A group for properties that are primarily for display purposes (names, ordering etc)." ;
   rdfs:label "Display Settings" ;
-  sh:order 1 ;
+  sh:order 1.0 ;
 .
 tosh:InferencesPropertyGroup
   a sh:PropertyGroup ;
   tosh:openable true ;
   rdfs:label "Inferences" ;
   sh:order "11"^^xsd:decimal ;
+.
+tosh:InstancesInGraphSelectEditor
+  a dash:SingleEditor ;
+  rdfs:comment "A drop-down editor for all instances of a class (based on tosh:shapeInGraph/sh:class of the property) in a graph specified using tosh:graph." ;
+  rdfs:label "Instances in graph select editor" ;
 .
 tosh:MemberShapeConstraintComponent
   a sh:ConstraintComponent ;
@@ -176,7 +210,7 @@ tosh:OtherConstraintPropertyGroup
   a sh:PropertyGroup ;
   tosh:openable true ;
   rdfs:label "Other Constraints" ;
-  sh:order 10 ;
+  sh:order 10.0 ;
 .
 tosh:PrimaryKeyPropertyGroup
   a sh:PropertyGroup ;
@@ -188,6 +222,7 @@ tosh:PropertyGroupShape
   a sh:NodeShape ;
   rdfs:label "Property group shape" ;
   sh:property [
+      a sh:PropertyShape ;
       sh:path sh:order ;
       sh:maxCount 1 ;
     ] ;
@@ -197,7 +232,7 @@ tosh:PropertyPairConstraintPropertyGroup
   a sh:PropertyGroup ;
   tosh:openable true ;
   rdfs:label "Relationship to Other Properties" ;
-  sh:order 6 ;
+  sh:order 6.0 ;
 .
 tosh:PropertyShapeShape
   a sh:NodeShape ;
@@ -212,8 +247,83 @@ tosh:PropertyShapeShape
     ] ;
   sh:property [
       a sh:PropertyShape ;
+      sh:path sh:defaultValue ;
+      tosh:useDeclaredDatatype true ;
+      tosh:viewWidget <http://topbraid.org/tosh.ui#DefaultValueViewer> ;
+      sh:description "The default value to be used for this property if no other value has been asserted. This may be a constant value or a SHACL node expression, in which case the values can be derived from other values. Default values are typically inferred and not stored as RDF statements." ;
+      sh:group tosh:ValueTypeConstraintPropertyGroup ;
+    ] ;
+  sh:property [
+      a sh:PropertyShape ;
+      sh:path sh:description ;
+      sh:description "A human-readable description of the role of the property in the constraint." ;
+      sh:group tosh:DisplayPropertyGroup ;
+      sh:name "description" ;
+      sh:order 2.0 ;
+    ] ;
+  sh:property [
+      a sh:PropertyShape ;
+      sh:path sh:disjoint ;
+      sh:group tosh:PropertyPairConstraintPropertyGroup ;
+      sh:order 1.0 ;
+    ] ;
+  sh:property [
+      a sh:PropertyShape ;
+      sh:path sh:equals ;
+      sh:group tosh:PropertyPairConstraintPropertyGroup ;
+      sh:order 0.0 ;
+    ] ;
+  sh:property [
+      a sh:PropertyShape ;
+      sh:path sh:group ;
+      sh:description "The sh:PropertyGroup that the property belongs to." ;
+      sh:group tosh:DisplayPropertyGroup ;
+      sh:maxCount 1 ;
+      sh:name "group" ;
+      sh:order 10.0 ;
+    ] ;
+  sh:property [
+      a sh:PropertyShape ;
+      sh:path sh:lessThan ;
+      sh:group tosh:PropertyPairConstraintPropertyGroup ;
+      sh:order 2.0 ;
+    ] ;
+  sh:property [
+      a sh:PropertyShape ;
+      sh:path sh:lessThanOrEquals ;
+      sh:group tosh:PropertyPairConstraintPropertyGroup ;
+      sh:order 3.0 ;
+    ] ;
+  sh:property [
+      a sh:PropertyShape ;
+      sh:path sh:name ;
+      sh:description "The display name of the property." ;
+      sh:group tosh:DisplayPropertyGroup ;
+      sh:name "name" ;
+      sh:order 1.0 ;
+    ] ;
+  sh:property [
+      a sh:PropertyShape ;
+      sh:path sh:order ;
+      sh:description "The relative position of the property among its peers, e.g. a property with order 5 shows up before one with order 6." ;
+      sh:group tosh:DisplayPropertyGroup ;
+      sh:maxCount 1 ;
+      sh:name "order" ;
+      sh:order 11.0 ;
+    ] ;
+  sh:property [
+      a sh:PropertyShape ;
+      sh:path sh:path ;
+      tosh:viewWidget <http://topbraid.org/tosh.ui#PathViewer> ;
+      sh:group tosh:AboutPropertyGroup ;
+      sh:maxCount 1 ;
+      sh:minCount 1 ;
+      sh:name "on property" ;
+      sh:order 0.0 ;
+    ] ;
+  sh:property [
+      a sh:PropertyShape ;
       sh:path sh:values ;
-      tosh:editWidget swa:SourceCodeEditor ;
       tosh:viewWidget <http://topbraid.org/tosh.ui#ValuesExpressionDiagramViewer> ;
       sh:group tosh:InferencesPropertyGroup ;
       sh:name "values" ;
@@ -230,109 +340,6 @@ WHERE {
 	}
 }""" ;
         ] ;
-    ] ;
-  sh:property [
-      sh:path tosh:editWidget ;
-      tosh:editWidget swa:WidgetDropDownEditor ;
-      tosh:viewWidget swa:ResourceInUIGraphViewer ;
-      sh:description "The swa:ObjectEditorClass that shall be used to edit values of this predicate." ;
-      sh:group tosh:DisplayPropertyGroup ;
-      sh:maxCount 1 ;
-      sh:name "edit widget" ;
-      sh:nodeKind sh:IRI ;
-      sh:order 21 ;
-    ] ;
-  sh:property [
-      sh:path tosh:searchWidget ;
-      tosh:editWidget swa:WidgetDropDownEditor ;
-      tosh:viewWidget swa:ResourceInUIGraphViewer ;
-      sh:description "The swa:ObjectFacetClass that shall be used to search for values of this predicate." ;
-      sh:group tosh:DisplayPropertyGroup ;
-      sh:maxCount 1 ;
-      sh:name "search widget" ;
-      sh:nodeKind sh:IRI ;
-      sh:order 22 ;
-    ] ;
-  sh:property [
-      sh:path tosh:viewWidget ;
-      tosh:editWidget swa:WidgetDropDownEditor ;
-      tosh:viewWidget swa:ResourceInUIGraphViewer ;
-      sh:description "The swa:ObjectViewerClass that shall be used to view values of this predicate." ;
-      sh:group tosh:DisplayPropertyGroup ;
-      sh:maxCount 1 ;
-      sh:name "view widget" ;
-      sh:nodeKind sh:IRI ;
-      sh:order 20 ;
-    ] ;
-  sh:property [
-      sh:path sh:defaultValue ;
-      tosh:editWidget <http://topbraid.org/tosh.ui#UseDeclaredDatatypeEditor> ;
-      tosh:useDeclaredDatatype true ;
-      tosh:viewWidget <http://topbraid.org/tosh.ui#DefaultValueViewer> ;
-      sh:description "The default value to be used for this property if no other value has been asserted. This may be a constant value or a SHACL node expression, in which case the values can be derived from other values. Default values are typically inferred and not stored as RDF statements." ;
-      sh:group tosh:ValueTypeConstraintPropertyGroup ;
-    ] ;
-  sh:property [
-      sh:path sh:description ;
-      tosh:editWidget swa:TextAreaEditor ;
-      sh:description "A human-readable description of the role of the property in the constraint." ;
-      sh:group tosh:DisplayPropertyGroup ;
-      sh:name "description" ;
-      sh:order 2 ;
-    ] ;
-  sh:property [
-      sh:path sh:disjoint ;
-      sh:group tosh:PropertyPairConstraintPropertyGroup ;
-      sh:order 1 ;
-    ] ;
-  sh:property [
-      sh:path sh:equals ;
-      sh:group tosh:PropertyPairConstraintPropertyGroup ;
-      sh:order 0 ;
-    ] ;
-  sh:property [
-      sh:path sh:group ;
-      sh:description "The sh:PropertyGroup that the property belongs to." ;
-      sh:group tosh:DisplayPropertyGroup ;
-      sh:maxCount 1 ;
-      sh:name "group" ;
-      sh:order 10 ;
-    ] ;
-  sh:property [
-      sh:path sh:lessThan ;
-      sh:group tosh:PropertyPairConstraintPropertyGroup ;
-      sh:order 2 ;
-    ] ;
-  sh:property [
-      sh:path sh:lessThanOrEquals ;
-      sh:group tosh:PropertyPairConstraintPropertyGroup ;
-      sh:order 3 ;
-    ] ;
-  sh:property [
-      sh:path sh:name ;
-      tosh:editWidget swa:TextFieldEditorWithLang ;
-      sh:description "The display name of the property." ;
-      sh:group tosh:DisplayPropertyGroup ;
-      sh:name "name" ;
-      sh:order 1 ;
-    ] ;
-  sh:property [
-      sh:path sh:order ;
-      sh:description "The relative position of the property among its peers, e.g. a property with order 5 shows up before one with order 6." ;
-      sh:group tosh:DisplayPropertyGroup ;
-      sh:maxCount 1 ;
-      sh:name "order" ;
-      sh:order 11 ;
-    ] ;
-  sh:property [
-      sh:path sh:path ;
-      tosh:editWidget <http://topbraid.org/tosh.ui#PathEditor> ;
-      tosh:viewWidget <http://topbraid.org/tosh.ui#PathViewer> ;
-      sh:group tosh:AboutPropertyGroup ;
-      sh:maxCount 1 ;
-      sh:minCount 1 ;
-      sh:name "on property" ;
-      sh:order 0 ;
     ] ;
   sh:sparql [
       sh:message "Property shapes cannot have both class and datatype constraints." ;
@@ -351,7 +358,7 @@ tosh:RelationshipPropertyGroup
   a sh:PropertyGroup ;
   tosh:openable true ;
   rdfs:label "Relationship" ;
-  sh:order 8 ;
+  sh:order 8.0 ;
 .
 tosh:RemoteValuesPropertyGroup
   a sh:PropertyGroup ;
@@ -407,7 +414,20 @@ WHERE {
 tosh:ShapeInGraphConstraintComponent
   a sh:ConstraintComponent ;
   dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
-  rdfs:comment "A constraint component that can be used to verify that the value nodes have a given shape, where the shape validation is executed in a given graph. This can, for example, be used to verify that a given value is declared as an instance of a given class in some specified (not imported) graph." ;
+  rdfs:comment """A constraint component that can be used to verify that the value nodes have a given shape, where the shape validation is executed in a given graph. This can, for example, be used to verify that a given value is declared as an instance of a given class in some specified (not imported) graph.
+
+A typical design pattern is as follows:
+
+ex:NodeShape sh:property [
+	sh:path ex:myProperty ;
+	sh:nodeKind sh:IRI ;
+	tosh:graph <http://example.org/externalGraph> ;
+	tosh:shapeInGraph [
+		sh:class ex:ExternalClass ;
+	] ;
+	tosh:editor tosh:InstancesInGraphSelectEditor ;
+	tosh:viewer tosh:URIInGraphViewer ;
+] .""" ;
   rdfs:label "Shape in graph constraint component" ;
   sh:labelTemplate "Values must have shape {$shapeInGraph} defined in graph {$graph}" ;
   sh:message "Value does not have shape {$shapeInGraph} defined in graph {$graph}" ;
@@ -463,7 +483,6 @@ tosh:ShapeShape-deactivated
 tosh:ShapeShape-severity
   a sh:PropertyShape ;
   sh:path sh:severity ;
-  tosh:editWidget swa:InstancesSelectEditor ;
   sh:class sh:Severity ;
   sh:description "The severity to be used for validation results produced by the associated constraint." ;
   sh:group tosh:AboutPropertyGroup ;
@@ -475,7 +494,7 @@ tosh:StringBasedConstraintPropertyGroup
   a sh:PropertyGroup ;
   tosh:openable true ;
   rdfs:label "Constraints for Strings and Text" ;
-  sh:order 7 ;
+  sh:order 7.0 ;
 .
 tosh:SystemNamespaceShape
   a sh:NodeShape ;
@@ -505,6 +524,11 @@ tosh:TopBraidPlatform
   a dash:ExecutionPlatform ;
   rdfs:comment "The platform consisting of TopBraid." ;
   rdfs:label "TopBraid platform" ;
+.
+tosh:URIInGraphViewer
+  a dash:SingleViewer ;
+  rdfs:comment "A viewer for URI resources that have their data in a given graph that may be outside of the imports closure. The graph must be specified using a tosh:graph constraint for the property." ;
+  rdfs:label "URI in graph viewer" ;
 .
 tosh:UseDeclaredDatatypeConstraintComponent
   a sh:ConstraintComponent ;
@@ -552,19 +576,19 @@ tosh:ValueRangeConstraintPropertyGroup
   a sh:PropertyGroup ;
   tosh:openable true ;
   rdfs:label "Min/Max Values" ;
-  sh:order 5 ;
+  sh:order 5.0 ;
 .
 tosh:ValueTypeConstraintPropertyGroup
   a sh:PropertyGroup ;
   tosh:editGroupDescription "Hint: Use \"or\" under Complex Constraints to represent choices between multiple value types." ;
   rdfs:comment "A property group for constraint parameters that restrict the value types of values." ;
   rdfs:label "Type of Values" ;
-  sh:order 3 ;
+  sh:order 3.0 ;
 .
 tosh:closed
   a rdf:Property ;
   a owl:DeprecatedProperty ;
-  rdfs:comment "If set to true, then the corresponding form section will be closed by default." ;
+  rdfs:comment "If set to true, then the corresponding form section could be closed by default. NOTE: the current implementation of TopBraid EDG's \"New editor\" does not use this flag." ;
   rdfs:domain sh:PropertyGroup ;
   rdfs:label "closed" ;
   rdfs:range xsd:boolean ;
@@ -577,25 +601,25 @@ tosh:countShapesWithMatchResult
       sh:path sh:expectedValue ;
       sh:datatype xsd:boolean ;
       sh:description "The expected value of tosh:hasShape to count." ;
-      sh:order 3 ;
+      sh:order 3.0 ;
     ] ;
   sh:parameter [
       sh:path sh:focusNode ;
       sh:class rdfs:Resource ;
       sh:description "The focus node." ;
-      sh:order 0 ;
+      sh:order 0.0 ;
     ] ;
   sh:parameter [
       sh:path sh:shapes ;
       sh:class rdf:List ;
       sh:description "The list of shapes to walk through." ;
-      sh:order 1 ;
+      sh:order 1.0 ;
     ] ;
   sh:parameter [
       sh:path sh:shapesGraph ;
       sh:class rdfs:Resource ;
       sh:description "The shapes graph." ;
-      sh:order 2 ;
+      sh:order 2.0 ;
     ] ;
   sh:prefixes <http://topbraid.org/tosh> ;
   sh:returnType xsd:integer ;
@@ -618,11 +642,6 @@ tosh:editGroupDescription
   rdfs:domain sh:PropertyGroup ;
   rdfs:label "edit group description" ;
   rdfs:range xsd:string ;
-.
-tosh:editWidget
-  a rdf:Property ;
-  rdfs:label "edit widget" ;
-  rdfs:range swa:ObjectEditorClass ;
 .
 tosh:graph
   a rdf:Property ;
@@ -661,6 +680,23 @@ tosh:hasShape
     ] ;
   sh:returnType xsd:boolean ;
 .
+tosh:isHiddenClass
+  a sh:SPARQLFunction ;
+  rdfs:comment "Checks if a given resource is supposed to be hidden in typical class displays. This applies to owl:Nothing, owl:NamedIndividual and owl:Restriction and any class that has dash:hidden true." ;
+  rdfs:label "is hidden class" ;
+  sh:ask """ASK {
+	?resource dash:hidden true .
+}""" ;
+  sh:parameter [
+      a sh:Parameter ;
+      sh:path tosh:resource ;
+      sh:description "The node to check." ;
+      sh:name "resource" ;
+      sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+  sh:prefixes <http://topbraid.org/tosh> ;
+  sh:returnType xsd:boolean ;
+.
 tosh:isInTargetOf
   a sh:Function ;
   rdfs:comment "Checks whether a given node is in the target of a given shape." ;
@@ -675,6 +711,47 @@ tosh:isInTargetOf
       sh:class sh:Shape ;
       sh:description "The shape that the node is supposed to be in the target of." ;
       sh:name "shape" ;
+    ] ;
+  sh:returnType xsd:boolean ;
+.
+tosh:isReificationURI
+  a sh:Function ;
+  rdfs:comment "Checks whether a given URI represents a reified triple." ;
+  rdfs:label "is reification URI" ;
+  sh:parameter [
+      a sh:Parameter ;
+      sh:path tosh:uri ;
+      sh:description "The URI to check." ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+  sh:returnType xsd:boolean ;
+.
+tosh:isReified
+  a sh:Function ;
+  rdfs:comment "Checks whether there are any reified values for a given triple." ;
+  rdfs:label "is reified" ;
+  sh:parameter [
+      a sh:Parameter ;
+      sh:path tosh:object ;
+      sh:description "The object of the triple to reify." ;
+      sh:name "object" ;
+      sh:order 2.0 ;
+    ] ;
+  sh:parameter [
+      a sh:Parameter ;
+      sh:path tosh:predicate ;
+      sh:description "The predicate of the triple to reify." ;
+      sh:name "predicate" ;
+      sh:nodeKind sh:IRI ;
+      sh:order 1.0 ;
+    ] ;
+  sh:parameter [
+      a sh:Parameter ;
+      sh:path tosh:subject ;
+      sh:description "The subject of the triple to reify." ;
+      sh:name "subject" ;
+      sh:nodeKind sh:BlankNodeOrIRI ;
+      sh:order 0.0 ;
     ] ;
   sh:returnType xsd:boolean ;
 .
@@ -716,10 +793,69 @@ If set to true, then the corresponding form section shall be openable/closable (
   rdfs:label "openable" ;
   rdfs:range xsd:boolean ;
 .
-tosh:searchWidget
-  a rdf:Property ;
-  rdfs:label "search widget" ;
-  rdfs:range swa:ObjectFacetClass ;
+tosh:reificationURI
+  a sh:Function ;
+  rdfs:comment "Constructs a URI that is used to represent a reified triple. This is the inverse operation of tosh:reificationURIOf." ;
+  rdfs:label "reification URI" ;
+  sh:parameter [
+      a sh:Parameter ;
+      sh:path tosh:object ;
+      sh:description "The object of the triple to reify." ;
+      sh:name "object" ;
+      sh:order 2.0 ;
+    ] ;
+  sh:parameter [
+      a sh:Parameter ;
+      sh:path tosh:predicate ;
+      sh:description "The predicate of the triple to reify." ;
+      sh:name "predicate" ;
+      sh:nodeKind sh:IRI ;
+      sh:order 1.0 ;
+    ] ;
+  sh:parameter [
+      a sh:Parameter ;
+      sh:path tosh:subject ;
+      sh:description "The subject of the triple to reify." ;
+      sh:name "subject" ;
+      sh:nodeKind sh:BlankNodeOrIRI ;
+      sh:order 0.0 ;
+    ] ;
+  sh:returnType rdfs:Resource ;
+.
+tosh:reifiedValue
+  a sh:Function ;
+  rdfs:comment "Provides direct access to a value of a reified triple, e.g. the timestamp." ;
+  rdfs:label "reified value" ;
+  sh:parameter [
+      a sh:Parameter ;
+      sh:path tosh:object ;
+      sh:description "The object of the triple to reify." ;
+      sh:name "object" ;
+      sh:order 2.0 ;
+    ] ;
+  sh:parameter [
+      a sh:Parameter ;
+      sh:path tosh:predicate ;
+      sh:description "The predicate of the triple to reify." ;
+      sh:name "predicate" ;
+      sh:nodeKind sh:IRI ;
+      sh:order 1.0 ;
+    ] ;
+  sh:parameter [
+      a sh:Parameter ;
+      sh:path tosh:property ;
+      sh:description "The property to get the value of, at the reified triple." ;
+      sh:name "property" ;
+      sh:order 3.0 ;
+    ] ;
+  sh:parameter [
+      a sh:Parameter ;
+      sh:path tosh:subject ;
+      sh:description "The subject of the triple to reify." ;
+      sh:name "subject" ;
+      sh:nodeKind sh:BlankNodeOrIRI ;
+      sh:order 0.0 ;
+    ] ;
 .
 tosh:shaclExists
   a sh:Function ;
@@ -842,6 +978,15 @@ xsd:
 owl:
   tosh:systemNamespace true ;
 .
+owl:NamedIndividual
+  dash:hidden true ;
+.
+owl:Nothing
+  dash:hidden true ;
+.
+owl:Restriction
+  dash:hidden true ;
+.
 sh:
   tosh:systemNamespace true ;
 .
@@ -873,10 +1018,9 @@ sh:AndConstraintComponent
     ] ;
 .
 sh:AndConstraintComponent-and
-  tosh:editWidget swa:SourceCodeEditor ;
   tosh:viewWidget swa:SourceCodeViewer ;
   sh:group tosh:ComplexConstraintPropertyGroup ;
-  sh:order 11 ;
+  sh:order 11.0 ;
 .
 sh:ClassConstraintComponent
   dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
@@ -909,7 +1053,7 @@ WHERE {
 .
 sh:ClassConstraintComponent-class
   sh:group tosh:ValueTypeConstraintPropertyGroup ;
-  sh:order 2 ;
+  sh:order 2.0 ;
 .
 sh:ClosedConstraintComponent-closed
   sh:group tosh:OtherConstraintPropertyGroup ;
@@ -960,11 +1104,10 @@ WHERE {
   sh:validator tosh:hasDatatype ;
 .
 sh:DatatypeConstraintComponent-datatype
-  tosh:editWidget <http://topbraid.org/tosh.ui#DatatypeEditor> ;
   sh:class rdfs:Datatype ;
   sh:group tosh:ValueTypeConstraintPropertyGroup ;
   sh:maxCount 1 ;
-  sh:order 1 ;
+  sh:order 1.0 ;
 .
 sh:DisjointConstraintComponent-disjoint
   sh:deactivated true ;
@@ -983,8 +1126,8 @@ WHERE {
 }""" ;
     ] ;
   sh:property [
+      a sh:PropertyShape ;
       sh:path sh:hasValue ;
-      tosh:editWidget <http://topbraid.org/tosh.ui#UseDeclaredDatatypeEditor> ;
       tosh:useDeclaredDatatype true ;
     ] ;
 .
@@ -997,7 +1140,7 @@ sh:InConstraintComponent
   dash:propertySuggestionGenerator [
       a dash:SPARQLUpdateSuggestionGenerator ;
       sh:message "Replace invalid value with {$newObject}" ;
-      sh:order 2 ;
+      sh:order 2.0 ;
       sh:prefixes <http://topbraid.org/tosh> ;
       sh:select """SELECT ?newObject
 WHERE {
@@ -1027,6 +1170,7 @@ sh:LanguageInConstraintComponent-languageIn
   sh:group tosh:StringBasedConstraintPropertyGroup ;
   sh:order "9"^^xsd:decimal ;
   sh:property [
+      a sh:PropertyShape ;
       sh:path (
           [
             sh:zeroOrMorePath rdf:rest ;
@@ -1045,13 +1189,12 @@ sh:LessThanOrEqualsConstraintComponent-lessThanOrEquals
 .
 sh:MaxCountConstraintComponent-maxCount
   sh:group tosh:CardinalityConstraintPropertyGroup ;
-  sh:order 1 ;
+  sh:order 1.0 ;
 .
 sh:MaxExclusiveConstraintComponent-maxExclusive
-  tosh:editWidget <http://topbraid.org/tosh.ui#UseDeclaredDatatypeEditor> ;
   tosh:useDeclaredDatatype true ;
   sh:group tosh:ValueRangeConstraintPropertyGroup ;
-  sh:order 3 ;
+  sh:order 3.0 ;
 .
 sh:MaxInclusiveConstraintComponent
   dash:propertySuggestionGenerator [
@@ -1068,10 +1211,9 @@ WHERE {
     ] ;
 .
 sh:MaxInclusiveConstraintComponent-maxInclusive
-  tosh:editWidget <http://topbraid.org/tosh.ui#UseDeclaredDatatypeEditor> ;
   tosh:useDeclaredDatatype true ;
   sh:group tosh:ValueRangeConstraintPropertyGroup ;
-  sh:order 2 ;
+  sh:order 2.0 ;
 .
 sh:MaxLengthConstraintComponent
   dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
@@ -1079,7 +1221,7 @@ sh:MaxLengthConstraintComponent
   dash:propertySuggestionGenerator [
       a dash:SPARQLUpdateSuggestionGenerator ;
       sh:message "Prune string to only {$maxLength} characters" ;
-      sh:order 1 ;
+      sh:order 1.0 ;
       sh:prefixes <http://topbraid.org/tosh> ;
       sh:update """DELETE {
     $focusNode $predicate $value .
@@ -1095,17 +1237,16 @@ WHERE {
 .
 sh:MaxLengthConstraintComponent-maxLength
   sh:group tosh:StringBasedConstraintPropertyGroup ;
-  sh:order 4 ;
+  sh:order 4.0 ;
 .
 sh:MinCountConstraintComponent-minCount
   sh:group tosh:CardinalityConstraintPropertyGroup ;
-  sh:order 0 ;
+  sh:order 0.0 ;
 .
 sh:MinExclusiveConstraintComponent-minExclusive
-  tosh:editWidget <http://topbraid.org/tosh.ui#UseDeclaredDatatypeEditor> ;
   tosh:useDeclaredDatatype true ;
   sh:group tosh:ValueRangeConstraintPropertyGroup ;
-  sh:order 0 ;
+  sh:order 0.0 ;
 .
 sh:MinInclusiveConstraintComponent
   dash:propertySuggestionGenerator [
@@ -1122,14 +1263,13 @@ WHERE {
     ] ;
 .
 sh:MinInclusiveConstraintComponent-minInclusive
-  tosh:editWidget <http://topbraid.org/tosh.ui#UseDeclaredDatatypeEditor> ;
   tosh:useDeclaredDatatype true ;
   sh:group tosh:ValueRangeConstraintPropertyGroup ;
-  sh:order 1 ;
+  sh:order 1.0 ;
 .
 sh:MinLengthConstraintComponent-minLength
   sh:group tosh:StringBasedConstraintPropertyGroup ;
-  sh:order 3 ;
+  sh:order 3.0 ;
 .
 sh:NodeConstraintComponent
   sh:nodeValidator [
@@ -1159,16 +1299,14 @@ sh:NodeConstraintComponent
     ] ;
 .
 sh:NodeConstraintComponent-node
-  tosh:editWidget swa:SourceCodeEditor ;
   tosh:viewWidget swa:SourceCodeViewer ;
   sh:group tosh:ComplexConstraintPropertyGroup ;
-  sh:order 0 ;
+  sh:order 0.0 ;
 .
 sh:NodeKindConstraintComponent-nodeKind
-  tosh:editWidget <http://topbraid.org/tosh.ui#NodeKindEditor> ;
   sh:group tosh:ValueTypeConstraintPropertyGroup ;
   sh:name "value kinds" ;
-  sh:order 0 ;
+  sh:order 0.0 ;
 .
 sh:NotConstraintComponent
   sh:nodeValidator [
@@ -1198,10 +1336,9 @@ sh:NotConstraintComponent
     ] ;
 .
 sh:NotConstraintComponent-not
-  tosh:editWidget swa:SourceCodeEditor ;
   tosh:viewWidget swa:SourceCodeViewer ;
   sh:group tosh:ComplexConstraintPropertyGroup ;
-  sh:order 10 ;
+  sh:order 10.0 ;
 .
 sh:OrConstraintComponent
   sh:nodeValidator [
@@ -1233,23 +1370,20 @@ sh:OrConstraintComponent
     ] ;
 .
 sh:OrConstraintComponent-or
-  tosh:editWidget swa:SourceCodeEditor ;
   tosh:viewWidget swa:SourceCodeViewer ;
   sh:group tosh:ComplexConstraintPropertyGroup ;
-  sh:order 12 ;
+  sh:order 12.0 ;
 .
 sh:PatternConstraintComponent
   dash:propertySuggestionGenerator tosh:DeleteTripleSuggestionGenerator ;
   dash:propertySuggestionGenerator tosh:ReplaceWithDefaultValueSuggestionGenerator ;
 .
 sh:PatternConstraintComponent-flags
-  tosh:editWidget <http://topbraid.org/tosh.ui#FlagsEditor> ;
   sh:group tosh:StringBasedConstraintPropertyGroup ;
   sh:maxCount 1 ;
   sh:name "regex flags" ;
 .
 sh:PatternConstraintComponent-pattern
-  tosh:editWidget swa:PlainTextFieldEditor ;
   sh:group tosh:StringBasedConstraintPropertyGroup ;
   sh:maxCount 1 ;
   sh:name "regex pattern" ;
@@ -1267,23 +1401,22 @@ WHERE {
 sh:QualifiedMaxCountConstraintComponent-qualifiedMaxCount
   sh:group tosh:ComplexConstraintPropertyGroup ;
   sh:maxCount 1 ;
-  sh:order 3 ;
+  sh:order 3.0 ;
 .
 sh:QualifiedMinCountConstraintComponent-qualifiedMinCount
   sh:group tosh:ComplexConstraintPropertyGroup ;
   sh:maxCount 1 ;
-  sh:order 2 ;
+  sh:order 2.0 ;
 .
 sh:QualifiedMinCountConstraintComponent-qualifiedValueShape
-  tosh:editWidget swa:SourceCodeEditor ;
   tosh:viewWidget swa:SourceCodeViewer ;
   sh:group tosh:ComplexConstraintPropertyGroup ;
   sh:maxCount 1 ;
-  sh:order 1 ;
+  sh:order 1.0 ;
 .
 sh:UniqueLangConstraintComponent-uniqueLang
   sh:group tosh:StringBasedConstraintPropertyGroup ;
-  sh:order 8 ;
+  sh:order 8.0 ;
 .
 sh:XoneConstraintComponent
   sh:nodeValidator [
@@ -1315,10 +1448,9 @@ sh:XoneConstraintComponent
     ] ;
 .
 sh:XoneConstraintComponent-xone
-  tosh:editWidget swa:SourceCodeEditor ;
   tosh:viewWidget swa:SourceCodeViewer ;
   sh:group tosh:ComplexConstraintPropertyGroup ;
-  sh:order 13 ;
+  sh:order 13.0 ;
 .
 sh:count
   a rdf:Property ;

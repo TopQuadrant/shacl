@@ -17,16 +17,21 @@
 package org.topbraid.shacl.optimize;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
+import org.apache.jena.ext.com.google.common.cache.Cache;
+import org.apache.jena.ext.com.google.common.cache.CacheBuilder;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
+import org.apache.jena.rdf.model.Model;
+import org.topbraid.jenax.util.ARQFactory;
+import org.topbraid.jenax.util.ExceptionUtil;
 import org.topbraid.jenax.util.JenaUtil;
+import org.topbraid.shacl.engine.ShapesGraph;
+import org.topbraid.shacl.engine.ShapesGraphFactory;
 
 /**
  * A singleton managing Ontology-based optimizations, to be used (for example) with OptimizedMultiUnions.
@@ -36,6 +41,8 @@ import org.topbraid.jenax.util.JenaUtil;
  * @author Holger Knublauch
  */
 public class OntologyOptimizations {
+
+	final static org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(java.lang.invoke.MethodHandles.lookup().lookupClass());
 
 	private static OntologyOptimizations singleton = new OntologyOptimizations();
 	
@@ -71,52 +78,49 @@ public class OntologyOptimizations {
 	
 	private static final int capacity = 10000;
 	
-	// TODO: Switch to Guava caches
-	
-	@SuppressWarnings("serial")
-	public static class MyCache extends LinkedHashMap<Object,Object> {
-
-		public MyCache() {
-			super(capacity + 1, 1.1f, true);
-		}
-
-		@Override
-		protected boolean removeEldestEntry(Entry<Object, Object> eldest) {
-			if(size() > capacity) {
-				return true;
-			}
-			else {
-				return false;
-			}
-		}
-	};
-	
-	private Map<Object,Object> objects = Collections.synchronizedMap(new MyCache());
+	private Cache<Object,Object> cache = CacheBuilder.
+			newBuilder().
+			maximumSize(capacity).
+			build();
 	
 	
 	public ClassMetadata getClassMetadata(Node cls, Graph graph, String graphKey) {
 		Object cacheKey = ClassMetadata.createKey(cls, graphKey);
-		ClassMetadata classMetadata = (ClassMetadata)OntologyOptimizations.get().getObject(cacheKey);
-		if(classMetadata == null) {
-			classMetadata = new ClassMetadata(cls, graphKey);
-			OntologyOptimizations.get().putObject(cacheKey, classMetadata);
-		}
-		return classMetadata;
+		return (ClassMetadata) getOrComputeObject(cacheKey, () -> new ClassMetadata(cls, graphKey));
 	}
 	
 	
 	public Object getObject(Object key) {
-		return objects.get(key);
+		return cache.getIfPresent(key);
 	}
 	
-	
+
+	// Legacy version with Function parameter
 	public Object getOrComputeObject(Object key, Function<Object,Object> function) {
-		return objects.computeIfAbsent(key, function);
+		return getOrComputeObject(key, () -> function.apply(key));
 	}
 	
+	
+	public Object getOrComputeObject(Object key, Callable<Object> callable) {
+		try {
+			return cache.get(key, callable);
+		} catch (ExecutionException ex) {
+			log.error("Failed to populate OntologyOptimizations with key " + key, ex);
+			throw ExceptionUtil.throwUnchecked(ex);
+		}
+	}
+
+	public ShapesGraph getCachableShapesGraph(String uri) {
+		String key = "CachableShapesGraph-" + uri;
+		return (ShapesGraph) OntologyOptimizations.get().getOrComputeObject(key, u -> {
+			Model shapesModel = ARQFactory.getNamedModel(uri);
+			return ShapesGraphFactory.get().createShapesGraph(shapesModel);
+		});
+	}
+
 	
 	public List<Object> keys() {
-		return new ArrayList<>(objects.keySet());
+		return new ArrayList<>(cache.asMap().keySet());
 	}
 	
 	
@@ -135,11 +139,11 @@ public class OntologyOptimizations {
 	
 	
 	public void putObject(Object key, Object value) {
-		objects.put(key, value);
+		cache.put(key, value);
 	}
 	
 	
 	public void reset() {
-		objects.clear();
+		cache.invalidateAll();
 	}
 }

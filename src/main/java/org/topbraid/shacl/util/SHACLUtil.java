@@ -485,9 +485,9 @@ public class SHACLUtil {
 	
 	
 	public static List<SHNodeShape> getAllShapesAtNode(RDFNode node, Iterable<Resource> types) {
-		List<SHNodeShape> results = new LinkedList<SHNodeShape>();
+		List<SHNodeShape> results = new LinkedList<>();
 		if(node instanceof Resource) {
-			Set<Resource> reached = new HashSet<Resource>();
+			Set<Resource> reached = new HashSet<>();
 			for(Resource type : types) {
 				addAllShapesAtClassOrShape(type, results, reached);
 			}
@@ -506,18 +506,16 @@ public class SHACLUtil {
 	 * @param clsOrShape  the class or Shape to get the shapes of
 	 * @return the shapes, ordered by the most specialized (subclass) first
 	 */
+	@SuppressWarnings("unchecked")
 	public static List<SHNodeShape> getAllShapesAtClassOrShape(Resource clsOrShape) {
 		String key = OntologyOptimizations.get().getKeyIfEnabledFor(clsOrShape.getModel().getGraph());
 		if(key != null) {
 			key += ".getAllShapesAtClassOrShape(" + clsOrShape + ")";
-			@SuppressWarnings("unchecked")
-			List<SHNodeShape> results = (List<SHNodeShape>) OntologyOptimizations.get().getObject(key);
-			if(results == null) {
-				results = new LinkedList<SHNodeShape>();
+			return (List<SHNodeShape>) OntologyOptimizations.get().getOrComputeObject(key, () -> {				
+				List<SHNodeShape> results = new LinkedList<SHNodeShape>();
 				addAllShapesAtClassOrShape(clsOrShape, results, new HashSet<Resource>());
-				OntologyOptimizations.get().putObject(key, results);
-			}
-			return results;
+				return results;
+			});
 		}
 		else {
 			List<SHNodeShape> results = new LinkedList<SHNodeShape>();
@@ -576,6 +574,11 @@ public class SHACLUtil {
 	
 	
 	public static List<RDFNode> getTargetNodes(Resource shape, Dataset dataset) {
+		return getTargetNodes(shape, dataset, false);
+	}
+
+	
+	public static List<RDFNode> getTargetNodes(Resource shape, Dataset dataset, boolean includeApplicableToClass) {
 		
 		Model dataModel = dataset.getDefaultModel();
 
@@ -608,6 +611,12 @@ public class SHACLUtil {
 		for(Resource target : JenaUtil.getResourceProperties(shape, SH.target)) {
 			for(RDFNode targetNode : SHACLUtil.getResourcesInTarget(target, dataset)) {
 				results.add(targetNode);
+			}
+		}
+
+		if(includeApplicableToClass) {
+			for(Resource targetClass : JenaUtil.getResourceProperties(shape, DASH.applicableToClass)) {
+				results.addAll(JenaUtil.getAllInstances(targetClass.inModel(dataModel)));
 			}
 		}
 

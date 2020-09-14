@@ -40,6 +40,7 @@ import org.topbraid.shacl.expr.lib.DistinctExpression;
 import org.topbraid.shacl.expr.lib.UnionExpression;
 import org.topbraid.shacl.model.SHConstraintComponent;
 import org.topbraid.shacl.model.SHFactory;
+import org.topbraid.shacl.model.SHParameter;
 import org.topbraid.shacl.model.SHShape;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
@@ -75,10 +76,16 @@ public class ShapesGraph {
 	
 	/**
 	 * Constructs a new ShapesGraph.
+	 * This should not be called directly, only from ShapesGraphFactory.
 	 * @param shapesModel  the Model containing the shape definitions
 	 */
 	public ShapesGraph(Model shapesModel) {
 		this.shapesModel = shapesModel;
+	}
+	
+	
+	public Constraint createConstraint(Shape shape, SHConstraintComponent component, List<SHParameter> params, RDFNode parameterValue) {
+		return new Constraint(shape, component, params, parameterValue);
 	}
 
 	

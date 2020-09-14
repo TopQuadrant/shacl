@@ -121,6 +121,30 @@ public class PathEvaluator {
 	
 	
 	/**
+	 * Gets the executed Jena Path or null if this is just a simple forward property.
+	 * @return
+	 */
+	public Path getJenaPath() {
+		return jenaPath;
+	}
+	
+	
+	/**
+	 * Gets the predicate if this is a simple forward property path.
+	 * Returns null for inverse paths.
+	 * @return the predicate or null
+	 */
+	public Property getPredicate() {
+		if(predicate != null && !isInverse) {
+			return predicate;
+		}
+		else {
+			return null;
+		}
+	}
+	
+	
+	/**
 	 * Checks if the values of this may be inferred.
 	 * This is the case if this uses a single forward property path and there are any sh:values or sh:defaultValue statements on
 	 * that predicate in the provided shapes graph.
@@ -208,9 +232,7 @@ public class PathEvaluator {
 			Map<Node,NodeExpression> map = context.getShapesGraph().getValuesNodeExpressionsMap(predicate);
 			if(!map.isEmpty()) {
 				ExtendedIterator<RDFNode> result = base;
-				boolean assertedHasNext = base.hasNext();
 				boolean hasInferences = false;
-				int count = 0;
 				// TODO: support cases like metash:Resource (if it had no target): if the type has a sh:node then the value rules should be found
 				//       even if declared in the super-shape
 				for(Resource type : JenaUtil.getAllTypes((Resource)focusNode)) {
@@ -218,7 +240,6 @@ public class PathEvaluator {
 					if(expr != null) {
 						result = result.andThen(expr.eval(focusNode, context));
 						hasInferences = true;
-						count++;
 					}
 				}
 				if(!hasInferences && map.get(RDFS.Resource.asNode()) != null) {
@@ -226,15 +247,9 @@ public class PathEvaluator {
 					NodeExpression expr = map.get(RDFS.Resource.asNode());
 					result = result.andThen(expr.eval(focusNode, context));
 					hasInferences = true;
-					count++;
 				}
-				if((assertedHasNext && hasInferences) || count > 1) {
-					// Filter out duplicates in case the graph contains materialized inferences
-					return DistinctExpression.distinct(result);
-				}
-				else {
-					return result;
-				}
+				// Filter out duplicates in case the graph contains materialized inferences and because sh:values may return lists
+				return DistinctExpression.distinct(result);
 			}
 		}
 		return base;

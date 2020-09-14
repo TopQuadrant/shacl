@@ -27,7 +27,10 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.sparql.path.P_Inverse;
+import org.apache.jena.sparql.path.P_Link;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.vocabulary.RDFS;
 import org.topbraid.jenax.util.JenaUtil;
@@ -145,16 +148,14 @@ public class Shape {
 				if(component != null && !handled.contains(component)) {
 					List<SHParameter> params = component.getParameters();
 					if(params.size() == 1) {
-						Constraint constraint = new Constraint(this, component, params, s.getObject());
-						
+						Constraint constraint = shapesGraph.createConstraint(this, component, params, s.getObject());
 						if(!shapesGraph.isIgnoredConstraint(constraint)) {
 							constraints.add(constraint);
 						}
 					}
 					else if(isComplete(params)) {
 						handled.add(component);
-						Constraint constraint = new Constraint(this, component, params, null);
-						
+						Constraint constraint = shapesGraph.createConstraint(this, component, params, null);
 						if(!shapesGraph.isIgnoredConstraint(constraint)) {
 							constraints.add(constraint);
 						}
@@ -163,6 +164,14 @@ public class Shape {
 			}
 		}
 		return constraints;
+	}
+	
+	
+	public Property getInversePredicate() {
+		if(jenaPath instanceof P_Inverse && ((P_Inverse)jenaPath).getSubPath() instanceof P_Link) {
+			return ResourceFactory.createProperty(((P_Link)((P_Inverse)jenaPath).getSubPath()).getNode().getURI());
+		}
+		return null;
 	}
 	
 	

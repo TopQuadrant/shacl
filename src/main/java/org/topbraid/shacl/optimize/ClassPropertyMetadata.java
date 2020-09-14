@@ -141,9 +141,6 @@ public class ClassPropertyMetadata {
 						if(description == null) {
 							description = JenaNodeUtil.getObject(propertyShape, SH.description.asNode(), graph);
 						}
-						if(editWidget == null) {
-							editWidget = JenaNodeUtil.getObject(propertyShape, TOSH.editWidget.asNode(), graph);
-						}
 						if(localRange == null) {
 							if(inverse) {
 								// Maybe: support inverse ranges

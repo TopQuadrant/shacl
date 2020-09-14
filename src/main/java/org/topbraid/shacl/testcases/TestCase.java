@@ -18,7 +18,6 @@ package org.topbraid.shacl.testcases;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
-import org.topbraid.jenax.util.JenaDatatypes;
 import org.topbraid.shacl.testcases.context.TestCaseContext;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
@@ -38,32 +37,6 @@ public abstract class TestCase implements Comparable<TestCase> {
 	
 	@Override
 	public int compareTo(TestCase other) {
-		Resource env1 = getResource().getPropertyResourceValue(DASH.testEnvironment);
-		Resource env2 = other.getResource().getPropertyResourceValue(DASH.testEnvironment);
-		if(env1 != null) {
-			String uri1 = env1.getURI();
-			if(env2 != null) {
-				String uri2 = env2.getURI();
-				int c = uri1.compareTo(uri2);
-				if(c != 0) {
-					return c;
-				}
-				else {
-					Integer m1 = getResource().hasProperty(DASH.testModifiesEnvironment, JenaDatatypes.TRUE) ? 1 : 0;
-					Integer m2 = other.getResource().hasProperty(DASH.testModifiesEnvironment, JenaDatatypes.TRUE) ? 1 : 0;
-					int m = m1.compareTo(m2);
-					if(m != 0) {
-						return m;
-					}
-				}
-			}
-			else {
-				return 1;
-			}
-		}
-		else if(env2 != null) {
-			return -1;
-		}
 		return getResource().getURI().compareTo(other.getResource().getURI());
 	}
 
@@ -101,27 +74,4 @@ public abstract class TestCase implements Comparable<TestCase> {
 	
 	
 	public abstract void run(Model results) throws Exception;
-	
-	
-	public boolean usesDifferentEnvironmentFrom(TestCase other) {
-		
-		if(getResource().hasProperty(DASH.testModifiesEnvironment)) {
-			return true;
-		}
-		if(other.getResource().hasProperty(DASH.testModifiesEnvironment)) {
-			return true;
-		}
-		
-		Resource e1 = getResource().getPropertyResourceValue(DASH.testEnvironment);
-		Resource e2 = other.getResource().getPropertyResourceValue(DASH.testEnvironment);
-		if(e1 != null && e2 != null) {
-			return !e1.equals(e2);
-		}
-		else if(e1 == null && e2 == null) {
-			return false;
-		}
-		else {
-			return true;
-		}
-	}
 }

@@ -26,7 +26,7 @@ class MinCountConstraintExecutor extends AbstractNativeConstraintExecutor {
 		for(RDFNode focusNode : focusNodes) {
 			int count = engine.getValueNodes(constraint, focusNode).size();
 			if(count < minCount) {
-				engine.createValidationResult(constraint, focusNode, null,() -> "Property needs to have at least " + minCount + " values, but found " + count);
+				engine.createValidationResult(constraint, focusNode, null, () -> "Property needs to have at least " + minCount + " value" + (minCount == 1 ? "" : "s") + (count > 0 ? ", but found " + count : ""));
 			}
 			engine.checkCanceled();
 		}

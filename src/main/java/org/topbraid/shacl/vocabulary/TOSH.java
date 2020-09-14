@@ -35,6 +35,8 @@ public class TOSH {
 
 
     public final static Resource count = ResourceFactory.createResource(NS + "count");
+    
+    public final static Resource DeleteTripleSuggestionGenerator = ResourceFactory.createResource(NS + "DeleteTripleSuggestionGenerator");
 
     public final static Resource NodeProcessor = ResourceFactory.createResource(NS + "NodeProcessor");
 
@@ -61,16 +63,16 @@ public class TOSH {
     
     public final static Property closed = ResourceFactory.createProperty(NS + "closed");
     
-    public final static Property editWidget = ResourceFactory.createProperty(NS + "editWidget");
+    public final static Property editGroupDescription = ResourceFactory.createProperty(NS + "editGroupDescription");
     
     public final static Property javaMethod = ResourceFactory.createProperty(NS + "javaMethod");
-
-    public final static Property searchWidget = ResourceFactory.createProperty(NS + "searchWidget");
 
     public final static Property useDeclaredDatatype = ResourceFactory.createProperty(NS + "useDeclaredDatatype");
 
     // Note this property may be deleted in future versions
     public final static Property viewGadget = ResourceFactory.createProperty(NS + "viewGadget");
+    
+    public final static Property viewGroupDescription = ResourceFactory.createProperty(NS + "viewGroupDescription");
 
     public final static Property viewWidget = ResourceFactory.createProperty(NS + "viewWidget");
 

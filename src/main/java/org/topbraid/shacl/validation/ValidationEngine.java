@@ -19,6 +19,7 @@ package org.topbraid.shacl.validation;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -31,11 +32,15 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.graph.compose.MultiUnion;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
@@ -59,11 +64,16 @@ import org.topbraid.shacl.engine.Constraint;
 import org.topbraid.shacl.engine.Shape;
 import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.engine.filters.ExcludeMetaShapesFilter;
+import org.topbraid.shacl.expr.NodeExpression;
+import org.topbraid.shacl.expr.NodeExpressionFactory;
 import org.topbraid.shacl.js.SHACLScriptEngineManager;
+import org.topbraid.shacl.model.SHNodeShape;
+import org.topbraid.shacl.model.SHPropertyShape;
 import org.topbraid.shacl.targets.InstancesTarget;
 import org.topbraid.shacl.targets.Target;
 import org.topbraid.shacl.util.FailureLog;
 import org.topbraid.shacl.util.SHACLPreferences;
+import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.validation.sparql.SPARQLSubstitutions;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
@@ -95,11 +105,15 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 	
 	private Predicate<RDFNode> focusNodeFilter;
 	
+	private Model inferencesModel;
+	
 	private Function<RDFNode,String> labelFunction = (node -> RDFLabels.get().getNodeLabel(node));
 	
 	private Map<RDFNode,String> labelsCache = new ConcurrentHashMap<>();
 	
 	private Resource report;
+	
+	private int resultsCount = 0;
 	
 	private Map<ValueNodesCacheKey,Collection<RDFNode>> valueNodes = new WeakHashMap<>();
 	
@@ -118,13 +132,76 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 		setConfiguration(new ValidationEngineConfiguration());
 		if(report == null) {
 			Model reportModel = JenaUtil.createMemoryModel();
-			reportModel.setNsPrefixes(dataset.getDefaultModel());
+			reportModel.setNsPrefixes(dataset.getDefaultModel()); // This can be very expensive in some databases
 			reportModel.withDefaultMappings(shapesGraph.getShapesModel());
 			this.report = reportModel.createResource(SH.ValidationReport);
 		}
 		else {
 			this.report = report;
 		}
+	}
+	
+	
+	/**
+	 * Checks if entailments are active for the current shapes graph and applies them for a given focus node.
+	 * This will only work for the sh:Rules entailment, e.g. to compute sh:values and sh:defaultValue.
+	 * If any inferred triples exist, the focus node will be returned attached to the model that includes those inferences.
+	 * The dataset used internally will also be switched to use that new model as its default model, so that if
+	 * a node gets validated it will "see" the inferred triples too.
+	 * @param focusNode  the focus node
+	 * @return the focus node, possibly in a different Model than originally
+	 */
+	public RDFNode applyEntailments(Resource focusNode) {
+		Model shapesModel = dataset.getNamedModel(shapesGraphURI.toString());
+		if(shapesModel.contains(null, SH.entailment, SH.Rules)) {
+			
+			// Create union of data model and inferences if called for the first time 
+			if(inferencesModel == null) {
+				inferencesModel = JenaUtil.createDefaultModel();
+				Model dataModel = dataset.getDefaultModel();
+				MultiUnion multiUnion = new MultiUnion(new Graph[]{
+					dataModel.getGraph(),
+					inferencesModel.getGraph()
+				});
+				multiUnion.setBaseGraph(dataModel.getGraph());
+				dataset.setDefaultModel(ModelFactory.createModelForGraph(multiUnion));
+			}
+
+			// Apply sh:values rules
+			Map<Property,RDFNode> defaultValueMap = new HashMap<>();
+			for(SHNodeShape nodeShape : SHACLUtil.getAllShapesAtNode(focusNode)) {
+				if(!nodeShape.hasProperty(SH.deactivated, JenaDatatypes.TRUE)) {
+					for(SHPropertyShape ps : nodeShape.getPropertyShapes()) {
+						if(!ps.hasProperty(SH.deactivated, JenaDatatypes.TRUE)) {
+							Resource path = ps.getPath();
+							if(path instanceof Resource) {
+								Statement values = ps.getProperty(SH.values);
+								if(values != null) {
+									NodeExpression ne = NodeExpressionFactory.get().create(values.getObject());
+									ne.eval(focusNode, this).forEachRemaining(v -> inferencesModel.getGraph().add(Triple.create(focusNode.asNode(), path.asNode(), v.asNode())));
+								}
+								Statement defaultValue = ps.getProperty(SH.defaultValue);
+								if(defaultValue != null) {
+									defaultValueMap.put(JenaUtil.asProperty(path), defaultValue.getObject());
+								}
+							}
+						}
+					}
+				}
+			}
+			
+			// Add sh:defaultValue where needed
+			Model dataModel = dataset.getDefaultModel(); // This is now the union model
+			Resource newFocusNode = focusNode.inModel(dataModel);
+			for(Property predicate : defaultValueMap.keySet()) {
+				if(!newFocusNode.hasProperty(predicate)) {
+					NodeExpression ne = NodeExpressionFactory.get().create(defaultValueMap.get(predicate));
+					ne.eval(focusNode, this).forEachRemaining(v -> inferencesModel.add(focusNode, predicate, v));
+				}
+			}
+			return newFocusNode;
+		}
+		return focusNode;
 	}
 
 	
@@ -147,7 +224,7 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 	public Resource createResult(Resource type, Constraint constraint, RDFNode focusNode) {
 		Resource result = report.getModel().createResource(type);
 		report.addProperty(SH.result, result);
-		result.addProperty(SH.resultSeverity, constraint.getShape().getSeverity());
+		result.addProperty(SH.resultSeverity, constraint.getSeverity());
 		result.addProperty(SH.sourceConstraintComponent, constraint.getComponent());
 		result.addProperty(SH.sourceShape, constraint.getShapeResource());
 		if(focusNode != null) {
@@ -155,6 +232,8 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 		}
 
 		checkMaximumNumberFailures(constraint);
+		
+		resultsCount++;
 
 		return result;
 	}
@@ -168,7 +247,7 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 		if(!constraint.getShape().isNodeShape()) {
 			result.addProperty(SH.resultPath, SHACLPaths.clonePath(constraint.getShapeResource().getPath(), result.getModel()));
 		}
-		Collection<RDFNode> messages = constraint.getShape().getMessages();
+		Collection<RDFNode> messages = constraint.getMessages();
 		if(messages.size() > 0) {
 			messages.stream().forEach(message -> result.addProperty(SH.resultMessage, message));
 		}
@@ -337,54 +416,8 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 	 * @throws InterruptedException if the monitor has canceled this
 	 */
 	public Resource validateAll() throws InterruptedException {
-		boolean nested = SHACLScriptEngineManager.begin();
-		try {
-			List<Shape> rootShapes = shapesGraph.getRootShapes();
-			if(monitor != null) {
-				monitor.beginTask("Validating " + rootShapes.size() + " shapes", rootShapes.size());
-			}
-			if(classesCache == null) {
-				// If we are doing everything then the cache should be used, but not for individual nodes
-				classesCache = new ClassesCache();
-			}
-			int i = 0;
-			for(Shape shape : rootShapes) {
-
-				if(monitor != null) {
-					monitor.subTask("Shape " + (++i) + ": " + getLabelFunction().apply(shape.getShapeResource()));
-				}
-				
-				Collection<RDFNode> focusNodes = shape.getTargetNodes(dataset);
-				if(focusNodeFilter != null) {
-					List<RDFNode> filteredFocusNodes = new LinkedList<RDFNode>();
-					for(RDFNode focusNode : focusNodes) {
-						if(focusNodeFilter.test(focusNode)) {
-							filteredFocusNodes.add(focusNode);
-						}
-					}
-					focusNodes = filteredFocusNodes;
-				}
-				if(!focusNodes.isEmpty()) {
-					for(Constraint constraint : shape.getConstraints()) {
-						validateNodesAgainstConstraint(focusNodes, constraint);
-					}
-				}
-				if(monitor != null) {
-					monitor.worked(1);
-					if(monitor.isCanceled()) {
-						throw new InterruptedException();
-					}
-				}
-			}
-		}
-		catch(MaximumNumberViolations ex) {
-			// ignore
-		}
-		finally {
-			SHACLScriptEngineManager.end(nested);
-		}
-		updateConforms();
-		return report;
+		List<Shape> rootShapes = shapesGraph.getRootShapes();
+		return validateShapes(rootShapes);
 	}
 	
 	
@@ -441,6 +474,67 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 				}
 			}
 		}
+		return report;
+	}
+		
+	
+	/**
+	 * Validates all target nodes of a given collection of shapes against these shapes.
+	 * To further narrow down which nodes to validate, use {{@link #setFocusNodeFilter(Predicate)}.
+	 * @return an instance of sh:ValidationReport in the results Model
+	 * @throws InterruptedException if the monitor has canceled this
+	 */
+	public Resource validateShapes(Collection<Shape> shapes) throws InterruptedException {
+		boolean nested = SHACLScriptEngineManager.begin();
+		try {
+			if(monitor != null) {
+				monitor.beginTask("Validating " + shapes.size() + " shapes", shapes.size());
+			}
+			if(classesCache == null) {
+				// If we are doing everything then the cache should be used, but not for individual nodes
+				classesCache = new ClassesCache();
+			}
+			int i = 0;
+			for(Shape shape : shapes) {
+
+				if(monitor != null) {
+					String label = "Shape " + (++i) + ": " + getLabelFunction().apply(shape.getShapeResource());
+					if(resultsCount > 0) {
+						label = "" + resultsCount + " results. " + label;
+					}
+					monitor.subTask(label);
+				}
+				
+				Collection<RDFNode> focusNodes = shape.getTargetNodes(dataset);
+				if(focusNodeFilter != null) {
+					List<RDFNode> filteredFocusNodes = new LinkedList<RDFNode>();
+					for(RDFNode focusNode : focusNodes) {
+						if(focusNodeFilter.test(focusNode)) {
+							filteredFocusNodes.add(focusNode);
+						}
+					}
+					focusNodes = filteredFocusNodes;
+				}
+				if(!focusNodes.isEmpty()) {
+					for(Constraint constraint : shape.getConstraints()) {
+						validateNodesAgainstConstraint(focusNodes, constraint);
+					}
+				}
+				if(monitor != null) {
+					monitor.worked(1);
+					if(monitor.isCanceled()) {
+						throw new InterruptedException();
+					}
+				}
+			}
+		}
+		catch(MaximumNumberViolations ex) {
+			// ignore
+		}
+		finally {
+			SHACLScriptEngineManager.end(nested);
+		}
+		updateConforms();
 		return report;
 	}
 

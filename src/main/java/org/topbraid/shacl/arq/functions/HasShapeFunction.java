@@ -34,7 +34,9 @@ import org.apache.jena.vocabulary.RDF;
 import org.topbraid.jenax.functions.AbstractFunction3;
 import org.topbraid.jenax.util.ARQFactory;
 import org.topbraid.jenax.util.JenaDatatypes;
+import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.engine.ShapesGraph;
+import org.topbraid.shacl.engine.ShapesGraphFactory;
 import org.topbraid.shacl.util.FailureLog;
 import org.topbraid.shacl.util.RecursionGuard;
 import org.topbraid.shacl.validation.DefaultShapesGraphProvider;
@@ -159,19 +161,20 @@ public class HasShapeFunction extends AbstractFunction3 {
 		if(sgURI == null) {
 			sgURI = DefaultShapesGraphProvider.get().getDefaultShapesGraphURI(dataset);
 			Model shapesModel = dataset.getNamedModel(sgURI.toString());
-			sg = new ShapesGraph(shapesModel);
+			sg = ShapesGraphFactory.get().createShapesGraph(shapesModel);
 		}
 		else if(sg == null) {
 			Model shapesModel = dataset.getNamedModel(sgURI.toString());
-			sg = new ShapesGraph(shapesModel);
+			sg = ShapesGraphFactory.get().createShapesGraph(shapesModel);
 			shapesGraph.set(sg);
 		}
-		ValidationEngine engine = ValidationEngineFactory.get().create(dataset, sgURI, sg, null);
+		Model reportModel = JenaUtil.createMemoryModel();
+		Resource report = reportModel.createResource(SH.ValidationReport); // This avoids the expensive setNsPrefixes call in ValidationEngine constructor
+		ValidationEngine engine = ValidationEngineFactory.get().create(dataset, sgURI, sg, report);
 		if(ValidationEngine.getCurrent() != null) {
 			engine.setConfiguration(ValidationEngine.getCurrent().getConfiguration());
 		}
-		return engine.
-				validateNodesAgainstShape(Collections.singletonList(focusNode), shape.asNode()).
-				getModel();
+		engine.validateNodesAgainstShape(Collections.singletonList(focusNode), shape.asNode());
+		return reportModel;
 	}
 }

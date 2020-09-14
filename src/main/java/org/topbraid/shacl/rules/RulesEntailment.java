@@ -42,6 +42,7 @@ public class RulesEntailment implements SHACLEntailment.Engine {
 		RuleEngine engine = new RuleEngine(dataset, shapesGraphURI, shapesGraph, inferencesModel);
 		engine.setProgressMonitor(monitor);
 		engine.executeAll();
+		engine.executeAllDefaultValues();
 		if(inferencesModel.isEmpty()) {
 			return dataModel;
 		}

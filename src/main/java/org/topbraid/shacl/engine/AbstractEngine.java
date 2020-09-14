@@ -5,7 +5,6 @@ import java.net.URI;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Statement;
 import org.topbraid.jenax.progress.ProgressMonitor;
 import org.topbraid.shacl.entailment.SHACLEntailment;
 import org.topbraid.shacl.expr.NodeExpressionContext;
@@ -50,13 +49,13 @@ public abstract class AbstractEngine implements NodeExpressionContext {
 	 */
 	public void applyEntailments() throws InterruptedException {
 		Model shapesModel = dataset.getNamedModel(shapesGraphURI.toString());
-		for(Statement s : shapesModel.listStatements(null, SH.entailment, (RDFNode)null).toList()) {
-			if(s.getObject().isURIResource()) {
-				if(SHACLEntailment.get().getEngine(s.getResource().getURI()) != null) {
-					this.dataset = SHACLEntailment.get().withEntailment(dataset, shapesGraphURI, shapesGraph, s.getResource(), monitor);
+		for(RDFNode ent : shapesModel.listObjectsOfProperty(SH.entailment).toList()) {
+			if(ent.isURIResource()) {
+				if(SHACLEntailment.get().getEngine(ent.asResource().getURI()) != null) {
+					this.dataset = SHACLEntailment.get().withEntailment(dataset, shapesGraphURI, shapesGraph, ent.asResource(), monitor);
 				}
 				else {
-					throw new UnsupportedOperationException("Unsupported entailment regime " + s.getResource());
+					throw new UnsupportedOperationException("Unsupported entailment regime " + ent);
 				}
 			}
 		}

@@ -518,7 +518,7 @@ public class JenaUtil {
 						int startLang = bestLang < 0 ? langs.size() - 1 : (label != null ? bestLang - 1 : bestLang);
 						for(int i = startLang; i >= 0; i--) {
 							String langi = langs.get(i);
-							if(langi.equals(lang)) {
+							if(langi.equalsIgnoreCase(lang)) {
 								label = literal;
 								bestLang = i;
 							}

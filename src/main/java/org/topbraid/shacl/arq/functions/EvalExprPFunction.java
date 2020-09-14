@@ -36,6 +36,7 @@ import org.apache.jena.sparql.pfunction.PropertyFunctionBase;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.topbraid.jenax.util.ARQFactory;
 import org.topbraid.shacl.engine.ShapesGraph;
+import org.topbraid.shacl.engine.ShapesGraphFactory;
 import org.topbraid.shacl.expr.NodeExpression;
 import org.topbraid.shacl.expr.NodeExpressionContext;
 import org.topbraid.shacl.expr.NodeExpressionFactory;
@@ -83,7 +84,7 @@ public class EvalExprPFunction extends PropertyFunctionBase {
 			@Override
 			public ShapesGraph getShapesGraph() {
 				if(shapesGraph[0] == null) {
-					shapesGraph[0] = new ShapesGraph(model);
+					shapesGraph[0] = ShapesGraphFactory.get().createShapesGraph(model);
 				}
 				return shapesGraph[0];
 			}

@@ -53,7 +53,7 @@ public abstract class AbstractSPARQLExpression extends AbstractInputExpression {
 		for(RDFNode f : focusNodes) {
 			QuerySolutionMap binding = new QuerySolutionMap();
 			binding.add(SH.thisVar.getName(), f);
-			try(QueryExecution qexec = ARQFactory.get().createQueryExecution(query, focusNode.getModel(), binding)) {
+			try(QueryExecution qexec = ARQFactory.get().createQueryExecution(query, context.getDataset(), binding)) {
 				if(query.isAskType()) {
 					results.add(qexec.execAsk() ? JenaDatatypes.TRUE : JenaDatatypes.FALSE);
 				}
@@ -82,6 +82,11 @@ public abstract class AbstractSPARQLExpression extends AbstractInputExpression {
 			results.add(input.getFunctionalSyntax());
 		}
 		return results;
+	}
+	
+	
+	public Query getQuery() {
+		return query;
 	}
 	
 	

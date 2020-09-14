@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.script.Bindings;
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -105,6 +106,11 @@ public class NashornScriptEngine implements JSScriptEngine {
 		return engine.eval(expr);
 	}
 
+
+	@Override
+	public Object eval(String expr, Bindings bindings) throws ScriptException {
+		return engine.eval(expr, bindings);
+	}
 
 	@Override
     public void executeLibraries(Resource e) throws Exception {

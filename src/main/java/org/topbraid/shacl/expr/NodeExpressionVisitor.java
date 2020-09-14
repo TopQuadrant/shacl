@@ -25,8 +25,6 @@ import org.topbraid.shacl.expr.lib.UnionExpression;
 public interface NodeExpressionVisitor {
 	
 	void visit(AskExpression expr);
-
-	void visit(GroupConcatExpression expr);
 	
 	void visit(ConstantTermExpression expr);
 	
@@ -41,6 +39,8 @@ public interface NodeExpressionVisitor {
 	void visit(FocusNodeExpression expr);
 	
 	void visit(FunctionExpression expr);
+
+	void visit(GroupConcatExpression expr);
 	
 	void visit(IfExpression expr);
 	

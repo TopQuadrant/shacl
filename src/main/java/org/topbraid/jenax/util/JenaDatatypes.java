@@ -103,6 +103,7 @@ public class JenaDatatypes {
 		otherDatatypeURIs.add(XSD.xstring.getURI());
 		otherDatatypeURIs.add(RDF.langString.getURI());
 		otherDatatypeURIs.add(RDF.HTML.getURI());
+		otherDatatypeURIs.add(RDF.JSON.getURI());
 		otherDatatypeURIs.add(RDF.xmlLiteral.getURI()) ;
 	}
 

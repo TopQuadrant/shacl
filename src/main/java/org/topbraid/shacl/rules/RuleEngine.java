@@ -27,12 +27,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.util.iterator.ExtendedIterator;
 import org.topbraid.jenax.progress.ProgressMonitor;
 import org.topbraid.jenax.statistics.ExecStatistics;
 import org.topbraid.jenax.statistics.ExecStatisticsManager;
@@ -54,7 +57,7 @@ import org.topbraid.shacl.vocabulary.SH;
  * including Triple rules, SPARQL rules and JavaScript rules.
  * 
  * In preparation for inclusion into SHACL 1.1, this engine also supports sh:values rules,
- * see https://www.topquadrant.com/graphql/values.html.
+ * see https://www.topquadrant.com/graphql/values.html and treats sh:defaultValues as inferences.
  * 
  * @author Holger Knublauch
  */
@@ -91,6 +94,40 @@ public class RuleEngine extends AbstractEngine {
 			}
 		}
 		executeShapes(ruleShapes, null);
+	}
+	
+	
+	public void executeAllDefaultValues() throws InterruptedException {
+		// Add sh:defaultValues where applicable
+		Model shapesModel = this.getShapesModel();
+		Set<Property> defaultValuePredicates = new HashSet<>();
+		shapesModel.listSubjectsWithProperty(SH.defaultValue).forEachRemaining(ps -> {
+			Resource path = ps.getPropertyResourceValue(SH.path);
+			if(path != null && path.isURIResource() && !ps.hasProperty(SH.deactivated, JenaDatatypes.TRUE)) {
+				defaultValuePredicates.add(JenaUtil.asProperty(path));
+			}
+		});
+		for(Property predicate : defaultValuePredicates) {
+			Map<Node,NodeExpression> map = shapesGraph.getDefaultValueNodeExpressionsMap(predicate);
+			for(Node shapeNode : map.keySet()) {
+				Shape shape = shapesGraph.getShape(shapeNode);
+				if(shape != null) {
+					NodeExpression expr = map.get(shapeNode);
+					List<RDFNode> targetNodes = new ArrayList<>(shape.getTargetNodes(getDataset()));
+					for(RDFNode targetNode : targetNodes) {
+						if(targetNode.isResource() && !targetNode.asResource().hasProperty(predicate)) {
+							ExtendedIterator<RDFNode> it = expr.eval(targetNode, this);
+							if(it.hasNext()) {
+								List<RDFNode> list = it.toList();
+								for(RDFNode value : list) {
+									inferences.add(targetNode.asResource(), predicate, value);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 	
 	

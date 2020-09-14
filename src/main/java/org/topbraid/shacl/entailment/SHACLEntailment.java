@@ -52,7 +52,7 @@ public class SHACLEntailment {
 		return singleton;
 	}
 	
-	private Map<String,Engine> engines = new HashMap<String,Engine>();
+	private Map<String,Engine> engines = new HashMap<>();
 	
 	
 	protected SHACLEntailment() {

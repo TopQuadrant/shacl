@@ -29,6 +29,7 @@ import org.apache.jena.vocabulary.RDF;
 import org.topbraid.jenax.util.ARQFactory;
 import org.topbraid.shacl.arq.SHACLFunctions;
 import org.topbraid.shacl.engine.ShapesGraph;
+import org.topbraid.shacl.engine.ShapesGraphFactory;
 import org.topbraid.shacl.util.SHACLSystemModel;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.vocabulary.TOSH;
@@ -67,7 +68,7 @@ public class ValidationUtil {
 		Dataset dataset = ARQFactory.get().getDataset(dataModel);
 		dataset.addNamedModel(shapesGraphURI.toString(), shapesModel);
 
-		ShapesGraph shapesGraph = new ShapesGraph(shapesModel);
+		ShapesGraph shapesGraph = ShapesGraphFactory.get().createShapesGraph(shapesModel);
 
 		ValidationEngine engine = ValidationEngineFactory.get().create(dataset, shapesGraphURI, shapesGraph, null);
 		engine.setConfiguration(configuration);

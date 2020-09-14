@@ -13,10 +13,8 @@
 
 <http://datashapes.org/dash>
   a owl:Ontology ;
-  rdfs:comment """DASH defines SPARQL-based validators for many SHACL Core constraint components. These are (among others) utilized by TopBraid and its API. Note that constraint components that require validation of nested shapes (such as sh:node) are not implementable without a function such as tosh:hasShape.
-
-DASH is also a SHACL library for frequently needed features and design patterns. All features in this library are 100% standards compliant and will work on any engine that fully supports SHACL.""" ;
-  rdfs:label "DASH Data Shapes Library" ;
+  rdfs:comment "DASH is a SHACL library for frequently needed features and design patterns. Almost all features in this library are 100% standards compliant and will work on any engine that fully supports SHACL." ;
+  rdfs:label "DASH Data Shapes Vocabulary" ;
   owl:imports <http://topbraid.org/tosh> ;
   owl:imports sh: ;
   sh:declare [
@@ -46,6 +44,96 @@ DASH is also a SHACL library for frequently needed features and design patterns.
   sh:declare [
       sh:namespace "http://www.w3.org/2004/02/skos/core#"^^xsd:anyURI ;
       sh:prefix "skos" ;
+    ] ;
+.
+dash:Action
+  a rdfs:Class ;
+  a sh:NodeShape ;
+  dash:abstract true ;
+  rdfs:comment "An executable command triggered by an agent, backed by a Script implementation. Actions may get deactivated using sh:deactivated." ;
+  rdfs:label "Action" ;
+  rdfs:subClassOf dash:Script ;
+  rdfs:subClassOf sh:Parameterizable ;
+  sh:property dash:Action-actionGroup ;
+  sh:property dash:Action-actionIconClass ;
+  sh:property dash:Action-parameter ;
+.
+dash:Action-actionGroup
+  a sh:PropertyShape ;
+  sh:path dash:actionGroup ;
+  sh:class dash:ActionGroup ;
+  sh:description "The Action Group that the action should appear in (in menus etc)." ;
+  sh:group dash:DefinitionPropertyGroup ;
+  sh:maxCount 1 ;
+  sh:order "5"^^xsd:decimal ;
+.
+dash:Action-actionIconClass
+  a sh:PropertyShape ;
+  sh:path dash:actionIconClass ;
+  sh:datatype xsd:string ;
+  sh:description "The CSS class for the action for display purposes. For example, pick one of https://fontawesome.com/icons?d=gallery&m=free or https://getbootstrap.com/docs/3.3/components/#glyphicons-glyphs" ;
+  sh:group dash:DefinitionPropertyGroup ;
+  sh:maxCount 1 ;
+  sh:order "7"^^xsd:decimal ;
+.
+dash:Action-parameter
+  a sh:PropertyShape ;
+  sh:path sh:parameter ;
+  sh:class sh:Parameter ;
+  sh:description "The input parameters for the action." ;
+  sh:group dash:DefinitionPropertyGroup ;
+  sh:name "parameters" ;
+  sh:nodeKind sh:BlankNodeOrIRI ;
+  sh:order "10"^^xsd:decimal ;
+.
+dash:ActionGroup
+  a rdfs:Class ;
+  rdfs:comment "A group of ResourceActions, used to arrange items in menus etc. Similar to sh:PropertyGroups, they may have a sh:order and should have labels (in multiple languages if applicable)." ;
+  rdfs:label "Action group" ;
+  rdfs:subClassOf rdfs:Resource ;
+.
+dash:ActionTestCase
+  a rdfs:Class ;
+  a sh:NodeShape ;
+  rdfs:comment """A test case that evaluates a dash:Action using provided input parameters. Requires exactly one value for dash:action and will operate on the test case's graph (with imports) as both data and shapes graph.
+
+Currently only supports read-only actions, allowing the comparison of actual results with the expected results.""" ;
+  rdfs:label "Action test case" ;
+  rdfs:subClassOf dash:TestCase ;
+  sh:property [
+      a sh:PropertyShape ;
+      sh:path dash:action ;
+      sh:class dash:Action ;
+      sh:description "The dash:Action to execute." ;
+      sh:maxCount 1 ;
+      sh:minCount 1 ;
+      sh:name "action" ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+  sh:property [
+      a sh:PropertyShape ;
+      sh:path dash:expectedResult ;
+      sh:description "The expected result of the evaluation, as JSON object as produced by the servlet, or true or false." ;
+      sh:maxCount 1 ;
+      sh:name "expected result" ;
+    ] ;
+  sh:property [
+      a sh:PropertyShape ;
+      sh:path dash:focusNode ;
+      sh:description "The selected resource, which will become value of focusNode for the script, with its \"most suitable\" JavaScript class as type. Defaults to the test case itself." ;
+      sh:maxCount 1 ;
+      sh:name "focus node" ;
+      sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+  sh:property [
+      a sh:PropertyShape ;
+      sh:path dash:variables ;
+      sh:datatype xsd:string ;
+      sh:description """A JSON object (string) with name-value pairs for the variable bindings. This must be in the same format as expected by the script servlet.
+
+For parameters that declare dash:mimeTypes (i.e. file upload parameters), the value needs to be the path to a file relative to the workspace root. This file will be temporarily uploaded for the duration of the test case execution.""" ;
+      sh:maxCount 1 ;
+      sh:name "variables" ;
     ] ;
 .
 dash:AllObjects
@@ -89,17 +177,17 @@ WHERE {
 }""" ;
 .
 dash:AutoCompleteEditor
-  a dash:Editor ;
+  a dash:SingleEditor ;
   rdfs:comment "An auto-complete field to enter the label of instances of a class. This is the fallback editor for any URI resource if no other editors are more suitable." ;
   rdfs:label "Auto-complete editor" ;
 .
 dash:BlankNodeViewer
-  a dash:Viewer ;
+  a dash:SingleViewer ;
   rdfs:comment "A Viewer for blank nodes, rendering as the label of the blank node." ;
-  rdfs:label "Blank Node Viewer" ;
+  rdfs:label "Blank node viewer" ;
 .
 dash:BooleanSelectEditor
-  a dash:Editor ;
+  a dash:SingleEditor ;
   rdfs:comment """An editor for boolean literals, rendering as a select box with values true and false.
 
 Also displays the current value (such as \"1\"^^xsd:boolean), but only allows to switch to true or false.""" ;
@@ -176,6 +264,29 @@ dash:CoExistsWithConstraintComponent-coExistsWith
   sh:class rdf:Property ;
   sh:nodeKind sh:IRI ;
 .
+dash:ConstraintReificationShape
+  a sh:NodeShape ;
+  rdfs:comment "Can be used to attach sh:severity and sh:messages to individual constraints using reification." ;
+  rdfs:label "Constraint reification shape" ;
+  sh:property dash:ConstraintReificationShape-message ;
+  sh:property dash:ConstraintReificationShape-severity ;
+.
+dash:ConstraintReificationShape-message
+  a sh:PropertyShape ;
+  sh:path sh:message ;
+  dash:singleLine true ;
+  sh:name "message" ;
+  sh:nodeKind sh:Literal ;
+  sh:or dash:StringOrLangString ;
+.
+dash:ConstraintReificationShape-severity
+  a sh:PropertyShape ;
+  sh:path sh:severity ;
+  sh:class sh:Severity ;
+  sh:maxCount 1 ;
+  sh:name "severity" ;
+  sh:nodeKind sh:IRI ;
+.
 dash:DASHJSLibrary
   a sh:JSLibrary ;
   rdfs:label "DASH JavaScript library" ;
@@ -196,9 +307,14 @@ dash:DateOrDateTime
   rdfs:label "Date or date time" ;
 .
 dash:DatePickerEditor
-  a dash:Editor ;
+  a dash:SingleEditor ;
   rdfs:comment "An editor for xsd:date literals, offering a calendar-like date picker." ;
   rdfs:label "Date picker editor" ;
+.
+dash:DateTimePickerEditor
+  a dash:SingleEditor ;
+  rdfs:comment "An editor for xsd:dateTime literals, offering a calendar-like date picker and a time selector." ;
+  rdfs:label "Date time picker editor" ;
 .
 dash:DefaultValueTypeRule
   a sh:SPARQLConstructExecutable ;
@@ -219,20 +335,31 @@ dash:DefaultValueTypeRule
 		}
 		""" ;
 .
+dash:DefinitionPropertyGroup
+  a sh:PropertyGroup ;
+  rdfs:label "Definition" ;
+  sh:order "0"^^xsd:decimal ;
+.
+dash:DetailsEditor
+  a dash:SingleEditor ;
+  rdfs:comment "An editor for non-literal values, typically displaying a nested form where the values of the linked resource can be edited directly on the \"parent\" form. Implementations that do not support this (yet) could fall back to an auto-complete widget." ;
+  rdfs:label "Details editor" ;
+.
 dash:DetailsViewer
-  a dash:Viewer ;
+  a dash:SingleViewer ;
   rdfs:comment "A Viewer for resources that shows the details of the value using its default view shape as a nested form-like display." ;
-  rdfs:label "Details Viewer" ;
+  rdfs:label "Details viewer" ;
 .
 dash:Editor
   a rdfs:Class ;
   a sh:NodeShape ;
+  dash:abstract true ;
   rdfs:comment "The class of widgets for editing value nodes." ;
   rdfs:label "Editor" ;
   rdfs:subClassOf dash:Widget ;
 .
 dash:EnumSelectEditor
-  a dash:Editor ;
+  a dash:SingleEditor ;
   rdfs:comment "A drop-down editor for enumerated values (typically based on sh:in lists)." ;
   rdfs:label "Enum select editor" ;
 .
@@ -241,6 +368,12 @@ dash:ExecutionPlatform
   rdfs:comment "An platform (such as TopBraid) that may have features needed to execute, for example, SPARQL queries." ;
   rdfs:label "Execution platform" ;
   rdfs:subClassOf rdfs:Resource ;
+.
+dash:ExploreAction
+  a rdfs:Class ;
+  rdfs:comment "An action typically showing up in an Explore section of a selected resource. Cannot make changes to the data." ;
+  rdfs:label "Explore action" ;
+  rdfs:subClassOf dash:ResourceAction ;
 .
 dash:FailureResult
   a rdfs:Class ;
@@ -324,13 +457,63 @@ dash:HTMLOrStringOrLangString
         sh:datatype rdf:langString ;
       ]
     ) ;
-  rdfs:comment "An rdf:List that can be used in property constraints as value for sh:or to indicate that all values of a property must be either rdf:HTML, xsd:string or rdf:langString." ;
+  rdfs:comment "An rdf:List that can be used in property constraints as value for sh:or to indicate that all values of a property must be either rdf:HTML, xsd:string or rdf:langString (in that order of preference)." ;
   rdfs:label "HTML or string or langString" ;
 .
 dash:HTMLViewer
-  a dash:Viewer ;
+  a dash:SingleViewer ;
   rdfs:comment "A Viewer for HTML encoded text from rdf:HTML literals, rendering as parsed HTML DOM elements. Also displays the language if the HTML has a lang attribute on its root DOM element." ;
-  rdfs:label "HTML Viewer" ;
+  rdfs:label "HTML viewer" ;
+.
+dash:HasValueInConstraintComponent
+  a sh:ConstraintComponent ;
+  rdfs:comment "A constraint component that can be used to express a constraint on property shapes so that one of the values of the property path must be a member of a given list of nodes." ;
+  rdfs:label "Has value in constraint component" ;
+  sh:message "At least one of the values must be in {$hasValueIn}" ;
+  sh:parameter dash:HasValueInConstraintComponent-hasValueIn ;
+  sh:propertyValidator [
+      a sh:SPARQLSelectValidator ;
+      sh:prefixes <http://datashapes.org/dash> ;
+      sh:select """SELECT $this
+WHERE {
+	FILTER NOT EXISTS {
+    	$this $PATH ?value .
+		GRAPH $shapesGraph {
+			$hasValueIn rdf:rest*/rdf:first ?value .
+		}
+	}
+}""" ;
+    ] ;
+  sh:targetClass sh:PropertyShape ;
+.
+dash:HasValueInConstraintComponent-hasValueIn
+  a sh:Parameter ;
+  sh:path dash:hasValueIn ;
+.
+dash:HasValueTarget
+  a sh:SPARQLTargetType ;
+  rdfs:comment "A target type for all subjects where a given predicate has a certain object value." ;
+  rdfs:label "Has Value target" ;
+  rdfs:subClassOf sh:Target ;
+  sh:labelTemplate "All subjects where {$predicate} has value {$object}" ;
+  sh:parameter [
+      a sh:Parameter ;
+      sh:path dash:object ;
+      sh:description "The value that is expected to be present." ;
+      sh:name "object" ;
+    ] ;
+  sh:parameter [
+      a sh:Parameter ;
+      sh:path dash:predicate ;
+      sh:description "The predicate property." ;
+      sh:name "predicate" ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+  sh:prefixes <http://datashapes.org/dash> ;
+  sh:select """SELECT DISTINCT ?this
+WHERE {
+    ?this $predicate $object .
+}""" ;
 .
 dash:HasValueWithClassConstraintComponent
   a sh:ConstraintComponent ;
@@ -351,7 +534,7 @@ WHERE {
 	FILTER NOT EXISTS {
     	$this $PATH ?value .
 		?value a ?type .
-		?type rdfs:subClassOf* ?hasValueWithClass .
+		?type rdfs:subClassOf* $hasValueWithClass .
 	}
 }""" ;
     ] ;
@@ -364,18 +547,36 @@ dash:HasValueWithClassConstraintComponent-hasValueWithClass
   sh:nodeKind sh:IRI ;
 .
 dash:HyperlinkViewer
-  a dash:Viewer ;
+  a dash:SingleViewer ;
   rdfs:comment """A Viewer for literals, rendering as a hyperlink to a URL.
 
 For literals it assumes the lexical form is the URL.
 
 This is often used as default viewer for xsd:anyURI literals. Unsupported for blank nodes.""" ;
-  rdfs:label "Hyperlink Viewer" ;
+  rdfs:label "Hyperlink viewer" ;
 .
 dash:ImageViewer
-  a dash:Viewer ;
+  a dash:SingleViewer ;
   rdfs:comment "A Viewer for URI values that are recognized as images by a browser, rendering as an image." ;
-  rdfs:label "Image Viewer" ;
+  rdfs:label "Image viewer" ;
+.
+dash:ImplementationPropertyGroup
+  a sh:PropertyGroup ;
+  rdfs:label "Implementation" ;
+  sh:order "10"^^xsd:decimal ;
+.
+dash:IndexedConstraintComponent
+  a sh:ConstraintComponent ;
+  rdfs:comment "A constraint component that can be used to mark property shapes to be indexed, meaning that each of its value nodes must carry a dash:index from 0 to N." ;
+  rdfs:label "Indexed constraint component" ;
+  sh:parameter dash:IndexedConstraintComponent-indexed ;
+.
+dash:IndexedConstraintComponent-indexed
+  a sh:Parameter ;
+  sh:path dash:indexed ;
+  sh:datatype xsd:boolean ;
+  sh:description "True to activate indexing for this property." ;
+  sh:name "indexed" ;
 .
 dash:InferencingTestCase
   a rdfs:Class ;
@@ -391,14 +592,14 @@ dash:InferencingTestCase
     ] ;
 .
 dash:InstancesSelectEditor
-  a dash:Editor ;
+  a dash:SingleEditor ;
   rdfs:comment "A drop-down editor for all instances of the target class (based on sh:class of the property)." ;
   rdfs:label "Instances select editor" ;
 .
 dash:JSTestCase
   a rdfs:Class ;
-  rdfs:comment "A test case that calls a given JavaScript function like a sh:JSFunction and compares its result with the dash:expectedResult." ;
-  rdfs:label "JavaScript test case" ;
+  rdfs:comment "A test case that calls a given SHACL-JS JavaScript function like a sh:JSFunction and compares its result with the dash:expectedResult." ;
+  rdfs:label "SHACL-JS test case" ;
   rdfs:subClassOf dash:TestCase ;
   rdfs:subClassOf sh:JSFunction ;
   sh:property [
@@ -410,14 +611,14 @@ dash:JSTestCase
     ] ;
 .
 dash:LabelViewer
-  a dash:Viewer ;
+  a dash:SingleViewer ;
   rdfs:comment "A Viewer for URI resources, rendering as a hyperlink to that URI based on the display label of the resource. Also includes other ways of interacting with the URI such as opening a nested summary display." ;
-  rdfs:label "Label Viewer" ;
+  rdfs:label "Label viewer" ;
 .
 dash:LangStringViewer
-  a dash:Viewer ;
+  a dash:SingleViewer ;
   rdfs:comment "A Viewer for literals with a language tag, rendering as the text plus a language indicator." ;
-  rdfs:label "LangString Viewer" ;
+  rdfs:label "LangString viewer" ;
 .
 dash:ListNodeShape
   a sh:NodeShape ;
@@ -427,10 +628,12 @@ dash:ListNodeShape
       [
         sh:hasValue () ;
         sh:property [
+            a sh:PropertyShape ;
             sh:path rdf:first ;
             sh:maxCount 0 ;
           ] ;
         sh:property [
+            a sh:PropertyShape ;
             sh:path rdf:rest ;
             sh:maxCount 0 ;
           ] ;
@@ -440,11 +643,13 @@ dash:ListNodeShape
             sh:hasValue () ;
           ] ;
         sh:property [
+            a sh:PropertyShape ;
             sh:path rdf:first ;
             sh:maxCount 1 ;
             sh:minCount 1 ;
           ] ;
         sh:property [
+            a sh:PropertyShape ;
             sh:path rdf:rest ;
             sh:maxCount 1 ;
             sh:minCount 1 ;
@@ -467,6 +672,7 @@ The focus node must either be rdf:nil or not recursive. Furthermore, this shape 
             sh:hasValue () ;
           ] ;
         sh:property [
+            a sh:PropertyShape ;
             sh:path [
                 sh:oneOrMorePath rdf:rest ;
               ] ;
@@ -475,6 +681,7 @@ The focus node must either be rdf:nil or not recursive. Furthermore, this shape 
       ]
     ) ;
   sh:property [
+      a sh:PropertyShape ;
       sh:path [
           sh:zeroOrMorePath rdf:rest ;
         ] ;
@@ -483,9 +690,41 @@ The focus node must either be rdf:nil or not recursive. Furthermore, this shape 
     ] ;
 .
 dash:LiteralViewer
-  a dash:Viewer ;
+  a dash:SingleViewer ;
   rdfs:comment "A simple viewer for literals, rendering the lexical form of the value." ;
-  rdfs:label "Literal Viewer" ;
+  rdfs:label "Literal viewer" ;
+.
+dash:ModifyAction
+  a rdfs:Class ;
+  a sh:NodeShape ;
+  rdfs:comment "An action typically showing up in a Modify section of a selected resource. May make changes to the data." ;
+  rdfs:label "Modify action" ;
+  rdfs:subClassOf dash:ResourceAction ;
+  sh:property dash:ModifyAction-skipPreview ;
+.
+dash:ModifyAction-skipPreview
+  a sh:PropertyShape ;
+  sh:path dash:skipPreview ;
+  sh:datatype xsd:boolean ;
+  sh:description "For actions that take no parameters, this can be set to true to skip any means for the user to preview the action. It will instead directly execute the modification." ;
+  sh:group dash:DefinitionPropertyGroup ;
+  sh:maxCount 1 ;
+  sh:name "skip preview" ;
+  sh:order "11"^^xsd:decimal ;
+.
+dash:MultiEditor
+  a rdfs:Class ;
+  a sh:NodeShape ;
+  rdfs:comment "An editor for multiple/all value nodes at once." ;
+  rdfs:label "Multi editor" ;
+  rdfs:subClassOf dash:Editor ;
+.
+dash:MultiViewer
+  a rdfs:Class ;
+  a sh:NodeShape ;
+  rdfs:comment "A viewer for multiple/all values at once." ;
+  rdfs:label "Multi viewer" ;
+  rdfs:subClassOf dash:Viewer ;
 .
 dash:NonRecursiveConstraintComponent
   a sh:ConstraintComponent ;
@@ -632,8 +871,26 @@ dash:ReifiableByConstraintComponent-reifiableBy
   sh:description "Can be used to specify the node shape that may be applied to reified statements produced by a property shape. The property shape must have a URI resource as its sh:path. The values of this property must be node shapes. User interfaces can use this information to determine which properties to present to users when reified statements are explored or edited. Also, SHACL validators can use it to determine how to validate reified triples. Use dash:None to indicate that no reification should be permitted." ;
   sh:nodeKind sh:IRI ;
 .
+dash:ResourceAction
+  a rdfs:Class ;
+  a sh:NodeShape ;
+  dash:abstract true ;
+  rdfs:comment "An Action that can be executed for a selected resource. Such Actions show up in context menus once they have been assigned a sh:group." ;
+  rdfs:label "Resource action" ;
+  rdfs:subClassOf dash:Action ;
+  sh:property dash:ResourceAction-jsCondition ;
+.
+dash:ResourceAction-jsCondition
+  a sh:PropertyShape ;
+  sh:path dash:jsCondition ;
+  sh:datatype xsd:string ;
+  sh:description "A JavaScript expression that must return true before the action will be suggested to users. In the expression, the variable focusNode points at the resource for which the action is supposed to be executed for." ;
+  sh:group dash:ImplementationPropertyGroup ;
+  sh:name "JavaScript condition" ;
+  sh:order "5"^^xsd:decimal ;
+.
 dash:RichTextEditor
-  a dash:Editor ;
+  a dash:SingleEditor ;
   rdfs:comment "A rich text editor to enter the lexical value of a literal and a drop down to select language. The selected language is stored in the HTML lang attribute of the root node in the HTML DOM tree." ;
   rdfs:label "Rich text editor" ;
 .
@@ -676,13 +933,130 @@ dash:SPARQLSelectTemplate
 .
 dash:SPARQLUpdateSuggestionGenerator
   a rdfs:Class ;
-  rdfs:comment """A SuggestionGenerator based on a SPARQL UPDATE query (sh:update), producing an instance of dash:GraphUpdate. The INSERTs become dash:addedTriple and the DELETEs become dash:deletedTriple. The WHERE clause operates on the data graph with the pre-bound variables $subject, $predicate and $object, as well as the other pre-bound variables for the parameters of the constraint.
+  rdfs:comment """A SuggestionGenerator based on a SPARQL UPDATE query (sh:update), producing an instance of dash:GraphUpdate. The INSERTs become dash:addedTriple and the DELETEs become dash:deletedTriple. The WHERE clause operates on the data graph with the pre-bound variables $focusNode, $predicate and $value, as well as the other pre-bound variables for the parameters of the constraint.
 
 In many cases, there may be multiple possible suggestions to fix a problem. For example, with sh:maxLength there are many ways to slice a string. In those cases, the system will first iterate through the result variables from a SELECT query (sh:select) and apply these results as pre-bound variables into the UPDATE query.""" ;
   rdfs:label "SPARQL UPDATE suggestion generator" ;
   rdfs:subClassOf dash:SuggestionGenerator ;
   rdfs:subClassOf sh:SPARQLSelectExecutable ;
   rdfs:subClassOf sh:SPARQLUpdateExecutable ;
+.
+dash:Script
+  a rdfs:Class ;
+  a sh:NodeShape ;
+  rdfs:comment "An executable unit implemented in one or more languages such as JavaScript." ;
+  rdfs:label "Script" ;
+  rdfs:subClassOf rdfs:Resource ;
+  sh:property dash:Script-comment ;
+  sh:property dash:Script-js ;
+  sh:property dash:Script-label ;
+.
+dash:Script-comment
+  a sh:PropertyShape ;
+  sh:path rdfs:comment ;
+  dash:singleLine false ;
+  sh:description "The description(s)." ;
+  sh:group dash:DefinitionPropertyGroup ;
+  sh:nodeKind sh:Literal ;
+  sh:or dash:StringOrLangString ;
+  sh:order 1.0 ;
+.
+dash:Script-js
+  a sh:PropertyShape ;
+  sh:path dash:js ;
+  sh:datatype xsd:string ;
+  sh:description "The implementation as JavaScript." ;
+  sh:group dash:ImplementationPropertyGroup ;
+  sh:maxCount 1 ;
+  sh:name "JavaScript code" ;
+.
+dash:Script-label
+  a sh:PropertyShape ;
+  sh:path rdfs:label ;
+  dash:singleLine true ;
+  sh:description "The display label(s)." ;
+  sh:group dash:DefinitionPropertyGroup ;
+  sh:nodeKind sh:Literal ;
+  sh:or dash:StringOrLangString ;
+  sh:order 0.0 ;
+.
+dash:ScriptSuggestionGenerator
+  a rdfs:Class ;
+  a sh:NodeShape ;
+  rdfs:comment """A Suggestion Generator that is backed by an Active Data Shapes script. The script needs to return a JSON object or an array of JSON objects if it shall generate multiple suggestions. It may also return null to indicate that nothing was suggested. Note that the whole script is evaluated as a (JavaScript) expression, and those will use the last value as result. So simply putting an object at the end of your script should do. Alternatively, define the bulk of the operation as a function and simply call that function in the script.
+
+Each response object can have the following fields:
+
+{
+	message: \"The human readable message\",  // Defaults to the rdfs:label(s) of the suggestion generator
+	add: [ // An array of triples to add, each triple as an array with three nodes
+		[ subject, predicate, object ],
+		[ ... ]
+	],
+	delete: [
+		... like add, for the triples to delete
+	]
+}
+
+Suggestions with neither added nor deleted triples will be discarded.
+
+At execution time, the script operates on the data graph as the active graph, with the following pre-bound variables:
+- focusNode: the NamedNode that is the sh:focusNode of the validation result
+- predicate: the NamedNode representing the predicate of the validation result, assuming sh:resultPath is a URI
+- value: the value node from the validation result's sh:value, cast into the most suitable JS object
+- the other pre-bound variables for the parameters of the constraint, e.g. in a sh:maxCount constraint it would be maxCount
+
+The script will be executed in read-only mode, i.e. it cannot modify the graph.
+
+Example with dash:js:
+
+({
+	message: `Copy labels into ${graph.localName(predicate)}`,
+	add: focusNode.values(rdfs.label).map(label => 
+		[ focusNode, predicate, label ]
+    )
+})""" ;
+  rdfs:label "Script suggestion generator" ;
+  rdfs:subClassOf dash:Script ;
+  rdfs:subClassOf dash:SuggestionGenerator ;
+.
+dash:ScriptTestCase
+  a rdfs:Class ;
+  a sh:NodeShape ;
+  rdfs:comment """A test case that evaluates a script. Requires exactly one value for dash:js and will operate on the test case's graph (with imports) as both data and shapes graph.
+
+Supports read-only scripts only at this stage.""" ;
+  rdfs:label "Script test case" ;
+  rdfs:subClassOf dash:Script ;
+  rdfs:subClassOf dash:TestCase ;
+  sh:property [
+      a sh:PropertyShape ;
+      sh:path dash:expectedResult ;
+      sh:description "The expected result of the evaluation, as JSON object as produced by the servlet, or true or false." ;
+      sh:maxCount 1 ;
+      sh:name "expected result" ;
+    ] ;
+  sh:property [
+      a sh:PropertyShape ;
+      sh:path dash:focusNode ;
+      sh:description "The selected resource, which will become value of focusNode for the script, with its \"most suitable\" JavaScript class as type. Defaults to the test case itself." ;
+      sh:maxCount 1 ;
+      sh:name "focus node" ;
+      sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+.
+dash:ShapeScript
+  a rdfs:Class ;
+  rdfs:comment "A shape script contains extra code that gets injected into the API for the associated node shape. In particular you can use this to define additional functions that operate on the current focus node (the this variable in JavaScript)." ;
+  rdfs:label "Shape script" ;
+  rdfs:subClassOf dash:Script ;
+.
+dash:SingleEditor
+  a rdfs:Class ;
+  a sh:NodeShape ;
+  rdfs:comment "An editor for individual value nodes." ;
+  rdfs:label "Single editor" ;
+  rdfs:subClassOf dash:Editor ;
 .
 dash:SingleLineConstraintComponent
   a sh:ConstraintComponent ;
@@ -712,6 +1086,13 @@ User interfaces may use the dash:singleLine flag to prefer a text field over a (
 }""" ;
       sh:prefixes <http://datashapes.org/dash> ;
     ] ;
+.
+dash:SingleViewer
+  a rdfs:Class ;
+  a sh:NodeShape ;
+  rdfs:comment "A viewer for a single value." ;
+  rdfs:label "Single viewer" ;
+  rdfs:subClassOf dash:Viewer ;
 .
 dash:StemConstraintComponent
   a sh:ConstraintComponent ;
@@ -746,6 +1127,22 @@ dash:StringOrLangString
     ) ;
   rdfs:comment "An rdf:List that can be used in property constraints as value for sh:or to indicate that all values of a property must be either xsd:string or rdf:langString." ;
   rdfs:label "String or langString" ;
+.
+dash:StringOrLangStringOrHTML
+  a rdf:List ;
+  rdf:first [
+      sh:datatype xsd:string ;
+    ] ;
+  rdf:rest (
+      [
+        sh:datatype rdf:langString ;
+      ]
+      [
+        sh:datatype rdf:HTML ;
+      ]
+    ) ;
+  rdfs:comment "An rdf:List that can be used in property constraints as value for sh:or to indicate that all values of a property must be either xsd:string, rdf:langString or rdf:HTML (in that order of preference)." ;
+  rdfs:label "string or langString or HTML" ;
 .
 dash:SubSetOfConstraintComponent
   a sh:ConstraintComponent ;
@@ -842,6 +1239,7 @@ dash:TestCase
   rdfs:label "Test case" ;
   rdfs:subClassOf rdfs:Resource ;
   sh:property [
+      a sh:PropertyShape ;
       sh:path sh:deactivated ;
       sh:datatype xsd:boolean ;
       sh:description "If set to true, this test case will be skipped." ;
@@ -883,36 +1281,36 @@ dash:TestEnvironment
   rdfs:subClassOf rdfs:Resource ;
 .
 dash:TextAreaEditor
-  a dash:Editor ;
+  a dash:SingleEditor ;
   rdfs:comment "A multi-line text area to enter the value of a literal." ;
   rdfs:label "Text area editor" ;
 .
 dash:TextAreaWithLangEditor
-  a dash:Editor ;
+  a dash:SingleEditor ;
   rdfs:comment "A multi-line text area to enter the value of a literal and a drop down to select a language." ;
   rdfs:label "Text area with lang editor" ;
 .
 dash:TextFieldEditor
-  a dash:Editor ;
+  a dash:SingleEditor ;
   rdfs:comment """A simple input field to enter the value of a literal, without the ability to change language or datatype.
 
 This is the fallback editor for any literal if no other editors are more suitable.""" ;
   rdfs:label "Text field editor" ;
 .
 dash:TextFieldWithLangEditor
-  a dash:Editor ;
+  a dash:SingleEditor ;
   rdfs:comment "A single-line input field to enter the value of a literal and a drop down to select language, which is mandatory unless xsd:string is among the permissible datatypes." ;
   rdfs:label "Text field with lang editor" ;
 .
 dash:URIEditor
-  a dash:Editor ;
+  a dash:SingleEditor ;
   rdfs:comment "An input field to enter the URI of a resource, e.g. rdfs:seeAlso links or images." ;
   rdfs:label "URI editor" ;
 .
 dash:URIViewer
-  a dash:Viewer ;
+  a dash:SingleViewer ;
   rdfs:comment "A Viewer for URI resources, rendering as a hyperlink to that URI. Also includes other ways of interacting with the URI such as opening a nested summary display." ;
-  rdfs:label "URI Viewer" ;
+  rdfs:label "URI viewer" ;
 .
 dash:UniqueValueForClassConstraintComponent
   a sh:ConstraintComponent ;
@@ -950,6 +1348,11 @@ dash:UniqueValueForClassConstraintComponent-uniqueValueForClass
   sh:class rdfs:Class ;
   sh:nodeKind sh:IRI ;
 .
+dash:UntrustedHTMLViewer
+  a dash:SingleViewer ;
+  rdfs:comment "A Viewer for HTML content from untrusted sources. This viewer will sanitize the HTML before rendering. Any a, button, checkbox, form, hidden, input, img, script, select, style and textarea tags and class and style attributes will be removed." ;
+  rdfs:label "Untrusted HTML viewer" ;
+.
 dash:ValidationTestCase
   a rdfs:Class ;
   a sh:NodeShape ;
@@ -966,13 +1369,14 @@ dash:ValidationTestCase
     ] ;
 .
 dash:ValueTableViewer
-  a dash:Viewer ;
+  a dash:MultiViewer ;
   rdfs:comment "A viewer that renders all values of a given property as a table, with one value per row, and the columns defined by the shape that is the sh:node or sh:class of the property." ;
   rdfs:label "Value table viewer" ;
 .
 dash:Viewer
   a rdfs:Class ;
   a sh:NodeShape ;
+  dash:abstract true ;
   rdfs:comment "The class of widgets for viewing value nodes." ;
   rdfs:label "Viewer" ;
   rdfs:subClassOf dash:Widget ;
@@ -991,6 +1395,20 @@ dash:abstract
   rdfs:domain rdfs:Class ;
   rdfs:label "abstract" ;
   rdfs:range xsd:boolean ;
+.
+dash:actionGroup
+  a rdf:Property ;
+  rdfs:comment "Links an Action with the ActionGroup that it should be arranged in." ;
+  rdfs:domain dash:Action ;
+  rdfs:label "action group" ;
+  rdfs:range dash:ActionGroup ;
+.
+dash:actionIconClass
+  a rdf:Property ;
+  rdfs:comment "The (CSS) class of an Action for display purposes alongside the label." ;
+  rdfs:domain dash:Action ;
+  rdfs:label "action icon class" ;
+  rdfs:range xsd:string ;
 .
 dash:addedTriple
   a rdf:Property ;
@@ -1062,6 +1480,12 @@ dash:deletedTriple
   rdfs:label "deleted triple" ;
   rdfs:range rdf:Statement ;
 .
+dash:dependencyPredicate
+  a rdf:Property ;
+  rdfs:comment "Can be used in dash:js node expressions to enumerate the predicates that the computation of the values may depend on. This can be used by clients to determine whether an edit requires re-computation of values on a form or elsewhere. For example, if the dash:js is something like \"focusNode.firstName + focusNode.lastName\" then the dependency predicates should be ex:firstName and ex:lastName." ;
+  rdfs:label "dependency predicate" ;
+  rdfs:range rdf:Property ;
+.
 dash:detailsEndpoint
   a rdf:Property ;
   rdfs:comment """Can be used to link a SHACL property shape with the URL of a SPARQL endpoint that may contain further RDF triples for the value nodes delivered by the property. This can be used to inform a processor that it should switch to values from an external graph when the user wants to retrieve more information about a value.
@@ -1086,6 +1510,12 @@ dash:editor
   rdfs:domain sh:PropertyShape ;
   rdfs:label "editor" ;
   rdfs:range dash:Editor ;
+.
+dash:excludedPrefix
+  a rdf:Property ;
+  rdfs:comment "Specifies a prefix that shall be excluded from the Script code generation." ;
+  rdfs:label "excluded prefix" ;
+  rdfs:range xsd:string ;
 .
 dash:expectedResult
   a rdf:Property ;
@@ -1209,6 +1639,12 @@ dash:hasStem
   sh:ask "ASK { FILTER (isIRI($value) && STRSTARTS(str($value), $stem)) }" ;
   sh:prefixes <http://datashapes.org/dash> ;
 .
+dash:hasValueIn
+  a rdf:Property ;
+  rdfs:comment "Specifies a constraint that at least one of the value nodes must be a member of the given list." ;
+  rdfs:label "has value in" ;
+  rdfs:range rdf:List ;
+.
 dash:hasValueWithClass
   a rdf:Property ;
   rdfs:comment "Specifies a constraint that at least one of the value nodes must be an instance of a given class." ;
@@ -1223,7 +1659,7 @@ dash:height
 .
 dash:hidden
   a rdf:Property ;
-  rdfs:comment "Properties marked as readOnly do not appear in user interfaces, yet remain part of the shape for other purposes such as validation and GraphQL schemas." ;
+  rdfs:comment "Properties marked as hidden do not appear in user interfaces, yet remain part of the shape for other purposes such as validation and scripting or GraphQL schema generation." ;
   rdfs:domain sh:PropertyShape ;
   rdfs:label "hidden" ;
   rdfs:range xsd:boolean ;
@@ -1234,6 +1670,16 @@ dash:includedExecutionPlatform
   rdfs:domain dash:ExecutionPlatform ;
   rdfs:label "included execution platform" ;
   rdfs:range dash:ExecutionPlatform ;
+.
+dash:index
+  a rdf:Property ;
+  rdfs:label "index" ;
+  rdfs:range xsd:integer ;
+.
+dash:indexed
+  a rdf:Property ;
+  rdfs:domain sh:PropertyShape ;
+  rdfs:range xsd:boolean ;
 .
 dash:isDeactivated
   a sh:SPARQLFunction ;
@@ -1331,6 +1777,13 @@ dash:isNodeKindLiteral
   sh:prefixes <http://datashapes.org/dash> ;
   sh:returnType xsd:boolean ;
 .
+dash:js
+  a rdf:Property ;
+  rdfs:comment "The JavaScript source code of a Script." ;
+  rdfs:domain dash:Script ;
+  rdfs:label "JavaScript source code" ;
+  rdfs:range xsd:string ;
+.
 dash:localConstraint
   a rdf:Property ;
   rdfs:comment """Can be set to true for those constraint components where the validation does not require to visit any other triples than the shape definitions and the direct property values of the focus node mentioned in the property constraints. Examples of this include sh:minCount and sh:hasValue.
@@ -1341,6 +1794,15 @@ Any component marked with dash:staticConstraint is also a dash:localConstraint."
   rdfs:domain sh:ConstraintComponent ;
   rdfs:label "local constraint" ;
   rdfs:range xsd:boolean ;
+.
+dash:mimeTypes
+  a rdf:Property ;
+  rdfs:comment """For file-typed properties, this can be used to specify the expected/allowed mime types of its values. This can be used, for example, to limit file input boxes or file selectors. If multiple values are allowed then they need to be separated by commas.
+
+Example values are listed at https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types""" ;
+  rdfs:domain sh:PropertyShape ;
+  rdfs:label "mime types" ;
+  rdfs:range xsd:string ;
 .
 dash:propertySuggestionGenerator
   a rdf:Property ;
@@ -1369,6 +1831,13 @@ dash:requiredExecutionPlatform
   rdfs:label "required execution platform" ;
   rdfs:range dash:ExecutionPlatform ;
 .
+dash:resourceAction
+  a rdf:Property ;
+  rdfs:comment "Links a class with the Resource Actions that can be applied to instances of that class." ;
+  rdfs:domain rdfs:Class ;
+  rdfs:label "resource action" ;
+  rdfs:range dash:ResourceAction ;
+.
 dash:rootClass
   a rdf:Property ;
   rdfs:label "root class" ;
@@ -1378,6 +1847,11 @@ dash:shape
   rdfs:comment "States that a subject resource has a given shape. This property can, for example, be used to capture results of SHACL validation on static data." ;
   rdfs:label "shape" ;
   rdfs:range sh:Shape ;
+.
+dash:shapeScript
+  a rdf:Property ;
+  rdfs:domain sh:NodeShape ;
+  rdfs:label "shape script" ;
 .
 dash:singleLine
   a rdf:Property ;
@@ -1433,13 +1907,6 @@ dash:symmetric
   a rdf:Property ;
   rdfs:comment "True to declare that the associated property path is symmetric." ;
   rdfs:label "symmetric" ;
-.
-dash:testEnvironment
-  a rdf:Property ;
-  rdfs:comment "Can be used by TestCases to point at a resource with information on how to set up the execution environment prior to execution." ;
-  rdfs:domain dash:TestCase ;
-  rdfs:label "test environment" ;
-  rdfs:range dash:TestEnvironment ;
 .
 dash:testModifiesEnvironment
   a rdf:Property ;

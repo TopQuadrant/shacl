@@ -18,6 +18,15 @@ package org.topbraid.shacl.js;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.Map;
+
+import org.apache.jena.atlas.json.JsonArray;
+import org.apache.jena.atlas.json.JsonBoolean;
+import org.apache.jena.atlas.json.JsonNull;
+import org.apache.jena.atlas.json.JsonNumber;
+import org.apache.jena.atlas.json.JsonObject;
+import org.apache.jena.atlas.json.JsonString;
+import org.apache.jena.atlas.json.JsonValue;
 
 /**
  * Utility methods to work with Nashorn objects using reflection - in cases where
@@ -39,6 +48,42 @@ public class NashornUtil {
     	   return null;
        }
 	}
+
+	
+	public static JsonValue asJsonValue(Object object) throws Exception {
+		if(object instanceof String) {
+			return new JsonString(object.toString());
+		}
+		else if(object instanceof Number) {
+			return JsonNumber.valueDecimal(object.toString());
+		}
+		else if(object instanceof Boolean) {
+			return new JsonBoolean((Boolean)object);
+		}
+		else if(NashornUtil.isArraySafe(object)) {
+			JsonArray array = new JsonArray();
+			for(Object item : NashornUtil.asArray(object)) {
+				array.add(asJsonValue(item));
+			}
+			return array;
+		}
+		else if(object == null) {
+			return JsonNull.instance;
+		}
+		else if(object instanceof Map) {
+			@SuppressWarnings("rawtypes")
+			Map map = (Map) object;
+			JsonObject json = new JsonObject();
+			for(Object key : map.keySet()) {
+				Object value = map.get(key);
+				json.put(key.toString(), asJsonValue(value));
+			}
+			return json;
+		}
+		else {
+			throw new IllegalArgumentException("Unexpected Nashorn object " + object);
+		}
+	}
 	
 
 	public static boolean isArray(Object obj) throws Exception {
@@ -48,6 +93,16 @@ public class NashornUtil {
             return result != null && result.equals(true);
 		}
 		else {
+			return false;
+		}
+	}
+	
+
+	public static boolean isArraySafe(Object obj) {
+		try {
+			return isArray(obj);
+		}
+		catch(Exception ex) {
 			return false;
 		}
 	}

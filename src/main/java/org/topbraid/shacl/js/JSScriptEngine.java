@@ -16,6 +16,7 @@
  */
 package org.topbraid.shacl.js;
 
+import javax.script.Bindings;
 import javax.script.ScriptException;
 
 import org.apache.jena.query.QuerySolution;
@@ -30,6 +31,8 @@ import org.apache.jena.rdf.model.Resource;
 public interface JSScriptEngine {
 	
 	Object eval(String expr) throws ScriptException;
+	
+	Object eval(String expr, Bindings bindings) throws ScriptException;
 
 	void executeLibraries(Resource exec) throws Exception;
 	

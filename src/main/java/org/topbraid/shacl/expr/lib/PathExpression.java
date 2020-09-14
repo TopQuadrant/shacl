@@ -19,6 +19,7 @@ package org.topbraid.shacl.expr.lib;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.path.Path;
@@ -73,6 +74,16 @@ public class PathExpression extends AbstractInputExpression {
 	@Override
 	public ExtendedIterator<RDFNode> evalReverse(RDFNode valueNode, NodeExpressionContext context) {
 		return eval.evalReverse(valueNode, context);
+	}
+	
+	
+	public Path getJenaPath() {
+		return eval.getJenaPath();
+	}
+	
+	
+	public Property getPredicate() {
+		return eval.getPredicate();
 	}
 
 

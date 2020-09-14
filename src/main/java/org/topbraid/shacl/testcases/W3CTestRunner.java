@@ -46,6 +46,7 @@ import org.topbraid.jenax.util.ExceptionUtil;
 import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.arq.SHACLPaths;
 import org.topbraid.shacl.engine.ShapesGraph;
+import org.topbraid.shacl.engine.ShapesGraphFactory;
 import org.topbraid.shacl.engine.filters.CoreConstraintFilter;
 import org.topbraid.shacl.util.ModelPrinter;
 import org.topbraid.shacl.validation.ValidationEngine;
@@ -241,7 +242,7 @@ public class W3CTestRunner {
 			Dataset dataset = ARQFactory.get().getDataset(dataModel);
 			dataset.addNamedModel(shapesGraphURI.toString(), shapesModel);
 
-			ShapesGraph shapesGraph = new ShapesGraph(shapesModel);
+			ShapesGraph shapesGraph = ShapesGraphFactory.get().createShapesGraph(shapesModel);
 			ValidationEngineConfiguration configuration = new ValidationEngineConfiguration().setValidateShapes(false);
 			if(entry.hasProperty(ResourceFactory.createProperty(MF.NS + "requires"), SHT.CoreOnly)) {
 				shapesGraph.setConstraintFilter(new CoreConstraintFilter());

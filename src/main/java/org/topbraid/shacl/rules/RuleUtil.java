@@ -33,6 +33,7 @@ import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.arq.SHACLFunctions;
 import org.topbraid.shacl.engine.Shape;
 import org.topbraid.shacl.engine.ShapesGraph;
+import org.topbraid.shacl.engine.ShapesGraphFactory;
 import org.topbraid.shacl.js.SHACLScriptEngineManager;
 import org.topbraid.shacl.util.SHACLSystemModel;
 import org.topbraid.shacl.util.SHACLUtil;
@@ -115,7 +116,7 @@ public class RuleUtil {
 		Dataset dataset = ARQFactory.get().getDataset(dataModel);
 		dataset.addNamedModel(shapesGraphURI.toString(), shapesModel);
 
-		ShapesGraph shapesGraph = new ShapesGraph(shapesModel);
+		ShapesGraph shapesGraph = ShapesGraphFactory.get().createShapesGraph(shapesModel);
 		RuleEngine engine = new RuleEngine(dataset, shapesGraphURI, shapesGraph, inferencesModel);
 		engine.setProgressMonitor(monitor);
 		
