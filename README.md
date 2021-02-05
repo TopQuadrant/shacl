@@ -75,3 +75,8 @@ where `-shapesfile` is optional and falls back to using the data graph as shapes
 Currently only Turtle (.ttl) files and SHACL Compact Syntax (.shaclc) files are supported.
 
 The tools print the validation report or the inferences graph to the output screen.
+
+
+## Quick Command Line Usage
+
+If you have Docker installed you can, with little setup effort, use this with [shacl_box](https://github.com/justin2004/shacl_box).
