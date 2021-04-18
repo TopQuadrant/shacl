@@ -38,6 +38,7 @@ import org.apache.jena.sparql.function.FunctionFactory;
 import org.apache.jena.sparql.function.FunctionRegistry;
 import org.apache.jena.sparql.sse.ItemList;
 import org.apache.jena.sparql.sse.builders.BuilderExpr;
+import org.apache.jena.sparql.sse.builders.ExprBuildException;
 import org.apache.jena.sparql.util.Context;
 import org.apache.jena.sparql.util.ExprUtils;
 import org.apache.jena.sparql.util.FmtUtils;
@@ -54,8 +55,6 @@ import org.topbraid.shacl.vocabulary.SPARQL;
 public class FunctionExpression extends ComplexNodeExpression {
 	
 	private List<NodeExpression> args;
-	
-	private static MyBuilderExpr bob = new MyBuilderExpr() ;
 	
 	private Expr expr;
 	
@@ -75,11 +74,15 @@ public class FunctionExpression extends ComplexNodeExpression {
 			for(int i = 0; i < args.size(); i++) {
 				il.add(Var.alloc("a" + i));
 			}
-			BuilderExpr.Build build = bob.getBuild(function.getLocalName());
-			if(build == null) {
-				throw new IllegalArgumentException("Unknown SPARQL built-in " + function.getLocalName());
-			}
-			this.expr = build.make(il);
+			
+			if ( ! BuilderExpr.isDefined(function.getLocalName()) )
+			    throw new IllegalArgumentException("Unknown SPARQL built-in " + function.getLocalName());
+
+	         try { 
+	             this.expr = BuilderExpr.buildExpr(il);
+	         } catch (ExprBuildException ex) {
+	             throw new IllegalArgumentException("Failed to build expression for "+il);
+	         }
 		}
 		else {
 			StringBuffer sb = new StringBuffer();
@@ -193,13 +196,5 @@ public class FunctionExpression extends ComplexNodeExpression {
 	@Override
 	public void visit(NodeExpressionVisitor visitor) {
 		visitor.visit(this);
-	}
-	
-	
-	private static class MyBuilderExpr extends BuilderExpr {
-		
-		BuilderExpr.Build getBuild(String name) {
-			return dispatch.get(name);
-		}
 	}
 }

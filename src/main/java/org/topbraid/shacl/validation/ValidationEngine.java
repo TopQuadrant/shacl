@@ -173,18 +173,16 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 				if(!nodeShape.hasProperty(SH.deactivated, JenaDatatypes.TRUE)) {
 					for(SHPropertyShape ps : nodeShape.getPropertyShapes()) {
 						if(!ps.hasProperty(SH.deactivated, JenaDatatypes.TRUE)) {
-							Resource path = ps.getPath();
-							if(path instanceof Resource) {
-								Statement values = ps.getProperty(SH.values);
-								if(values != null) {
-									NodeExpression ne = NodeExpressionFactory.get().create(values.getObject());
-									ne.eval(focusNode, this).forEachRemaining(v -> inferencesModel.getGraph().add(Triple.create(focusNode.asNode(), path.asNode(), v.asNode())));
-								}
-								Statement defaultValue = ps.getProperty(SH.defaultValue);
-								if(defaultValue != null) {
-									defaultValueMap.put(JenaUtil.asProperty(path), defaultValue.getObject());
-								}
-							}
+						    Resource path = ps.getPath();
+						    Statement values = ps.getProperty(SH.values);
+						    if(values != null) {
+						        NodeExpression ne = NodeExpressionFactory.get().create(values.getObject());
+						        ne.eval(focusNode, this).forEachRemaining(v -> inferencesModel.getGraph().add(Triple.create(focusNode.asNode(), path.asNode(), v.asNode())));
+						    }
+						    Statement defaultValue = ps.getProperty(SH.defaultValue);
+						    if(defaultValue != null) {
+						        defaultValueMap.put(JenaUtil.asProperty(path), defaultValue.getObject());
+						    }
 						}
 					}
 				}
