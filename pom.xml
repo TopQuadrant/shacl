@@ -73,6 +73,7 @@
     <ver.antlr>4.5.3</ver.antlr>
     <ver.slf4j>1.7.30</ver.slf4j>
     <ver.log4j2>2.14.1</ver.log4j2>
+    <java.version>11</java.version>
   </properties>
 
   <dependencies>
@@ -118,14 +119,9 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.0</version>
-         <configuration>
-            <encoding>UTF-8</encoding>
-            <debug>true</debug>
-            <debuglevel>source,lines,vars</debuglevel>
-            <optimize>true</optimize>
-            <source>1.8</source>
-            <target>1.8</target>
+        <version>3.8.1</version>
+        <configuration>
+          <release>${java.version}</release>
          </configuration>
       </plugin>
 
