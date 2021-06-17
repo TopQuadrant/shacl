@@ -29,6 +29,7 @@ import org.apache.jena.sparql.expr.ExprAggregator;
 import org.apache.jena.sparql.expr.ExprFunction;
 import org.apache.jena.sparql.expr.ExprFunctionOp;
 import org.apache.jena.sparql.expr.ExprNone;
+import org.apache.jena.sparql.expr.ExprTripleTerm;
 import org.apache.jena.sparql.expr.ExprVar;
 import org.apache.jena.sparql.expr.ExprVisitorFunction;
 import org.apache.jena.sparql.expr.NodeValue;
@@ -146,6 +147,8 @@ public class SPARQLSyntaxChecker {
 							expr.visit(this);
 						}
 					}
+                    @Override
+                    public void visit(ExprTripleTerm tripleTerm) {}
 				});
 			}
 		};

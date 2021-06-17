@@ -4,6 +4,7 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -16,7 +17,9 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.system.PrefixMap;
 import org.apache.jena.riot.system.RiotLib;
@@ -42,7 +45,7 @@ public class SHACLCWriter extends WriterGraphRIOTBase {
 	);
 	
 	private static Set<Property> specialShapeProperties = Sets.newHashSet(
-			RDF.type, SH.property, SH.node
+			RDF.type, SH.property, SH.node, SH.targetClass
 	);
 
 	@Override
@@ -140,14 +143,30 @@ public class SHACLCWriter extends WriterGraphRIOTBase {
 	
 	private void writeShape(IndentedWriter out, Resource shape) {
 		out.print("shape " + iri(shape));
+		if ( shape.hasProperty(SH.targetClass) ) {
+		    out.print(" ->");
+		    StmtIterator iter = shape.listProperties(SH.targetClass);
+		    try {
+		        while(iter.hasNext()) {
+		            out.print(" ");
+		            Resource x = iter.next().getResource();
+		            out.print(iri(x));
+		        }
+		        
+		    } finally {
+		        iter.close();
+		    }
+		    
+		}
 		writeShapeBody(out, shape);
 	}
 	
 	
 	private void writeShapeBody(IndentedWriter out, Resource shape) {
-		writeExtraStatements(out, shape, specialShapeProperties, false);
 		out.println(" {");
 		out.incIndent();
+        writeExtraStatements(out, shape, specialShapeProperties, false);
+        out.ensureStartOfLine();
 		List<Resource> properties = new LinkedList<>();
 		for(Resource property : JenaUtil.getResourceProperties(shape, SH.property)) {
 			properties.add(property);
@@ -212,11 +231,28 @@ public class SHACLCWriter extends WriterGraphRIOTBase {
 			for(Statement s : extras) {
 				out.print(" " + getPredicateName(s.getPredicate()));
 				out.print("=");
-				out.print(node(s.getObject()));
+				if ( s.getObject().isAnon() ) {
+				    boolean first = true;
+				    out.print("[");
+				    if ( s.getObject().canAs(RDFList.class) ) {
+				        RDFList list = s.getObject().as(RDFList.class);
+				        Iterator<RDFNode> iter = list.iterator();
+				        while(iter.hasNext()) {
+				            RDFNode x = iter.next();
+				            if ( ! first )
+				                out.print(" ");
+				            first = false;
+				            out.print(node(x));
+				        }
+				        out.print("]");
+				    }
+				} else
+				    out.print(node(s.getObject()));
 			}
 			if(wrapped) {
 				out.print(" )");
 			}
+			out.print(" .");
 		}
 	}
 	
@@ -233,9 +269,11 @@ public class SHACLCWriter extends WriterGraphRIOTBase {
 	private List<Statement> getExtraStatements(Resource subject, Set<Property> specialProperties) {
 		List<Statement> results = new LinkedList<>();
 		for(Statement s : subject.listProperties().toList()) {
-			if(SH.NS.equals(s.getPredicate().getNameSpace()) && !specialProperties.contains(s.getPredicate()) && !s.getObject().isAnon()) {
-				results.add(s);
-			}
+		    if(SH.NS.equals(s.getPredicate().getNameSpace()) && !specialProperties.contains(s.getPredicate()) ) {
+		        // If blank node, add if a list.
+		        if ( !s.getObject().isAnon() || s.getObject().canAs(RDFList.class) )
+		            results.add(s);
+		    }
 		}
 		Collections.sort(results, new Comparator<Statement>() {
 			@Override
@@ -313,7 +351,7 @@ public class SHACLCWriter extends WriterGraphRIOTBase {
 			return iri((Resource)node);
 		}
 		else if(node.isLiteral()) {
-			return FmtUtils.stringForNode(node.asNode());
+			return FmtUtils.stringForNode(node.asNode(), node.getModel());
 		}
 		else {
 			// TODO?

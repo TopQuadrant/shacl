@@ -90,14 +90,14 @@ public class NashornScriptEngine implements JSScriptEngine {
 	}
 
 	private ScriptEngine findNashorn() {
-		ScriptEngine nashorn = new ScriptEngineManager().getEngineByName("nashorn");
-		if (nashorn == null) {
-			nashorn = new ScriptEngineManager(null).getEngineByName("nashorn");
+		ScriptEngine scriptEngine = new ScriptEngineManager().getEngineByName("javascript");
+		if (scriptEngine == null) {
+			scriptEngine = new ScriptEngineManager(null).getEngineByName("javascript");
 		}
-		if (nashorn == null) {
-			throw new RuntimeException("Oracle Nashorn not found in the current context");
+		if (scriptEngine == null) {
+			throw new RuntimeException("No javascript ScriptEngine found in the current context");
 		}
-		return nashorn;
+		return scriptEngine;
 	}
 	
 	

@@ -28,6 +28,8 @@ import org.apache.jena.query.ReadWrite;
 import org.apache.jena.query.TxnType;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.riot.system.PrefixMap;
+import org.apache.jena.riot.system.Prefixes;
 import org.apache.jena.shared.Lock;
 import org.apache.jena.sparql.core.DatasetGraphBase;
 import org.apache.jena.sparql.core.Quad;
@@ -91,6 +93,12 @@ public class DatasetWrappingDatasetGraph extends DatasetGraphBase {
 
 
 	@Override
+    public PrefixMap prefixes() {
+        return Prefixes.adapt(dataset.getPrefixMapping());
+    }
+
+
+    @Override
 	public Iterator<Quad> find(Node g, Node s, Node p, Node o) {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException();

@@ -68,11 +68,12 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <ver.jena>3.16.0</ver.jena>
-    <ver.junit>4.12</ver.junit>
+    <ver.jena>4.1.0</ver.jena>
+    <ver.junit>4.13.2</ver.junit>
     <ver.antlr>4.5.3</ver.antlr>
-    <ver.slf4j>1.7.26</ver.slf4j>
-    <ver.log4j1>1.2.17</ver.log4j1>
+    <ver.slf4j>1.7.30</ver.slf4j>
+    <ver.log4j2>2.14.1</ver.log4j2>
+    <java.version>11</java.version>
   </properties>
 
   <dependencies>
@@ -102,20 +103,11 @@
       <version>${ver.antlr}</version>
     </dependency>
 
-    <!-- Logging : <optional> so the application chooses the provider for slf4j -->
+    <!-- Require a logging implementation -->
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>${ver.slf4j}</version>
-      <optional>true</optional>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>${ver.log4j1}</version>
-      <optional>true</optional>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j-impl</artifactId>
+      <version>${ver.log4j2}</version>
       <scope>test</scope>
     </dependency>
 
@@ -127,14 +119,9 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.0</version>
-         <configuration>
-            <encoding>UTF-8</encoding>
-            <debug>true</debug>
-            <debuglevel>source,lines,vars</debuglevel>
-            <optimize>true</optimize>
-            <source>1.8</source>
-            <target>1.8</target>
+        <version>3.8.1</version>
+        <configuration>
+          <release>${java.version}</release>
          </configuration>
       </plugin>
 

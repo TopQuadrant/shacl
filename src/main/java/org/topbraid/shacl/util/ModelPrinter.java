@@ -19,7 +19,7 @@ package org.topbraid.shacl.util;
 import java.io.StringWriter;
 
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.RDFWriter;
+import org.apache.jena.rdf.model.RDFWriterI;
 import org.apache.jena.util.FileUtils;
 
 /**
@@ -42,14 +42,14 @@ public class ModelPrinter {
 	}
 	
 	
-	protected RDFWriter createRDFWriter(Model model) {
+	protected RDFWriterI createRDFWriter(Model model) {
 		return model.getWriter(FileUtils.langTurtle);
 	}
 	
 	
 	public String print(Model model) {
 		StringWriter writer = new StringWriter();
-		RDFWriter w = createRDFWriter(model);
+		RDFWriterI w = createRDFWriter(model);
 		w.write(model, writer, "http://example.org/random");
 		return writer.toString();
 	}
