@@ -24,6 +24,7 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.topbraid.jenax.progress.ProgressMonitor;
+import org.topbraid.jenax.util.DatasetWithDifferentDefaultModel;
 import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.entailment.SHACLEntailment;
@@ -39,7 +40,8 @@ public class RulesEntailment implements SHACLEntailment.Engine {
 			inferencesModel.getGraph()
 		});
 		Model unionDataModel = ModelFactory.createModelForGraph(unionGraph);
-		RuleEngine engine = new RuleEngine(dataset, shapesGraphURI, shapesGraph, inferencesModel);
+		Dataset newDataset = new DatasetWithDifferentDefaultModel(unionDataModel, dataset);
+		RuleEngine engine = new RuleEngine(newDataset, shapesGraphURI, shapesGraph, inferencesModel);
 		engine.setProgressMonitor(monitor);
 		engine.executeAll();
 		engine.executeAllDefaultValues();
