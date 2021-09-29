@@ -68,7 +68,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <ver.jena>4.1.0</ver.jena>
+    <ver.jena>4.2.0</ver.jena>
     <ver.junit>4.13.2</ver.junit>
     <ver.antlr>4.5.3</ver.antlr>
     <ver.slf4j>1.7.30</ver.slf4j>
