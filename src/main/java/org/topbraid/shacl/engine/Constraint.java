@@ -31,22 +31,27 @@ import org.topbraid.shacl.validation.ConstraintExecutors;
 import org.topbraid.shacl.vocabulary.SH;
 
 /**
- * Represents a constraint as input to an engine (e.g. validation or rule).
- * Here, a constraint is combination of parameters, e.g. a specific value
+ * Represents a constraint as input to an engine (e.g. validation or inferencing).
+ * Here, a constraint is the combination of parameters, e.g. a specific value
  * of sh:datatype at a given Shape.
  * 
  * @author Holger Knublauch
  */
 public class Constraint {
 	
+	// The constraint component resource, e.g. sh:DatatypeConstraintComponent
 	private SHConstraintComponent component;
 	
+	// The constraint executor, computed on demand
 	private ConstraintExecutor executor;
 	
+	// The parameter value that triggered this, e.g. the specific sh:datatype triple object
 	private RDFNode parameterValue;
-	
+
+	// The list of parameters
 	private List<SHParameter> params;
 
+	// The owning Shape
 	private Shape shape;
 	
 	
@@ -95,7 +100,7 @@ public class Constraint {
 	}
 	
 	
-	public ConstraintExecutor getExecutor() {
+	public synchronized ConstraintExecutor getExecutor() {
 		if(executor == null) {
 			executor = ConstraintExecutors.get().getExecutor(this);
 		}

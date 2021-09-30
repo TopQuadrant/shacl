@@ -20,7 +20,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.jena.rdf.model.Resource;
-import org.topbraid.shacl.validation.js.JSTargetLanguage;
 import org.topbraid.shacl.validation.sparql.SPARQLTargetLanguage;
 
 /**
@@ -62,18 +61,5 @@ public class CustomTargets {
 	
 	private void init() {
 		addLanguage(new SPARQLTargetLanguage());
-		addLanguage(new JSTargetLanguage());
-	}
-	
-	
-	public void setJSPreferred(boolean value) {
-		languages.clear();
-		if(value) {
-			addLanguage(new JSTargetLanguage());
-			addLanguage(new SPARQLTargetLanguage());
-		}
-		else {
-			init();
-		}
 	}
 }

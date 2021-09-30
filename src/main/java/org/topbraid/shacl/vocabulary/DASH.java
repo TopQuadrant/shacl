@@ -39,14 +39,28 @@ public class DASH {
     public final static Resource ActionGroup = ResourceFactory.createResource(NS + "ActionGroup");
     
     public final static Resource ActionTestCase = ResourceFactory.createResource(NS + "ActionTestCase");
+    
+    public final static Resource addedGraph = ResourceFactory.createResource(NS + "addedGraph");
 
 	public final static Resource all = ResourceFactory.createResource(NS + "all");
 
-	public final static Resource DefaultValueTypeRule = ResourceFactory.createResource(NS + "DefaultValueTypeRule");
+    public final static Resource ChangeScript = ResourceFactory.createResource(NS + "ChangeScript");
+
+    public final static Resource Constructor = ResourceFactory.createResource(NS + "Constructor");
+    
+    public final static Resource deletedGraph = ResourceFactory.createResource(NS + "deletedGraph");
+
+    public final static Resource DepictionRole = ResourceFactory.createResource(NS + "DepictionRole");
+
+    public final static Resource Deprecated = ResourceFactory.createResource(NS + "Deprecated");
+
+    public final static Resource DescriptionRole = ResourceFactory.createResource(NS + "DescriptionRole");
 
     public final static Resource Editor = ResourceFactory.createResource(NS + "Editor");
 
     public final static Resource ExecutionPlatform = ResourceFactory.createResource(NS + "ExecutionPlatform");
+
+    public final static Resource Experimental = ResourceFactory.createResource(NS + "Experimental");
     
     public final static Resource ExploreAction = ResourceFactory.createResource(NS + "ExploreAction");
 
@@ -56,11 +70,19 @@ public class DASH {
 
     public final static Resource FunctionTestCase = ResourceFactory.createResource(NS + "FunctionTestCase");
 
+    public final static Resource GraphService = ResourceFactory.createResource(NS + "GraphService");
+
     public final static Resource GraphStoreTestCase = ResourceFactory.createResource(NS + "GraphStoreTestCase");
 
     public final static Resource GraphUpdate = ResourceFactory.createResource(NS + "GraphUpdate");
 
     public final static Resource GraphValidationTestCase = ResourceFactory.createResource(NS + "GraphValidationTestCase");
+
+    public final static Resource IconRole = ResourceFactory.createResource(NS + "IconRole");
+
+    public final static Resource IDRole = ResourceFactory.createResource(NS + "IDRole");
+
+    public final static Resource IncludedScript = ResourceFactory.createResource(NS + "IncludedScript");
 
     public final static Resource IndexedConstraintComponent = ResourceFactory.createResource(NS + "IndexedConstraintComponent");
 
@@ -70,9 +92,15 @@ public class DASH {
 
     public final static Resource JSTestCase = ResourceFactory.createResource(NS + "JSTestCase");
 
+    public final static Resource KeyInfoRole = ResourceFactory.createResource(NS + "KeyInfoRole");
+
+    public final static Resource LabelRole = ResourceFactory.createResource(NS + "LabelRole");
+
     public final static Resource ListShape = ResourceFactory.createResource(NS + "ListShape");
     
     public final static Resource ModifyAction = ResourceFactory.createResource(NS + "ModifyAction");
+    
+    public final static Resource MultiFunction = ResourceFactory.createResource(NS + "MultiFunction");
     
     public final static Resource None = ResourceFactory.createResource(NS + "None");
 
@@ -87,22 +115,40 @@ public class DASH {
     public final static Resource ReifiableByConstraintComponent = ResourceFactory.createResource(NS + "ReifiableByConstraintComponent");
     
     public final static Resource ResourceAction = ResourceFactory.createResource(NS + "ResourceAction");
+    
+    public final static Resource ResourceService = ResourceFactory.createResource(NS + "ResourceService");
 
     public final static Resource Script = ResourceFactory.createResource(NS + "Script");
+
+    public final static Resource ScriptConstraint = ResourceFactory.createResource(NS + "ScriptConstraint");
+
+    public final static Resource ScriptConstraintComponent = ResourceFactory.createResource(NS + "ScriptConstraintComponent");
+
+    public final static Resource ScriptFunction = ResourceFactory.createResource(NS + "ScriptFunction");
 
     public final static Resource ScriptSuggestionGenerator = ResourceFactory.createResource(NS + "ScriptSuggestionGenerator");
 
     public final static Resource ScriptTestCase = ResourceFactory.createResource(NS + "ScriptTestCase");
 
+    public final static Resource ScriptValidator = ResourceFactory.createResource(NS + "ScriptValidator");
+
+    public final static Resource Service = ResourceFactory.createResource(NS + "Service");
+
+    public final static Resource ShapeClass = ResourceFactory.createResource(NS + "ShapeClass");
+
     public final static Resource ShapeScript = ResourceFactory.createResource(NS + "ShapeScript");
 
     public final static Resource SPARQLConstructTemplate = ResourceFactory.createResource(NS + "SPARQLConstructTemplate");
+    
+    public final static Resource SPARQLMultiFunction = ResourceFactory.createResource(NS + "SPARQLMultiFunction");
 
     public final static Resource SPARQLSelectTemplate = ResourceFactory.createResource(NS + "SPARQLSelectTemplate");
 
     public final static Resource SPARQLUpdateSuggestionGenerator = ResourceFactory.createResource(NS + "SPARQLUpdateSuggestionGenerator");
 
     public final static Resource SingleLineConstraintComponent = ResourceFactory.createResource(NS + "SingleLineConstraintComponent");
+
+    public final static Resource Stable = ResourceFactory.createResource(NS + "Stable");
 
     public final static Resource SuccessResult = ResourceFactory.createResource(NS + "SuccessResult");
     
@@ -125,17 +171,23 @@ public class DASH {
 
     public final static Property action = ResourceFactory.createProperty(NS + "action");
 
+    public final static Property actualResult = ResourceFactory.createProperty(NS + "actualResult");
+
     public final static Property actionGroup = ResourceFactory.createProperty(NS + "actionGroup");
     
     public final static Property addedTriple = ResourceFactory.createProperty(NS + "addedTriple");
-
+    
+    public final static Property apiStatus = ResourceFactory.createProperty(NS + "apiStatus");
+    
     public final static Property applicableToClass = ResourceFactory.createProperty(NS + "applicableToClass");
 
     public final static Property cachable = ResourceFactory.createProperty(NS + "cachable");
+    
+    public final static Property canWrite = ResourceFactory.createProperty(NS + "canWrite");
 
     public final static Property composite = ResourceFactory.createProperty(NS + "composite");
 
-    public final static Property defaultValueType = ResourceFactory.createProperty(NS + "defaultValueType");
+    public final static Property constructor = ResourceFactory.createProperty(NS + "constructor");
 
     public final static Property defaultViewForRole = ResourceFactory.createProperty(NS + "defaultViewForRole");
     
@@ -149,17 +201,23 @@ public class DASH {
     
     public final static Property editor = ResourceFactory.createProperty(NS + "editor");
     
-    public final static Property excludedPrefix = ResourceFactory.createProperty(NS + "excludedPrefix");
-    
     public final static Property expectedResult = ResourceFactory.createProperty(NS + "expectedResult");
     
     public final static Property expectedResultIsJSON = ResourceFactory.createProperty(NS + "expectedResultIsJSON");
     
     public final static Property expectedResultIsTTL = ResourceFactory.createProperty(NS + "expectedResultIsTTL");
 
+    public final static Property exports = ResourceFactory.createProperty(NS + "exports");
+
     public final static Property expression = ResourceFactory.createProperty(NS + "expression");
 
     public final static Property focusNode = ResourceFactory.createProperty(NS + "focusNode");
+
+    public final static Property generateClass = ResourceFactory.createProperty(NS + "generateClass");
+
+    public final static Property generatePrefixClasses = ResourceFactory.createProperty(NS + "generatePrefixClasses");
+
+    public final static Property generatePrefixConstants = ResourceFactory.createProperty(NS + "generatePrefixConstants");
 
     public final static Property hidden = ResourceFactory.createProperty(NS + "hidden");
     
@@ -176,14 +234,22 @@ public class DASH {
     public final static Property jsCondition = ResourceFactory.createProperty(NS + "jsCondition");
 
     public final static Property mimeTypes = ResourceFactory.createProperty(NS + "mimeTypes");
+
+    public final static Property neverMaterialize = ResourceFactory.createProperty(NS + "neverMaterialize");
     
     public final static Property node = ResourceFactory.createProperty(NS + "node");
+
+    public final static Property onAllValues = ResourceFactory.createProperty(NS + "onAllValues");
     
     public final static Property private_ = ResourceFactory.createProperty(NS + "private");
+    
+    public final static Property propertyRole = ResourceFactory.createProperty(NS + "propertyRole");
     
     public final static Property propertySuggestionGenerator = ResourceFactory.createProperty(NS + "propertySuggestionGenerator");
     
     public final static Property requiredExecutionPlatform = ResourceFactory.createProperty(NS + "requiredExecutionPlatform");
+
+    public final static Property resultVariable = ResourceFactory.createProperty(NS + "resultVariable");
 
     public final static Property rootClass = ResourceFactory.createProperty(NS + "rootClass");
 
@@ -192,6 +258,12 @@ public class DASH {
     public final static Property reifiableBy = ResourceFactory.createProperty(NS + "reifiableBy");
     
     public final static Property resourceAction = ResourceFactory.createProperty(NS + "resourceAction");
+    
+    public final static Property resourceService = ResourceFactory.createProperty(NS + "resourceService");
+
+    public final static Property responseContentType = ResourceFactory.createProperty(NS + "responseContentType");
+
+    public final static Property scriptConstraint = ResourceFactory.createProperty(NS + "scriptConstraint");
 
     public final static Property shape = ResourceFactory.createProperty(NS + "shape");
 
@@ -228,5 +300,16 @@ public class DASH {
 
     public static String getURI() {
         return NS;
+    }
+    
+    
+    /**
+     * Checks whether a given feature shall be included into the generated APIs.
+     * @param feature  the feature to check
+     * @return true currently if the feature has any value for dash:apiStatus but this may change in case we introduce
+     *              additional stati in the future.
+     */
+    public static boolean isAPI(Resource feature) {
+    	return feature.hasProperty(DASH.apiStatus);
     }
 }

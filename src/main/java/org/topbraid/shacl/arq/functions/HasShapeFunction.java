@@ -22,11 +22,11 @@ import java.util.Collections;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.sparql.core.DatasetImpl;
 import org.apache.jena.sparql.expr.ExprEvalException;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.function.FunctionEnv;
@@ -88,7 +88,7 @@ public class HasShapeFunction extends AbstractFunction3 {
 	
 	@Override
 	protected NodeValue exec(Node focusNode, Node shapeNode, Node recursionIsError, FunctionEnv env) {
-		return exec(focusNode, shapeNode, recursionIsError, env.getActiveGraph(), DatasetImpl.wrap(env.getDataset()));
+		return exec(focusNode, shapeNode, recursionIsError, env.getActiveGraph(), DatasetFactory.wrap(env.getDataset()));
 	}
 	
 	

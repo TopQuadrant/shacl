@@ -62,7 +62,6 @@ import org.topbraid.shacl.targets.CustomTargetLanguage;
 import org.topbraid.shacl.targets.CustomTargets;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
-import org.topbraid.shacl.vocabulary.TOSH;
 
 /**
  * Various SHACL-related utility methods that didn't fit elsewhere.
@@ -87,14 +86,6 @@ public class SHACLUtil {
 		SPARQL_PROPERTIES.add(SH.construct);
 		SPARQL_PROPERTIES.add(SH.select);
 		SPARQL_PROPERTIES.add(SH.update);
-	}
-
-	private final static Set<Resource> classesWithDefaultType = new HashSet<Resource>();
-	static {
-		classesWithDefaultType.add(SH.NodeShape);
-		classesWithDefaultType.add(SH.Parameter);
-		classesWithDefaultType.add(SH.PropertyShape);
-		classesWithDefaultType.add(SH.SPARQLConstraint);
 	}
 	
 	private static Query propertyLabelQuery = ARQFactory.get().createQuery(
@@ -573,6 +564,34 @@ public class SHACLUtil {
 	}
 	
 	
+	public static Set<Resource> getDirectShapesAtResource(Resource resource) {
+		Set<Resource> shapes = new HashSet<>();
+		for(Resource type : JenaUtil.getResourceProperties(resource, RDF.type)) {
+			if(JenaUtil.hasIndirectType(type, SH.NodeShape)) {
+				shapes.add(type);
+			}
+			Set<Resource> ts = JenaUtil.getAllSuperClassesStar(type);
+			for(Resource s : ts) {
+				{
+					StmtIterator it = type.getModel().listStatements(null, DASH.applicableToClass, s);
+					while(it.hasNext()) {
+						Resource shape = it.next().getSubject();
+						shapes.add(shape);
+					}
+				}
+				{
+					StmtIterator it = type.getModel().listStatements(null, SH.targetClass, s);
+					while(it.hasNext()) {
+						Resource shape = it.next().getSubject();
+						shapes.add(shape);
+					}
+				}
+			}
+		}
+		return shapes;
+	}
+	
+	
 	public static List<RDFNode> getTargetNodes(Resource shape, Dataset dataset) {
 		return getTargetNodes(shape, dataset, false);
 	}
@@ -649,11 +668,6 @@ public class SHACLUtil {
 	}
 	
 	
-	public static boolean isClassWithDefaultType(Resource cls) {
-		return classesWithDefaultType.contains(cls);
-	}
-	
-	
 	public static boolean isParameterAtInstance(Resource subject, Property predicate) {
 		for(Resource type : getTypes(subject)) {
 			Resource arg = getParameterAtClass(type, predicate);
@@ -691,14 +705,6 @@ public class SHACLUtil {
 	        		SH.NS.equals(graph.getPrefixMapping().getNsPrefixURI(SH.PREFIX)) && 
 	        		graph.contains(SH.Shape.asNode(), RDF.type.asNode(), Node.ANY);
 		}
-	}
-	
-	
-	public static Model withDefaultValueTypeInferences(Model model) {
-		return ModelFactory.createModelForGraph(new MultiUnion(new Graph[] {
-				model.getGraph(),
-				SHACLUtil.createDefaultValueTypesModel(model).getGraph()
-		}));
 	}
 
 
@@ -757,30 +763,6 @@ public class SHACLUtil {
 		}
 		else {
 			return false;
-		}
-	}
-
-
-	/**
-	 * Runs the rule to infer missing rdf:type triples for certain blank nodes.
-	 * @param model  the input Model
-	 * @return a new Model containing the inferred triples
-	 */
-	public static Model createDefaultValueTypesModel(Model model) {
-		String sparql = JenaUtil.getStringProperty(DASH.DefaultValueTypeRule.inModel(model), SH.construct);
-		if(sparql == null) {
-			throw new IllegalArgumentException("Shapes graph does not include " + TOSH.PREFIX + ":" + DASH.DefaultValueTypeRule);
-		}
-		Model resultModel = JenaUtil.createMemoryModel();
-		MultiUnion multiUnion = new MultiUnion(new Graph[] {
-			model.getGraph(),
-			resultModel.getGraph()
-		});
-		Model unionModel = ModelFactory.createModelForGraph(multiUnion);
-		Query query = ARQFactory.get().createQuery(model, sparql);
-		try(QueryExecution qexec = ARQFactory.get().createQueryExecution(query, unionModel)) {
-		    qexec.execConstruct(resultModel);
-		    return resultModel;    
 		}
 	}
 

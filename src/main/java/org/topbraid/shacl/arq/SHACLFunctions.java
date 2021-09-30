@@ -24,8 +24,10 @@ import org.apache.jena.sparql.function.FunctionRegistry;
 import org.topbraid.jenax.functions.DeclarativeFunctionDrivers;
 import org.topbraid.jenax.functions.DeclarativeFunctionFactory;
 import org.topbraid.jenax.util.JenaUtil;
+import org.topbraid.shacl.arq.functions.SHACLSPARQLARQFunction;
 import org.topbraid.shacl.model.SHConstraintComponent;
 import org.topbraid.shacl.model.SHFactory;
+import org.topbraid.shacl.multifunctions.MultiFunctions;
 import org.topbraid.shacl.vocabulary.SH;
 
 /**
@@ -69,6 +71,8 @@ public class SHACLFunctions {
 		for(Resource resource : JenaUtil.getAllInstances(ccClass)) {
 			perhapsRegisterFunction(resource.as(SHConstraintComponent.class), SH.validator);
 		}
+		
+		MultiFunctions.registerAll(model);
 	}
 	
 	

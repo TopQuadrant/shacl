@@ -25,8 +25,6 @@ import java.util.function.Function;
 import org.apache.jena.rdf.model.Resource;
 import org.topbraid.shacl.engine.Constraint;
 import org.topbraid.shacl.validation.java.JavaConstraintExecutors;
-import org.topbraid.shacl.validation.js.JSConstraintExecutor;
-import org.topbraid.shacl.validation.js.JSValidationLanguage;
 import org.topbraid.shacl.validation.sparql.SPARQLConstraintExecutor;
 import org.topbraid.shacl.validation.sparql.SPARQLValidationLanguage;
 import org.topbraid.shacl.vocabulary.DASH;
@@ -53,18 +51,16 @@ public class ConstraintExecutors {
 	public ConstraintExecutors() {
 		addSpecialExecutor(SH.PropertyConstraintComponent, constraint -> new PropertyConstraintExecutor());
 		addSpecialExecutor(DASH.ParameterConstraintComponent, constraint -> new PropertyConstraintExecutor());
-		addSpecialExecutor(SH.JSConstraintComponent, constraint -> new JSConstraintExecutor());
 		addSpecialExecutor(SH.SPARQLConstraintComponent, constraint -> new SPARQLConstraintExecutor(constraint));
 		addSpecialExecutor(SH.ExpressionConstraintComponent, constraint -> new ExpressionConstraintExecutor());
 
 		JavaConstraintExecutors.install(this);
 
 		addLanguage(SPARQLValidationLanguage.get());
-		addLanguage(JSValidationLanguage.get());
 	}
 	
 	
-	protected void addLanguage(ValidationLanguage language) {
+	public void addLanguage(ValidationLanguage language) {
 		languages.add(language);
 	}
 	
@@ -93,26 +89,5 @@ public class ConstraintExecutors {
 	
 	public void removeSpecialExecutor(Resource constraintComponent) {
 		specialExecutors.remove(constraintComponent);
-	}
-
-	
-	/**
-	 * Can be used to make the JavaScript engine the preferred implementation over SPARQL.
-	 * By default, SPARQL is preferred.
-	 * In cases where a constraint component has multiple validators, it would then chose
-	 * the JavaScript one.
-	 * @param value  true to make JS
-	 */
-	public void setJSPreferred(boolean value) {
-		languages.remove(0);
-		languages.remove(0);
-		if(value) {
-			languages.add(0, JSValidationLanguage.get());
-			languages.add(1, SPARQLValidationLanguage.get());
-		}
-		else {
-			languages.add(0, SPARQLValidationLanguage.get());
-			languages.add(1, JSValidationLanguage.get());
-		}
 	}
 }

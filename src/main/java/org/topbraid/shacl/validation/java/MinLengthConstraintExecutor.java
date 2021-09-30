@@ -3,7 +3,7 @@ package org.topbraid.shacl.validation.java;
 import org.topbraid.shacl.engine.Constraint;
 
 /**
- * Native implementation of sh:MinLengthConstraintComponent.
+ * Validator for sh:minLength constraints.
  * 
  * @author Holger Knublauch
  */

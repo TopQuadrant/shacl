@@ -36,6 +36,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.util.iterator.ExtendedIterator;
+import org.apache.jena.vocabulary.RDF;
 import org.topbraid.jenax.progress.ProgressMonitor;
 import org.topbraid.jenax.statistics.ExecStatistics;
 import org.topbraid.jenax.statistics.ExecStatisticsManager;
@@ -50,6 +51,7 @@ import org.topbraid.shacl.expr.NodeExpressionFactory;
 import org.topbraid.shacl.util.OrderComparator;
 import org.topbraid.shacl.validation.ValidationEngine;
 import org.topbraid.shacl.validation.ValidationEngineFactory;
+import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 
 /**
@@ -62,6 +64,12 @@ import org.topbraid.shacl.vocabulary.SH;
  * @author Holger Knublauch
  */
 public class RuleEngine extends AbstractEngine {
+	
+	// true to skip sh:values rules from property shapes marked with dash:neverMaterialize true
+	private boolean excludeNeverMaterialize;
+	
+	// true to skip all sh:values rules
+	private boolean excludeValues;
 	
 	private Model inferences;
 	
@@ -204,7 +212,12 @@ public class RuleEngine extends AbstractEngine {
 				}
 				if(!oldOrder.equals(rule.getOrder())) {
 					oldOrder = rule.getOrder();
+					// If new rdf:type triples have been inferred, recompute the target nodes (this is brute-force for now)
+					boolean recomputeTarget = focusNode == null && pending.stream().anyMatch(triple -> RDF.type.asNode().equals(triple.getPredicate()));
 					flushPending();
+					if(recomputeTarget) {
+						targetNodes = new ArrayList<>(shape.getTargetNodes(dataset));
+					}
 				}
 				List<Resource> conditions = rule2Conditions.get(rule);
 				if(conditions != null && !conditions.isEmpty()) {
@@ -277,13 +290,15 @@ public class RuleEngine extends AbstractEngine {
 				List<Resource> conditions = JenaUtil.getResourceProperties(raw, SH.condition);
 				rule2Conditions.put(rule, conditions);
 			}
-			for(Resource ps : JenaUtil.getResourceProperties(shape.getShapeResource(), SH.property)) {
-				if(!ps.hasProperty(SH.deactivated, JenaDatatypes.TRUE)) {
-					Resource path = ps.getPropertyResourceValue(SH.path);
-					if(path != null && path.isURIResource()) {
-						for(Statement s : ps.listProperties(SH.values).toList()) {
-							NodeExpression expr = NodeExpressionFactory.get().create(s.getObject());
-							rules.add(new ValuesRule(expr, path.asNode(), false));
+			if(!excludeValues) {
+				for(Resource ps : JenaUtil.getResourceProperties(shape.getShapeResource(), SH.property)) {
+					if(!ps.hasProperty(SH.deactivated, JenaDatatypes.TRUE) && (!excludeNeverMaterialize || !ps.hasProperty(DASH.neverMaterialize, JenaDatatypes.TRUE))) {
+						Resource path = ps.getPropertyResourceValue(SH.path);
+						if(path != null && path.isURIResource()) {
+							for(Statement s : ps.listProperties(SH.values).toList()) {
+								NodeExpression expr = NodeExpressionFactory.get().create(s.getObject());
+								rules.add(new ValuesRule(expr, path.asNode(), false));
+							}
 						}
 					}
 				}
@@ -317,6 +332,24 @@ public class RuleEngine extends AbstractEngine {
 			}
 		}
 		return true;
+	}
+	
+	
+	/**
+	 * If set to true then all sh:values rules in property shapes marked with dash:neverMaterialize will be skipped.
+	 * @param value  the new flag (defaults to false)
+	 */
+	public void setExcludeNeverMaterialize(boolean value) {
+		this.excludeNeverMaterialize = value;
+	}
+	
+	
+	/**
+	 * If set to true then all sh:values rules will be skipped.
+	 * @param value  the new flag (defaults to false)
+	 */
+	public void setExcludeValues(boolean value) {
+		this.excludeValues = value;
 	}
 	
 	

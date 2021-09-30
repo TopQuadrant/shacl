@@ -56,6 +56,8 @@ public class OntologyOptimizations {
 	
 	private boolean enabled;
 	
+	private long resetTimeStamp = System.currentTimeMillis();
+	
 	public boolean isEnabled() {
 		return enabled;
 	}
@@ -117,6 +119,10 @@ public class OntologyOptimizations {
 			return ShapesGraphFactory.get().createShapesGraph(shapesModel);
 		});
 	}
+	
+	public long getResetTimeStamp() {
+		return resetTimeStamp;
+	}
 
 	
 	public List<Object> keys() {
@@ -145,5 +151,6 @@ public class OntologyOptimizations {
 	
 	public void reset() {
 		cache.invalidateAll();
+		resetTimeStamp = System.currentTimeMillis();
 	}
 }

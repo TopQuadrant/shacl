@@ -80,6 +80,7 @@ import org.apache.jena.sparql.syntax.syntaxtransform.QueryTransformOps;
 import org.apache.jena.sparql.util.Context;
 import org.apache.jena.sparql.util.NodeFactoryExtra;
 import org.apache.jena.sparql.util.NodeUtils;
+import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
@@ -498,11 +499,12 @@ public class JenaUtil {
 	}
 	
 	
-	public static Literal getBestStringLiteral(Resource resource, List<String> langs, Iterable<Property> properties, BiFunction<Resource,Property,Iterator<Statement>> getter) {
+	public static Literal getBestStringLiteral(Resource resource, List<String> langs, Iterable<Property> properties, BiFunction<Resource,Property,ExtendedIterator<Statement>> getter) {
+		String prefLang = langs.isEmpty() ? null : langs.get(0);
 		Literal label = null;
 		int bestLang = -1;
 		for(Property predicate : properties) {
-			Iterator<Statement> it = getter.apply(resource, predicate);
+			ExtendedIterator<Statement> it = getter.apply(resource, predicate);
 			while(it.hasNext()) {
 				RDFNode object = it.next().getObject();
 				if(object.isLiteral()) {
@@ -511,18 +513,22 @@ public class JenaUtil {
 					if(lang.length() == 0 && label == null) {
 						label = literal;
 					}
+					else if(prefLang != null && prefLang.equalsIgnoreCase(lang)) {
+						it.close();
+						return literal;
+					}
 					else {
 						// 1) Never use a less suitable language
 						// 2) Never replace an already existing label (esp: skos:prefLabel) unless new lang is better
 						// 3) Fall back to more special languages if no other was found (e.g. use en-GB if only "en" is accepted)
 						int startLang = bestLang < 0 ? langs.size() - 1 : (label != null ? bestLang - 1 : bestLang);
-						for(int i = startLang; i >= 0; i--) {
+						for(int i = startLang; i > 0; i--) {
 							String langi = langs.get(i);
 							if(langi.equalsIgnoreCase(lang)) {
 								label = literal;
 								bestLang = i;
 							}
-							else if(lang.contains("-") && NodeFunctions.langMatches(lang, langi) && label == null) {
+							else if(label == null && lang.contains("-") && NodeFunctions.langMatches(lang, langi)) {
 								label = literal;
 							}
 						}

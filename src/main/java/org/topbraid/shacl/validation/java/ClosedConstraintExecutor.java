@@ -16,6 +16,11 @@ import org.topbraid.shacl.validation.AbstractNativeConstraintExecutor;
 import org.topbraid.shacl.validation.ValidationEngine;
 import org.topbraid.shacl.vocabulary.SH;
 
+/**
+ * Validator for sh:closed constraints.
+ * 
+ * @author Holger Knublauch
+ */
 class ClosedConstraintExecutor extends AbstractNativeConstraintExecutor {
 	
 	private Set<RDFNode> allowedProperties = new HashSet<>();
@@ -40,8 +45,8 @@ class ClosedConstraintExecutor extends AbstractNativeConstraintExecutor {
 	
 	@Override
 	public void executeConstraint(Constraint constraint, ValidationEngine engine, Collection<RDFNode> focusNodes) {
-		long startTime = System.currentTimeMillis();
 		if(closed) {
+			long startTime = System.currentTimeMillis();
 			for(RDFNode focusNode : focusNodes) {
 				if(focusNode instanceof Resource) {
 					Iterator<Statement> it = ((Resource)focusNode).listProperties();
@@ -56,7 +61,7 @@ class ClosedConstraintExecutor extends AbstractNativeConstraintExecutor {
 				}
 				engine.checkCanceled();
 			}
+			addStatistics(engine, constraint, startTime, focusNodes.size(), focusNodes.size());
 		}
-		addStatistics(constraint, startTime);
 	}
 }

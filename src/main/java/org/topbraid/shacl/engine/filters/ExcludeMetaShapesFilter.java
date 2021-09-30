@@ -29,7 +29,8 @@ import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.shacl.vocabulary.TOSH;
 
 /**
- * A Predicate that can be used to bypass any shapes that are also constraint components.
+ * A Predicate that can be used to bypass any shapes that are also constraint components
+ * and any shapes from the tosh namespace.
  * 
  * @author Holger Knublauch
  */
@@ -37,7 +38,6 @@ public class ExcludeMetaShapesFilter implements Predicate<SHShape> {
 	
 	private static Set<Resource> systemShapes = new HashSet<>();
 	static {
-		Collections.addAll(systemShapes, TOSH.PropertyGroupShape, TOSH.PropertyShapeShape, TOSH.ShapeShape);
 		Collections.addAll(systemShapes, DASH.Editor, DASH.GraphStoreTestCase, DASH.InferencingTestCase, DASH.QueryTestCase, DASH.ValidationTestCase, DASH.Viewer, DASH.Widget);
 	}
 
@@ -51,6 +51,7 @@ public class ExcludeMetaShapesFilter implements Predicate<SHShape> {
 
 	@Override
 	public boolean test(SHShape shape) {
-		return !JenaUtil.hasIndirectType(shape, SH.ConstraintComponent) && !systemShapes.contains(shape);
+		return !JenaUtil.hasIndirectType(shape, SH.Parameter) && !systemShapes.contains(shape) &&
+				(shape.isAnon() || !shape.getURI().startsWith(TOSH.NS));
 	}
 }

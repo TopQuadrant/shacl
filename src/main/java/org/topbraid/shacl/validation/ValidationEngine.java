@@ -59,14 +59,13 @@ import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.jenax.util.RDFLabels;
 import org.topbraid.shacl.arq.SHACLPaths;
 import org.topbraid.shacl.engine.AbstractEngine;
-import org.topbraid.shacl.engine.ConfigurableEngine;
 import org.topbraid.shacl.engine.Constraint;
+import org.topbraid.shacl.engine.SHACLScriptEngineManager;
 import org.topbraid.shacl.engine.Shape;
 import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.engine.filters.ExcludeMetaShapesFilter;
 import org.topbraid.shacl.expr.NodeExpression;
 import org.topbraid.shacl.expr.NodeExpressionFactory;
-import org.topbraid.shacl.js.SHACLScriptEngineManager;
 import org.topbraid.shacl.model.SHNodeShape;
 import org.topbraid.shacl.model.SHPropertyShape;
 import org.topbraid.shacl.targets.InstancesTarget;
@@ -79,14 +78,14 @@ import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 
 /**
- * A ValidationEngine uses a given shapes graph (represented via an instance of VShapesGraph)
+ * A ValidationEngine uses a given shapes graph (represented via an instance of ShapesGraph)
  * and performs SHACL validation on a given Dataset.
  * 
  * Instances of this class should be created via the ValidatorFactory.
  * 
  * @author Holger Knublauch
  */
-public class ValidationEngine extends AbstractEngine implements ConfigurableEngine {
+public class ValidationEngine extends AbstractEngine {
 	
 	// The currently active ValidationEngine for cases where no direct pointer can be acquired, e.g. from HasShapeFunction
 	private static ThreadLocal<ValidationEngine> current = new ThreadLocal<>();
@@ -98,25 +97,38 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 	public static void setCurrent(ValidationEngine value) {
 		current.set(value);
 	}
+
 	
+	// Avoids repeatedly walking up/down the class hierarchy for sh:class constraints
 	private ClassesCache classesCache;
 	
 	private ValidationEngineConfiguration configuration;
 	
+	// Can be used to drop certain focus nodes from validation
 	private Predicate<RDFNode> focusNodeFilter;
-	
+
+	// The inferred triples if the shapes graph declares an entailment regime
 	private Model inferencesModel;
 	
+	// The label function for rendering nodes in validation results (message templates etc)
 	private Function<RDFNode,String> labelFunction = (node -> RDFLabels.get().getNodeLabel(node));
-	
+
+	// Avoids repeatedly fetching labels
 	private Map<RDFNode,String> labelsCache = new ConcurrentHashMap<>();
 	
-	private Resource report;
+	// Can be used to collect statistical data about execution time of constraint components and shapes
+	private ValidationProfile profile;
 	
+	// The resulting validation report instance
+	private Resource report;
+
+	// Number of created results, e.g. for progress monitor
 	private int resultsCount = 0;
 	
+	// Avoids repeatedly fetching the value nodes of a focus node / path combination
 	private Map<ValueNodesCacheKey,Collection<RDFNode>> valueNodes = new WeakHashMap<>();
-	
+
+	// Number of created violations, e.g. for progress monitor
 	private int violationsCount = 0;
 	
 
@@ -155,7 +167,7 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 		Model shapesModel = dataset.getNamedModel(shapesGraphURI.toString());
 		if(shapesModel.contains(null, SH.entailment, SH.Rules)) {
 			
-			// Create union of data model and inferences if called for the first time 
+			// Create union of data model and inferences if called for the first time
 			if(inferencesModel == null) {
 				inferencesModel = JenaUtil.createDefaultModel();
 				Model dataModel = dataset.getDefaultModel();
@@ -173,16 +185,18 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 				if(!nodeShape.hasProperty(SH.deactivated, JenaDatatypes.TRUE)) {
 					for(SHPropertyShape ps : nodeShape.getPropertyShapes()) {
 						if(!ps.hasProperty(SH.deactivated, JenaDatatypes.TRUE)) {
-						    Resource path = ps.getPath();
-						    Statement values = ps.getProperty(SH.values);
-						    if(values != null) {
-						        NodeExpression ne = NodeExpressionFactory.get().create(values.getObject());
-						        ne.eval(focusNode, this).forEachRemaining(v -> inferencesModel.getGraph().add(Triple.create(focusNode.asNode(), path.asNode(), v.asNode())));
-						    }
-						    Statement defaultValue = ps.getProperty(SH.defaultValue);
-						    if(defaultValue != null) {
-						        defaultValueMap.put(JenaUtil.asProperty(path), defaultValue.getObject());
-						    }
+							Resource path = ps.getPath();
+							if(path instanceof Resource) {
+								Statement values = ps.getProperty(SH.values);
+								if(values != null) {
+									NodeExpression ne = NodeExpressionFactory.get().create(values.getObject());
+									ne.eval(focusNode, this).forEachRemaining(v -> inferencesModel.getGraph().add(Triple.create(focusNode.asNode(), path.asNode(), v.asNode())));
+								}
+								Statement defaultValue = ps.getProperty(SH.defaultValue);
+								if(defaultValue != null) {
+									defaultValueMap.put(JenaUtil.asProperty(path), defaultValue.getObject());
+								}
+							}
 						}
 					}
 				}
@@ -200,16 +214,6 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 			return newFocusNode;
 		}
 		return focusNode;
-	}
-
-	
-	public Function<RDFNode,String> getLabelFunction() {
-		return labelFunction;
-	}
-	
-	
-	public void setLabelFunction(Function<RDFNode,String> value) {
-		this.labelFunction = value;
 	}
 	
 	
@@ -250,7 +254,10 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 			messages.stream().forEach(message -> result.addProperty(SH.resultMessage, message));
 		}
 		else if(defaultMessage != null) {
-			result.addProperty(SH.resultMessage, defaultMessage.get());
+			String m = defaultMessage.get();
+			if(m != null) {
+				result.addProperty(SH.resultMessage, m);
+			}
 		}
 		return result;
 	}
@@ -269,10 +276,25 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 	public ClassesCache getClassesCache() {
 		return classesCache;
 	}
+
+
+	public ValidationEngineConfiguration getConfiguration() {
+		return configuration;
+	}
 	
 	
 	public String getLabel(RDFNode node) {
 		return labelsCache.computeIfAbsent(node, n -> getLabelFunction().apply(n));
+	}
+
+	
+	public Function<RDFNode,String> getLabelFunction() {
+		return labelFunction;
+	}
+	
+	
+	public ValidationProfile getProfile() {
+		return profile;
 	}
 
 
@@ -286,8 +308,8 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 
 
 	/**
-	 * Gets a Set of all Shapes that should be evaluated for a given resource.
-	 * @param focusNode  the resource to get the shapes for
+	 * Gets a Set of all shapes that should be evaluated for a given resource.
+	 * @param focusNode  the focus node to get the shapes for
 	 * @param dataset  the Dataset containing the resource
 	 * @param shapesModel  the shapes Model
 	 * @return a Set of shape resources
@@ -335,12 +357,12 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 			// We use a cache here because many shapes contains for example both sh:datatype and sh:minCount, and fetching
 			// the value nodes each time may be expensive, esp for sh:minCount/maxCount constraints.
 			ValueNodesCacheKey key = new ValueNodesCacheKey(focusNode, constraint.getShape().getPath());
-			return valueNodes.computeIfAbsent(key, k -> computeValueNodes(focusNode, constraint));
+			return valueNodes.computeIfAbsent(key, k -> getValueNodesHelper(focusNode, constraint));
 		}
 	}
 
 	
-	private Collection<RDFNode> computeValueNodes(RDFNode focusNode, Constraint constraint) {
+	private Collection<RDFNode> getValueNodesHelper(RDFNode focusNode, Constraint constraint) {
 		Property predicate = constraint.getShape().getPredicate();
 		if(predicate != null) {
 			List<RDFNode> results = new LinkedList<>();
@@ -372,6 +394,42 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 			return results;
 		}
 	}
+
+	
+	/**
+	 * Validates a given list of focus nodes against a given Shape, and stops as soon
+	 * as one validation result is reported.  No results are recorded.
+	 * @param focusNodes  the nodes to validate
+	 * @param shape  the sh:Shape to validate against
+	 * @return true if there were no validation results, false for violations
+	 */
+	public boolean nodesConformToShape(List<RDFNode> focusNodes, Node shape) {
+		if(!shapesGraph.isIgnored(shape)) {
+			Resource oldReport = report;
+			report = JenaUtil.createMemoryModel().createResource();
+			try {
+				Shape vs = shapesGraph.getShape(shape);
+				if(!vs.isDeactivated()) {
+					boolean nested = SHACLScriptEngineManager.get().begin();
+					try {
+						for(Constraint constraint : vs.getConstraints()) {
+							validateNodesAgainstConstraint(focusNodes, constraint);
+							if(report.hasProperty(SH.result)) {
+								return false;
+							}
+						}
+					}
+					finally {
+						SHACLScriptEngineManager.get().end(nested);
+					}
+				}
+			}
+			finally {
+				this.report = oldReport;
+			}
+		}
+		return true;
+	}
 	
 	
 	public void setClassesCache(ClassesCache value) {
@@ -388,6 +446,12 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 	public void setFocusNodeFilter(Predicate<RDFNode> value) {
 		this.focusNodeFilter = value;
 	}
+	
+	
+	public void setLabelFunction(Function<RDFNode,String> value) {
+		this.labelFunction = value;
+	}
+
 	
 	public void updateConforms() {
 		boolean conforms = true;
@@ -409,7 +473,7 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 	
 	/**
 	 * Validates all target nodes against all of their shapes.
-	 * To further narrow down which nodes to validate, use {{@link #setFocusNodeFilter(Predicate)}.
+	 * To further narrow down which nodes to validate, use {@link #setFocusNodeFilter(Predicate)}.
 	 * @return an instance of sh:ValidationReport in the results Model
 	 * @throws InterruptedException if the monitor has canceled this
 	 */
@@ -431,7 +495,7 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 		
 		RDFNode focusRDFNode = dataset.getDefaultModel().asRDFNode(focusNode);
 		Set<Resource> shapes = getShapesForNode(focusRDFNode, dataset, shapesModel);
-		boolean nested = SHACLScriptEngineManager.begin();
+		boolean nested = SHACLScriptEngineManager.get().begin();
 		try {
 			for(Resource shape : shapes) {
 				if(monitor != null && monitor.isCanceled()) {
@@ -441,7 +505,7 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 			}
 		}
 		finally {
-			SHACLScriptEngineManager.end(nested);
+			SHACLScriptEngineManager.get().end(nested);
 		}
 		
 		return report;
@@ -458,7 +522,7 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 		if(!shapesGraph.isIgnored(shape)) {
 			Shape vs = shapesGraph.getShape(shape);
 			if(!vs.isDeactivated()) {
-				boolean nested = SHACLScriptEngineManager.begin();
+				boolean nested = SHACLScriptEngineManager.get().begin();
 				ValidationEngine oldEngine = current.get();
 				current.set(this);
 				try {
@@ -468,7 +532,7 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 				}
 				finally {
 					current.set(oldEngine);
-					SHACLScriptEngineManager.end(nested);
+					SHACLScriptEngineManager.get().end(nested);
 				}
 			}
 		}
@@ -478,18 +542,18 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 	
 	/**
 	 * Validates all target nodes of a given collection of shapes against these shapes.
-	 * To further narrow down which nodes to validate, use {{@link #setFocusNodeFilter(Predicate)}.
+	 * To further narrow down which nodes to validate, use {@link #setFocusNodeFilter(Predicate)}.
 	 * @return an instance of sh:ValidationReport in the results Model
 	 * @throws InterruptedException if the monitor has canceled this
 	 */
 	public Resource validateShapes(Collection<Shape> shapes) throws InterruptedException {
-		boolean nested = SHACLScriptEngineManager.begin();
+		boolean nested = SHACLScriptEngineManager.get().begin();
 		try {
 			if(monitor != null) {
 				monitor.beginTask("Validating " + shapes.size() + " shapes", shapes.size());
 			}
 			if(classesCache == null) {
-				// If we are doing everything then the cache should be used, but not for individual nodes
+				// If we are doing everything then the cache should be used, but not for validation of individual focus nodes
 				classesCache = new ClassesCache();
 			}
 			int i = 0;
@@ -505,7 +569,7 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 				
 				Collection<RDFNode> focusNodes = shape.getTargetNodes(dataset);
 				if(focusNodeFilter != null) {
-					List<RDFNode> filteredFocusNodes = new LinkedList<RDFNode>();
+					List<RDFNode> filteredFocusNodes = new LinkedList<>();
 					for(RDFNode focusNode : focusNodes) {
 						if(focusNodeFilter.test(focusNode)) {
 							filteredFocusNodes.add(focusNode);
@@ -527,49 +591,13 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 			}
 		}
 		catch(MaximumNumberViolations ex) {
-			// ignore
+			// Ignore as this is just our way to stop validation when max number of violations is reached
 		}
 		finally {
-			SHACLScriptEngineManager.end(nested);
+			SHACLScriptEngineManager.get().end(nested);
 		}
 		updateConforms();
 		return report;
-	}
-
-	
-	/**
-	 * Validates a given list of focus node against a given Shape, and stops as soon
-	 * as one validation result is reported.  No results are recorded.
-	 * @param focusNodes  the nodes to validate
-	 * @param shape  the sh:Shape to validate against
-	 * @return true if there were no validation results, false for violations
-	 */
-	public boolean nodesConformToShape(List<RDFNode> focusNodes, Node shape) {
-		if(!shapesGraph.isIgnored(shape)) {
-			Resource oldReport = report;
-			report = JenaUtil.createMemoryModel().createResource();
-			try {
-				Shape vs = shapesGraph.getShape(shape);
-				if(!vs.isDeactivated()) {
-					boolean nested = SHACLScriptEngineManager.begin();
-					try {
-						for(Constraint constraint : vs.getConstraints()) {
-							validateNodesAgainstConstraint(focusNodes, constraint);
-							if(report.hasProperty(SH.result)) {
-								return false;
-							}
-						}
-					}
-					finally {
-						SHACLScriptEngineManager.end(nested);
-					}
-				}
-			}
-			finally {
-				this.report = oldReport;
-			}
-		}
-		return true;
 	}
 	
 	
@@ -598,14 +626,7 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 		}
 	}
 
-
-	@Override
-	public ValidationEngineConfiguration getConfiguration() {
-		return configuration;
-	}
-
 	
-	@Override
 	public void setConfiguration(ValidationEngineConfiguration configuration) {
 		this.configuration = configuration;
 		if(!configuration.getValidateShapes()) {
@@ -614,6 +635,12 @@ public class ValidationEngine extends AbstractEngine implements ConfigurableEngi
 	}
 	
 	
+	public void setProfile(ValidationProfile profile) {
+		this.profile = profile;
+	}
+	
+	
+	// Used to avoid repeated computation of value nodes for a focus node / path combination
 	private static class ValueNodesCacheKey {
 		
 		Resource path;

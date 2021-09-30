@@ -27,9 +27,11 @@ abstract class AbstractClusiveConstraintExecutor extends AbstractNativeConstrain
 	@Override
 	public void executeConstraint(Constraint constraint, ValidationEngine engine, Collection<RDFNode> focusNodes) {
 		long startTime = System.currentTimeMillis();
+		int valueNodeCount = 0;
 		NodeValue cmpValue = NodeValue.makeNode(constraint.getParameterValue().asNode());
 		for(RDFNode focusNode : focusNodes) {
-			for(RDFNode valueNode : engine.getValueNodes(constraint, focusNode)) {				
+			for(RDFNode valueNode : engine.getValueNodes(constraint, focusNode)) {
+				valueNodeCount++;
 				try {
 			        NodeValue value = NodeValue.makeNode(valueNode.asNode());
 					int c = NodeValue.compare(cmpValue, value);
@@ -46,6 +48,6 @@ abstract class AbstractClusiveConstraintExecutor extends AbstractNativeConstrain
 			}
 			engine.checkCanceled();
 		}
-		addStatistics(constraint, startTime);
+		addStatistics(engine, constraint, startTime, focusNodes.size(), valueNodeCount);
 	}
 }

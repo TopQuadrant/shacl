@@ -19,9 +19,12 @@ abstract class AbstractLengthConstraintExecutor extends AbstractNativeConstraint
 	public void executeConstraint(Constraint constraint, ValidationEngine engine, Collection<RDFNode> focusNodes) {
 		long startTime = System.currentTimeMillis();
 		String message = "Value has " + getComparisonString() + " than " + expectedLength + " characters";
+		int valueNodeCount;
 		if(constraint.getShapeResource().isPropertyShape()) {
+			valueNodeCount = 0;
 			for(RDFNode focusNode : focusNodes) {
 				for(RDFNode valueNode : engine.getValueNodes(constraint, focusNode)) {
+					valueNodeCount++;
 					validate(constraint, engine, message, expectedLength, focusNode, valueNode);
 				}
 				engine.checkCanceled();
@@ -32,8 +35,9 @@ abstract class AbstractLengthConstraintExecutor extends AbstractNativeConstraint
 				validate(constraint, engine, message, expectedLength, focusNode, focusNode);
 				engine.checkCanceled();
 			}
+			valueNodeCount = focusNodes.size();
 		}
-		addStatistics(constraint, startTime);
+		addStatistics(engine, constraint, startTime, focusNodes.size(), valueNodeCount);
 	}
 	
 	

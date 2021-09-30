@@ -14,13 +14,21 @@ import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.util.iterator.ExtendedIterator;
 
 
-// TODO: note this graph does not correctly implement GraphWithPerform and event notification contracts
 /**
  * A WrappedGraph that filters out deleted triples or adds added triples, without
  * modifying the underlying base graph.
  * 
- * Similar to BufferingGraph in TopBraid, but with minimal code dependencies
- * and simpler contracts that are just right for use in SPARQLMotion.
+ * This class is for single-threaded use only, typically used as temporary graph layer on top of an existing
+ * graph for the duration of some algorithm.
+ *   
+ * This runs in two modes, based on the updateBaseGraph flag.
+ * 
+ * By default/legacy (false) the system will only add triples that exist in none of the subgraphs of the delegate graph
+ * and claim to delete triples even if they exist in subgraphs only.
+ * 
+ * If true, the adds will always be applied even if one of the subgraphs already contains the triple.
+ * This is making sure that transformations will always produce all requested triples.
+ * Furthermore this mode is more correct w.r.t. deletes because it will only allow deleting triples from the editable graph.
  * 
  * @author Holger Knublauch
  */
@@ -32,16 +40,29 @@ public class DiffGraph extends TransparentWrappedGraph {
 	protected GraphWithPerform addedGraph = new GraphMem();
 	
 	/**
-	 * This Set has triples that are in the delegate but are excluded
-	 * from the filtered graph.
+	 * This Set has triples that are in the delegate but are excluded from the filtered graph.
 	 */
-	protected Set<Triple> deletedTriples = new HashSet<Triple>();
+	protected Set<Triple> deletedTriples = new HashSet<>();
 	
 	private PrefixMapping pm;
 
+	// The graph that the triples will be added to
+	private Graph updateableGraph;
+
 	
-	public DiffGraph(Graph base) {
-		super(base);
+	public DiffGraph(Graph delegate) {
+		this(delegate, false);
+	}
+
+	
+	public DiffGraph(Graph delegate, boolean updateBaseGraph) {
+		super(delegate);
+		if(updateBaseGraph) {
+			updateableGraph = JenaUtil.getBaseGraph(delegate);
+		}
+		else {
+			updateableGraph = delegate;
+		}
 	}
 	
 	
@@ -91,7 +112,7 @@ public class DiffGraph extends TransparentWrappedGraph {
 	// but sameValueAs then this code is incorrect.
 	// Specifically we should be able to show bugs with TDB which does
 	// something different from either equals or sameValueAs.
-	protected boolean containsByEquals(Graph g,Triple t) {
+	protected boolean containsByEquals(Graph g, Triple t) {
 		ExtendedIterator<Triple> it = g.find(t);
 		try {
 			while (it.hasNext()) {
@@ -179,14 +200,8 @@ public class DiffGraph extends TransparentWrappedGraph {
 	public void performAdd(Triple t) {
     	if (deletedTriples.contains(t)) {
     		deletedTriples.remove(t);
-    		// getEventManager().notifyAddTriple(this, t);
     	}
-    	else if (containsByEquals(addedGraph,t) || containsByEquals(base, t) ) {
-    		// notify even unsuccessful adds - see javadoc for graphlistener
-    		// getEventManager().notifyAddTriple(this, t);
-        }
-    	else {
-    		// addedGraph does notification for us.
+    	else if(!containsByEquals(addedGraph, t) && !containsByEquals(updateableGraph, t)) {
     		addedGraph.add(t);
     	}
 	}
@@ -194,19 +209,12 @@ public class DiffGraph extends TransparentWrappedGraph {
 
 	@Override
 	public void performDelete(Triple t) {
-		if( containsByEquals(addedGraph,t) ) {
-			// addedGraph does notification for us.
+		if(containsByEquals(addedGraph, t)) {
 			addedGraph.delete(t);
 		} 
-		else if ( containsByEquals(base, t) ) {
+		else if(containsByEquals(updateableGraph, t)) {
 			deletedTriples.add(t);
-			// getEventManager().notifyDeleteTriple(this, t);
 		} 
-		else {
-			// notify even unsuccessful deletes - see javadoc for graphlistener
-			// getEventManager().notifyDeleteTriple(this, t);
-			return;
-		}
 	}
 
 	

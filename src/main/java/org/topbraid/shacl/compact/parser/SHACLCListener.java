@@ -9,6 +9,7 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
  * This interface defines a complete listener for a parse tree produced by
  * {@link SHACLCParser}.
  */
+@SuppressWarnings("deprecation")
 public interface SHACLCListener extends ParseTreeListener {
 	/**
 	 * Enter a parse tree produced by {@link SHACLCParser#propertyMinCount}.

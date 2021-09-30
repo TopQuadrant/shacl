@@ -10,6 +10,11 @@ import org.topbraid.shacl.engine.Constraint;
 import org.topbraid.shacl.validation.AbstractNativeConstraintExecutor;
 import org.topbraid.shacl.validation.ValidationEngine;
 
+/**
+ * Validator for sh:languageIn constraints.
+ * 
+ * @author Holger Knublauch
+ */
 class LanguageInConstraintExecutor extends AbstractNativeConstraintExecutor {
 	
 	private Set<String> langs;
@@ -23,8 +28,10 @@ class LanguageInConstraintExecutor extends AbstractNativeConstraintExecutor {
 	@Override
 	public void executeConstraint(Constraint constraint, ValidationEngine engine, Collection<RDFNode> focusNodes) {
 		long startTime = System.currentTimeMillis();
+		long valueNodeCount = 0;
 		for(RDFNode focusNode : focusNodes) {
 			for(RDFNode valueNode : engine.getValueNodes(constraint, focusNode)) {
+				valueNodeCount++;
 				if(!valueNode.isLiteral()) {					
 					engine.createValidationResult(constraint, focusNode, valueNode, () -> "Not a literal");
 				}
@@ -42,7 +49,7 @@ class LanguageInConstraintExecutor extends AbstractNativeConstraintExecutor {
 			}
 			engine.checkCanceled();
 		}
-		addStatistics(constraint, startTime);
+		addStatistics(engine, constraint, startTime, focusNodes.size(), valueNodeCount);
 	}
 	
 	

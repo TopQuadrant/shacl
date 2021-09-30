@@ -28,7 +28,7 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.topbraid.jenax.util.JenaDatatypes;
 import org.topbraid.jenax.util.JenaUtil;
-import org.topbraid.shacl.arq.SHACLFunctionDriver;
+import org.topbraid.shacl.arq.functions.SHACLSPARQLFunctionDriver;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 
@@ -36,7 +36,7 @@ import org.topbraid.shacl.vocabulary.SH;
 /**
  * The singleton that creates ARQ FunctionFactories from (SHACL, SPIN) function declarations.
  * Can be used by applications to install a different singleton with support
- * for different kinds of functions, such as SPINx.
+ * for different kinds of functions, such as SHACL-JS or Script-based functions.
  * 
  * @author Holger Knublauch
  */
@@ -58,9 +58,8 @@ public class DeclarativeFunctionDrivers implements DeclarativeFunctionDriver {
 	private Map<Property,DeclarativeFunctionDriver> drivers = new HashMap<>();
 	
 	DeclarativeFunctionDrivers() {
-		register(SH.ask, new SHACLFunctionDriver());
-		register(SH.select, new SHACLFunctionDriver());
-		register(SH.jsLibrary, new SHACLFunctionDriver());
+		register(SH.ask, new SHACLSPARQLFunctionDriver());
+		register(SH.select, new SHACLSPARQLFunctionDriver());
 	}
 
 

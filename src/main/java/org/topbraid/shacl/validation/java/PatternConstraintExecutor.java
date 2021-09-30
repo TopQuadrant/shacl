@@ -12,6 +12,11 @@ import org.topbraid.shacl.validation.AbstractNativeConstraintExecutor;
 import org.topbraid.shacl.validation.ValidationEngine;
 import org.topbraid.shacl.vocabulary.SH;
 
+/**
+ * Validator for sh:pattern constraints.
+ * 
+ * @author Holger Knublauch
+ */
 class PatternConstraintExecutor extends AbstractNativeConstraintExecutor {
 
     private Pattern pattern;
@@ -35,8 +40,10 @@ class PatternConstraintExecutor extends AbstractNativeConstraintExecutor {
 	@Override
 	public void executeConstraint(Constraint constraint, ValidationEngine engine, Collection<RDFNode> focusNodes) {
 		long startTime = System.currentTimeMillis();
+		long valueNodeCount = 0;
 		for(RDFNode focusNode : focusNodes) {
 			for(RDFNode valueNode : engine.getValueNodes(constraint, focusNode)) {
+				valueNodeCount++;
 		        if(valueNode.isAnon()) {
 		        	engine.createValidationResult(constraint, focusNode, valueNode, () -> "Blank node cannot match pattern");
 		        }
@@ -49,6 +56,6 @@ class PatternConstraintExecutor extends AbstractNativeConstraintExecutor {
 			}
 			engine.checkCanceled();
 		}
-		addStatistics(constraint, startTime);
+		addStatistics(engine, constraint, startTime, focusNodes.size(), valueNodeCount);
 	}
 }

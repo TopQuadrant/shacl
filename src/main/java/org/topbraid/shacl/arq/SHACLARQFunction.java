@@ -27,11 +27,11 @@ import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.sparql.core.DatasetImpl;
 import org.apache.jena.sparql.core.Substitute;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.expr.Expr;
@@ -43,8 +43,8 @@ import org.apache.jena.sparql.serializer.SerializationContext;
 import org.apache.jena.sparql.sse.SSE;
 import org.apache.jena.sparql.util.ExprUtils;
 import org.apache.jena.sparql.util.FmtUtils;
-import org.topbraid.jenax.functions.OptionalArgsFunction;
 import org.topbraid.jenax.functions.DeclarativeFunctionFactory;
+import org.topbraid.jenax.functions.OptionalArgsFunction;
 import org.topbraid.jenax.statistics.ExecStatistics;
 import org.topbraid.jenax.statistics.ExecStatisticsManager;
 import org.topbraid.jenax.util.JenaDatatypes;
@@ -154,7 +154,7 @@ public abstract class SHACLARQFunction implements org.apache.jena.sparql.functio
 			}
 		}
 		
-		Dataset dataset = DatasetImpl.wrap(env.getDataset());
+		Dataset dataset = DatasetFactory.wrap(env.getDataset());
 		
 		if(ExecStatisticsManager.get().isRecording() && ExecStatisticsManager.get().isRecordingDeclarativeFunctions()) {
 			StringBuffer sb = new StringBuffer();

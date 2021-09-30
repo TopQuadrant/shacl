@@ -10,14 +10,21 @@ import org.topbraid.shacl.validation.AbstractNativeConstraintExecutor;
 import org.topbraid.shacl.validation.ValidationEngine;
 import org.topbraid.shacl.validation.sparql.AbstractSPARQLExecutor;
 
+/**
+ * Validator for sh:node constraints.
+ * 
+ * @author Holger Knublauch
+ */
 class NodeConstraintExecutor extends AbstractNativeConstraintExecutor {
 
 	@Override
 	public void executeConstraint(Constraint constraint, ValidationEngine engine, Collection<RDFNode> focusNodes) {
 		long startTime = System.currentTimeMillis();
 		RDFNode shape = constraint.getParameterValue();
+		long valueNodeCount = 0;
 		for(RDFNode focusNode : focusNodes) {
 			for(RDFNode valueNode : engine.getValueNodes(constraint, focusNode)) {
+				valueNodeCount++;
 				Model nestedResults = hasShape(engine, constraint, focusNode, valueNode, shape, false);
 				if(nestedResults != null) {
 					Resource result = engine.createValidationResult(constraint, focusNode, valueNode, () -> "Value does not have shape " + engine.getLabelFunction().apply(shape));
@@ -28,6 +35,6 @@ class NodeConstraintExecutor extends AbstractNativeConstraintExecutor {
 			}
 			engine.checkCanceled();
 		}
-		addStatistics(constraint, startTime);
+		addStatistics(engine, constraint, startTime, focusNodes.size(), valueNodeCount);
 	}
 }

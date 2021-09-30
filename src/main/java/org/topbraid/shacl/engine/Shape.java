@@ -52,43 +52,59 @@ import org.topbraid.shacl.vocabulary.SH;
 
 /**
  * Represents a shape as input to an engine (e.g. validation or rule).
- * A Shape consists of a collection of Constraints.
+ * A Shape is mainly a collection of Constraints.
  * 
  * @author Holger Knublauch
  */
 public class Shape {
 	
+	// The Constraints of this shape
 	private List<Constraint> constraints;
 	
+	// True if this is sh:deactivated
 	private boolean deactivated;
-	
+
+	// The Jena Path if this is a property shape with a path expression, see also predicate
 	private Path jenaPath;
 	
+	// The sh:path
 	private Resource path;
-	
+
+	// The predicate if this is a property shape with a IRI sh:path
 	private Property predicate;
-	
+
+	// The values of sh:message, computed once on demand
 	private List<RDFNode> messages;
 	
+	// True if this is a node shape, i.e. no path
 	private boolean nodeShape;
-	
+
+	// The sh:severity
 	private Resource severity;
 
+	// The resource of the shape in the shapes graph's Jena Model to query details when needed
 	private SHShape shape;
 	
+	// The owning ShapesGraph
 	private ShapesGraph shapesGraph;
 	
+	// The Targets that this shape declares (e.g., based on sh:targetClass)
 	private List<Target> targets = new ArrayList<>();
 	
 	
+	/**
+	 * Constructs a new Shape in a given ShapesGraph.
+	 * @param shapesGraph  the owning ShapesGraph
+	 * @param shape  the Jena resource of the shape
+	 */
 	public Shape(ShapesGraph shapesGraph, SHShape shape) {
 		this.shape = shape;
 		this.shapesGraph = shapesGraph;
-		Resource path = shape.getPath();
-		this.path = path;
 		this.deactivated = shape.isDeactivated();
 		this.severity = shape.getSeverity();
+		Resource path = shape.getPath();
 		if(path != null) {			
+			this.path = path;
 			if(path.isAnon()) {
 				jenaPath = (Path) SHACLPaths.getJenaPath(SHACLPaths.getPathString(path), path.getModel());
 			}
@@ -180,7 +196,7 @@ public class Shape {
 	}
 	
 	
-	public Collection<RDFNode> getMessages() {
+	public synchronized Collection<RDFNode> getMessages() {
 		if(messages == null) {
 			messages = shape.listProperties(SH.message).mapWith(s -> s.getObject()).toList();
 		}

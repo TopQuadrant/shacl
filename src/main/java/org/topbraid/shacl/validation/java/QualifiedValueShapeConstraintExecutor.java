@@ -14,7 +14,13 @@ import org.topbraid.shacl.validation.AbstractNativeConstraintExecutor;
 import org.topbraid.shacl.validation.ValidationEngine;
 import org.topbraid.shacl.vocabulary.SH;
 
-// Note this is used for both min and max, but min is skipped if max also exists (avoids doing the count twice)
+/**
+ * Validator for sh:qualifiedValueShape constraints.
+ * 
+ * Note this is used for both min and max, but min is skipped if max also exists (avoids doing the count twice).
+ * 
+ * @author Holger Knublauch
+ */
 class QualifiedValueShapeConstraintExecutor extends AbstractNativeConstraintExecutor {
 	
 	private boolean disjoint;
@@ -64,9 +70,11 @@ class QualifiedValueShapeConstraintExecutor extends AbstractNativeConstraintExec
 			return;
 		}
 		
+		long valueNodeCount = 0;
 		for(RDFNode focusNode : focusNodes) {
 			int count = 0;
 			for(RDFNode valueNode : engine.getValueNodes(constraint, focusNode)) {
+				valueNodeCount++;
 				Model results = hasShape(engine, constraint, focusNode, valueNode, valueShape, true);
 				if(results == null && !hasAnySiblingShape(engine, constraint, focusNode, valueNode)) {
 					count++;
@@ -84,6 +92,6 @@ class QualifiedValueShapeConstraintExecutor extends AbstractNativeConstraintExec
 			}
 			engine.checkCanceled();
 		}
-		addStatistics(constraint, startTime);
+		addStatistics(engine, constraint, startTime, focusNodes.size(), valueNodeCount);
 	}
 }

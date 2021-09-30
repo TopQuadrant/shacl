@@ -3,6 +3,7 @@ package org.topbraid.shacl.validation.java;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
@@ -13,6 +14,11 @@ import org.topbraid.shacl.engine.Constraint;
 import org.topbraid.shacl.validation.ValidationEngine;
 import org.topbraid.shacl.vocabulary.SH;
 
+/**
+ * Validator for sh:or constraints.
+ * 
+ * @author Holger Knublauch
+ */
 class OrConstraintExecutor extends AbstractShapeListConstraintExecutor {
 
 	// An optimization if the sh:or list consists only of sh:datatype constraints.
@@ -36,11 +42,14 @@ class OrConstraintExecutor extends AbstractShapeListConstraintExecutor {
 
 		long startTime = System.currentTimeMillis();
 
+		long valueNodeCount = 0;
 		if(datatypeURIs != null) {
 			for(RDFNode focusNode : focusNodes) {
 				for(RDFNode valueNode : engine.getValueNodes(constraint, focusNode)) {
+					valueNodeCount++;
 					if(!valueNode.isLiteral() || !datatypeURIs.contains(valueNode.asNode().getLiteralDatatypeURI()) || !valueNode.asNode().getLiteralDatatype().isValid(valueNode.asNode().getLiteralLexicalForm())) {
-						engine.createValidationResult(constraint, focusNode, valueNode, () -> "Value matches none of the datatypes in the sh:or enumeration");
+						engine.createValidationResult(constraint, focusNode, valueNode, () -> "Value must have one of the following datatypes: " +
+								datatypeURIs.stream().map(uri -> engine.getLabelFunction().apply(focusNode.getModel().getResource(uri))).collect(Collectors.joining(", ")));
 					}
 				}
 				engine.checkCanceled();
@@ -49,6 +58,7 @@ class OrConstraintExecutor extends AbstractShapeListConstraintExecutor {
 		else {
 			for(RDFNode focusNode : focusNodes) {
 				for(RDFNode valueNode : engine.getValueNodes(constraint, focusNode)) {
+					valueNodeCount++;
 					boolean hasOne = false;
 					for(RDFNode shape : shapes) {
 						Model nestedResults = hasShape(engine, constraint, focusNode, valueNode, shape, true);
@@ -58,13 +68,13 @@ class OrConstraintExecutor extends AbstractShapeListConstraintExecutor {
 						}
 					}
 					if(!hasOne) {
-						engine.createValidationResult(constraint, focusNode, valueNode, () -> "Value has none of the shapes in the sh:or enumeration");
+						engine.createValidationResult(constraint, focusNode, valueNode, () -> "Value must have at least one of the following shapes: " + shapeLabelsList(engine));
 					}
 				}
 			}
 		}
 
-		addStatistics(constraint, startTime);
+		addStatistics(engine, constraint, startTime, focusNodes.size(), valueNodeCount);
 	}
 
 	

@@ -93,12 +93,6 @@ public class DatasetWrappingDatasetGraph extends DatasetGraphBase {
 
 
 	@Override
-    public PrefixMap prefixes() {
-        return Prefixes.adapt(dataset.getPrefixMapping());
-    }
-
-
-    @Override
 	public Iterator<Quad> find(Node g, Node s, Node p, Node o) {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException();
@@ -238,5 +232,15 @@ public class DatasetWrappingDatasetGraph extends DatasetGraphBase {
 	@Override
 	public boolean supportsTransactions() {
 		return dataset.supportsTransactions();
+	}
+
+
+	@Override
+	public PrefixMap prefixes() {
+		Model defaultModel = dataset.getDefaultModel();
+		if (defaultModel != null) {
+			return Prefixes.adapt(defaultModel);
+		}
+		return null;
 	}
 }

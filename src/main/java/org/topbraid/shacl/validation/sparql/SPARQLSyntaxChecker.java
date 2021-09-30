@@ -147,8 +147,9 @@ public class SPARQLSyntaxChecker {
 							expr.visit(this);
 						}
 					}
-                    @Override
-                    public void visit(ExprTripleTerm tripleTerm) {}
+					@Override
+					public void visit(ExprTripleTerm tripleTerm) {
+					}
 				});
 			}
 		};

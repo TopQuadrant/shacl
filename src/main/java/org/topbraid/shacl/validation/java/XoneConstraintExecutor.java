@@ -7,6 +7,11 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.topbraid.shacl.engine.Constraint;
 import org.topbraid.shacl.validation.ValidationEngine;
 
+/**
+ * Validator for sh:xone constraints.
+ * 
+ * @author Holger Knublauch
+ */
 class XoneConstraintExecutor extends AbstractShapeListConstraintExecutor {
 
 	XoneConstraintExecutor(Constraint constraint) {
@@ -19,18 +24,22 @@ class XoneConstraintExecutor extends AbstractShapeListConstraintExecutor {
 
 		long startTime = System.currentTimeMillis();
 
+		long valueNodeCount = 0;
 		for(RDFNode focusNode : focusNodes) {
 			for(RDFNode valueNode : engine.getValueNodes(constraint, focusNode)) {
+				valueNodeCount++;
 				long count = shapes.stream().filter(shape -> {
 					Model nestedResults = hasShape(engine, constraint, focusNode, valueNode, shape, true);
 					return nestedResults == null;
 				}).count();
 				if(count != 1) {
-					engine.createValidationResult(constraint, focusNode, valueNode, () -> "Value has " + count + " shapes out of " + shapes.size() + " in the sh:xone enumeration");
+					engine.createValidationResult(constraint, focusNode, valueNode, () -> 
+						"Value must have exactly one of the following " + shapes.size() + " shapes but conforms to " + count + ": " + shapeLabelsList(engine)
+					);
 				}
 			}
 		}
 
-		addStatistics(constraint, startTime);
+		addStatistics(engine, constraint, startTime, focusNodes.size(), valueNodeCount);
 	}
 }

@@ -17,7 +17,9 @@
 package org.topbraid.shacl.optimize;
 
 import java.util.List;
+import java.util.Map;
 
+import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 
 /**
@@ -37,4 +39,7 @@ public interface OptimizedMultiUnion {
 
 	
 	void resetOptimizations();
+	
+	
+	void tellContainedNamespaces(Map<String,List<Graph>> subjectNamespaces, Map<String,List<Graph>> objectNamespaces);
 }

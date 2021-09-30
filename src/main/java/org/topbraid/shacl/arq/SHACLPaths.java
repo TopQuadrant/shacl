@@ -43,6 +43,7 @@ import org.apache.jena.sparql.path.P_ZeroOrMore1;
 import org.apache.jena.sparql.path.P_ZeroOrMoreN;
 import org.apache.jena.sparql.path.P_ZeroOrOne;
 import org.apache.jena.sparql.path.Path;
+import org.apache.jena.sparql.path.PathFactory;
 import org.apache.jena.sparql.path.eval.PathEval;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementGroup;
@@ -238,8 +239,12 @@ public class SHACLPaths {
 			return path;
 		}
 		else {
-			String pathString = SHACLPaths.getPathString(path);
-			return SHACLPaths.getJenaPath(pathString, path.getModel());
+			try {
+				return getPath(path);
+			}
+			catch(Exception ex) {
+				throw new IllegalArgumentException("Not a SPARQL 1.1 Path expression", ex);
+			}
 		}
 	}
 
@@ -270,6 +275,63 @@ public class SHACLPaths {
 			}
 		}
 		throw new QueryParseException("Not a SPARQL 1.1 Path expression", 2, 1);
+	}
+	
+	
+	public static Path getPath(Resource shaclPath) {
+		if(shaclPath.isURIResource()) {
+			return PathFactory.pathLink(shaclPath.asNode());
+		}
+		{
+			Resource inversePath = shaclPath.getPropertyResourceValue(SH.inversePath);
+			if(inversePath != null) {
+				return PathFactory.pathInverse(getPath(inversePath));
+			}
+		}
+		{
+			Resource first = shaclPath.getPropertyResourceValue(RDF.first);
+			if(first != null) {
+				Resource rest = shaclPath.getPropertyResourceValue(RDF.rest);
+				if(RDF.nil.equals(rest)) {
+					return getPath(first);
+				}
+				else {
+					return PathFactory.pathSeq(getPath(first), getPath(rest));
+				}
+			}
+		}
+		{
+			Resource alternativePath = shaclPath.getPropertyResourceValue(SH.alternativePath);
+			if(alternativePath != null) {
+				Resource first = alternativePath.getPropertyResourceValue(RDF.first);
+				Resource rest = alternativePath.getPropertyResourceValue(RDF.rest);
+				if(RDF.nil.equals(rest)) {
+					return getPath(first);
+				}
+				else {
+					return PathFactory.pathAlt(getPath(first), getPath(rest));
+				}
+			}
+		}
+		{
+			Resource zeroOrMorePath = shaclPath.getPropertyResourceValue(SH.zeroOrMorePath);
+			if(zeroOrMorePath != null) {
+				return PathFactory.pathZeroOrMore1(getPath(zeroOrMorePath));
+			}
+		}
+		{
+			Resource oneOrMorePath = shaclPath.getPropertyResourceValue(SH.oneOrMorePath);
+			if(oneOrMorePath != null) {
+				return PathFactory.pathOneOrMore1(getPath(oneOrMorePath));
+			}
+		}
+		{
+			Resource zeroOrOnePath = shaclPath.getPropertyResourceValue(SH.zeroOrOnePath);
+			if(zeroOrOnePath != null) {
+				return PathFactory.pathZeroOrOne(getPath(zeroOrOnePath));
+			}
+		}
+		throw new IllegalArgumentException("Malformed SHACL path expression");
 	}
 
 	
