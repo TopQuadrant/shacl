@@ -41,6 +41,7 @@ import org.topbraid.shacl.util.FailureLog;
 import org.topbraid.shacl.util.RecursionGuard;
 import org.topbraid.shacl.validation.DefaultShapesGraphProvider;
 import org.topbraid.shacl.validation.ValidationEngine;
+import org.topbraid.shacl.validation.ValidationEngineConfiguration;
 import org.topbraid.shacl.validation.ValidationEngineFactory;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
@@ -172,7 +173,9 @@ public class HasShapeFunction extends AbstractFunction3 {
 		Resource report = reportModel.createResource(SH.ValidationReport); // This avoids the expensive setNsPrefixes call in ValidationEngine constructor
 		ValidationEngine engine = ValidationEngineFactory.get().create(dataset, sgURI, sg, report);
 		if(ValidationEngine.getCurrent() != null) {
-			engine.setConfiguration(ValidationEngine.getCurrent().getConfiguration());
+			ValidationEngineConfiguration cloned = ValidationEngine.getCurrent().getConfiguration().clone();
+			cloned.setValidationErrorBatch(-1);
+			engine.setConfiguration(cloned);
 		}
 		engine.validateNodesAgainstShape(Collections.singletonList(focusNode), shape.asNode());
 		return reportModel;

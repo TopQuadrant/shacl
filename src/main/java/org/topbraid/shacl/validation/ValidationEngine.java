@@ -264,9 +264,9 @@ public class ValidationEngine extends AbstractEngine {
 
 	
 	private void checkMaximumNumberFailures(Constraint constraint) {
-		if (constraint.getShape().getSeverity() == SH.Violation) {
+		if (SH.Violation.equals(constraint.getShape().getSeverity())) {
 			this.violationsCount++;
-			if (configuration.getValidationErrorBatch() != -1 && violationsCount == configuration.getValidationErrorBatch()) {
+			if (configuration.getValidationErrorBatch() != -1 && violationsCount >= configuration.getValidationErrorBatch()) {
 				throw new MaximumNumberViolations(violationsCount);
 			}
 		}
