@@ -24,6 +24,19 @@ public class ValidationEngineConfiguration {
     
     
     /**
+     * Creates a clone of this, with exactly the same values.
+     */
+    public ValidationEngineConfiguration clone() {
+    	ValidationEngineConfiguration c = new ValidationEngineConfiguration();
+    	c.reportDetails = this.reportDetails;
+    	c.skippedConstraintComponents = new HashSet<>(this.skippedConstraintComponents);
+    	c.validateShapes = this.validateShapes;
+    	c.validationErrorBatch = this.validationErrorBatch;
+    	return c;
+    }
+
+    
+    /**
      * Checks whether the report shall include sh:detail triples (for sh:node etc).
      * @return true to report details (false is default)
      */

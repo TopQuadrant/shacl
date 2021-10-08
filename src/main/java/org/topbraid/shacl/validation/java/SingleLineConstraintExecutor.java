@@ -8,14 +8,21 @@ import org.topbraid.shacl.engine.Constraint;
 import org.topbraid.shacl.validation.AbstractNativeConstraintExecutor;
 import org.topbraid.shacl.validation.ValidationEngine;
 
+/**
+ * Validator for dash:singleLine constraints.
+ * 
+ * @author Holger Knublauch
+ */
 class SingleLineConstraintExecutor extends AbstractNativeConstraintExecutor {
 	
 	@Override
 	public void executeConstraint(Constraint constraint, ValidationEngine engine, Collection<RDFNode> focusNodes) {
-		long startTime = System.currentTimeMillis();
 		if(JenaDatatypes.TRUE.equals(constraint.getParameterValue())) {
+			long startTime = System.currentTimeMillis();
+			long valueNodeCount = 0;
 			for(RDFNode focusNode : focusNodes) {
 				for(RDFNode valueNode : engine.getValueNodes(constraint, focusNode)) {
+					valueNodeCount++;
 					if(!valueNode.isLiteral()) {					
 						engine.createValidationResult(constraint, focusNode, valueNode, () -> "Not a literal");
 					}
@@ -28,7 +35,7 @@ class SingleLineConstraintExecutor extends AbstractNativeConstraintExecutor {
 				}
 				engine.checkCanceled();
 			}
+			addStatistics(engine, constraint, startTime, focusNodes.size(), valueNodeCount);
 		}
-		addStatistics(constraint, startTime);
 	}
 }

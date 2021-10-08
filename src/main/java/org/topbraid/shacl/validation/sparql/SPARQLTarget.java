@@ -1,7 +1,7 @@
 package org.topbraid.shacl.validation.sparql;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
@@ -49,7 +49,7 @@ public class SPARQLTarget implements Target {
 
 	
 	@Override
-	public void addTargetNodes(Dataset dataset, Collection<RDFNode> results) {
+	public void addTargetNodes(Dataset dataset, Set<RDFNode> results) {
 		QuerySolutionMap bindings = null;
 		if(parameterizableTarget != null) {
 			bindings = new QuerySolutionMap();

@@ -8,7 +8,7 @@ import org.topbraid.shacl.validation.AbstractNativeConstraintExecutor;
 import org.topbraid.shacl.validation.ValidationEngine;
 
 /**
- * Native implementation of sh:MaxCountConstraintComponent.
+ * Validator for sh:maxCount constraints.
  * 
  * @author Holger Knublauch
  */
@@ -23,14 +23,16 @@ class MaxCountConstraintExecutor extends AbstractNativeConstraintExecutor {
 	@Override
 	public void executeConstraint(Constraint constraint, ValidationEngine engine, Collection<RDFNode> focusNodes) {
 		long startTime = System.currentTimeMillis();
+		long valueNodeCount = 0;
 		for(RDFNode focusNode : focusNodes) {
 			// Here we could theoretically only count until the maxCount is reached, but then the error message would not be as informative
 			int count = engine.getValueNodes(constraint, focusNode).size();
+			valueNodeCount += count;
 			if(count > maxCount) {
 				engine.createValidationResult(constraint, focusNode, null, () -> "Property may only have " + maxCount + " value" + (maxCount == 1 ? "" : "s") + ", but found " + count);
 			}
 			engine.checkCanceled();
 		}
-		addStatistics(constraint, startTime);
+		addStatistics(engine, constraint, startTime, focusNodes.size(), valueNodeCount);
 	}
 }

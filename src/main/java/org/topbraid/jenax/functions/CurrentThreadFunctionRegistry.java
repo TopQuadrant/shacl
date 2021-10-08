@@ -18,6 +18,7 @@ package org.topbraid.jenax.functions;
 
 import java.util.Iterator;
 
+import org.apache.jena.query.ARQ;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.function.FunctionFactory;
 import org.apache.jena.sparql.function.FunctionRegistry;
@@ -59,18 +60,37 @@ public class CurrentThreadFunctionRegistry extends FunctionRegistry {
 	
 	private static ThreadLocal<CurrentThreadFunctions> localFunctions = new ThreadLocal<>();
 	
+	private static CurrentThreadFunctionRegistry singleton = new CurrentThreadFunctionRegistry(FunctionRegistry.get());
+	
+	
+	public static CurrentThreadFunctionRegistry get() {
+		return singleton;
+	}
+
+	
 	/**
 	 * Registers a set of extra SPIN functions from a given Model for the current
 	 * Thread.
 	 * @param model  the Model containing the SPIN functions
-	 * @return any old object that was registered for the current Thread, so that
-	 *         the old value can be restored when done.
+	 * @return a Runnable that must be called (in a finally block) when done to restore the previous state
 	 */
-	public static CurrentThreadFunctions register(Model model) {
+	public static Runnable register(Model model) {
 		CurrentThreadFunctions old = localFunctions.get();
 		CurrentThreadFunctions neo = new CurrentThreadFunctions(model);
 		localFunctions.set(neo);
-		return old;
+		FunctionRegistry oldFR = FunctionRegistry.get();
+		if(oldFR != singleton) {
+			FunctionRegistry.set(ARQ.getContext(), singleton);
+			return () -> {
+				unregister(old);
+				FunctionRegistry.set(ARQ.getContext(), oldFR);
+			};
+		}
+		else {
+			return () -> {
+				unregister(old);
+			};
+		}
 	}
 	
 	
@@ -78,7 +98,7 @@ public class CurrentThreadFunctionRegistry extends FunctionRegistry {
 	 * Unregisters the current Model for the current Thread.
 	 * @param old  the old functions that shall be restored or null
 	 */
-	public static void unregister(CurrentThreadFunctions old) {
+	private static void unregister(CurrentThreadFunctions old) {
 		if(old != null) {
 			localFunctions.set(old);
 		}
@@ -93,7 +113,7 @@ public class CurrentThreadFunctionRegistry extends FunctionRegistry {
 	
 	private FunctionRegistry base;
 	
-	public CurrentThreadFunctionRegistry(FunctionRegistry base) {
+	private CurrentThreadFunctionRegistry(FunctionRegistry base) {
 		this.base = base;
 	}
 

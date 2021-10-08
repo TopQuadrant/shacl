@@ -28,6 +28,11 @@ import org.topbraid.shacl.expr.NodeExpression;
 import org.topbraid.shacl.expr.NodeExpressionFactory;
 import org.topbraid.shacl.vocabulary.SH;
 
+/**
+ * Validator for sh:expression constraints, see https://w3c.github.io/shacl/shacl-af/#ExpressionConstraintComponent
+ * 
+ * @author Holger Knublauch
+ */
 public class ExpressionConstraintExecutor implements ConstraintExecutor {
 
 	@Override

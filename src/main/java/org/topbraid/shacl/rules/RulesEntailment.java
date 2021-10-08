@@ -42,6 +42,7 @@ public class RulesEntailment implements SHACLEntailment.Engine {
 		Model unionDataModel = ModelFactory.createModelForGraph(unionGraph);
 		Dataset newDataset = new DatasetWithDifferentDefaultModel(unionDataModel, dataset);
 		RuleEngine engine = new RuleEngine(newDataset, shapesGraphURI, shapesGraph, inferencesModel);
+		engine.setExcludeNeverMaterialize(true);
 		engine.setProgressMonitor(monitor);
 		engine.executeAll();
 		engine.executeAllDefaultValues();

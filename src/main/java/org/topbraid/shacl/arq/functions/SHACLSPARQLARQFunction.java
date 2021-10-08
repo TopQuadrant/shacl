@@ -15,7 +15,7 @@
  *  information regarding copyright ownership.
  */
 
-package org.topbraid.shacl.arq;
+package org.topbraid.shacl.arq.functions;
 
 import java.util.List;
 
@@ -32,6 +32,7 @@ import org.apache.jena.sparql.expr.NodeValue;
 import org.topbraid.jenax.util.ARQFactory;
 import org.topbraid.jenax.util.DatasetWithDifferentDefaultModel;
 import org.topbraid.jenax.util.JenaUtil;
+import org.topbraid.shacl.arq.SHACLARQFunction;
 import org.topbraid.shacl.model.SHConstraintComponent;
 import org.topbraid.shacl.model.SHSPARQLFunction;
 import org.topbraid.shacl.validation.sparql.SPARQLSubstitutions;

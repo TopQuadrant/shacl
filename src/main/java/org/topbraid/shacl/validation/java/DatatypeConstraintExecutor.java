@@ -12,12 +12,18 @@ import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.compose.MultiUnion;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.vocabulary.XSD;
 import org.topbraid.jenax.util.DiffGraph;
 import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.engine.Constraint;
 import org.topbraid.shacl.validation.AbstractNativeConstraintExecutor;
 import org.topbraid.shacl.validation.ValidationEngine;
 
+/**
+ * Validator for sh:datatype constraints.
+ * 
+ * @author Holger Knublauch
+ */
 public class DatatypeConstraintExecutor extends AbstractNativeConstraintExecutor {
 
 	// A Function that tests whether a given Model is stored in Apache Jena TDB1.
@@ -54,14 +60,17 @@ public class DatatypeConstraintExecutor extends AbstractNativeConstraintExecutor
 		RDFNode datatypeNode = constraint.getParameterValue();
 		String datatypeURI = datatypeNode.asNode().getURI();
 		RDFDatatype datatype = NodeFactory.getType(datatypeURI);
-		String message = "Value must be a valid literal of type " + ((Resource)datatypeNode).getLocalName();
+		String message = "Value must be a valid literal of type " + ((Resource)datatypeNode).getLocalName() + (datatypeNode.equals(XSD.date) ? " e.g. ('YYYY-MM-DD')" : "");
+
+		long valueNodeCount = 0;
 		for(RDFNode focusNode : focusNodes) {
 			for(RDFNode valueNode : engine.getValueNodes(constraint, focusNode)) {
+				valueNodeCount++;
 				validate(constraint, engine, message, datatypeURI, datatype, focusNode, valueNode);
 			}
 			engine.checkCanceled();
 		}
-		addStatistics(constraint, startTime);
+		addStatistics(engine, constraint, startTime, focusNodes.size(), valueNodeCount);
 	}
 
 

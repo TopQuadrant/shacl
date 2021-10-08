@@ -37,6 +37,10 @@ public interface SHParameterizable extends SHResource {
 	Map<String,SHParameter> getParametersMap();
 
 	
+	/**
+	 * Gets the sh:labelTemplate if that exists.
+	 * @return the label template string or null
+	 */
 	String getLabelTemplate();
 
 	

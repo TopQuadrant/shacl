@@ -1,6 +1,6 @@
 package org.topbraid.shacl.targets;
 
-import java.util.Collection;
+import java.util.Set;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Property;
@@ -22,7 +22,7 @@ public class ObjectsOfTarget implements Target {
 	
 	
 	@Override
-	public void addTargetNodes(Dataset dataset, Collection<RDFNode> results) {
+	public void addTargetNodes(Dataset dataset, Set<RDFNode> results) {
 		dataset.getDefaultModel().listObjectsOfProperty(predicate).forEachRemaining(results::add);
 	}
 

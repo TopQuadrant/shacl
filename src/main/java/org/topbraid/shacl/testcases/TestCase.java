@@ -17,6 +17,7 @@
 package org.topbraid.shacl.testcases;
 
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.topbraid.shacl.testcases.context.TestCaseContext;
 import org.topbraid.shacl.vocabulary.DASH;
@@ -42,8 +43,16 @@ public abstract class TestCase implements Comparable<TestCase> {
 
 
 	public Resource createFailure(Model results, String message) {
+		return createFailure(results, message, (RDFNode) null);
+	}
+
+
+	public Resource createFailure(Model results, String message, RDFNode actualResult) {
 		Resource failure = createResult(results, DASH.FailureTestCaseResult);
 		failure.addProperty(SH.resultMessage, message);
+		if(actualResult != null) {
+			failure.addProperty(DASH.actualResult, actualResult);
+		}
 		return failure;
 	}
 

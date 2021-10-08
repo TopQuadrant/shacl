@@ -1,9 +1,5 @@
 package org.topbraid.shacl.util;
 
-import org.topbraid.shacl.arq.SHACLFunctionDriver;
-import org.topbraid.shacl.targets.CustomTargets;
-import org.topbraid.shacl.validation.ConstraintExecutors;
-
 /**
  * Manages global preferences related to SHACL processing.
  * 
@@ -11,19 +7,7 @@ import org.topbraid.shacl.validation.ConstraintExecutors;
  */
 public class SHACLPreferences {
 	
-	private static boolean jsPreferred;
-	
 	private static boolean produceFailuresMode;
-
-	
-	/**
-	 * Checks if JavaScript is preferred over SPARQL for the execution of constraint
-	 * validators, functions etc.
-	 * @return true if JavaScript if preferred
-	 */
-	public static boolean isJSPreferred() {
-		return jsPreferred;
-	}
 	
 	
 	/**
@@ -34,14 +18,6 @@ public class SHACLPreferences {
 	 */
 	public static boolean isProduceFailuresMode() {
 		return produceFailuresMode;
-	}
-	
-	
-	public static void setJSPreferred(boolean value) {
-		jsPreferred = value;
-		ConstraintExecutors.get().setJSPreferred(value);
-		SHACLFunctionDriver.setJSPreferred(value);
-		CustomTargets.get().setJSPreferred(value);
 	}
 	
 	

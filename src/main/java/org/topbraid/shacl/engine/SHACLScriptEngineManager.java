@@ -14,7 +14,7 @@
  *  See the NOTICE file distributed with this work for additional
  *  information regarding copyright ownership.
  */
-package org.topbraid.shacl.js;
+package org.topbraid.shacl.engine;
 
 /**
  * A singleton that uses a ThreadLocal to manage the life cycle of a JSScriptEngine
@@ -29,12 +29,20 @@ package org.topbraid.shacl.js;
  */
 public class SHACLScriptEngineManager {
 	
-	private static ThreadLocal<Boolean> actives = new ThreadLocal<>();
-
-	private static ThreadLocal<JSScriptEngine> engines = new ThreadLocal<>();
+	private static SHACLScriptEngineManager singleton = new SHACLScriptEngineManager();
+	
+	public static SHACLScriptEngineManager get() {
+		return singleton;
+	}
+	
+	public static void set(SHACLScriptEngineManager value) {
+		singleton = value;
+	}
+	
+	private ThreadLocal<Boolean> actives = new ThreadLocal<>();
 	
 	
-	public static boolean begin() {
+	public boolean begin() {
 		if(actives.get() != null) {
 			return actives.get();
 		}
@@ -45,19 +53,8 @@ public class SHACLScriptEngineManager {
 	}
 	
 	
-	public static JSScriptEngine getCurrentEngine() {
-		JSScriptEngine engine = engines.get();
-		if(engine == null) {
-			engine = JSScriptEngineFactory.get().createScriptEngine();
-			engines.set(engine);
-		}
-		return engine;
-	}
-	
-	
-	public static void end(boolean nested) {
+	public void end(boolean nested) {
 		if(!nested) {
-			engines.remove();
 			actives.remove();
 		}
 	}

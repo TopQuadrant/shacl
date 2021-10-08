@@ -2,6 +2,11 @@ package org.topbraid.shacl.validation.java;
 
 import org.apache.jena.sparql.expr.Expr;
 
+/**
+ * Validator for sh:minInclusive constraints.
+ * 
+ * @author Holger Knublauch
+ */
 class MinInclusiveConstraintExecutor extends AbstractClusiveConstraintExecutor {
 
 	public MinInclusiveConstraintExecutor() {

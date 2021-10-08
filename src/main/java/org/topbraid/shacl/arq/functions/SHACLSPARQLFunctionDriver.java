@@ -14,24 +14,23 @@
  *  See the NOTICE file distributed with this work for additional
  *  information regarding copyright ownership.
  */
-package org.topbraid.shacl.validation.js;
+package org.topbraid.shacl.arq.functions;
 
 import org.apache.jena.rdf.model.Resource;
-import org.topbraid.shacl.model.SHParameterizableTarget;
-import org.topbraid.shacl.targets.CustomTargetLanguage;
-import org.topbraid.shacl.targets.Target;
-import org.topbraid.shacl.vocabulary.SH;
+import org.topbraid.jenax.functions.DeclarativeFunctionDriver;
+import org.topbraid.jenax.functions.DeclarativeFunctionFactory;
+import org.topbraid.shacl.model.SHSPARQLFunction;
 
-public class JSTargetLanguage implements CustomTargetLanguage {
 
-	@Override
-	public boolean canHandle(Resource executable) {
-		return executable.hasProperty(SH.jsFunctionName);
-	}
-
+/**
+ * A DeclarativeFunctionDriver for SHACL-SPARQL functions.
+ * 
+ * @author Holger Knublauch
+ */
+public class SHACLSPARQLFunctionDriver implements DeclarativeFunctionDriver {
 	
 	@Override
-	public Target createTarget(Resource executable, SHParameterizableTarget parameterizableTarget) {
-		return new JSTarget(executable, parameterizableTarget);
+	public DeclarativeFunctionFactory create(Resource shaclFunction) {
+		return new SHACLSPARQLARQFunction(shaclFunction.as(SHSPARQLFunction.class));
 	}
 }

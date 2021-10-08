@@ -21,7 +21,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.jena.graph.Graph;
-import org.apache.jena.query.ARQ;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.ResultSet;
@@ -29,15 +28,11 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.sparql.function.FunctionRegistry;
 import org.apache.jena.util.FileUtils;
 import org.topbraid.jenax.functions.CurrentThreadFunctionRegistry;
-import org.topbraid.jenax.functions.CurrentThreadFunctions;
 import org.topbraid.jenax.util.ARQFactory;
 import org.topbraid.jenax.util.JenaDatatypes;
 import org.topbraid.jenax.util.JenaUtil;
-import org.topbraid.shacl.testcases.context.JSPreferredTestCaseContext;
-import org.topbraid.shacl.testcases.context.SPARQLPreferredTestCaseContext;
 import org.topbraid.shacl.testcases.context.TestCaseContext;
 import org.topbraid.shacl.testcases.context.TestCaseContextFactory;
 import org.topbraid.shacl.vocabulary.DASH;
@@ -45,10 +40,6 @@ import org.topbraid.shacl.vocabulary.DASH;
 public class FunctionTestCaseType extends TestCaseType {
 	
 	private static List<TestCaseContextFactory> contextFactories = new LinkedList<>();
-	static {
-		registerContextFactory(SPARQLPreferredTestCaseContext.getTestCaseContextFactory());
-		registerContextFactory(JSPreferredTestCaseContext.getTestCaseContextFactory());
-	}
 	
 	public static void registerContextFactory(TestCaseContextFactory factory) {
 		contextFactories.add(factory);
@@ -77,10 +68,7 @@ public class FunctionTestCaseType extends TestCaseType {
 		public void run(Model results) {
 			Resource testCase = getResource();
 			
-			FunctionRegistry oldFR = FunctionRegistry.get();
-			CurrentThreadFunctionRegistry threadFR = new CurrentThreadFunctionRegistry(oldFR);
-			FunctionRegistry.set(ARQ.getContext(), threadFR);
-			CurrentThreadFunctions old = CurrentThreadFunctionRegistry.register(testCase.getModel());
+			Runnable tearDownCTFR = CurrentThreadFunctionRegistry.register(testCase.getModel());
 
 			try {
 				for(TestCaseContextFactory contextFactory : contextFactories) {
@@ -131,8 +119,7 @@ public class FunctionTestCaseType extends TestCaseType {
 				}
 			}
 			finally {
-				CurrentThreadFunctionRegistry.unregister(old);
-				FunctionRegistry.set(ARQ.getContext(), oldFR);
+				tearDownCTFR.run();
 			}
 			
 			createResult(results, DASH.SuccessTestCaseResult);

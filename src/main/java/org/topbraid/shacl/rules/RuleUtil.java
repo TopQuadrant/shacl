@@ -31,10 +31,10 @@ import org.topbraid.jenax.progress.ProgressMonitor;
 import org.topbraid.jenax.util.ARQFactory;
 import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.arq.SHACLFunctions;
+import org.topbraid.shacl.engine.SHACLScriptEngineManager;
 import org.topbraid.shacl.engine.Shape;
 import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.engine.ShapesGraphFactory;
-import org.topbraid.shacl.js.SHACLScriptEngineManager;
 import org.topbraid.shacl.util.SHACLSystemModel;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.vocabulary.SH;
@@ -121,10 +121,11 @@ public class RuleUtil {
 		RuleEngine engine = new RuleEngine(dataset, shapesGraphURI, shapesGraph, inferencesModel);
 		engine.setProgressMonitor(monitor);
 		
-		boolean nested = SHACLScriptEngineManager.begin();
+		boolean nested = SHACLScriptEngineManager.get().begin();
 		try {
 			engine.applyEntailments();
 			if(focusNode == null) {
+				engine.setExcludeNeverMaterialize(true);
 				engine.executeAll();
 			}
 			else {
@@ -136,7 +137,7 @@ public class RuleUtil {
 			return null;
 		}
 		finally {
-			SHACLScriptEngineManager.end(nested);
+			SHACLScriptEngineManager.get().end(nested);
 		}
 		return inferencesModel;
 	}

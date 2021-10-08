@@ -23,19 +23,19 @@ import java.util.List;
 
 import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.atlas.json.JsonObject;
+import org.apache.jena.datatypes.xsd.impl.RDFjson;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.topbraid.jenax.functions.CurrentThreadFunctionRegistry;
-import org.topbraid.jenax.functions.CurrentThreadFunctions;
 import org.topbraid.jenax.util.ARQFactory;
 import org.topbraid.jenax.util.ExceptionUtil;
 import org.topbraid.jenax.util.JenaUtil;
-import org.topbraid.shacl.testcases.context.JSPreferredTestCaseContext;
-import org.topbraid.shacl.testcases.context.SPARQLPreferredTestCaseContext;
+import org.topbraid.shacl.multifunctions.MultiFunctions;
 import org.topbraid.shacl.testcases.context.TestCaseContext;
 import org.topbraid.shacl.testcases.context.TestCaseContextFactory;
 import org.topbraid.shacl.vocabulary.DASH;
@@ -44,17 +44,13 @@ import org.topbraid.shacl.vocabulary.SH;
 public class QueryTestCaseType extends TestCaseType {
 	
 	private static List<TestCaseContextFactory> contextFactories = new LinkedList<>();
-	static {
-		registerContextFactory(SPARQLPreferredTestCaseContext.getTestCaseContextFactory());
-		registerContextFactory(JSPreferredTestCaseContext.getTestCaseContextFactory());
-	}
 	
 	public static void registerContextFactory(TestCaseContextFactory factory) {
 		contextFactories.add(factory);
 	}
 
 	public static String createResultSetJSON(String queryString, Model model) {
-		CurrentThreadFunctions old = CurrentThreadFunctionRegistry.register(model);
+		Runnable tearDownCTFR = CurrentThreadFunctionRegistry.register(model);
 		try {
 			Query query = ARQFactory.get().createQuery(model, queryString);
 			try(QueryExecution qexec = ARQFactory.get().createQueryExecution(query, model)) {
@@ -68,7 +64,7 @@ public class QueryTestCaseType extends TestCaseType {
 			throw ExceptionUtil.throwUnchecked(e);
 		}
 		finally {
-			CurrentThreadFunctionRegistry.unregister(old);
+			tearDownCTFR.run();
 		}
 	}
 
@@ -93,34 +89,42 @@ public class QueryTestCaseType extends TestCaseType {
 		
 		@Override
 		public void run(Model results) throws Exception {
-			Resource testCase = getResource();
-			String queryString = JenaUtil.getStringProperty(testCase, SH.select);
-			Model model = testCase.getModel();
-			JsonObject expectedJSON = JSON.parse(JenaUtil.getStringProperty(testCase, DASH.expectedResult));
 			
-			for(TestCaseContextFactory contextFactory : contextFactories) {
-				TestCaseContext context = contextFactory.createContext();
-				context.setUpTestContext();
-				try {
-					String actual = createResultSetJSON(queryString, model);
-					JsonObject actualJSON = JSON.parse(actual);
-					if(!actualJSON.equals(expectedJSON)) {
-					    System.err.println("---- Test failure: "+testCase);
-					    System.err.println(queryString);
-					    System.err.println("---- Expected ----");
-					    System.err.println(expectedJSON);
-					    System.err.println("---- Actual ----");
-					    System.err.println(actual);
-					    System.err.println("----");
-						createFailure(results, "Mismatching result set. Actual: " + actual, context);
-						return;
+			Iterable<String> tempURIs = MultiFunctions.registerAllTemp(getResource().getModel());
+			try {
+				Resource testCase = getResource();
+				String queryString = JenaUtil.getStringProperty(testCase, SH.select);
+				Model model = testCase.getModel();
+				JsonObject expectedJSON = JSON.parse(JenaUtil.getStringProperty(testCase, DASH.expectedResult));
+				
+				for(TestCaseContextFactory contextFactory : contextFactories) {
+					TestCaseContext context = contextFactory.createContext();
+					context.setUpTestContext();
+					try {
+						String actual = createResultSetJSON(queryString, model);
+						JsonObject actualJSON = JSON.parse(actual);
+						if(!actualJSON.equals(expectedJSON)) {
+							System.err.println("---- Test failure: "+testCase);
+							System.err.println(queryString);
+							System.err.println("---- Expected ----");
+							System.err.println(expectedJSON);
+							System.err.println("---- Actual ----");
+							System.err.println(actual);
+							System.err.println("----");
+							Resource failure = createFailure(results, "Mismatching query result set", context);
+							failure.addProperty(DASH.actualResult, ResourceFactory.createTypedLiteral(actualJSON.toString(), RDFjson.rdfJSON));
+							return;
+						}
+					}
+					finally {
+						context.tearDownTestContext();
 					}
 				}
-				finally {
-					context.tearDownTestContext();
-				}
+				createResult(results, DASH.SuccessTestCaseResult);
 			}
-			createResult(results, DASH.SuccessTestCaseResult);
+			finally {
+				tempURIs.forEach(uri -> MultiFunctions.unregister(uri));
+			}
 		}
 	}
 }

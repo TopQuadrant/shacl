@@ -45,6 +45,7 @@ import org.apache.jena.sparql.util.FmtUtils;
 import org.apache.jena.sparql.util.NodeFactoryExtra;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.util.iterator.WrappedIterator;
+import org.topbraid.jenax.functions.CurrentThreadFunctionRegistry;
 import org.topbraid.jenax.functions.OptionalArgsFunction;
 import org.topbraid.shacl.expr.ComplexNodeExpression;
 import org.topbraid.shacl.expr.NodeExpression;
@@ -69,20 +70,20 @@ public class FunctionExpression extends ComplexNodeExpression {
 		this.function = function;
 		
 		if(function.getNameSpace().equals(SPARQL.NS)) {
+			if (!BuilderExpr.isDefined(function.getLocalName())) {
+				throw new IllegalArgumentException("Unknown SPARQL built-in " + function.getLocalName());
+			}
 			ItemList il = new ItemList();
-			il.add(function.asNode());
+			il.add(function.getLocalName());
 			for(int i = 0; i < args.size(); i++) {
 				il.add(Var.alloc("a" + i));
 			}
-			
-			if ( ! BuilderExpr.isDefined(function.getLocalName()) )
-			    throw new IllegalArgumentException("Unknown SPARQL built-in " + function.getLocalName());
-
-	         try { 
-	             this.expr = BuilderExpr.buildExpr(il);
-	         } catch (ExprBuildException ex) {
-	             throw new IllegalArgumentException("Failed to build expression for "+il);
-	         }
+			try {
+				this.expr = BuilderExpr.buildExpr(il);
+			}
+			catch (ExprBuildException ebe) {
+				throw new IllegalArgumentException("Failed to build expression for " + il, ebe);
+			}
 		}
 		else {
 			StringBuffer sb = new StringBuffer();
@@ -96,6 +97,7 @@ public class FunctionExpression extends ComplexNodeExpression {
 				sb.append("?a" + i);
 			}
 			sb.append(")");
+			
 			this.expr = ExprUtils.parse(sb.toString());
 		}
 	}
@@ -132,34 +134,40 @@ public class FunctionExpression extends ComplexNodeExpression {
 			as.add(a);
 		}
 		
-		for(int x = 0; x < total; x++) {
-			
-			int y = x;
-			BindingHashMap binding = new BindingHashMap();
-			for(int i = 0; i < args.size(); i++) {
-				List<RDFNode> a = as.get(i);
-				if(!a.isEmpty()) {
-					int m = y % a.size();
-					binding.add(Var.alloc("a" + i), a.get(m).asNode());
-					y /= a.size();
-				}
-			}
-			
-			Dataset dataset = context.getDataset();
-			DatasetGraph dsg = dataset.asDatasetGraph();
-			FunctionEnv env = new ExecutionContext(cxt, dsg.getDefaultGraph(), dsg, null);
-			try {
-				NodeValue r = expr.eval(binding, env);
-				if(r != null) {
-					Model defaultModel = dataset.getDefaultModel();
-					RDFNode rdfNode = defaultModel.asRDFNode(r.asNode());
-					if(!results.contains(rdfNode)) {
-						results.add(rdfNode);
+		Runnable tearDownCTFR = CurrentThreadFunctionRegistry.register(context.getShapesGraph().getShapesModel());
+		try {
+			for(int x = 0; x < total; x++) {
+				
+				int y = x;
+				BindingHashMap binding = new BindingHashMap();
+				for(int i = 0; i < args.size(); i++) {
+					List<RDFNode> a = as.get(i);
+					if(!a.isEmpty()) {
+						int m = y % a.size();
+						binding.add(Var.alloc("a" + i), a.get(m).asNode());
+						y /= a.size();
 					}
 				}
+				
+				Dataset dataset = context.getDataset();
+				DatasetGraph dsg = dataset.asDatasetGraph();
+				FunctionEnv env = new ExecutionContext(cxt, dsg.getDefaultGraph(), dsg, null);
+				try {
+					NodeValue r = expr.eval(binding, env);
+					if(r != null) {
+						Model defaultModel = dataset.getDefaultModel();
+						RDFNode rdfNode = defaultModel.asRDFNode(r.asNode());
+						if(!results.contains(rdfNode)) {
+							results.add(rdfNode);
+						}
+					}
+				}
+				catch(ExprEvalException ex) {
+				}
 			}
-			catch(ExprEvalException ex) {
-			}
+		}
+		finally {
+			tearDownCTFR.run();
 		}
 		return WrappedIterator.create(results.iterator());
 	}

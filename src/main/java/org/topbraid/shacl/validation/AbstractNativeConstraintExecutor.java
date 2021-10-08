@@ -21,12 +21,17 @@ import org.topbraid.shacl.vocabulary.SH;
 
 public abstract class AbstractNativeConstraintExecutor implements ConstraintExecutor {
 
-	protected void addStatistics(Constraint constraint, long startTime) {
+	protected void addStatistics(ValidationEngine engine, Constraint constraint, long startTime, int focusNodeCount, long valueNodeCount) {
 		if(ExecStatisticsManager.get().isRecording()) {
 			long endTime = System.currentTimeMillis();
 			long duration = endTime - startTime;
 			ExecStatistics stats = new ExecStatistics(constraint.getComponent().getLocalName() + " (Native constraint executor)", null, duration, startTime, constraint.getComponent().asNode());
 			ExecStatisticsManager.get().add(Collections.singletonList(stats));
+		}
+		if(engine.getProfile() != null) {
+			long endTime = System.currentTimeMillis();
+			long duration = endTime - startTime;
+			engine.getProfile().record(duration, focusNodeCount, valueNodeCount, constraint);
 		}
 	}
 	

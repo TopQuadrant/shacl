@@ -36,6 +36,11 @@ import org.topbraid.shacl.validation.SHACLException;
 import org.topbraid.shacl.validation.ValidationEngine;
 import org.topbraid.shacl.vocabulary.SH;
 
+/**
+ * Validator for sh:sparql constraints.
+ * 
+ * @author Holger Knublauch
+ */
 public class SPARQLConstraintExecutor extends AbstractSPARQLExecutor {
 	
 	private boolean deactivated;

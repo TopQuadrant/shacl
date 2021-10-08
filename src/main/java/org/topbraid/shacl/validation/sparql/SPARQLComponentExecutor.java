@@ -28,6 +28,11 @@ import org.topbraid.shacl.engine.Constraint;
 import org.topbraid.shacl.model.SHParameter;
 import org.topbraid.shacl.vocabulary.SH;
 
+/**
+ * Validator for user-defined SPARQL constraint components.
+ * 
+ * @author Holger Knublauch
+ */
 public class SPARQLComponentExecutor extends AbstractSPARQLExecutor {
 	
 	private boolean wasAsk;

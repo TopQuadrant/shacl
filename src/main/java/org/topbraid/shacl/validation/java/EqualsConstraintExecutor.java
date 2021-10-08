@@ -10,12 +10,18 @@ import org.topbraid.shacl.engine.Constraint;
 import org.topbraid.shacl.validation.AbstractNativeConstraintExecutor;
 import org.topbraid.shacl.validation.ValidationEngine;
 
+/**
+ * Validator for sh:equals constraints.
+ * 
+ * @author Holger Knublauch
+ */
 class EqualsConstraintExecutor extends AbstractNativeConstraintExecutor {
 
 	@Override
 	public void executeConstraint(Constraint constraint, ValidationEngine engine, Collection<RDFNode> focusNodes) {
 		long startTime = System.currentTimeMillis();
 		Property equalsPredicate = constraint.getParameterValue().as(Property.class);
+		long valueNodeCount = 0;
 		for(RDFNode focusNode : focusNodes) {
 			if(focusNode instanceof Resource) {
 				Collection<RDFNode> valueNodes = engine.getValueNodes(constraint, focusNode);
@@ -30,9 +36,10 @@ class EqualsConstraintExecutor extends AbstractNativeConstraintExecutor {
 						engine.createValidationResult(constraint, focusNode, otherNode, () -> "Expected value from property " + engine.getLabelFunction().apply(equalsPredicate));
 					}
 				}
+				valueNodeCount += valueNodes.size();
 			}
 			engine.checkCanceled();
 		}
-		addStatistics(constraint, startTime);
+		addStatistics(engine, constraint, startTime, focusNodes.size(), valueNodeCount);
 	}
 }

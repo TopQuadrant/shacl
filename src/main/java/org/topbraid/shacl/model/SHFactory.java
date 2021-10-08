@@ -34,7 +34,7 @@ import org.topbraid.shacl.arq.functions.IsDeactivatedFunction;
 import org.topbraid.shacl.arq.functions.IsInTargetOfFunction;
 import org.topbraid.shacl.arq.functions.IsValidForDatatypeFunction;
 import org.topbraid.shacl.arq.functions.IsValidLangTagFunction;
-import org.topbraid.shacl.arq.functions.TargetContainsPFunction;
+import org.topbraid.shacl.arq.functions.TargetContainsMultiFunction;
 import org.topbraid.shacl.arq.functions.ValuesPFunction;
 import org.topbraid.shacl.model.impl.SHConstraintComponentImpl;
 import org.topbraid.shacl.model.impl.SHJSConstraintImpl;
@@ -51,6 +51,7 @@ import org.topbraid.shacl.model.impl.SHRuleImpl;
 import org.topbraid.shacl.model.impl.SHSPARQLConstraintImpl;
 import org.topbraid.shacl.model.impl.SHSPARQLFunctionImpl;
 import org.topbraid.shacl.model.impl.SHSPARQLTargetImpl;
+import org.topbraid.shacl.multifunctions.MultiFunctions;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.util.SimpleImplementation;
 import org.topbraid.shacl.vocabulary.DASH;
@@ -93,7 +94,7 @@ public class SHFactory {
 		FunctionRegistry.get().put("http://spinrdf.org/spif#isValidLangTag", IsValidLangTagFunction.class);
 		PropertyFunctionRegistry.get().put(TOSH.evalExpr.getURI(), EvalExprPFunction.class);
 		PropertyFunctionRegistry.get().put(TOSH.values.getURI(), ValuesPFunction.class);
-		PropertyFunctionRegistry.get().put(TOSH.targetContains.getURI(), TargetContainsPFunction.class);
+		MultiFunctions.register(new TargetContainsMultiFunction());
     }
 	
 	

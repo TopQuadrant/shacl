@@ -10,13 +10,15 @@ This API also serves as a reference implementation of the SHACL spec.
 Coverage:
 * [SHACL Core and SHACL-SPARQL validation](https://www.w3.org/TR/shacl/)
 * [SHACL Advanced Features (Rules etc)](https://www.w3.org/TR/shacl-af/)
-* [SHACL JavaScript Extensions](https://www.w3.org/TR/shacl-js/)
 * [SHACL Compact Syntax](https://w3c.github.io/shacl/shacl-compact-syntax/)
+
+Former Coverage until version 1.3.2
+* [SHACL JavaScript Extensions](https://www.w3.org/TR/shacl-js/)
 
 The TopBraid SHACL API is internally used by the European Commission's generic [SHACL-based RDF validator](https://www.itb.ec.europa.eu/shacl/any/upload) (used to validate RDF content against SHACL shapes)
 and [SHACL shape validator](https://www.itb.ec.europa.eu/shacl/shacl/upload) (used to validate SHACL shapes themselves).
 
-The same code is used in the TopBraid products (currently aligned with the TopBraid 6.3 release).
+The same code is used in the TopBraid products (currently aligned with the TopBraid 7.1 release).
 
 Feedback and questions should become GitHub issues or sent to TopBraid Users mailing list:
 https://groups.google.com/forum/#!forum/topbraid-users

@@ -13,7 +13,7 @@ import org.topbraid.shacl.validation.ValidationEngine;
 import org.topbraid.shacl.vocabulary.SH;
 
 /**
- * Native implementation of sh:NodeKindConstraintComponent.
+ * Validator for sh:node constraints.
  * 
  * @author Holger Knublauch
  */
@@ -39,15 +39,17 @@ class NodeKindConstraintExecutor extends AbstractNativeConstraintExecutor {
 		if(checker == null) {
 			throw new IllegalArgumentException("Unsupported sh:nodeKind " + nodeKind);
 		}
+		long valueNodeCount = 0;
 		String message = "Value does not have node kind " + ((Resource)nodeKind).getLocalName();
 		for(RDFNode focusNode : focusNodes) {
 			for(RDFNode valueNode : engine.getValueNodes(constraint, focusNode)) {
+				valueNodeCount++;
 				if(!checker.test(valueNode)) {
 					engine.createValidationResult(constraint, focusNode, valueNode, () -> message);
 				}
 			}
 			engine.checkCanceled();
 		}
-		addStatistics(constraint, startTime);
+		addStatistics(engine, constraint, startTime, focusNodes.size(), valueNodeCount);
 	}
 }

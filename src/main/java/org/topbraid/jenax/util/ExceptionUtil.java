@@ -117,7 +117,7 @@ public class ExceptionUtil {
 		}
 		catch (Exception e) {
 			try {
-				rslt = clazz.newInstance();
+				rslt = clazz.getDeclaredConstructor().newInstance();
 				rslt.initCause(t);
 			}
 			catch (Exception e1) {
@@ -166,6 +166,7 @@ public class ExceptionUtil {
 	}
 	
 	public static String getStackTrace(Throwable t) {
+		if (t == null) return null;
 		StringWriter writer = new StringWriter();
 		t.printStackTrace(new PrintWriter(writer));
 		return writer.getBuffer().toString();

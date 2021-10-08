@@ -22,11 +22,11 @@ import java.util.Collections;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.sparql.core.DatasetImpl;
 import org.apache.jena.sparql.expr.ExprEvalException;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.function.FunctionEnv;
@@ -41,6 +41,7 @@ import org.topbraid.shacl.util.FailureLog;
 import org.topbraid.shacl.util.RecursionGuard;
 import org.topbraid.shacl.validation.DefaultShapesGraphProvider;
 import org.topbraid.shacl.validation.ValidationEngine;
+import org.topbraid.shacl.validation.ValidationEngineConfiguration;
 import org.topbraid.shacl.validation.ValidationEngineFactory;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
@@ -88,7 +89,7 @@ public class HasShapeFunction extends AbstractFunction3 {
 	
 	@Override
 	protected NodeValue exec(Node focusNode, Node shapeNode, Node recursionIsError, FunctionEnv env) {
-		return exec(focusNode, shapeNode, recursionIsError, env.getActiveGraph(), DatasetImpl.wrap(env.getDataset()));
+		return exec(focusNode, shapeNode, recursionIsError, env.getActiveGraph(), DatasetFactory.wrap(env.getDataset()));
 	}
 	
 	
@@ -172,7 +173,9 @@ public class HasShapeFunction extends AbstractFunction3 {
 		Resource report = reportModel.createResource(SH.ValidationReport); // This avoids the expensive setNsPrefixes call in ValidationEngine constructor
 		ValidationEngine engine = ValidationEngineFactory.get().create(dataset, sgURI, sg, report);
 		if(ValidationEngine.getCurrent() != null) {
-			engine.setConfiguration(ValidationEngine.getCurrent().getConfiguration());
+			ValidationEngineConfiguration cloned = ValidationEngine.getCurrent().getConfiguration().clone();
+			cloned.setValidationErrorBatch(-1);
+			engine.setConfiguration(cloned);
 		}
 		engine.validateNodesAgainstShape(Collections.singletonList(focusNode), shape.asNode());
 		return reportModel;

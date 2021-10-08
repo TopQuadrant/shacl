@@ -28,12 +28,14 @@ abstract class AbstractLessThanConstraintExecutor extends AbstractNativeConstrai
 	@Override
 	public void executeConstraint(Constraint constraint, ValidationEngine engine, Collection<RDFNode> focusNodes) {
 		long startTime = System.currentTimeMillis();
+		long valueNodeCount = 0;
 		Property predicate = constraint.getParameterValue().as(Property.class);
 		for(RDFNode focusNode : focusNodes) {
 			if(focusNode instanceof Resource) {
 				Collection<RDFNode> valueNodes = engine.getValueNodes(constraint, focusNode);
 				Set<RDFNode> otherNodes = ((Resource)focusNode).listProperties(predicate).mapWith(s -> s.getObject()).toSet();
 				for(RDFNode valueNode : valueNodes) {
+					valueNodeCount++;
 					NodeValue v = NodeValue.makeNode(valueNode.asNode());
 			        for(RDFNode otherNode : otherNodes) {
 			        	NodeValue o = NodeValue.makeNode(otherNode.asNode());
@@ -51,6 +53,6 @@ abstract class AbstractLessThanConstraintExecutor extends AbstractNativeConstrai
 			}
 			engine.checkCanceled();
 		}
-		addStatistics(constraint, startTime);
+		addStatistics(engine, constraint, startTime, focusNodes.size(), valueNodeCount);
 	}
 }

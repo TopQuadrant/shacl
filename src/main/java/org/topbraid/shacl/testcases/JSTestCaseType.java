@@ -16,7 +16,6 @@
  */
 package org.topbraid.shacl.testcases;
 
-import org.apache.jena.query.ARQ;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.ResultSet;
@@ -24,9 +23,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.sparql.function.FunctionRegistry;
 import org.topbraid.jenax.functions.CurrentThreadFunctionRegistry;
-import org.topbraid.jenax.functions.CurrentThreadFunctions;
 import org.topbraid.jenax.util.ARQFactory;
 import org.topbraid.shacl.vocabulary.DASH;
 
@@ -54,11 +51,8 @@ public class JSTestCaseType extends TestCaseType {
 		public void run(Model results) {
 			Resource testCase = getResource();
 			
-			FunctionRegistry oldFR = FunctionRegistry.get();
-			CurrentThreadFunctionRegistry threadFR = new CurrentThreadFunctionRegistry(oldFR);
-			FunctionRegistry.set(ARQ.getContext(), threadFR);
-
-			CurrentThreadFunctions old = CurrentThreadFunctionRegistry.register(testCase.getModel());
+			Runnable tearDownCTFR = CurrentThreadFunctionRegistry.register(testCase.getModel());
+	
 			Statement expectedResultS = testCase.getProperty(DASH.expectedResult);
 			String queryString = "SELECT (<" + getResource() + ">() AS ?result) WHERE {}";
 			Query query = ARQFactory.get().createQuery(testCase.getModel(), queryString);
@@ -88,8 +82,7 @@ public class JSTestCaseType extends TestCaseType {
 			    }
 			}
 			finally {
-				CurrentThreadFunctionRegistry.unregister(old);
-				FunctionRegistry.set(ARQ.getContext(), oldFR);
+				tearDownCTFR.run();
 			}
 			
 			createResult(results, DASH.SuccessTestCaseResult);

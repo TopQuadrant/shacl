@@ -31,9 +31,13 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.shared.PrefixMapping;
+import org.apache.jena.sparql.graph.PrefixMappingMem;
+import org.apache.jena.sparql.util.FmtUtils;
 import org.apache.jena.vocabulary.RDFS;
 import org.topbraid.jenax.util.JenaDatatypes;
 import org.topbraid.jenax.util.JenaUtil;
+import org.topbraid.shacl.arq.SHACLPaths;
 import org.topbraid.shacl.expr.NodeExpression;
 import org.topbraid.shacl.expr.NodeExpressionFactory;
 import org.topbraid.shacl.expr.lib.DistinctExpression;
@@ -46,8 +50,8 @@ import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 
 /**
- * Represents a shapes graph as input to an engine (e.g. validation or rule).
- * Basically it's a collection of Shapes with some data structures that avoid repetitive computation.
+ * Represents a shapes graph as input to an engine (e.g. validation or inferencing).
+ * This is basically a collection of Shapes with some data structures that avoid repetitive computation.
  * 
  * @author Holger Knublauch
  */
@@ -55,22 +59,34 @@ public class ShapesGraph {
 	
 	private final static Map<Node,NodeExpression> EMPTY = new HashMap<>();
 	
+	// May be defined to skip certain constraints (which are computed on demand)
 	private Predicate<Constraint> constraintFilter;
-	
+
+	// Map of sh:defaultValue expressions. Outer keys are sh:path predicates, inner keys are (node) shapes.
 	private Map<Node,Map<Node,NodeExpression>> defaultValueMap = new ConcurrentHashMap<>();
+
+	// Can be used to bypass TDB's slow prefix mapping
+	private PrefixMapping fastPrefixMapping;
 	
+	// Cache of shapeFilter results
 	private Map<Node,Boolean> ignoredShapes = new ConcurrentHashMap<>();
-	
+
+	// Mapping of properties (e.g., sh:datatype) to their constraint components (e.g., sh:DatatypeConstraintComponent) 
 	private Map<Property,SHConstraintComponent> parametersMap = new ConcurrentHashMap<>();
-	
+
+	// The root shapes where whole-graph validation and inferencing would start
 	private List<Shape> rootShapes;
-	
+
+	// Can be used to skip certain shapes
 	private Predicate<SHShape> shapeFilter;
 	
+	// Map of Jena Nodes to their Shape instances, computed on demand
 	private Map<Node,Shape> shapesMap = new ConcurrentHashMap<>();
-	
+
+	// The Jena Model of the shape definitions
 	private Model shapesModel;
 	
+	// Map of sh:values expressions. Outer keys are sh:path predicates, inner keys are (node) shapes.
 	private Map<Node,Map<Node,NodeExpression>> valuesMap = new ConcurrentHashMap<>();
 
 	
@@ -81,6 +97,14 @@ public class ShapesGraph {
 	 */
 	public ShapesGraph(Model shapesModel) {
 		this.shapesModel = shapesModel;
+	}
+	
+	
+	public ShapesGraph clone() {
+		ShapesGraph clone = new ShapesGraph(shapesModel);
+		clone.constraintFilter = this.constraintFilter;
+		clone.shapeFilter = this.shapeFilter;
+		return clone;
 	}
 	
 	
@@ -109,6 +133,29 @@ public class ShapesGraph {
 			}
 			return null;
 		});
+	}
+	
+	
+	// Added for cases where repeated access to the prefixes causes many (TDB) loads, produces a faster in-memory PrefixMapping
+	public synchronized PrefixMapping getFastPrefixMapping() {
+		if(fastPrefixMapping == null) {
+			fastPrefixMapping = new PrefixMappingMem();
+			Map<String,String> pm = shapesModel.getNsPrefixMap();
+			for(String prefix : pm.keySet()) {
+				fastPrefixMapping.setNsPrefix(prefix, pm.get(prefix));
+			}
+		}
+		return fastPrefixMapping;
+	}
+	
+	
+	public String getPathString(Resource path) {
+		if(path.isURIResource()) {
+			return FmtUtils.stringForNode(path.asNode(), getFastPrefixMapping());
+		}
+		else {
+			return SHACLPaths.getPathString(path);
+		}
 	}
 	
 	

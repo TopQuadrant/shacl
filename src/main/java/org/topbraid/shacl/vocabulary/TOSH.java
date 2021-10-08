@@ -35,16 +35,16 @@ public class TOSH {
 
 
     public final static Resource count = ResourceFactory.createResource(NS + "count");
+
+    public final static Resource DatatypePropertyShapeView = ResourceFactory.createResource(NS + "DatatypePropertyShapeView");
     
     public final static Resource DeleteTripleSuggestionGenerator = ResourceFactory.createResource(NS + "DeleteTripleSuggestionGenerator");
 
     public final static Resource NodeProcessor = ResourceFactory.createResource(NS + "NodeProcessor");
 
-    public final static Resource PropertyGroupShape = ResourceFactory.createResource(NS + "PropertyGroupShape");
-
-    public final static Resource PropertyShapeShape = ResourceFactory.createResource(NS + "PropertyShapeShape");
-
-    public final static Resource ShapeShape = ResourceFactory.createResource(NS + "ShapeShape");
+    public final static Resource NodeShapeConstraintsShape = ResourceFactory.createResource(NS + "NodeShapeConstraintsShape");
+    
+    public final static Resource ObjectPropertyShapeView = ResourceFactory.createResource(NS + "ObjectPropertyShapeView");
 
     public final static Resource TeamworkPlatform = ResourceFactory.createResource(NS + "TeamworkPlatform");
 

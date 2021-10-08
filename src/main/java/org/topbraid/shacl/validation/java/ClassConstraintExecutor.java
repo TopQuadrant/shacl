@@ -11,16 +11,24 @@ import org.topbraid.shacl.validation.AbstractNativeConstraintExecutor;
 import org.topbraid.shacl.validation.ClassesCache;
 import org.topbraid.shacl.validation.ValidationEngine;
 
+/**
+ * Validator for sh:class constraints.
+ * 
+ * @author Holger Knublauch
+ */
 class ClassConstraintExecutor extends AbstractNativeConstraintExecutor {
 
 	@Override
 	public void executeConstraint(Constraint constraint, ValidationEngine engine, Collection<RDFNode> focusNodes) {
 		long startTime = System.currentTimeMillis();
+		long valueNodeCount;
 		Resource classNode = (Resource) constraint.getParameterValue();
 		if(!constraint.getShape().isNodeShape()) {
+			valueNodeCount = 0;
 			for(RDFNode focusNode : focusNodes) {
 				if(!focusNode.isLiteral()) {
 					for(RDFNode valueNode : engine.getValueNodes(constraint, focusNode)) {
+						valueNodeCount++;
 						validate(constraint, engine, classNode, focusNode, valueNode);
 					}
 				}
@@ -28,12 +36,13 @@ class ClassConstraintExecutor extends AbstractNativeConstraintExecutor {
 			}
 		}
 		else {
+			valueNodeCount = focusNodes.size();
 			for(RDFNode focusNode : focusNodes) {
 				validate(constraint, engine, classNode, focusNode, focusNode);
 				engine.checkCanceled();
 			}
 		}
-		addStatistics(constraint, startTime);
+		addStatistics(engine, constraint, startTime, focusNodes.size(), valueNodeCount);
 	}
 
 

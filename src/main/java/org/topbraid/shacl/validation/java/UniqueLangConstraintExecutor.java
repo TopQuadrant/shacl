@@ -10,17 +10,24 @@ import org.topbraid.shacl.engine.Constraint;
 import org.topbraid.shacl.validation.AbstractNativeConstraintExecutor;
 import org.topbraid.shacl.validation.ValidationEngine;
 
+/**
+ * Validator for sh:uniqueLang constraints.
+ * 
+ * @author Holger Knublauch
+ */
 class UniqueLangConstraintExecutor extends AbstractNativeConstraintExecutor {
 
 	@Override
 	public void executeConstraint(Constraint constraint, ValidationEngine engine, Collection<RDFNode> focusNodes) {
-		long startTime = System.currentTimeMillis();
 		if(JenaDatatypes.TRUE.equals(constraint.getParameterValue())) {			
+			long startTime = System.currentTimeMillis();
+			long valueNodeCount = 0;
 			for(RDFNode focusNode : focusNodes) {
 		        Set<String> langs = new HashSet<>();
 		        Set<String> reported = new HashSet<>();
 				Collection<RDFNode> valueNodes = engine.getValueNodes(constraint, focusNode);
 				for(RDFNode valueNode : valueNodes) {
+					valueNodeCount++;
 					if(valueNode.isLiteral() && valueNode.asNode().getLiteralLanguage().length() > 0) {
 						String lang = valueNode.asNode().getLiteralLanguage();
 						if(langs.contains(lang)) {
@@ -36,7 +43,7 @@ class UniqueLangConstraintExecutor extends AbstractNativeConstraintExecutor {
 				}
 				engine.checkCanceled();
 			}
+			addStatistics(engine, constraint, startTime, focusNodes.size(), valueNodeCount);
 		}
-		addStatistics(constraint, startTime);
 	}
 }
