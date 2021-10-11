@@ -50,7 +50,7 @@ public class ModelPrinter {
 	public String print(Model model) {
 		StringWriter writer = new StringWriter();
 		RDFWriterI w = createRDFWriter(model);
-		w.write(model, writer, "http://example.org/random");
+		w.write(model, writer, null);
 		return writer.toString();
 	}
 }

@@ -17,6 +17,7 @@
 package org.topbraid.shacl.arq.functions;
 
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.expr.ExprEvalException;
@@ -31,15 +32,47 @@ public class CheckRegexSyntaxFunction extends AbstractFunction1 {
 		if(regexNode == null || !regexNode.isLiteral()) {
 			return NodeValue.makeString("Invalid argument to spif:checkRegexSyntax: " + regexNode);
 		}
-		else {
-			String str = regexNode.getLiteralLexicalForm();
-			try {
-				Pattern.compile(str);
-			}
-			catch(Exception ex) {
-				return NodeValue.makeString(ex.getMessage());
-			}
-			throw new ExprEvalException(); // OK
+
+		String str = regexNode.getLiteralLexicalForm();
+		try {
+			Pattern.compile(str);
 		}
+		catch(Exception ex) {
+			String message = (ex instanceof PatternSyntaxException) ?
+					this.buildSystemIndependentMessage((PatternSyntaxException) ex) :
+					ex.getMessage();
+			return NodeValue.makeString(message);
+		}
+
+		throw new ExprEvalException(); // OK
+	}
+
+	/**
+	 * Convert the specified exception's message to a system-independent
+	 * format while preserving the message's embedded regex unchanged.
+	 * This allows whomever catches the exception to inspect the original regex
+	 * unchanged.
+	 * 
+	 * @see PatternSyntaxException#getMessage()
+	 */
+	private String buildSystemIndependentMessage(PatternSyntaxException ex) {
+		String message = ex.getMessage();
+		if ( ! System.lineSeparator().contains("\r")) {
+			return message;
+		}
+
+		// the message will *not* be null and
+		// it will contain at least a single line separator before the
+		// embedded pattern
+		message = message.replaceFirst("\r", "");
+
+		// there *may* be another line separator after the pattern
+		int index = ex.getIndex();
+		String pattern = ex.getPattern();
+		if (index >= 0 && pattern != null && index < pattern.length()) {
+			int last = message.lastIndexOf("\r");
+			message = message.substring(0, last) + message.substring(last + 1);
+		}
+		return message;
 	}
 }

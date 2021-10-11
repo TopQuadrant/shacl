@@ -34,7 +34,7 @@ public class ValidationEngineConfiguration {
     	c.validationErrorBatch = this.validationErrorBatch;
     	return c;
     }
-
+    
     
     /**
      * Checks whether the report shall include sh:detail triples (for sh:node etc).

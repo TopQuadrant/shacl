@@ -97,12 +97,6 @@
       <version>${ver.slf4j}</version>
     </dependency>
 
-    <dependency>
-      <groupId>org.antlr</groupId>
-      <artifactId>antlr4-runtime</artifactId>
-      <version>${ver.antlr}</version>
-    </dependency>
-
     <!-- Require a logging implementation -->
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>

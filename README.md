@@ -74,6 +74,6 @@ Both tools take the following parameters, for example:
 
 where `-shapesfile` is optional and falls back to using the data graph as shapes graph.
 
-Currently only Turtle (.ttl) files and SHACL Compact Syntax (.shaclc) files are supported.
+Currently only Turtle (.ttl) files are supported.
 
 The tools print the validation report or the inferences graph to the output screen.

@@ -29,7 +29,6 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.util.FileUtils;
 import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.jenax.util.SystemTriples;
-import org.topbraid.shacl.compact.SHACLC;
 import org.topbraid.shacl.util.SHACLSystemModel;
 import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
@@ -66,8 +65,6 @@ class AbstractTool {
 		dm.addModel(TOSH.BASE_URI, tosh);
 		
 		spec.setDocumentManager(dm);
-		
-		SHACLC.install();
 	}
 	
 	
@@ -77,7 +74,7 @@ class AbstractTool {
 				String dataFileName = args[i + 1];
 				OntModel dataModel = ModelFactory.createOntologyModel(spec);
 				File file = new File(dataFileName);
-				String lang = file.getName().endsWith(".shaclc") ? SHACLC.langName : FileUtils.langTurtle;
+				String lang = FileUtils.langTurtle;
 				dataModel.read(new FileInputStream(file), "urn:x:base", lang);
 				return dataModel;
 			}
@@ -94,7 +91,7 @@ class AbstractTool {
 				String fileName = args[i + 1];
 				OntModel model = ModelFactory.createOntologyModel(spec);
 				File file = new File(fileName);
-				String lang = file.getName().endsWith(".shaclc") ? SHACLC.langName : FileUtils.langTurtle;
+				String lang = FileUtils.langTurtle;
 				model.read(new FileInputStream(file), "urn:x:base", lang);
 				return model;
 			}
