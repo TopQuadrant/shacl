@@ -10,6 +10,8 @@ This API also serves as a reference implementation of the SHACL spec.
 Coverage:
 * [SHACL Core and SHACL-SPARQL validation](https://www.w3.org/TR/shacl/)
 * [SHACL Advanced Features (Rules etc)](https://www.w3.org/TR/shacl-af/)
+
+Former Coverage until version 1.4.0
 * [SHACL Compact Syntax](https://w3c.github.io/shacl/shacl-compact-syntax/)
 
 Former Coverage until version 1.3.2
