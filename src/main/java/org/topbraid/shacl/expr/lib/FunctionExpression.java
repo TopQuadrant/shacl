@@ -28,7 +28,8 @@ import org.apache.jena.sparql.ARQConstants;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.ExecutionContext;
-import org.apache.jena.sparql.engine.binding.BindingHashMap;
+import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.engine.binding.BindingBuilder;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprEvalException;
 import org.apache.jena.sparql.expr.NodeValue;
@@ -139,15 +140,17 @@ public class FunctionExpression extends ComplexNodeExpression {
 			for(int x = 0; x < total; x++) {
 				
 				int y = x;
-				BindingHashMap binding = new BindingHashMap();
+				BindingBuilder builder = Binding.builder();
+				//BindingHashMap binding = new BindingHashMap();
 				for(int i = 0; i < args.size(); i++) {
 					List<RDFNode> a = as.get(i);
 					if(!a.isEmpty()) {
 						int m = y % a.size();
-						binding.add(Var.alloc("a" + i), a.get(m).asNode());
+						builder.add(Var.alloc("a" + i), a.get(m).asNode());
 						y /= a.size();
 					}
 				}
+				Binding binding = builder.build();
 				
 				Dataset dataset = context.getDataset();
 				DatasetGraph dsg = dataset.asDatasetGraph();

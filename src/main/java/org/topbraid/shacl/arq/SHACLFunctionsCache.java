@@ -19,7 +19,6 @@ package org.topbraid.shacl.arq;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
