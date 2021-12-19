@@ -386,7 +386,7 @@ public class ValidationEngine extends AbstractEngine {
 				return results;					
 			}
 			Set<RDFNode> results = new HashSet<>();
-			Iterator<Node> it = PathEval.eval(focusNode.getModel().getGraph(), focusNode.asNode(), jenaPath, Context.emptyContext);
+			Iterator<Node> it = PathEval.eval(focusNode.getModel().getGraph(), focusNode.asNode(), jenaPath, Context.emptyContext());
 			while(it.hasNext()) {
 				Node node = it.next();
 				results.add(focusNode.getModel().asRDFNode(node));

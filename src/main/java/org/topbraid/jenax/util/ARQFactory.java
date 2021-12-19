@@ -17,19 +17,15 @@
 
 package org.topbraid.jenax.util;
 
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
+import java.net.http.HttpClient;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.http.auth.AuthScope ;
-import org.apache.http.auth.Credentials ;
-import org.apache.http.auth.UsernamePasswordCredentials ;
-import org.apache.http.client.CredentialsProvider ;
-import org.apache.http.client.HttpClient ;
-import org.apache.http.impl.client.BasicCredentialsProvider ;
-import org.apache.http.impl.client.HttpClients ;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -39,11 +35,11 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.Syntax;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.riot.web.HttpOp ;
+import org.apache.jena.http.HttpEnv;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.sparql.core.DatasetImpl;
-import org.apache.jena.sparql.engine.http.QueryEngineHTTP;
+import org.apache.jena.sparql.exec.http.QueryExecutionHTTP;
 import org.apache.jena.sparql.syntax.ElementNamedGraph;
 import org.apache.jena.sparql.syntax.ElementVisitorBase;
 import org.apache.jena.sparql.syntax.ElementWalker;
@@ -305,13 +301,13 @@ public class ARQFactory {
 	 * @param query  the Query to execute
 	 * @return a remote QueryExecution
 	 */
-	public QueryEngineHTTP createRemoteQueryExecution(Query query) {
+	public QueryExecutionHTTP createRemoteQueryExecution(Query query) {
 		List<String> graphURIs = query.getGraphURIs();
 		return createRemoteQueryExecution(query, graphURIs);
 	}
 	
 	
-	public QueryEngineHTTP createRemoteQueryExecution(Query query, List<String> graphURIs) {
+	public QueryExecutionHTTP createRemoteQueryExecution(Query query, List<String> graphURIs) {
 		String service = graphURIs.get(0);
 		String serviceAsURI = service;
 		if(service.endsWith("/sparql")) {
@@ -321,7 +317,7 @@ public class ARQFactory {
 	}
 	
 	
-	public QueryEngineHTTP createRemoteQueryExecution(
+	public QueryExecutionHTTP createRemoteQueryExecution(
 			String service,
 			Query query, 
 			List<String> defaultGraphURIs, 
@@ -329,26 +325,25 @@ public class ARQFactory {
 			String user, 
 			String password) {
 	    HttpClient httpClient = buildHttpClient(service, user, password);
-		QueryEngineHTTP qexec = (QueryEngineHTTP) QueryExecutionFactoryFilter.get().sparqlService(service, query, httpClient);
-		if( defaultGraphURIs.size() > 0 ) {
-			qexec.setDefaultGraphURIs(defaultGraphURIs);
-		}
-		if( namedGraphURIs.size() > 0 ) {
-			qexec.setNamedGraphURIs(namedGraphURIs);
-		}
-		return qexec;
+		return QueryExecutionFactoryFilter
+				.get()
+				.sparqlService(service, query, httpClient, defaultGraphURIs, namedGraphURIs);
 	}
 	
     public static HttpClient buildHttpClient(String serviceURI, String user, String password) {
         if ( user == null )
-            return HttpOp.getDefaultHttpClient();
-        CredentialsProvider credsProvider = new BasicCredentialsProvider();
-        Credentials credentials = new UsernamePasswordCredentials(user, password);
-        credsProvider.setCredentials(AuthScope.ANY, credentials);
-        return HttpClients.custom()
-            .setDefaultCredentialsProvider(credsProvider)
+        	return HttpEnv.getDftHttpClient();
+
+        HttpClient client = HttpEnv.httpClientBuilder()
+            .authenticator(new Authenticator() {
+            	@Override
+                protected PasswordAuthentication getPasswordAuthentication() {
+            		return new PasswordAuthentication(user, password.toCharArray());
+                }
+            })
             .build();
-        
+           
+        return client;
         // Example for scoped credentials 
         // See http://jena.staging.apache.org/documentation/query/http-auth.html
 //      CredentialsProvider credsProvider = new BasicCredentialsProvider();

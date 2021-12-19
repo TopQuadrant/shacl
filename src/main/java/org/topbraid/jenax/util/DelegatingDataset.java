@@ -19,10 +19,10 @@ package org.topbraid.jenax.util;
 import java.util.Iterator;
 
 import org.apache.jena.query.Dataset;
-import org.apache.jena.query.LabelExistsException;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.query.TxnType;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.Lock;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.util.Context;
@@ -44,7 +44,7 @@ public class DelegatingDataset implements Dataset {
 
 	
 	@Override
-	public Dataset addNamedModel(String uri, Model model) throws LabelExistsException {
+	public Dataset addNamedModel(String uri, Model model) { //throws LabelExistsException {
 		delegate.addNamedModel(uri, model);
 		return this;
 	}
@@ -200,4 +200,40 @@ public class DelegatingDataset implements Dataset {
     public ReadWrite transactionMode() {
         return delegate.transactionMode();
     }
+
+
+	@Override
+	public Model getNamedModel(Resource uri) {
+		return delegate.getNamedModel(uri);
+	}
+
+
+	@Override
+	public boolean containsNamedModel(Resource uri) {
+		return delegate.containsNamedModel(uri);
+	}
+
+
+	@Override
+	public Dataset addNamedModel(Resource resource, Model model) {
+		return delegate.addNamedModel(resource, model);
+	}
+
+
+	@Override
+	public Dataset removeNamedModel(Resource resource) {
+		return delegate.removeNamedModel(resource);
+	}
+
+
+	@Override
+	public Dataset replaceNamedModel(Resource resource, Model model) {
+		return delegate.replaceNamedModel(resource, model);
+	}
+
+
+	@Override
+	public Iterator<Resource> listModelNames() {
+		return delegate.listModelNames();
+	}
 }

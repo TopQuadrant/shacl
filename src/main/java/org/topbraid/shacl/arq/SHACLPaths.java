@@ -69,7 +69,7 @@ public class SHACLPaths {
 	
 	public static void addValueNodes(RDFNode focusNode, Path path, Collection<RDFNode> results) {
 		Set<Node> seen = new HashSet<>();
-		Iterator<Node> it = PathEval.eval(focusNode.getModel().getGraph(), focusNode.asNode(), path, Context.emptyContext);
+		Iterator<Node> it = PathEval.eval(focusNode.getModel().getGraph(), focusNode.asNode(), path, Context.emptyContext());
 		while(it.hasNext()) {
 			Node node = it.next();
 			if(!seen.contains(node)) {

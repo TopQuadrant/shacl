@@ -60,7 +60,7 @@ import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.ExecutionContext;
 import org.apache.jena.sparql.engine.binding.Binding;
-import org.apache.jena.sparql.engine.binding.BindingHashMap;
+import org.apache.jena.sparql.engine.binding.BindingBuilder;
 import org.apache.jena.sparql.engine.binding.BindingRoot;
 import org.apache.jena.sparql.expr.E_Function;
 import org.apache.jena.sparql.expr.Expr;
@@ -202,16 +202,17 @@ public class JenaUtil {
 	 */
 	public static Binding asBinding(final QuerySolution map) {
 		if(map != null) {
-			BindingHashMap result = new BindingHashMap();
+			BindingBuilder builder = Binding.builder();
+			//BindingHashMap result = new BindingHashMap();
 			Iterator<String> varNames = map.varNames();
 			while(varNames.hasNext()) {
 				String varName = varNames.next();
 				RDFNode node = map.get(varName);
 				if(node != null) {
-					result.add(Var.alloc(varName), node.asNode());
+					builder.add(Var.alloc(varName), node.asNode());
 				}
 			}
-			return result;
+			return builder.build();
 		}
 		else {
 			return null;
