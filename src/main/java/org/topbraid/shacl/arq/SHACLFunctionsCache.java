@@ -19,6 +19,7 @@ package org.topbraid.shacl.arq;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
@@ -47,10 +48,9 @@ public class SHACLFunctionsCache {
 	
 	private static final int capacity = 10000;
 	
-	@SuppressWarnings("serial")
 	private static class MyCache extends LinkedHashMap<Key,Result> {
 
-		MyCache() {
+        MyCache() {
 			super(capacity + 1, 1.1f, true);
 		}
 

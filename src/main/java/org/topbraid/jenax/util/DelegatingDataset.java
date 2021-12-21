@@ -44,10 +44,17 @@ public class DelegatingDataset implements Dataset {
 
 	
 	@Override
-	public Dataset addNamedModel(String uri, Model model) { //throws LabelExistsException {
+	public Dataset addNamedModel(String uri, Model model) {
 		delegate.addNamedModel(uri, model);
 		return this;
 	}
+
+
+    @Override
+    public Dataset addNamedModel(Resource resource, Model model) {
+        delegate.addNamedModel(resource, model);
+        return this;
+    }
 
 	
 	@Override
@@ -126,7 +133,13 @@ public class DelegatingDataset implements Dataset {
 		return delegate.getNamedModel(uri);
 	}
 
+
+    @Override
+    public Model getNamedModel(Resource uri) {
+        return delegate.getNamedModel(uri);
+    }
 	
+
     @Override
     public Model getUnionModel() {
         return delegate.getUnionModel();
@@ -163,6 +176,13 @@ public class DelegatingDataset implements Dataset {
         return this;
 	}
 
+
+    @Override
+    public Dataset removeNamedModel(Resource resource) {
+        delegate.removeNamedModel(resource);
+        return this;
+    }
+
 	
 	@Override
 	public Dataset replaceNamedModel(String uri, Model model) {
@@ -170,6 +190,11 @@ public class DelegatingDataset implements Dataset {
         return this;
 	}
 
+    @Override
+    public Dataset replaceNamedModel(Resource resource, Model model) {
+        delegate.replaceNamedModel(resource, model);
+        return this;
+    }
 	
 	@Override
 	public Dataset setDefaultModel(Model model) {
@@ -202,38 +227,14 @@ public class DelegatingDataset implements Dataset {
     }
 
 
-	@Override
-	public Model getNamedModel(Resource uri) {
-		return delegate.getNamedModel(uri);
-	}
+    @Override
+    public boolean containsNamedModel(Resource uri) {
+        return delegate.containsNamedModel(uri);
+    }
 
 
-	@Override
-	public boolean containsNamedModel(Resource uri) {
-		return delegate.containsNamedModel(uri);
-	}
-
-
-	@Override
-	public Dataset addNamedModel(Resource resource, Model model) {
-		return delegate.addNamedModel(resource, model);
-	}
-
-
-	@Override
-	public Dataset removeNamedModel(Resource resource) {
-		return delegate.removeNamedModel(resource);
-	}
-
-
-	@Override
-	public Dataset replaceNamedModel(Resource resource, Model model) {
-		return delegate.replaceNamedModel(resource, model);
-	}
-
-
-	@Override
-	public Iterator<Resource> listModelNames() {
-		return delegate.listModelNames();
-	}
+    @Override
+    public Iterator<Resource> listModelNames() {
+        return delegate.listModelNames();
+    }
 }
