@@ -47,6 +47,7 @@ import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.topbraid.jenax.util.ARQFactory;
+import org.topbraid.jenax.util.JenaDatatypes;
 import org.topbraid.jenax.util.JenaNodeUtil;
 import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.model.SHConstraintComponent;
@@ -665,6 +666,11 @@ public class SHACLUtil {
 		else { // SH.Error
 			return SH.Violation.equals(severity);
 		}
+	}
+	
+	
+	public static boolean isDeactivated(Resource resource) {
+		return resource.hasProperty(SH.deactivated, JenaDatatypes.TRUE);
 	}
 	
 	

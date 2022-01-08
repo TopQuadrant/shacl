@@ -22,7 +22,7 @@ import org.apache.jena.rdf.model.Resource;
 public interface SHPropertyShape extends SHShape {
 	
 	/**
-	 * Gets the declared sh:class, sh:directType or sh:datatype (if any).
+	 * Gets the declared sh:class or sh:datatype (if any).
 	 * If none is declared, falls back to sh:nodeKind, e.g. returning rdfs:Resource
 	 * if sh:nodeKind is sh:IRI.
 	 * @return the value type or data type

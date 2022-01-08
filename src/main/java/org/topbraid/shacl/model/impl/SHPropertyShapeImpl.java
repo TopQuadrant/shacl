@@ -45,7 +45,7 @@ public class SHPropertyShapeImpl extends SHShapeImpl implements SHPropertyShape 
 			}
 			else {
 				Resource kind = getPropertyResourceValue(SH.nodeKind);
-				if(SH.IRI.equals(kind) || SH.BlankNode.equals(kind)) {
+				if(SH.IRI.equals(kind) || SH.BlankNode.equals(kind) || SH.BlankNodeOrIRI.equals(kind)) {
 					return RDFS.Resource.inModel(getModel());
 				}
 				else if(SH.Literal.equals(kind)) {

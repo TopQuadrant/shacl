@@ -65,7 +65,7 @@ public class SPARQLMultiFunction extends AbstractMultiFunction {
 	public QueryIterator execute(List<Node> args, Graph activeGraph, DatasetGraph dataset) {
 		QuerySolutionMap initialBindings = new QuerySolutionMap();
 		if(args.size() > getParameters().size()) {
-			throw new IllegalArgumentException("Too many arguments for dash:SPARQLMultiFunction: " + args.size() + " >= " + getParameters().size());
+			throw new IllegalArgumentException("Too many arguments for multi-function " + getURI() + ": " + args.size() + " >= " + getParameters().size());
 		}
 		if(activeGraph == null) {
 			activeGraph = JenaUtil.createDefaultGraph();
@@ -75,6 +75,11 @@ public class SPARQLMultiFunction extends AbstractMultiFunction {
 			Node arg = args.get(i);
 			if(arg != null) {
 				initialBindings.add(getParameters().get(i).getName(), model.asRDFNode(arg));
+			}
+		}
+		for(MultiFunctionParameter param : getParameters()) {
+			if(!param.isOptional() && !initialBindings.contains(param.getName())) {
+				throw new IllegalArgumentException("Missing value for required multi-function parameter " + param.getName() + " at " + getURI());
 			}
 		}
 

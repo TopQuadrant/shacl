@@ -20,7 +20,10 @@ package org.topbraid.jenax.util;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.shared.PrefixMapping;
+import org.apache.jena.shared.impl.PrefixMappingImpl;
 
 
 /**
@@ -70,6 +73,36 @@ public class ExtraPrefixes {
 		if(prefix != null && prefix.length() > 0) {
 			add(prefix, ns);
 		}
+	}
+
+
+	/**
+	 * Creates a PrefixMapping that uses the prefixes from a Model plus any extra prefixes
+	 * (unless they overlap with those from the Model).
+	 * @param model  the Model to construct the PrefixMapping from
+	 * @return a new PrefixMapping instance
+	 */
+	public static PrefixMapping createPrefixMappingWithExtraPrefixes(Model model) {
+		PrefixMapping pm = new PrefixMappingImpl();
+
+		String defaultNamespace = JenaUtil.getNsPrefixURI(model, "");
+	    if(defaultNamespace != null) {
+	        pm.setNsPrefix("", defaultNamespace);
+	    }
+	    Map<String,String> extraPrefixes = ExtraPrefixes.getExtraPrefixes();
+	    for(String prefix : extraPrefixes.keySet()) {
+	    	String ns = extraPrefixes.get(prefix);
+	    	if(ns != null && pm.getNsPrefixURI(prefix) == null) {
+	    		pm.setNsPrefix(prefix, ns);
+	    	}
+	    }
+
+	    // Get all the prefixes from the model at once.
+	    Map<String, String> map = model.getNsPrefixMap();
+	    map.remove("");
+	    pm.setNsPrefixes(map);
+	    
+		return pm;
 	}
 	
 	

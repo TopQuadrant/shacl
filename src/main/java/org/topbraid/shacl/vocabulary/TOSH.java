@@ -45,6 +45,8 @@ public class TOSH {
     public final static Resource NodeShapeConstraintsShape = ResourceFactory.createResource(NS + "NodeShapeConstraintsShape");
     
     public final static Resource ObjectPropertyShapeView = ResourceFactory.createResource(NS + "ObjectPropertyShapeView");
+    
+    public final static Resource ResultsGenerators = ResourceFactory.createResource(NS + "ResultsGenerators");
 
     public final static Resource TeamworkPlatform = ResourceFactory.createResource(NS + "TeamworkPlatform");
 

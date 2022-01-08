@@ -31,11 +31,19 @@ import org.topbraid.shacl.multifunctions.MultiFunctions;
 import org.topbraid.shacl.vocabulary.SH;
 
 /**
- * Manages globally registered SHACL functions, usually loaded from .shapes.* files.
+ * Manages globally registered SHACL functions, usually loaded from .api.* files.
  * 
  * @author Holger Knublauch
  */
 public class SHACLFunctions {
+	
+	private static Model globalFunctions;
+	
+	
+	public static Model getGlobalFunctions() {
+		return globalFunctions;
+	}
+
 	
 	/**
 	 * Registers a single SHACL function declared as a sh:Function.
@@ -73,6 +81,12 @@ public class SHACLFunctions {
 		}
 		
 		MultiFunctions.registerAll(model);
+	}
+	
+	
+	public static void registerGlobalFunctions(Model model) {
+		SHACLFunctions.globalFunctions = model;
+		registerFunctions(model);
 	}
 	
 	

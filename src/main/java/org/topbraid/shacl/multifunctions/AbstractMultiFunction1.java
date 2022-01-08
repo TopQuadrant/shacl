@@ -38,7 +38,7 @@ public abstract class AbstractMultiFunction1 extends AbstractNativeMultiFunction
 	
 
 	@Override
-	public QueryIterator execute(List<Node> args, Graph activeGraph, DatasetGraph dataset) {
+	public QueryIterator doExecute(List<Node> args, Graph activeGraph, DatasetGraph dataset) {
 		Iterator<Node> it = executeIterator(args, activeGraph, dataset);
 		Var resultVar = Var.alloc(getResultVars().get(0).getName());
 		Iterator<Binding> bindings = Iter.map(it, node -> BindingBuilder.create().add(resultVar, node).build());

@@ -24,7 +24,6 @@ import org.apache.jena.atlas.lib.DateTimeUtils ;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionDatasetBuilder;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdf.model.Model;
@@ -61,11 +60,11 @@ public class QueryExecutionFactoryFilter {
 
 	public QueryExecution create(Query query, Model model, QuerySolution initialBinding) {
 		analyzeRequest(query, model, initialBinding);
-		return QueryExecutionDatasetBuilder
-				.create()
+		return QueryExecution.create()
 				.query(query)
 				.model(model)
-				.initialBinding(initialBinding).build();		
+				.initialBinding(initialBinding)
+				.build();
 	}
 
 	public QueryExecution create(Query query, Dataset dataset) {
@@ -79,25 +78,26 @@ public class QueryExecutionFactoryFilter {
 	}
 
 	public QueryExecution sparqlService(String service, Query query) {
-		return QueryExecutionHTTP.service(service).query(query).build();
+		return sparqlServiceBuilder(service, query).build();
 	}
 	
-    public QueryExecutionHTTP sparqlService(String service, Query query, HttpClient httpClient) {
-    	return QueryExecutionHTTP.service(service).query(query).httpClient(httpClient).build();
+    public QueryExecution sparqlService(String service, Query query, HttpClient httpClient) {
+		return sparqlServiceBuilder(service, query, httpClient).build();
     }
-    
-    public QueryExecutionHTTP sparqlService(String service, Query query, HttpClient httpClient, List<String> defaultGraphURIs, List<String> namedGraphURIs) {
-    	QueryExecutionHTTPBuilder qb = QueryExecutionHTTP
-    		.service(service)
-    		.query(query)
-    		.httpClient(httpClient);
-    	
-    	for ( String uri : defaultGraphURIs) 
-    		qb.addDefaultGraphURI(uri);
-    	for ( String uri : namedGraphURIs) 
-    		qb.addNamedGraphURI(uri);
-    	
-    	return qb.build();
+
+	public QueryExecutionHTTP sparqlService(String service, Query query, HttpClient httpClient, List<String> defaultGraphURIs, List<String> namedGraphURIs) {
+		QueryExecutionHTTPBuilder builder = sparqlServiceBuilder(service, query, httpClient);
+		defaultGraphURIs.forEach(uri -> builder.addDefaultGraphURI(uri));
+		namedGraphURIs.forEach(uri -> builder.addNamedGraphURI(uri));
+		return builder.build();
+	}
+	
+    private QueryExecutionHTTPBuilder sparqlServiceBuilder(String service, Query query, HttpClient httpClient) {
+		return sparqlServiceBuilder(service, query).httpClient(httpClient);
+	}
+	
+    private QueryExecutionHTTPBuilder sparqlServiceBuilder(String service, Query query) {
+		return QueryExecution.service(service).query(query);
     }
     
 	private void analyzeRequest(Query query, Model model, QuerySolution initialBinding) {
@@ -163,6 +163,4 @@ public class QueryExecutionFactoryFilter {
 		
 		return "A Dataset";
 	}
-	
-
 }

@@ -202,8 +202,7 @@ public class JenaUtil {
 	 */
 	public static Binding asBinding(final QuerySolution map) {
 		if(map != null) {
-			BindingBuilder builder = Binding.builder();
-			//BindingHashMap result = new BindingHashMap();
+			BindingBuilder builder = BindingBuilder.create();
 			Iterator<String> varNames = map.varNames();
 			while(varNames.hasNext()) {
 				String varName = varNames.next();

@@ -46,6 +46,8 @@ public class DASH {
 
     public final static Resource ChangeScript = ResourceFactory.createResource(NS + "ChangeScript");
 
+    public final static Resource CommitScript = ResourceFactory.createResource(NS + "CommitScript");
+
     public final static Resource Constructor = ResourceFactory.createResource(NS + "Constructor");
     
     public final static Resource deletedGraph = ResourceFactory.createResource(NS + "deletedGraph");
@@ -188,6 +190,8 @@ public class DASH {
     public final static Property composite = ResourceFactory.createProperty(NS + "composite");
 
     public final static Property constructor = ResourceFactory.createProperty(NS + "constructor");
+    
+    public final static Property contextFree = ResourceFactory.createProperty(NS + "contextFree");
 
     public final static Property defaultViewForRole = ResourceFactory.createProperty(NS + "defaultViewForRole");
     

@@ -606,14 +606,22 @@ public class ValidationEngine extends AbstractEngine {
 			return;
 		}
 		
-		ConstraintExecutor executor = constraint.getExecutor();
+		ConstraintExecutor executor;
+		try {
+			executor = constraint.getExecutor();
+		}
+		catch(Exception ex) {
+			Resource result = createResult(DASH.FailureResult, constraint, constraint.getShapeResource());
+			result.addProperty(SH.resultMessage, "Failed to create validator: " + ExceptionUtil.getStackTrace(ex));
+			return;
+		}
 		if(executor != null) {
 			if(SHACLPreferences.isProduceFailuresMode()) {
 				try {
 					executor.executeConstraint(constraint, this, focusNodes);
 				}
 				catch(Exception ex) {
-					Resource result = createResult(DASH.FailureResult, constraint, null);
+					Resource result = createResult(DASH.FailureResult, constraint, constraint.getShapeResource());
 					result.addProperty(SH.resultMessage, "Exception during validation: " + ExceptionUtil.getStackTrace(ex));
 				}
 			}

@@ -17,8 +17,6 @@
 
 package org.topbraid.jenax.util;
 
-import java.net.Authenticator;
-import java.net.PasswordAuthentication;
 import java.net.http.HttpClient;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -27,6 +25,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.jena.graph.Node;
+import org.apache.jena.http.HttpEnv;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.Query;
@@ -35,9 +34,7 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.Syntax;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.http.HttpEnv;
 import org.apache.jena.shared.PrefixMapping;
-import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.sparql.core.DatasetImpl;
 import org.apache.jena.sparql.exec.http.QueryExecutionHTTP;
 import org.apache.jena.sparql.syntax.ElementNamedGraph;
@@ -152,18 +149,19 @@ public class ARQFactory {
 	    if(defaultNamespace != null) {
 	        queryString.append("PREFIX :   <" + defaultNamespace + ">\n");
 	    }
+	    Map<String, String> map = model.getNsPrefixMap();
 	    if(includeExtraPrefixes) {
 	    	Map<String,String> extraPrefixes = ExtraPrefixes.getExtraPrefixes();
 	    	for(String prefix : extraPrefixes.keySet()) {
 	    		String ns = extraPrefixes.get(prefix);
-		    	perhapsAppend(queryString, prefix, ns, model);
+		    	perhapsAppend(queryString, prefix, ns, map);
 	    	}
 	    }
 	    
-	    Map<String, String> map = model.getNsPrefixMap();
-	    map.forEach((prefix,namespace)->{
-	        if ( ! prefix.isEmpty() && namespace != null )
+	    map.forEach((prefix,namespace) -> {
+	        if(!prefix.isEmpty() && namespace != null) {
 	            queryString.append("PREFIX " + prefix + ": <" + namespace + ">\n");
+	        }
 	    });
 	    return queryString.toString();
 	}
@@ -205,31 +203,27 @@ public class ARQFactory {
 
 	
 	/**
-	 * Creates a new Query from a partial query (possibly lacking
-	 * PREFIX declarations), using the ARQ syntax specified by <code>getSyntax</code>.
-	 * @param model  the Model to operate on
+	 * Creates a new Query from a partial query (possibly lacking PREFIX declarations),
+	 * using the ARQ syntax specified by <code>getSyntax</code>.
+	 * This will also use the ExtraPrefixes, e.g. for function definitions.
+	 * @param model  the Model to use the prefixes from
 	 * @param partialQuery  the (partial) query string
 	 * @return the Query
 	 */
 	public Query createQuery(Model model, String partialQuery) {
-		PrefixMapping pm = new PrefixMappingImpl();
-	    String defaultNamespace = JenaUtil.getNsPrefixURI(model, "");
-	    if(defaultNamespace != null) {
-	        pm.setNsPrefix("", defaultNamespace);
-	    }
-	    Map<String,String> extraPrefixes = ExtraPrefixes.getExtraPrefixes();
-	    for(String prefix : extraPrefixes.keySet()) {
-	    	String ns = extraPrefixes.get(prefix);
-	    	if(ns != null && pm.getNsPrefixURI(prefix) == null) {
-	    		pm.setNsPrefix(prefix, ns);
-	    	}
-	    }
+		PrefixMapping pm = ExtraPrefixes.createPrefixMappingWithExtraPrefixes(model);
+		return doCreateQuery(partialQuery, pm);
+	}
 
-	    // Get all the prefixes from the model at once.
-	    Map<String, String> map = model.getNsPrefixMap();
-	    map.remove("");
-	    pm.setNsPrefixes(map);
-	    
+	
+	/**
+	 * Creates a new Query from a partial query (possibly lacking PREFIX declarations),
+	 * using the ARQ syntax specified by <code>getSyntax</code>.
+	 * @param partialQuery  the (partial) query string
+	 * @param prefixMapping  the PrefixMapping to use
+	 * @return the Query
+	 */
+	public Query createQueryWithPrefixMapping(String partialQuery, PrefixMapping pm) {
 		return doCreateQuery(partialQuery, pm);
 	}
 
@@ -324,46 +318,17 @@ public class ARQFactory {
 			List<String> namedGraphURIs, 
 			String user, 
 			String password) {
-	    HttpClient httpClient = buildHttpClient(service, user, password);
-		return QueryExecutionFactoryFilter
-				.get()
-				.sparqlService(service, query, httpClient, defaultGraphURIs, namedGraphURIs);
+	    HttpClient httpClient = buildHttpClient(user, password);
+	    return QueryExecutionFactoryFilter.get().sparqlService(service, query, httpClient, defaultGraphURIs, namedGraphURIs);
 	}
 	
-    public static HttpClient buildHttpClient(String serviceURI, String user, String password) {
-        if ( user == null )
-        	return HttpEnv.getDftHttpClient();
-
-        HttpClient client = HttpEnv.httpClientBuilder()
-            .authenticator(new Authenticator() {
-            	@Override
-                protected PasswordAuthentication getPasswordAuthentication() {
-            		return new PasswordAuthentication(user, password.toCharArray());
-                }
-            })
-            .build();
-           
-        return client;
-        // Example for scoped credentials 
-        // See http://jena.staging.apache.org/documentation/query/http-auth.html
-//      CredentialsProvider credsProvider = new BasicCredentialsProvider();
-//      Credentials unscopedCredentials = new UsernamePasswordCredentials("user", "passwd");
-//      credsProvider.setCredentials(AuthScope.ANY, unscopedCredentials);
-//      Credentials scopedCredentials = new UsernamePasswordCredentials("user", "passwd");
-//      final String host = "http://example.com/sparql";
-//      final int port = 80;
-//      final String realm = "aRealm";
-//      final String schemeName = "DIGEST";
-//      AuthScope authscope = new AuthScope(host, port, realm, schemeName);
-//      credsProvider.setCredentials(authscope, scopedCredentials);
-//      return HttpClients.custom()
-//          .setDefaultCredentialsProvider(credsProvider)
-//          .build();
-        
+    public static HttpClient buildHttpClient(String user, String password) {
+        return (user == null) ?
+        		HttpEnv.getDftHttpClient() :
+        		HttpEnv.httpClientBuilder()
+        			.authenticator(BasicAuthenticator.with(user, password))
+        			.build();
     }
-
-
-	
 	
 	public UpdateRequest createUpdateRequest(String parsableString) {
 		UpdateRequest result = string2Update.get(parsableString);
@@ -432,8 +397,8 @@ public class ARQFactory {
 	}
 
 
-	private static void perhapsAppend(StringBuffer queryString, String prefix, String namespace, Model model) {
-		if(model.getNsPrefixURI(prefix) == null && namespace != null) {
+	private static void perhapsAppend(StringBuffer queryString, String prefix, String namespace, Map<String,String> map) {
+		if(!map.containsKey(prefix) && namespace != null) {
 	    	queryString.append("PREFIX ");
 	    	queryString.append(prefix);
 	    	queryString.append(": <");

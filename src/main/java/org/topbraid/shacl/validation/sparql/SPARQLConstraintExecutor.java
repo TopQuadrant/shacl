@@ -17,6 +17,7 @@
 package org.topbraid.shacl.validation.sparql;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,6 +27,8 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.topbraid.jenax.statistics.ExecStatistics;
+import org.topbraid.jenax.statistics.ExecStatisticsManager;
 import org.topbraid.jenax.util.JenaDatatypes;
 import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.jenax.util.RDFLabels;
@@ -62,6 +65,21 @@ public class SPARQLConstraintExecutor extends AbstractSPARQLExecutor {
 	}
 
 	
+	private void addStatistics(ValidationEngine engine, Constraint constraint, long startTime, int focusNodeCount, long valueNodeCount) {
+		if(ExecStatisticsManager.get().isRecording()) {
+			long endTime = System.currentTimeMillis();
+			long duration = endTime - startTime;
+			ExecStatistics stats = new ExecStatistics(constraint.getComponent().getLocalName() + " (SPARQL constraint executor)", null, duration, startTime, constraint.getComponent().asNode());
+			ExecStatisticsManager.get().add(Collections.singletonList(stats));
+		}
+		if(engine.getProfile() != null) {
+			long endTime = System.currentTimeMillis();
+			long duration = endTime - startTime;
+			engine.getProfile().record(duration, focusNodeCount, valueNodeCount, constraint);
+		}
+	}
+
+	
 	@Override
 	public void executeConstraint(Constraint constraint, ValidationEngine engine, Collection<RDFNode> focusNodes) {
 		
@@ -69,7 +87,9 @@ public class SPARQLConstraintExecutor extends AbstractSPARQLExecutor {
 			return;
 		}
 		
+		long startTime = System.currentTimeMillis();
 		super.executeConstraint(constraint, engine, focusNodes);
+		addStatistics(engine, constraint, startTime, focusNodes.size(), focusNodes.size());
 	}
 
 	
