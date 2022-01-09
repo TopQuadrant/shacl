@@ -68,7 +68,7 @@ fi
 # Expand SHACL_HOME but literal *
 SHACL_CP="$SHACL_HOME"'/lib/*'
 SOCKS=
-LOGGING="${LOGGING:--Dlog4j.configuration=file:$SHACL_HOME/log4j.properties}"
+LOGGING="${LOGGING:--Dlog4j.configurationFile=file:$SHACL_HOME/log4j2.properties}"
 
 # Platform specific fixup
 # On CYGWIN convert path and end with a ';' 

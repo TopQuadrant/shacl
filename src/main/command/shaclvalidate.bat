@@ -11,8 +11,8 @@ exit /B
 
 :okHome
 set SHACL_CP=%SHACL_HOME%\lib\*;
-set LOGGING=file:%SHACL_HOME%/log4j.properties
+set LOGGING=file:%SHACL_HOME%/log4j2.properties
 
 @rem JVM_ARGS comes from the environment.
-java %JVM_ARGS% -Dlog4j.configuration="%LOGGING%" -cp "%SHACL_CP%" org.topbraid.shacl.tools.Validate %*
+java %JVM_ARGS% -Dlog4j.configurationFile="%LOGGING%" -cp "%SHACL_CP%" org.topbraid.shacl.tools.Validate %*
 exit /B

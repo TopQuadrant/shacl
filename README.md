@@ -51,14 +51,14 @@ The binary distribution is:
 
 `https://repo1.maven.org/maven2/org/topbraid/shacl/*VER*/shacl-*VER*-bin.zip`.
 
-Two command line utilities are included: validate (performs constraint validation) and infer (performs SHACL rule inferencing).
+Two command line utilities are included: shaclvalidate (performs constraint validation) and shaclinfer (performs SHACL rule inferencing).
 
 To use them, set up your environment similar to https://jena.apache.org/documentation/tools/ (note that the SHACL download includes Jena).
 
 For example, on Windows:
 
 ```
-SET SHACLROOT=C:\Users\Holger\Desktop\shacl-1.0.0-bin
+SET SHACLROOT=C:\Users\Holger\Desktop\shacl-1.4.1-bin
 SET PATH=%PATH%;%SHACLROOT%\bin
 ```
 
@@ -66,7 +66,7 @@ As another example, for Linux, add to .bashrc these lines:
 
 ```
 # for shacl
-export SHACLROOT=/home/holger/shacl/shacl-1.0.0-bin/shacl-1.0.0/bin
+export SHACLROOT=/home/holger/shacl/shacl-1.4.1-bin/shacl-1.4.1/bin
 export PATH=$SHACLROOT:$PATH 
 ```
 
@@ -75,6 +75,7 @@ Both tools take the following parameters, for example:
 `shaclvalidate.bat -datafile myfile.ttl -shapesfile myshapes.ttl`
 
 where `-shapesfile` is optional and falls back to using the data graph as shapes graph.
+Add -validateShapes in case you want to include the metashapes (from the tosh namespace in particular).
 
 Currently only Turtle (.ttl) files are supported.
 
