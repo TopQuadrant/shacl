@@ -19,6 +19,7 @@ package org.topbraid.shacl.tools;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Arrays;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
@@ -54,7 +55,8 @@ public class Validate extends AbstractTool {
 		if(shapesModel == null) {
 			shapesModel = dataModel;
 		}
-		Resource report = ValidationUtil.validateModel(dataModel, shapesModel, true);
+		boolean validateShapes = Arrays.asList(args).contains("-validateShapes");
+		Resource report = ValidationUtil.validateModel(dataModel, shapesModel, validateShapes);
 		report.getModel().write(System.out, FileUtils.langTurtle);
 
 		if(report.hasProperty(SH.conforms, JenaDatatypes.FALSE)) {
