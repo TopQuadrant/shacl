@@ -223,8 +223,8 @@ public class ARQFactory {
 	 * @param prefixMapping  the PrefixMapping to use
 	 * @return the Query
 	 */
-	public Query createQueryWithPrefixMapping(String partialQuery, PrefixMapping pm) {
-		return doCreateQuery(partialQuery, pm);
+	public Query createQueryWithPrefixMapping(String partialQuery, PrefixMapping prefixMapping) {
+		return doCreateQuery(partialQuery, prefixMapping);
 	}
 
 	
