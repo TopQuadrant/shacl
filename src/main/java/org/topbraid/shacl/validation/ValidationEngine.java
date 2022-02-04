@@ -619,13 +619,15 @@ public class ValidationEngine extends AbstractEngine {
             executor.shutdown();
             try {
                 if (!executor.awaitTermination(30, TimeUnit.SECONDS)) {
+                    // report potentially useful information about why threads have not finished yet
                     StringBuffer threadDump = new StringBuffer(System.lineSeparator());
                     ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
-                    // for(ThreadInfo threadInfo : threadMXBean.dumpAllThreads(lockedMonitors, lockedSynchronizers)) {
                     for(ThreadInfo threadInfo : threadMXBean.dumpAllThreads(true, true)) {
                         threadDump.append(threadInfo.toString());
                     }
-                    System.out.println(threadDump.toString());
+                    FailureLog.get().logWarning("Still waiting for threads to complete - check for BLOCKED threads in thread dump that follows");
+                    FailureLog.get().logWarning(threadDump.toString());
+
                     executor.shutdownNow();
                 } 
             } catch (InterruptedException e) {
