@@ -16,6 +16,9 @@
  */
 package org.topbraid.shacl.validation;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
@@ -26,7 +29,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -36,6 +38,8 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.apache.commons.lang3.concurrent.ConcurrentRuntimeException;
+import org.apache.jena.ext.com.google.common.cache.Cache;
+import org.apache.jena.ext.com.google.common.cache.CacheBuilder;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
@@ -130,7 +134,8 @@ public class ValidationEngine extends AbstractEngine {
     private int resultsCount = 0;
 
     // Avoids repeatedly fetching the value nodes of a focus node / path combination
-    private Map<ValueNodesCacheKey,Collection<RDFNode>> valueNodes = new WeakHashMap<>();
+    // cache builder is thread-safe whereas WeakHashMap is not
+    private Cache<ValueNodesCacheKey, Collection<RDFNode>> valueNodes = CacheBuilder.newBuilder().weakKeys().build();
 
     // Number of created violations, e.g. for progress monitor
     private int violationsCount = 0;
@@ -221,13 +226,13 @@ public class ValidationEngine extends AbstractEngine {
     }
 
 
-    public void addResultMessage(Resource result, Literal message, QuerySolution bindings) {
+    synchronized public void addResultMessage(Resource result, Literal message, QuerySolution bindings) {
         result.addProperty(SH.resultMessage, SPARQLSubstitutions.withSubstitutions(message, bindings, getLabelFunction()));
     }
 
 
     // Note: does not set sh:path
-    public Resource createResult(Resource type, Constraint constraint, RDFNode focusNode) {
+    synchronized public Resource createResult(Resource type, Constraint constraint, RDFNode focusNode) {
         Resource result = report.getModel().createResource(type);
         report.addProperty(SH.result, result);
         result.addProperty(SH.resultSeverity, constraint.getSeverity());
@@ -245,7 +250,7 @@ public class ValidationEngine extends AbstractEngine {
     }
 
 
-    public Resource createValidationResult(Constraint constraint, RDFNode focusNode, RDFNode value, Supplier<String> defaultMessage) {
+    synchronized public Resource createValidationResult(Constraint constraint, RDFNode focusNode, RDFNode value, Supplier<String> defaultMessage) {
         Resource result = createResult(SH.ValidationResult, constraint, focusNode);
         if(value != null) {
             result.addProperty(SH.value, value);
@@ -361,7 +366,7 @@ public class ValidationEngine extends AbstractEngine {
             // We use a cache here because many shapes contains for example both sh:datatype and sh:minCount, and fetching
             // the value nodes each time may be expensive, esp for sh:minCount/maxCount constraints.
             ValueNodesCacheKey key = new ValueNodesCacheKey(focusNode, constraint.getShape().getPath());
-            return valueNodes.computeIfAbsent(key, k -> getValueNodesHelper(focusNode, constraint));
+            return valueNodes.asMap().computeIfAbsent(key, k -> getValueNodesHelper(focusNode, constraint));
         }
     }
 
@@ -457,7 +462,7 @@ public class ValidationEngine extends AbstractEngine {
     }
 
 
-    public void updateConforms() {
+    synchronized public void updateConforms() {
         boolean conforms = true;
         StmtIterator it = report.listProperties(SH.result);
         while(it.hasNext()) {
@@ -483,7 +488,7 @@ public class ValidationEngine extends AbstractEngine {
      */
     public Resource validateAll() throws InterruptedException {
         List<Shape> rootShapes = shapesGraph.getRootShapes();
-        return validateShapesThreaded(rootShapes);
+        return validateShapes(rootShapes);
     }
 
 
@@ -543,7 +548,13 @@ public class ValidationEngine extends AbstractEngine {
         return report;
     }
 
-    public Resource validateShapesThreaded(Collection<Shape> shapes) throws InterruptedException {
+    /**
+     * Validates all target nodes of a given collection of shapes against these shapes.
+     * To further narrow down which nodes to validate, use {@link #setFocusNodeFilter(Predicate)}.
+     * @return an instance of sh:ValidationReport in the results Model
+     * @throws InterruptedException if the monitor has canceled this
+     */
+    public Resource validateShapes(Collection<Shape> shapes) throws InterruptedException {
         int threads = Runtime.getRuntime().availableProcessors();
         threads = threads > 1 ? threads - 1 : 1;
         ExecutorService executor = Executors.newFixedThreadPool(threads);
@@ -557,13 +568,9 @@ public class ValidationEngine extends AbstractEngine {
                 // If we are doing everything then the cache should be used, but not for validation of individual focus nodes
                 classesCache = new ClassesCache();
             }
-            // int i = 0;
 
-            // this is a good place to multi-thread
-            // List<Runnable> results = new ArrayList<>();
             for(Shape shape : shapes) {
 
-                executor.submit(() -> { 
 
                     if(monitor != null) {
                         String label = "Shape: " + getLabelFunction().apply(shape.getShapeResource());
@@ -589,7 +596,9 @@ public class ValidationEngine extends AbstractEngine {
                     // which is a very big assumption so this is more of a test really
                     if(!focusNodes.isEmpty()) {
                         for(Constraint constraint : shape.getConstraints()) {
-                            validateNodesAgainstConstraint(finalFocusNodes, constraint);
+                            executor.submit(() -> { 
+                                validateNodesAgainstConstraint(finalFocusNodes, constraint);
+                            }); 
                         }
                     }
                     if(monitor != null) {
@@ -598,7 +607,6 @@ public class ValidationEngine extends AbstractEngine {
                             throw new ConcurrentRuntimeException(new InterruptedException());
                         }
                     }
-                }); 
             }
         }
         catch(MaximumNumberViolations ex) {
@@ -611,6 +619,13 @@ public class ValidationEngine extends AbstractEngine {
             executor.shutdown();
             try {
                 if (!executor.awaitTermination(30, TimeUnit.SECONDS)) {
+                    StringBuffer threadDump = new StringBuffer(System.lineSeparator());
+                    ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
+                    // for(ThreadInfo threadInfo : threadMXBean.dumpAllThreads(lockedMonitors, lockedSynchronizers)) {
+                    for(ThreadInfo threadInfo : threadMXBean.dumpAllThreads(true, true)) {
+                        threadDump.append(threadInfo.toString());
+                    }
+                    System.out.println(threadDump.toString());
                     executor.shutdownNow();
                 } 
             } catch (InterruptedException e) {
@@ -620,69 +635,6 @@ public class ValidationEngine extends AbstractEngine {
         updateConforms();
         return report;
     }
-
-
-
-    /**
-     * Validates all target nodes of a given collection of shapes against these shapes.
-     * To further narrow down which nodes to validate, use {@link #setFocusNodeFilter(Predicate)}.
-     * @return an instance of sh:ValidationReport in the results Model
-     * @throws InterruptedException if the monitor has canceled this
-     */
-    public Resource validateShapes(Collection<Shape> shapes) throws InterruptedException {
-        boolean nested = SHACLScriptEngineManager.get().begin();
-        try {
-            if(monitor != null) {
-                monitor.beginTask("Validating " + shapes.size() + " shapes", shapes.size());
-            }
-            if(classesCache == null) {
-                // If we are doing everything then the cache should be used, but not for validation of individual focus nodes
-                classesCache = new ClassesCache();
-            }
-            int i = 0;
-            for(Shape shape : shapes) {
-
-                if(monitor != null) {
-                    String label = "Shape " + (++i) + ": " + getLabelFunction().apply(shape.getShapeResource());
-                    if(resultsCount > 0) {
-                        label = "" + resultsCount + " results. " + label;
-                    }
-                    monitor.subTask(label);
-                }
-
-                Collection<RDFNode> focusNodes = shape.getTargetNodes(dataset);
-                if(focusNodeFilter != null) {
-                    List<RDFNode> filteredFocusNodes = new LinkedList<>();
-                    for(RDFNode focusNode : focusNodes) {
-                        if(focusNodeFilter.test(focusNode)) {
-                            filteredFocusNodes.add(focusNode);
-                        }
-                    }
-                    focusNodes = filteredFocusNodes;
-                }
-                if(!focusNodes.isEmpty()) {
-                    for(Constraint constraint : shape.getConstraints()) {
-                        validateNodesAgainstConstraint(focusNodes, constraint);
-                    }
-                }
-                if(monitor != null) {
-                    monitor.worked(1);
-                    if(monitor.isCanceled()) {
-                        throw new InterruptedException();
-                    }
-                }
-            }
-        }
-        catch(MaximumNumberViolations ex) {
-            // Ignore as this is just our way to stop validation when max number of violations is reached
-        }
-        finally {
-            SHACLScriptEngineManager.get().end(nested);
-        }
-        updateConforms();
-        return report;
-    }
-
 
     protected void validateNodesAgainstConstraint(Collection<RDFNode> focusNodes, Constraint constraint) {
         if(configuration != null && configuration.isSkippedConstraintComponent(constraint.getComponent())) {
@@ -695,7 +647,9 @@ public class ValidationEngine extends AbstractEngine {
         }
         catch(Exception ex) {
             Resource result = createResult(DASH.FailureResult, constraint, constraint.getShapeResource());
-            result.addProperty(SH.resultMessage, "Failed to create validator: " + ExceptionUtil.getStackTrace(ex));
+            synchronized (result) {
+                result.addProperty(SH.resultMessage, "Failed to create validator: " + ExceptionUtil.getStackTrace(ex));
+            }
             return;
         }
         if(executor != null) {
@@ -705,7 +659,9 @@ public class ValidationEngine extends AbstractEngine {
                 }
                 catch(Exception ex) {
                     Resource result = createResult(DASH.FailureResult, constraint, constraint.getShapeResource());
-                    result.addProperty(SH.resultMessage, "Exception during validation: " + ExceptionUtil.getStackTrace(ex));
+                    synchronized (result) {
+                        result.addProperty(SH.resultMessage, "Exception during validation: " + ExceptionUtil.getStackTrace(ex));
+                    }
                 }
             }
             else {
