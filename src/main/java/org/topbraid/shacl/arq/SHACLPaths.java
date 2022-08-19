@@ -51,6 +51,7 @@ import org.apache.jena.sparql.syntax.ElementPathBlock;
 import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 import org.apache.jena.sparql.util.Context;
 import org.apache.jena.sparql.util.FmtUtils;
+import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.vocabulary.RDF;
 import org.topbraid.jenax.util.ARQFactory;
 import org.topbraid.shacl.vocabulary.SH;
@@ -303,13 +304,13 @@ public class SHACLPaths {
 		{
 			Resource alternativePath = shaclPath.getPropertyResourceValue(SH.alternativePath);
 			if(alternativePath != null) {
-				Resource first = alternativePath.getPropertyResourceValue(RDF.first);
-				Resource rest = alternativePath.getPropertyResourceValue(RDF.rest);
-				if(RDF.nil.equals(rest)) {
-					return getPath(first);
+				ExtendedIterator<Path> members = alternativePath.as(RDFList.class).iterator().
+						mapWith(node -> getPath(node.asResource()));
+				try {
+					return getPathAlt(members);
 				}
-				else {
-					return PathFactory.pathAlt(getPath(first), getPath(rest));
+				finally {
+					members.close();
 				}
 			}
 		}
@@ -332,6 +333,17 @@ public class SHACLPaths {
 			}
 		}
 		throw new IllegalArgumentException("Malformed SHACL path expression");
+	}
+	
+	
+	private static Path getPathAlt(Iterator<Path> it) {
+		Path first = it.next();
+		if(it.hasNext()) {
+			return PathFactory.pathAlt(first, getPathAlt(it));
+		}
+		else {
+			return first;
+		}
 	}
 
 	
