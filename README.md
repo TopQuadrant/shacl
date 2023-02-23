@@ -80,3 +80,40 @@ Add -validateShapes in case you want to include the metashapes (from the tosh na
 Currently only Turtle (.ttl) files are supported.
 
 The tools print the validation report or the inferences graph to the output screen.
+
+## Dockerfile Usage
+
+The `Dockerfile` in the `.docker` folder includes a minimal Java Runtime Environment for the SHACL API that clocks in at 144Mb. To build the docker use:
+
+```
+docker build -t shacl_API .docker/
+```
+
+To use the Docker image, there are two possible commands. To run the validator:
+
+```
+docker run --rm -v /path/to/data:/data IMAGE_ID validate -datafile /data/myfile.ttl -shapesfile /data/myshapes.ttl
+```
+
+To run rule inferencing:
+
+```
+docker run --rm -v /path/to/data:/data IMAGE_ID infer -datafile /data/myfile.ttl -shapesfile /data/myshapes.ttl
+```
+
+Any other command after `IMAGE_ID` will print the following help page:
+
+```
+Please use this docker image as follows:
+docker run -v /path/to/data:/data IMAGE [COMMAND] [PARAMETERS]
+COMMAND:
+	validate 
+		to run validation
+	infer
+		to run rule inferencing
+PARAMETERS:
+	-datafile /data/myfile.ttl [MANDATORY]
+		input to be validated (only .ttl format supported)
+	-shapesfile /data/myshapes.ttl [OPTIONAL]
+		shapes for validation (only .ttl format supported)
+```
