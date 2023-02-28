@@ -3,6 +3,8 @@ name: Create and publish SHACL API Docker image
 on:
   release:
     type: [published]
+  push:
+    branches: [main]
 
 env:
   REGISTRY: ghcr.io
