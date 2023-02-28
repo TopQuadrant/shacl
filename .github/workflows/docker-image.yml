@@ -33,23 +33,13 @@ jobs:
         # https://github.com/marketplace/actions/get-version
       - name: Get release version
         id: get_version
-        uses: battila7/get-version-action@v2
-        
-        #https://github.com/marketplace/actions/docker-metadata-action
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: type=raw,value=${{ steps.get-version.outputs.version }},enable=${{ github.event_name == 'release' }}
+        uses: reloc8/action-latest-release-version@1.0.0
 
       - name: Build and push Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
-          context: .
+          context: .docker/
           push: true
           platforms: linux/amd64,linux/arm64
-          file: .docker/Dockerfile
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=image,annotation-index.org.opencontainers.image.description=SHACL API in Java based on Apache Jena 
+          tags: ${{ steps.get_version.outputs.latest-release }}
+          outputs: type=image
