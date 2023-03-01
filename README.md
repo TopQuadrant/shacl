@@ -83,10 +83,10 @@ The tools print the validation report or the inferences graph to the output scre
 
 ## Dockerfile Usage
 
-The `Dockerfile` in the `.docker` folder includes a minimal Java Runtime Environment for the SHACL API that clocks in at 144Mb. To build the docker imageß use:
+The `Dockerfile` in the `.docker` folder includes a minimal Java Runtime Environment for the SHACL API that clocks in at 144Mb. To build the docker image use:
 
 ```
-docker build -t topquadrant/shacl:1.4.2 .docker/
+docker build -t topquadrant/shacl:1.4.2 --build-arg VERSION=1.4.2 .docker/
 ```
 
 To use the Docker image, there are two possible commands. To run the validator:
