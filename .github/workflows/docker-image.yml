@@ -39,7 +39,7 @@ jobs:
           
           LATEST_RELEASE=$(git describe --abbrev=0 --tags | sed 's/^v//')
           echo "latest-release=${LATEST_RELEASE}" >> $GITHUB_OUTPUT
-          echo "version_build=${version}_"$(git rev-parse --short "$GITHUB_SHA") >> $GITHUB_OUTPUT
+          echo "version_build=${LATEST_RELEASE}_"$(git rev-parse --short "$GITHUB_SHA") >> $GITHUB_OUTPUT
 
         # https://github.com/docker/metadata-action
       - name: Extract metadata (tags, labels) for Docker

@@ -27,7 +27,7 @@ RUN apt-get -y update && \
 
 # Compile with maven, extract binaries and copy into image
 COPY . /app
-RUN mvn versions:set -Dversion=${VERSION} -DremoveSnapshot && mvn package -Dmaven.test.skip=true
+RUN mvn versions:set -DnewVersion=${VERSION} && mvn package -Dmaven.test.skip=true
 RUN unzip target/shacl-${VERSION}-bin.zip -d /app/
 
 # BUILD STAGE 2: keep only Java and SHACL
