@@ -1,7 +1,7 @@
-ARG VERSION
-
 FROM eclipse-temurin:11 as jre-build
 WORKDIR /app
+
+ARG VERSION
 
 # Annotations to embed in container
 LABEL org.opencontainers.image.title="TopBraid SHACL API"
