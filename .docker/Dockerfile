@@ -22,12 +22,13 @@ RUN $JAVA_HOME/bin/jlink \
          --output /javaruntime
 
 RUN apt-get -y update && \
-    apt-get -y install curl zip && \
+    apt-get -y install maven curl zip && \
     rm -rf /var/lib/apt/lists/*
 
-# Download and unpack binary version for appropriate release
-RUN curl -s https://repo1.maven.org/maven2/org/topbraid/shacl/${VERSION}/shacl-${VERSION}-bin.zip > shacl.zip
-RUN unzip shacl.zip && rm shacl.zip
+# Compile with maven, extract binaries and copy into image
+COPY . /app
+RUN mvn versions:set -Dversion=${VERSION} -DremoveSnapshot && mvn package -Dmaven.test.skip=true
+RUN unzip target/shacl-${VERSION}-bin.zip -d /app/
 
 # BUILD STAGE 2: keep only Java and SHACL
 
@@ -40,6 +41,6 @@ ENV PATH "/app/shacl-${VERSION}/bin:${PATH}"
 
 COPY --from=jre-build /javaruntime $JAVA_HOME
 COPY --chmod=0755 --from=jre-build /app/shacl-${VERSION} /app/shacl-${VERSION}
-COPY --chmod=0755 "entrypoint.sh" "/entrypoint.sh"
+COPY --chmod=0755 --from=jre-build "/app/.docker/entrypoint.sh" "/entrypoint.sh"
 
 ENTRYPOINT ["/entrypoint.sh"]
