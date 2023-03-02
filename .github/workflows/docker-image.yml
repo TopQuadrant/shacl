@@ -32,10 +32,14 @@ jobs:
         id: buildx
         uses: docker/setup-buildx-action@15c905b16b06416d2086efa066dd8e3a35cc7f98 # v2.4.0
         
-        # https://github.com/reloc8/action-latest-release-version
+        # inspired by https://github.com/reloc8/action-latest-release-version
       - name: Get release version
         id: get_version
-        uses: reloc8/action-latest-release-version@b8d6337f30390558e7874a044d6a3c1314314bab # v1.0.0
+        run: |
+          git fetch --tags
+          git fetch --prune --unshallow || true
+          LATEST_RELEASE=$(git describe --abbrev=0 --tags)
+          echo "latest-release=${LATEST_RELEASE}" >> $GITHUB_OUTPUT
 
         # https://github.com/docker/metadata-action
       - name: Extract metadata (tags, labels) for Docker
