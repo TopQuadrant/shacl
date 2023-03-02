@@ -27,8 +27,8 @@ RUN apt-get -y update && \
 
 # Compile with maven, extract binaries and copy into image
 COPY . /app
-RUN mvn versions:set -DremoveSnapshot && mvn package
-RUN unzip target/shacl-${VERSION}-bin.zip -d /app/shacl-${VERSION}
+RUN mvn versions:set -Dversion=${VERSION} -DremoveSnapshot && mvn package -Dmaven.test.skip=true
+RUN unzip target/shacl-${VERSION}-bin.zip -d /app/
 
 # BUILD STAGE 2: keep only Java and SHACL
 
@@ -41,6 +41,6 @@ ENV PATH "/app/shacl-${VERSION}/bin:${PATH}"
 
 COPY --from=jre-build /javaruntime $JAVA_HOME
 COPY --chmod=0755 --from=jre-build /app/shacl-${VERSION} /app/shacl-${VERSION}
-COPY --chmod=0755 ".docker/entrypoint.sh" "/entrypoint.sh"
+COPY --chmod=0755 --from=jre-build "/app/.docker/entrypoint.sh" "/entrypoint.sh"
 
 ENTRYPOINT ["/entrypoint.sh"]

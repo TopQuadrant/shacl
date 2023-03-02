@@ -3,9 +3,9 @@ name: Create and publish SHACL API Docker image
 on:
   release:
     type: [published]
-  pull_request:
-    branches: [master]
   push:
+    branches: [master]
+  pull_request:
     branches: [master]
 
 env:
@@ -38,8 +38,10 @@ jobs:
         run: |
           git fetch --tags
           git fetch --prune --unshallow || true
+          
           LATEST_RELEASE=$(git describe --abbrev=0 --tags | sed 's/^v//')
           echo "latest-release=${LATEST_RELEASE}" >> $GITHUB_OUTPUT
+          echo "version_build=${version}_"$(git rev-parse --short "$GITHUB_SHA") >> $GITHUB_OUTPUT
 
         # https://github.com/docker/metadata-action
       - name: Extract metadata (tags, labels) for Docker
@@ -47,6 +49,11 @@ jobs:
         uses: docker/metadata-action@507c2f2dc502c992ad446e3d7a5dfbe311567a96 #v4.3.0
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+              type=raw,value=latest,enable=${{ github.event_name == 'push' }}
+              type=raw,value=${{ steps.get_version.outputs.version_build}},enable=${{ github.event_name == 'push' }}
+              type=raw,value=${{ steps.get_version.outputs.latest-release}},enable=${{ github.event_name == 'release' }}
+
 
         # https://github.com/docker/login-action
       - name: Log in to the Container registry
@@ -63,7 +70,7 @@ jobs:
           file: .docker/Dockerfile
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ${{ steps.get_version.outputs.latest-release }}
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: VERSION=${{ steps.get_version.outputs.latest-release }}
+          build-args: VERSION=${{ steps.meta.outputs.tags }}
           outputs: type=image
