@@ -1,8 +1,7 @@
 FROM eclipse-temurin:11 as jre-build
 WORKDIR /app
 
-# Version can be specified at build time
-ARG VERSION=1.4.2
+ARG VERSION
 
 # Annotations to embed in container
 LABEL org.opencontainers.image.title="TopBraid SHACL API"
@@ -34,7 +33,7 @@ RUN unzip shacl.zip && rm shacl.zip
 
 FROM ubuntu:jammy
 
-ARG VERSION=1.4.2
+ARG VERSION
 
 ENV JAVA_HOME=/usr
 ENV PATH "/app/shacl-${VERSION}/bin:${PATH}"
