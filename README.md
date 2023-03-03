@@ -86,26 +86,26 @@ The tools print the validation report or the inferences graph to the output scre
 The `Dockerfile` in the `.docker` folder includes a minimal Java Runtime Environment for the SHACL API that clocks in at 144Mb. To build the docker image use:
 
 ```
-docker build -t topquadrant/shacl:1.4.2 --build-arg VERSION=1.4.2 .docker/
+docker build -f .docker/Dockerfile -t ghcr.io/topquadrant/shacl:1.4.2 --build-arg VERSION=1.4.2 .
 ```
 
 To use the Docker image, there are two possible commands. To run the validator:
 
 ```
-docker run --rm -v /path/to/data:/data topquadrant/shacl:1.4.2 validate -datafile /data/myfile.ttl -shapesfile /data/myshapes.ttl
+docker run --rm -v /path/to/data:/data ghcr.io/topquadrant/shacl:1.4.2 validate -datafile /data/myfile.ttl -shapesfile /data/myshapes.ttl
 ```
 
 To run rule inferencing:
 
 ```
-docker run --rm -v /path/to/data:/data topquadrant/shacl:1.4.2 infer -datafile /data/myfile.ttl -shapesfile /data/myshapes.ttl
+docker run --rm -v /path/to/data:/data ghcr.io/topquadrant/shacl:1.4.2 infer -datafile /data/myfile.ttl -shapesfile /data/myshapes.ttl
 ```
 
-Any other command after `topquadrant/shacl:1.4.2` will print the following help page:
+Any other command after `ghcr.io/topquadrant/shacl:1.4.2` will print the following help page:
 
 ```
 Please use this docker image as follows:
-docker run -v /path/to/data:/data topquadrant/shacl:1.4.2 [COMMAND] [PARAMETERS]
+docker run -v /path/to/data:/data ghcr.io/topquadrant/shacl:1.4.2 [COMMAND] [PARAMETERS]
 COMMAND:
 	validate 
 		to run validation
