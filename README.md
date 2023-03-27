@@ -41,6 +41,7 @@ Releases are available in the central maven repository:
   <version>*VER*</version>
 </dependency>
 ```
+
 ## Command Line Usage
 
 Download the latest release from:
@@ -58,7 +59,7 @@ To use them, set up your environment similar to https://jena.apache.org/document
 For example, on Windows:
 
 ```
-SET SHACLROOT=C:\Users\Holger\Desktop\shacl-1.4.1-bin
+SET SHACLROOT=C:\Users\Holger\Desktop\shacl-1.4.2-bin
 SET PATH=%PATH%;%SHACLROOT%\bin
 ```
 
@@ -66,7 +67,7 @@ As another example, for Linux, add to .bashrc these lines:
 
 ```
 # for shacl
-export SHACLROOT=/home/holger/shacl/shacl-1.4.1-bin/shacl-1.4.1/bin
+export SHACLROOT=/home/holger/shacl/shacl-1.4.2-bin/shacl-1.4.2/bin
 export PATH=$SHACLROOT:$PATH 
 ```
 
@@ -83,29 +84,29 @@ The tools print the validation report or the inferences graph to the output scre
 
 ## Dockerfile Usage
 
-The `Dockerfile` in the `.docker` folder includes a minimal Java Runtime Environment for the SHACL API that clocks in at 144Mb. To build the docker image use:
+The `Dockerfile` in the `.docker` folder includes a minimal Java Runtime Environment for the SHACL API that clocks in at 144Mb. To get the latest release of the image use:
 
 ```
-docker build -f .docker/Dockerfile -t ghcr.io/topquadrant/shacl:1.4.2 --build-arg VERSION=1.4.2 .
+docker pull ghcr.io/SDSC-ORD/shacl:1.4.2
 ```
 
 To use the Docker image, there are two possible commands. To run the validator:
 
 ```
-docker run --rm -v /path/to/data:/data ghcr.io/topquadrant/shacl:1.4.2 validate -datafile /data/myfile.ttl -shapesfile /data/myshapes.ttl
+docker run --rm -v /path/to/data:/data ghcr.io/SDSC-ORD/shacl:1.4.2 validate -datafile /data/myfile.ttl -shapesfile /data/myshapes.ttl
 ```
 
 To run rule inferencing:
 
 ```
-docker run --rm -v /path/to/data:/data ghcr.io/topquadrant/shacl:1.4.2 infer -datafile /data/myfile.ttl -shapesfile /data/myshapes.ttl
+docker run --rm -v /path/to/data:/data ghcr.io/SDSC-ORD/shacl:1.4.2 infer -datafile /data/myfile.ttl -shapesfile /data/myshapes.ttl
 ```
 
-Any other command after `ghcr.io/topquadrant/shacl:1.4.2` will print the following help page:
+Any other command after `ghcr.io/SDSC-ORD/shacl:1.4.2` will print the following help page:
 
 ```
 Please use this docker image as follows:
-docker run -v /path/to/data:/data ghcr.io/topquadrant/shacl:1.4.2 [COMMAND] [PARAMETERS]
+docker run -v /path/to/data:/data ghcr.io/SDSC-ORD/shacl:1.4.2 [COMMAND] [PARAMETERS]
 COMMAND:
 	validate 
 		to run validation
@@ -116,4 +117,10 @@ PARAMETERS:
 		input to be validated (only .ttl format supported)
 	-shapesfile /data/myshapes.ttl [OPTIONAL]
 		shapes for validation (only .ttl format supported)
+```
+
+If you'd like to build the image locally, use:
+
+```
+docker build -f .docker/Dockerfile -t ghcr.io/SDSC-ORD/shacl:1.4.2 --build-arg VERSION=1.4.2 .
 ```
