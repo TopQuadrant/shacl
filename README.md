@@ -89,7 +89,8 @@ The `Dockerfile` in the `.docker` folder includes a minimal Java Runtime Environ
 ```
 docker pull ghcr.io/sdsc-ord/shacl:latest
 ```
-> :warning: It is generally better to used a fixed version of the docker image, rather than the `latest` tag. Consult the [package page](https://github.com/SDSC-ORD/shacl/pkgs/container/shacl) find what versions are available.
+> :warning: It is generally better to use a fixed version of the docker image, rather than the `latest` tag. Consult the [package page](https://github.com/SDSC-ORD/shacl/pkgs/container/shacl) to find what versions are available.
+
 To use the Docker image, there are two possible commands. To run the validator:
 
 ```
