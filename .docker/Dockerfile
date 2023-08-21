@@ -32,7 +32,7 @@ RUN unzip target/shacl-${VERSION}-bin.zip -d /app/
 
 # BUILD STAGE 2: keep only Java and SHACL
 
-FROM ubuntu:jammy
+FROM alpine:3.18
 
 ARG VERSION
 
