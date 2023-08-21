@@ -1,4 +1,4 @@
-FROM eclipse-temurin:11 as jre-build
+FROM eclipse-temurin:11-alpine as jre-build
 WORKDIR /app
 
 ARG VERSION
@@ -21,9 +21,7 @@ RUN $JAVA_HOME/bin/jlink \
          --compress=2 \
          --output /javaruntime
 
-RUN apt-get -y update && \
-    apt-get -y install maven curl zip && \
-    rm -rf /var/lib/apt/lists/*
+RUN apk add maven curl zip
 
 # Compile with maven, extract binaries and copy into image
 COPY . /app
