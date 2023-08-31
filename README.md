@@ -84,7 +84,7 @@ The tools print the validation report or the inferences graph to the output scre
 
 ## Dockerfile Usage
 
-The `Dockerfile` in the `.docker` folder includes a minimal Java Runtime Environment for the SHACL API that clocks in at 144Mb. To get the latest release of the image use:
+The `Dockerfile` in the `.docker` folder includes a minimal Java Runtime Environment for the SHACL API that clocks in at ~85Mb. To get the latest release of the image use:
 
 ```
 docker pull ghcr.io/sdsc-ord/shacl:latest
@@ -120,8 +120,14 @@ PARAMETERS:
 		shapes for validation (only .ttl format supported)
 ```
 
-If you'd like to build the image locally, use:
+If you'd like to build the image locally in an `x86` architecture, use:
 
 ```
-docker build -f .docker/Dockerfile -t ghcr.io/sdsc-ord/shacl:latest --build-arg VERSION=1.4.2 .
+docker build -f .docker/Dockerfile -t ghcr.io/sdsc-ord/shacl:latest --build-arg VERSION=1.4.2 --build-arg ARCH_BASE=eclipse-temurin:11-alpine .
+```
+
+If your architecture is `arm`, use:
+
+```
+docker build -f .docker/Dockerfile -t ghcr.io/sdsc-ord/shacl:latest --build-arg VERSION=1.4.2 --build-arg ARCH_BASE=amd64/eclipse-temurin:11-alpine .
 ```

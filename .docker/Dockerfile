@@ -1,4 +1,6 @@
-FROM eclipse-temurin:11-alpine as jre-build
+ARG ARCH_BASE
+FROM $ARCH_BASE as jre-build
+
 WORKDIR /app
 
 ARG VERSION
