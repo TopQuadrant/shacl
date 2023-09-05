@@ -85,5 +85,5 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VERSION=${{ steps.get_version.outputs.version_build }}
-            ARCH_BASE=amd64/eclipse-temurin:11-alpine
+            ARCH_BASE=amazoncorretto:11-alpine3.18-jdk
           outputs: type=image
