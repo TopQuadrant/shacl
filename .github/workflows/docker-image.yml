@@ -16,6 +16,13 @@ jobs:
     permissions:
       contents: read
       packages: write
+    strategy:
+      matrix:
+        include:
+          - platform: linux/amd64
+            base: eclipse-temurin:11-alpine
+          - platform: linux/arm64
+            base: amazoncorretto:11-alpine3.18-jdk
 
     steps:
       - name: Checkout repository
@@ -62,28 +69,15 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
         # https://github.com/docker/build-push-action
-      - name: Build and push x86 Docker image
+      - name: Build and push Docker image for x86 and arm64
         uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671 #v4.0.0
         with:
           file: .docker/Dockerfile
           push: true
-          platforms: linux/amd64
+          platforms: ${{ matrix.platform }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VERSION=${{ steps.get_version.outputs.version_build }}
-            ARCH_BASE=eclipse-temurin:11-alpine
-          outputs: type=image
-
-      - name: Build and push ARM Docker image
-        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671 #v4.0.0
-        with:
-          file: .docker/Dockerfile
-          push: true
-          platforms: linux/arm64
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            VERSION=${{ steps.get_version.outputs.version_build }}
-            ARCH_BASE=amazoncorretto:11-alpine3.18-jdk
+            ARCH_BASE=${{ matrix.base }}
           outputs: type=image
