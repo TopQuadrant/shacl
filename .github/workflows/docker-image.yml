@@ -107,6 +107,9 @@ jobs:
         - name: lowercase image name
           run: |
             echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}" >> ${GITHUB_ENV}
+        
+        - name: Checkout repository
+          uses: actions/checkout@v3
 
           # inspired by https://github.com/reloc8/action-latest-release-version
         - name: Get release version
