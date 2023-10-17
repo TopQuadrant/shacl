@@ -76,7 +76,6 @@ jobs:
           file: .docker/Dockerfile
           push: true
           platforms: ${{ matrix.platform }}
-          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VERSION=${{ steps.get_version.outputs.version_build }}
@@ -88,7 +87,7 @@ jobs:
         run: |
           mkdir -p /tmp/digests
           digest="${{ steps.build.outputs.digest }}"
-          touch "/tmp/digests/${digest#sha256}"          
+          touch "/tmp/digests/${digest#sha256:}"          
       - name: Upload digest
         uses: actions/upload-artifact@v3
         with:
