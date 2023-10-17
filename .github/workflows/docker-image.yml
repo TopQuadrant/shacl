@@ -107,6 +107,17 @@ jobs:
         - name: lowercase image name
           run: |
             echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}" >> ${GITHUB_ENV}
+
+          # inspired by https://github.com/reloc8/action-latest-release-version
+        - name: Get release version
+          id: get_version
+          run: |
+            git fetch --tags
+            git fetch --prune --unshallow || true
+          
+            LATEST_RELEASE=$(git describe --abbrev=0 --tags | sed 's/^v//')
+            echo "latest-release=${LATEST_RELEASE}" >> $GITHUB_OUTPUT
+            echo "version_build=${LATEST_RELEASE}_"$(git rev-parse --short "$GITHUB_SHA") >> $GITHUB_OUTPUT
           
           # https://github.com/actions/download-artifact
         - name: Download digests
