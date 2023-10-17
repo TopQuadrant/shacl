@@ -100,7 +100,7 @@ jobs:
   merge:
       runs-on: ubuntu-latest
       needs:
-        - build
+        - build-and-push-image
       steps:
           # https://github.com/actions/download-artifact
         - name: Download digests
