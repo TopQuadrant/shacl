@@ -104,6 +104,10 @@ jobs:
       needs:
         - build-and-push-image
       steps:
+        - name: lowercase image name
+          run: |
+            echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}" >> ${GITHUB_ENV}
+          
           # https://github.com/actions/download-artifact
         - name: Download digests
           uses: actions/download-artifact@v3
