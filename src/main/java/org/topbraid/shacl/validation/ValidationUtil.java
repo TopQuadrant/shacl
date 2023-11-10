@@ -84,6 +84,7 @@ public class ValidationUtil {
 				unionModel.getGraph(),
 				shapesModel.getGraph()
 			});
+			unionGraph.setBaseGraph(shapesModel.getGraph());
 			shapesModel = ModelFactory.createModelForGraph(unionGraph);
 		}
 		return shapesModel;
