@@ -7,7 +7,7 @@ set SHACL_HOME=%SHACLROOT%
 
 if NOT "%SHACL_HOME%" == "" goto :okHome
 echo SHACL_HOME not set
-exit /B
+exit /B 1
 
 :okHome
 set SHACL_CP=%SHACL_HOME%\lib\*;
