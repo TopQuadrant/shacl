@@ -41,6 +41,7 @@ Releases are available in the central maven repository:
   <version>*VER*</version>
 </dependency>
 ```
+
 ## Command Line Usage
 
 Download the latest release from:
@@ -58,7 +59,7 @@ To use them, set up your environment similar to https://jena.apache.org/document
 For example, on Windows:
 
 ```
-SET SHACLROOT=C:\Users\Holger\Desktop\shacl-1.4.1-bin
+SET SHACLROOT=C:\Users\Holger\Desktop\shacl-1.4.2-bin
 SET PATH=%PATH%;%SHACLROOT%\bin
 ```
 
@@ -66,7 +67,7 @@ As another example, for Linux, add to .bashrc these lines:
 
 ```
 # for shacl
-export SHACLROOT=/home/holger/shacl/shacl-1.4.1-bin/shacl-1.4.1/bin
+export SHACLROOT=/home/holger/shacl/shacl-1.4.2-bin/shacl-1.4.2/bin
 export PATH=$SHACLROOT:$PATH 
 ```
 
@@ -83,11 +84,12 @@ The tools print the validation report or the inferences graph to the output scre
 
 ## Dockerfile Usage
 
-The `Dockerfile` in the `.docker` folder includes a minimal Java Runtime Environment for the SHACL API that clocks in at 144Mb. To build the docker image use:
+The `Dockerfile` in the `.docker` folder includes a minimal Java Runtime Environment for the SHACL API that clocks in at ~85Mb. To get the latest release of the image use:
 
 ```
 docker build -f .docker/Dockerfile -t ghcr.io/topquadrant/shacl:1.4.2 --build-arg VERSION=1.4.2 .
 ```
+> :warning: It is generally better to use a fixed version of the docker image, rather than the `latest` tag. Consult the package page to find what versions are available.
 
 To use the Docker image, there are two possible commands. To run the validator:
 
@@ -116,4 +118,16 @@ PARAMETERS:
 		input to be validated (only .ttl format supported)
 	-shapesfile /data/myshapes.ttl [OPTIONAL]
 		shapes for validation (only .ttl format supported)
+```
+
+If you'd like to build the image locally in an `x86` architecture, use:
+
+```
+docker build -f .docker/Dockerfile -t ghcr.io/topquadrant/shacl:1.4.2 --build-arg VERSION=1.4.2 --build-arg ARCH_BASE=eclipse-temurin:11-alpine .
+```
+
+If your architecture is `arm`, use:
+
+```
+docker build -f .docker/Dockerfile -t ghcr.io/topquadrant/shacl:1.4.2 --build-arg VERSION=1.4.2 --build-arg ARCH_BASE=amd64/eclipse-temurin:11-alpine .
 ```

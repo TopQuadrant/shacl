@@ -8,7 +8,6 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build-and-push-image:
@@ -16,8 +15,19 @@ jobs:
     permissions:
       contents: read
       packages: write
+    strategy:
+      matrix:
+        include:
+          - platform: linux/amd64
+            base: eclipse-temurin:11-alpine
+          - platform: linux/arm64
+            base: amazoncorretto:11-alpine3.18-jdk
 
     steps:
+      - name: lowercase image name
+        run: |
+          echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}" >> ${GITHUB_ENV}
+          
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -62,13 +72,88 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
         # https://github.com/docker/build-push-action
-      - name: Build and push Docker image
+      - name: Build and push Docker image for x86 and arm64
+        id: build
         uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671 #v4.0.0
         with:
           file: .docker/Dockerfile
           push: true
-          platforms: linux/amd64,linux/arm64
-          tags: ${{ steps.meta.outputs.tags }}
+          platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: VERSION=${{ steps.get_version.outputs.version_build }}
-          outputs: type=image
+          build-args: |
+            VERSION=${{ steps.get_version.outputs.version_build }}
+            ARCH_BASE=${{ matrix.base }}
+          outputs: type=image,name=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true
+
+        # https://github.com/actions/upload-artifact
+      - name: Export digest
+        run: |
+          mkdir -p /tmp/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/${digest#sha256:}"          
+      - name: Upload digest
+        uses: actions/upload-artifact@v3
+        with:
+          name: digests
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  merge:
+      runs-on: ubuntu-latest
+      needs:
+        - build-and-push-image
+      steps:
+        - name: lowercase image name
+          run: |
+            echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}" >> ${GITHUB_ENV}
+        
+        - name: Checkout repository
+          uses: actions/checkout@v3
+
+          # inspired by https://github.com/reloc8/action-latest-release-version
+        - name: Get release version
+          id: get_version
+          run: |
+            git fetch --tags
+            git fetch --prune --unshallow || true
+          
+            LATEST_RELEASE=$(git describe --abbrev=0 --tags | sed 's/^v//')
+            echo "latest-release=${LATEST_RELEASE}" >> $GITHUB_OUTPUT
+            echo "version_build=${LATEST_RELEASE}_"$(git rev-parse --short "$GITHUB_SHA") >> $GITHUB_OUTPUT
+          
+          # https://github.com/actions/download-artifact
+        - name: Download digests
+          uses: actions/download-artifact@v3
+          with:
+            name: digests
+            path: /tmp/digests
+        - name: Set up Docker Buildx
+          uses: docker/setup-buildx-action@v3
+
+          # https://github.com/docker/metadata-action
+        - name: Extract metadata (tags, labels) for Docker
+          id: meta
+          uses: docker/metadata-action@507c2f2dc502c992ad446e3d7a5dfbe311567a96 #v4.3.0
+          with:
+            images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+            tags: |
+                type=raw,value=latest,enable=${{ github.event_name == 'push' }}
+                type=raw,value=${{ steps.get_version.outputs.version_build}},enable=${{ github.event_name == 'push' }}
+                type=raw,value=${{ steps.get_version.outputs.latest-release}},enable=${{ github.event_name == 'release' }}
+
+          # https://github.com/docker/login-action
+        - name: Log in to the Container registry
+          uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a # v2.1.0
+          with:
+            registry: ${{ env.REGISTRY }}
+            username: ${{ github.actor }}
+            password: ${{ secrets.GITHUB_TOKEN }}
+        - name: Create manifest list and push
+          working-directory: /tmp/digests
+          run: |
+            docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+              $(printf '${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@sha256:%s ' *)          
+        - name: Inspect image
+          run: |
+            docker buildx imagetools inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}          

@@ -1,4 +1,6 @@
-FROM eclipse-temurin:11 as jre-build
+ARG ARCH_BASE
+FROM $ARCH_BASE as jre-build
+
 WORKDIR /app
 
 ARG VERSION
@@ -21,9 +23,7 @@ RUN $JAVA_HOME/bin/jlink \
          --compress=2 \
          --output /javaruntime
 
-RUN apt-get -y update && \
-    apt-get -y install maven curl zip && \
-    rm -rf /var/lib/apt/lists/*
+RUN apk add maven curl zip
 
 # Compile with maven, extract binaries and copy into image
 COPY . /app
@@ -32,7 +32,7 @@ RUN unzip target/shacl-${VERSION}-bin.zip -d /app/
 
 # BUILD STAGE 2: keep only Java and SHACL
 
-FROM ubuntu:jammy
+FROM alpine:3.18
 
 ARG VERSION
 
@@ -42,5 +42,4 @@ ENV PATH "/app/shacl-${VERSION}/bin:${PATH}"
 COPY --from=jre-build /javaruntime $JAVA_HOME
 COPY --chmod=0755 --from=jre-build /app/shacl-${VERSION} /app/shacl-${VERSION}
 COPY --chmod=0755 --from=jre-build "/app/.docker/entrypoint.sh" "/entrypoint.sh"
-
 ENTRYPOINT ["/entrypoint.sh"]
