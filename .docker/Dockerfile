@@ -42,5 +42,4 @@ ENV PATH "/app/shacl-${VERSION}/bin:${PATH}"
 COPY --from=jre-build /javaruntime $JAVA_HOME
 COPY --chmod=0755 --from=jre-build /app/shacl-${VERSION} /app/shacl-${VERSION}
 COPY --chmod=0755 --from=jre-build "/app/.docker/entrypoint.sh" "/entrypoint.sh"
-
 ENTRYPOINT ["/entrypoint.sh"]
