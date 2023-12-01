@@ -23,7 +23,8 @@ import java.util.Arrays;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.util.FileUtils;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
 import org.topbraid.jenax.util.JenaDatatypes;
 import org.topbraid.shacl.validation.ValidationUtil;
 import org.topbraid.shacl.vocabulary.SH;
@@ -56,8 +57,16 @@ public class Validate extends AbstractTool {
 			shapesModel = dataModel;
 		}
 		boolean validateShapes = Arrays.asList(args).contains("-validateShapes");
+		boolean includeBlankNodes = Arrays.asList(args).contains("-addShapes");
 		Resource report = ValidationUtil.validateModel(dataModel, shapesModel, validateShapes);
-		report.getModel().write(System.out, FileUtils.langTurtle);
+		// If includeBlankNodes is true, then the code will walk through the report and add the blank nodes to the report
+
+		if(includeBlankNodes) {
+			Model referencedNodes = BlankNodeFinder.findBlankNodes(report.getModel(),shapesModel);
+			report.getModel().add(referencedNodes);
+		}
+
+		RDFDataMgr.write(System.out, report.getModel(), RDFFormat.TURTLE_PRETTY);
 
 		if(report.hasProperty(SH.conforms, JenaDatatypes.FALSE)) {
 			// See https://github.com/TopQuadrant/shacl/issues/56
