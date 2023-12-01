@@ -23,8 +23,7 @@ import java.util.Arrays;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.riot.RDFFormat;
+import org.apache.jena.util.FileUtils;
 import org.topbraid.jenax.util.JenaDatatypes;
 import org.topbraid.shacl.validation.ValidationUtil;
 import org.topbraid.shacl.vocabulary.SH;
@@ -66,7 +65,7 @@ public class Validate extends AbstractTool {
 			report.getModel().add(referencedNodes);
 		}
 
-		RDFDataMgr.write(System.out, report.getModel(), RDFFormat.TURTLE_PRETTY);
+		report.getModel().write(System.out, FileUtils.langTurtle);
 
 		if(report.hasProperty(SH.conforms, JenaDatatypes.FALSE)) {
 			// See https://github.com/TopQuadrant/shacl/issues/56
