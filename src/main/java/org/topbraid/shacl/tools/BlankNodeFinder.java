@@ -5,9 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.topbraid.shacl.vocabulary.SH;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
+import java.util.*;
 
 public class BlankNodeFinder {
     private static final Logger logger = LoggerFactory.getLogger(BlankNodeFinder.class);
@@ -20,18 +18,18 @@ public class BlankNodeFinder {
     public static Model findBlankNodes(Model report, Model shapesGraph) {
         // Find all blank nodes that references the shapes graph
 
-        Model blankNodes = ModelFactory.createDefaultModel();
+        Set<Statement> blankNodes = new HashSet<>();
 
-        Stream<Statement> statements = report.listStatements(null, SH.result, (RDFNode) null).toList().stream();
+        StmtIterator statements = report.listStatements(null, SH.result, (RDFNode) null);
 
-        statements.map(Statement::getResource).forEach(resource -> {
+        statements.mapWith(Statement::getResource).forEach(resource -> {
             try{
-                Stream<Statement> reportStatements = report.listStatements(resource, null, (RDFNode) null).toList().stream();
+                StmtIterator reportStatements = report.listStatements(resource, null, (RDFNode) null);
                 reportStatements.forEach(statement -> {
                     if (statement.getObject().isAnon()) {
-                        List<Statement> allBlankNodes = resolveAllBlankNodes(shapesGraph, statement.getResource());
+                        Set<Statement> allBlankNodes = resolveAllBlankNodes(shapesGraph, statement.getResource(), blankNodes);
                         blankNodes.add(statement);
-                        blankNodes.add(allBlankNodes);
+                        blankNodes.addAll(allBlankNodes);
                     }
                 });
             }
@@ -40,7 +38,7 @@ public class BlankNodeFinder {
             }
         });
 
-        return blankNodes;
+        return ModelFactory.createDefaultModel().add(new ArrayList<>(blankNodes));
     }
     /**
      * From given subject, find all blank nodes that can be reached from it recursively
@@ -48,15 +46,22 @@ public class BlankNodeFinder {
      * @param subject The subject to start from(BLANK NODE)
      * @return A list of all blank nodes that can be reached from the given subject
      */
-    private static List<Statement> resolveAllBlankNodes(Model model, Resource subject) {
-        List<Statement> blankNodes = new ArrayList<>();
-        Stream<Statement> statements = model.listStatements(subject, null, (RDFNode) null).toList().stream();
-        statements.forEach(statement -> {
-            blankNodes.add(statement);
-            if (statement.getObject().isAnon()) {
-                blankNodes.addAll(resolveAllBlankNodes(model, statement.getResource()));
-            }
-        });
+    private static Set<Statement> resolveAllBlankNodes(Model model, Resource subject, final Set<Statement> blankNodes) {
+        final Queue<Resource> queue = new LinkedList<>();
+        queue.add(subject);
+        while (!queue.isEmpty()) {
+            final Resource resource = queue.remove();
+            final StmtIterator statements = model.listStatements(resource, null, (RDFNode) null);
+            statements.forEachRemaining(statement -> {
+                if (blankNodes.contains(statement)) {
+                    return;
+                }
+                blankNodes.add(statement);
+                if (statement.getObject().isAnon()) {
+                    queue.add(statement.getResource());
+                }
+            });
+        }
 
         return blankNodes;
     }
