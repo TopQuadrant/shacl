@@ -57,11 +57,11 @@ public class Validate extends AbstractTool {
 			shapesModel = dataModel;
 		}
 		boolean validateShapes = Arrays.asList(args).contains("-validateShapes");
-		boolean includeBlankNodes = Arrays.asList(args).contains("-addShapes");
+		boolean addBlankNodes = Arrays.asList(args).contains("-addBlankNodes");
 		Resource report = ValidationUtil.validateModel(dataModel, shapesModel, validateShapes);
-		// If includeBlankNodes is true, then the code will walk through the report and add the blank nodes to the report
+		// If addBlankNodes is true, then the code will walk through the report and add the blank nodes to the report
 
-		if(includeBlankNodes) {
+		if(addBlankNodes) {
 			Model referencedNodes = BlankNodeFinder.findBlankNodes(report.getModel(),shapesModel);
 			report.getModel().add(referencedNodes);
 		}
