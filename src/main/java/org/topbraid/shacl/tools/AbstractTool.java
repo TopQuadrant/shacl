@@ -40,6 +40,8 @@ class AbstractTool {
 	
 	private final static String SHAPES_FILE = "-shapesfile";
 
+	private final static String MAX_ITERATIONS = "-maxiterations";
+
 	
 	private OntDocumentManager dm = new OntDocumentManager();
 	
@@ -67,6 +69,15 @@ class AbstractTool {
 		spec.setDocumentManager(dm);
 	}
 	
+	protected int getMaxIterations(String[] args) {
+		for(int i = 0; i < args.length - 1; i++) {
+			if(MAX_ITERATIONS.equals(args[i])) {
+				return Integer.parseInt(args[i + 1]);
+			}
+		}
+		System.err.println("Missing -maxiterations, e.g.: -maxiterations 100. Defaulting to 1.");
+		return 1;
+	}
 	
 	protected Model getDataModel(String[] args) throws IOException {
 		for(int i = 0; i < args.length - 1; i++) {
