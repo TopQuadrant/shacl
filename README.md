@@ -78,6 +78,9 @@ Both tools take the following parameters, for example:
 where `-shapesfile` is optional and falls back to using the data graph as shapes graph.
 Add -validateShapes in case you want to include the metashapes (from the tosh namespace in particular).
 
+For the shaclinfer tool, you can use the `-maxiterations` argument to apply SHACL rule inferencing multiple times; this will add inferred results back to the data graph to see if further triples can be inferred.
+The tool will iterate until either (a) the maximum number of iterations is reached, or (b) no new triples are inferred. The flag is optional and defaults to `1` (single iteration).
+
 Currently only Turtle (.ttl) files are supported.
 
 The tools print the validation report or the inferences graph to the output screen.
