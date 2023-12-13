@@ -75,7 +75,6 @@ class AbstractTool {
 				return Integer.parseInt(args[i + 1]);
 			}
 		}
-		System.err.println("Missing -maxiterations, e.g.: -maxiterations 100. Defaulting to 1.");
 		return 1;
 	}
 	
