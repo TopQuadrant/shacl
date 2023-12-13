@@ -53,11 +53,10 @@ public class Infer extends AbstractTool {
 		}
 		int maxIterations = getMaxIterations(args);
 
-		// execute the rules over and over until there are no new results
-		// or until a maximum number of iterations has been reached.
-		// Keep track of all results from each iteration in a separate model.
-		// Break if no new results are found, or if the size of the allResults
-		// model does not increase after a run.
+		// iteratively applies the inference rules until either (a) no new results are found,
+		// or (b) the max iterations is reached. The intermediate inference results are added
+		// to the data model in between each iteration. In addition, all of the inferred triples
+		// are added to a Model object called "results" which is output at the end
 
 		// stores which iteration we are on
 		int iteration = 0;
