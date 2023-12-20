@@ -38,7 +38,7 @@ import org.apache.jena.sparql.function.FunctionFactory;
 import org.apache.jena.sparql.function.FunctionRegistry;
 import org.apache.jena.sparql.sse.ItemList;
 import org.apache.jena.sparql.sse.builders.BuilderExpr;
-import org.apache.jena.sparql.sse.builders.ExprBuildException;
+import org.apache.jena.sparql.sse.builders.SSE_ExprBuildException;
 import org.apache.jena.sparql.util.Context;
 import org.apache.jena.sparql.util.ExprUtils;
 import org.apache.jena.sparql.util.FmtUtils;
@@ -81,7 +81,7 @@ public class FunctionExpression extends ComplexNodeExpression {
 			try {
 				this.expr = BuilderExpr.buildExpr(il);
 			}
-			catch (ExprBuildException ebe) {
+			catch (SSE_ExprBuildException ebe) {
 				throw new IllegalArgumentException("Failed to build expression for " + il, ebe);
 			}
 		}
