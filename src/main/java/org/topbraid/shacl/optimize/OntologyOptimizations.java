@@ -16,14 +16,14 @@
  */
 package org.topbraid.shacl.optimize;
 
+import com.github.jsonldjava.shaded.com.google.common.cache.Cache;
+import com.github.jsonldjava.shaded.com.google.common.cache.CacheBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
-import org.apache.jena.ext.com.google.common.cache.Cache;
-import org.apache.jena.ext.com.google.common.cache.CacheBuilder;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
