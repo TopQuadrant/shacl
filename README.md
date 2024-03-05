@@ -2,7 +2,8 @@
 
 **An open source implementation of the W3C Shapes Constraint Language (SHACL) based on Apache Jena.**
 
-Contact: Holger Knublauch (holger@topquadrant.com)
+Contact: Ashley Caselli (ashley.caselli@unige.ch)\
+Original developer: Holger Knublauch (holger@topquadrant.com)
 
 Can be used to perform SHACL constraint checking and rule inferencing in any Jena-based Java application.
 This API also serves as a reference implementation of the SHACL spec.
