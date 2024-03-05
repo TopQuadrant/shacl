@@ -63,7 +63,7 @@
     <url>https://github.com/TopQuadrant/shacl</url>
     <connection>scm:git:https://github.com/TopQuadrant/shacl</connection>
     <developerConnection>scm:git:git@github.com:TopQuadrant/shacl.git</developerConnection>
-    <tag>shacl-1.4.3</tag>
+    <tag>v@{project.version}</tag>
   </scm>
 
   <properties>
@@ -178,7 +178,8 @@
         <configuration>
           <goals>deploy</goals>
           <autoVersionSubmodules>true</autoVersionSubmodules>
-        </configuration> 
+          <tagNameFormat>v@{project.version}</tagNameFormat>
+        </configuration>
       </plugin>
       
     </plugins>
