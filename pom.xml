@@ -22,7 +22,7 @@
 
   <groupId>org.topbraid</groupId>
   <artifactId>shacl</artifactId>
-  <version>1.4.3</version>
+  <version>1.4.4-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>TopBraid SHACL API</name>
@@ -63,7 +63,7 @@
     <url>https://github.com/TopQuadrant/shacl</url>
     <connection>scm:git:https://github.com/TopQuadrant/shacl</connection>
     <developerConnection>scm:git:git@github.com:TopQuadrant/shacl.git</developerConnection>
-    <tag>v1.4.3</tag>
+    <tag>v@{project.version}</tag>
   </scm>
 
   <properties>
