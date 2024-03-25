@@ -44,7 +44,7 @@ jobs:
       - name: Get release version
         id: get_version
         run: |
-          git fetch --tags
+          git fetch --tags -f
           git fetch --prune --unshallow || true
           
           LATEST_RELEASE=$(git describe --abbrev=0 --tags | sed 's/^v//')
