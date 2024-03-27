@@ -1,0 +1,39 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": [
+        "local>ashleycaselli/renovate-config"
+    ],
+    "automerge": false,
+    "packageRules": [
+        {
+            "description": "Updates to the parent dependencies should trigger a new patch release",
+            "matchPaths": [
+                "pom.xml"
+            ],
+            "semanticCommitType": "chore",
+            "semanticCommitScope": "core-deps"
+        },
+        {
+            "description": "Updates to the dependencies under the build settings element should not trigger any release",
+            "matchPaths": [
+                "pom.xml"
+            ],
+            "matchDepTypes": [
+                "build"
+            ],
+            "semanticCommitType": "build",
+            "semanticCommitScope": "deps"
+        },
+        {
+            "description": "Updates to the dependencies with scope 'test' should be tagged as 'test(deps)'",
+            "matchPaths": [
+                "pom.xml"
+            ],
+            "matchDepTypes": [
+                "test"
+            ],
+            "semanticCommitType": "test",
+            "semanticCommitScope": "deps"
+        }
+    ]
+}
