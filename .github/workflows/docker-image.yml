@@ -17,10 +17,17 @@ jobs:
       packages: write
     strategy:
       matrix:
+        package:
+          [
+            "x86_64",
+            "arm64"
+          ]
         include:
-          - platform: linux/amd64
+          - package: "x86_64"
+            platform: linux/amd64
             base: eclipse-temurin:11-alpine
-          - platform: linux/arm64
+          - package: "arm64"
+            platform: linux/arm64
             base: amazoncorretto:11-alpine3.18-jdk
 
     steps:
@@ -29,16 +36,16 @@ jobs:
           echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}" >> ${GITHUB_ENV}
           
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
         # https://github.com/docker/setup-qemu-action
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@e81a89b1732b9c48d79cd809d8d81d79c4647a18 # v2.1.0
+        uses: docker/setup-qemu-action@68827325e0b33c7199eb31dd4e31fbe9023e06e3 # v3.0.0
         
         # https://github.com/docker/setup-buildx-action
       - name: Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@15c905b16b06416d2086efa066dd8e3a35cc7f98 # v2.4.0
+        uses: docker/setup-buildx-action@2b51285047da1547ffb1b2203d8be4c0af6b1f20 # v3.2.0
         
         # inspired by https://github.com/reloc8/action-latest-release-version
       - name: Get release version
@@ -54,7 +61,7 @@ jobs:
         # https://github.com/docker/metadata-action
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@507c2f2dc502c992ad446e3d7a5dfbe311567a96 #v4.3.0
+        uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81 #v5.5.1
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
@@ -65,7 +72,7 @@ jobs:
 
         # https://github.com/docker/login-action
       - name: Log in to the Container registry
-        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a # v2.1.0
+        uses: docker/login-action@e92390c5fb421da1463c202d546fed0ec5c39f20 # v3.1.0
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -74,7 +81,7 @@ jobs:
         # https://github.com/docker/build-push-action
       - name: Build and push Docker image for x86 and arm64
         id: build
-        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671 #v4.0.0
+        uses: docker/build-push-action@2cdde995de11925a030ce8070c3d77a52ffcf1c0 #v5.3.0
         with:
           file: .docker/Dockerfile
           push: true
@@ -90,11 +97,11 @@ jobs:
         run: |
           mkdir -p /tmp/digests
           digest="${{ steps.build.outputs.digest }}"
-          touch "/tmp/digests/${digest#sha256:}"          
+          touch "/tmp/digests/${digest#sha256:}"     
       - name: Upload digest
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 #v4.3.1
         with:
-          name: digests
+          name: digests-${{ matrix.package }}
           path: /tmp/digests/*
           if-no-files-found: error
           retention-days: 1
@@ -124,17 +131,19 @@ jobs:
           
           # https://github.com/actions/download-artifact
         - name: Download digests
-          uses: actions/download-artifact@v3
+          uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 #v4.1.4
           with:
-            name: digests
             path: /tmp/digests
+            pattern: digests-*
+            merge-multiple: true
+          # https://github.com/docker/setup-buildx-action
         - name: Set up Docker Buildx
-          uses: docker/setup-buildx-action@v3
+          uses: docker/setup-buildx-action@2b51285047da1547ffb1b2203d8be4c0af6b1f20 # v3.2.0
 
           # https://github.com/docker/metadata-action
         - name: Extract metadata (tags, labels) for Docker
           id: meta
-          uses: docker/metadata-action@507c2f2dc502c992ad446e3d7a5dfbe311567a96 #v4.3.0
+          uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81 #v5.5.1
           with:
             images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
             tags: |
@@ -144,7 +153,7 @@ jobs:
 
           # https://github.com/docker/login-action
         - name: Log in to the Container registry
-          uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a # v2.1.0
+          uses: docker/login-action@e92390c5fb421da1463c202d546fed0ec5c39f20 # v3.1.0
           with:
             registry: ${{ env.REGISTRY }}
             username: ${{ github.actor }}
