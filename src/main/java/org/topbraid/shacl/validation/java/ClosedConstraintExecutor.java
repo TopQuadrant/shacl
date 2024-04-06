@@ -48,8 +48,8 @@ class ClosedConstraintExecutor extends AbstractNativeConstraintExecutor {
 		if(closed) {
 			long startTime = System.currentTimeMillis();
 			for(RDFNode focusNode : focusNodes) {
-				if(focusNode instanceof Resource) {
-					for(RDFNode valueNode : engine.getValueNodes(constraint, focusNode)) {
+				for(RDFNode valueNode : engine.getValueNodes(constraint, focusNode)) {
+					if(valueNode instanceof Resource) {
 						Iterator<Statement> it = ((Resource)valueNode).listProperties();
 						while(it.hasNext()) {
 							Statement s = it.next();
