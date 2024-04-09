@@ -48,18 +48,20 @@ class ClosedConstraintExecutor extends AbstractNativeConstraintExecutor {
 		if(closed) {
 			long startTime = System.currentTimeMillis();
 			for(RDFNode focusNode : focusNodes) {
-				if(focusNode instanceof Resource) {
-					Iterator<Statement> it = ((Resource)focusNode).listProperties();
-					while(it.hasNext()) {
-						Statement s = it.next();
-						if(!allowedProperties.contains(s.getPredicate())) {
-							Resource result = engine.createValidationResult(constraint, focusNode, s.getObject(), () -> "Predicate " + engine.getLabelFunction().apply(s.getPredicate()) + " is not allowed (closed shape)");
-							result.removeAll(SH.resultPath);
-							result.addProperty(SH.resultPath, s.getPredicate());
+				for(RDFNode valueNode : engine.getValueNodes(constraint, focusNode)) {
+					if(valueNode instanceof Resource) {
+						Iterator<Statement> it = ((Resource)valueNode).listProperties();
+						while(it.hasNext()) {
+							Statement s = it.next();
+							if(!allowedProperties.contains(s.getPredicate())) {
+								Resource result = engine.createValidationResult(constraint, valueNode, s.getObject(), () -> "Predicate " + engine.getLabelFunction().apply(s.getPredicate()) + " is not allowed (closed shape)");
+								result.removeAll(SH.resultPath);
+								result.addProperty(SH.resultPath, s.getPredicate());
+							}
 						}
+						engine.checkCanceled();
 					}
 				}
-				engine.checkCanceled();
 			}
 			addStatistics(engine, constraint, startTime, focusNodes.size(), focusNodes.size());
 		}
