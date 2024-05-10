@@ -110,7 +110,7 @@ jobs:
             echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}" >> ${GITHUB_ENV}
         
         - name: Checkout repository
-          uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+          uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
         # inspired by https://github.com/reloc8/action-latest-release-version
         - name: Get release version
