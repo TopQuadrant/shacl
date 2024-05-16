@@ -4,6 +4,7 @@
         "local>ashleycaselli/renovate-config"
     ],
     "automerge": false,
+    "forkProcessing": "enabled",
     "packageRules": [
         {
             "description": "Updates to the parent dependencies should trigger a new patch release",
