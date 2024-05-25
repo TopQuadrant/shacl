@@ -19,7 +19,7 @@
   rdfs:label "Test of person2schema" ;
   owl:imports <http://datashapes.org/dash> ;
   owl:imports <http://datashapes.org/schema> ;
-  owl:imports <http://datashapes.org/shasf/tests/rules/triple/person#> ;
+  owl:imports <http://datashapes.org/shasf/tests/rules/triple/person> ;
   owl:versionInfo "Created with TopBraid Composer" ;
   sh:declare [
       rdf:type sh:PrefixDeclaration ;
