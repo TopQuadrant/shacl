@@ -29,7 +29,6 @@ import java.util.Set;
 import java.util.function.BiFunction;
 
 import org.apache.jena.enhanced.EnhGraph;
-import org.apache.jena.graph.Factory;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.compose.MultiUnion;
@@ -72,12 +71,14 @@ import org.apache.jena.sparql.expr.ExprVar;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.expr.nodevalue.NodeFunctions;
 import org.apache.jena.sparql.function.FunctionEnv;
+import org.apache.jena.sparql.graph.GraphFactory;
 import org.apache.jena.sparql.graph.NodeTransform;
 import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransform;
 import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformSubst;
 import org.apache.jena.sparql.syntax.syntaxtransform.ExprTransformNodeElement;
 import org.apache.jena.sparql.syntax.syntaxtransform.QueryTransformOps;
 import org.apache.jena.sparql.util.Context;
+import org.apache.jena.sparql.util.NodeCmp;
 import org.apache.jena.sparql.util.NodeFactoryExtra;
 import org.apache.jena.sparql.util.NodeUtils;
 import org.apache.jena.util.iterator.ExtendedIterator;
@@ -317,7 +318,7 @@ public class JenaUtil {
 	 * @return a new memory graph
 	 */
 	public static Graph createMemoryGraph() {
-		return Factory.createDefaultGraph();
+		return GraphFactory.createDefaultGraph();
 	}
 	
 	
@@ -1240,7 +1241,7 @@ public class JenaUtil {
 		Collections.sort(nodes, new Comparator<Resource>() {
 			@Override
 			public int compare(Resource o1, Resource o2) {
-		        return NodeUtils.compareRDFTerms(o1.asNode(), o2.asNode());
+		        return NodeCmp.compareRDFTerms(o1.asNode(), o2.asNode());
 			}
 		});
 	}

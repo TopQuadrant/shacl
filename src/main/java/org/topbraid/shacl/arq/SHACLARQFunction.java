@@ -103,7 +103,6 @@ public abstract class SHACLARQFunction implements org.apache.jena.sparql.functio
 	}
 	
 
-	@Override
     public void build(String uri, ExprList args) {
 	}
 
