@@ -46,7 +46,7 @@ public abstract class AbstractFunction implements Function {
 
 	@Override
 	public void build(String var1, ExprList var2, Context var3){}
-	
+
 	@Override
     public NodeValue exec(Binding binding, ExprList args, String uri, FunctionEnv env) {
 		Node[] nodes = new Node[args.size()];
