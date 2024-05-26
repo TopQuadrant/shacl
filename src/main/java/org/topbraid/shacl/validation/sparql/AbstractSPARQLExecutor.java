@@ -189,39 +189,41 @@ public abstract class AbstractSPARQLExecutor implements ConstraintExecutor {
 						}
 						
 						Resource result = engine.createResult(resultType, constraint, thisValue);
-						if(SH.SPARQLConstraintComponent.equals(constraint.getComponent())) {
-							result.addProperty(SH.sourceConstraint, constraint.getParameterValue());
-						}
-						
-						if(selectMessage != null) {
-							result.addProperty(SH.resultMessage, selectMessage);
-						}
-						else if(constraint.getShapeResource().hasProperty(SH.message)) {
-							for(Statement s : constraint.getShapeResource().listProperties(SH.message).toList()) {
-								result.addProperty(SH.resultMessage, s.getObject());
-							}
-						}
-						else {
-							addDefaultMessages(engine, messageHolder, constraint.getComponent(), result, bindings, sol);
-						}
-						
-						RDFNode pathValue = sol.get(SH.pathVar.getVarName());
-						if(pathValue != null && pathValue.isURIResource()) {
-							result.addProperty(SH.resultPath, pathValue);
-						}
-						else if(constraint.getShapeResource().isPropertyShape()) {
-							Resource basePath = constraint.getShapeResource().getPropertyResourceValue(SH.path);
-							result.addProperty(SH.resultPath, SHACLPaths.clonePath(basePath, result.getModel()));
-						}
-						
-						if(!SH.HasValueConstraintComponent.equals(constraint.getComponent())) { // See https://github.com/w3c/data-shapes/issues/111
-							RDFNode selectValue = sol.get(SH.valueVar.getVarName());
-							if(selectValue != null) {
-								result.addProperty(SH.value, selectValue);
-							}
-							else if(SH.NodeShape.equals(constraint.getContext())) {
-								result.addProperty(SH.value, focusNode);
-							}
+						synchronized (result) {
+						    if(SH.SPARQLConstraintComponent.equals(constraint.getComponent())) {
+						        result.addProperty(SH.sourceConstraint, constraint.getParameterValue());
+						    }
+
+						    if(selectMessage != null) {
+						        result.addProperty(SH.resultMessage, selectMessage);
+						    }
+						    else if(constraint.getShapeResource().hasProperty(SH.message)) {
+						        for(Statement s : constraint.getShapeResource().listProperties(SH.message).toList()) {
+						            result.addProperty(SH.resultMessage, s.getObject());
+						        }
+						    }
+						    else {
+						        addDefaultMessages(engine, messageHolder, constraint.getComponent(), result, bindings, sol);
+						    }
+
+						    RDFNode pathValue = sol.get(SH.pathVar.getVarName());
+						    if(pathValue != null && pathValue.isURIResource()) {
+						        result.addProperty(SH.resultPath, pathValue);
+						    }
+						    else if(constraint.getShapeResource().isPropertyShape()) {
+						        Resource basePath = constraint.getShapeResource().getPropertyResourceValue(SH.path);
+						        result.addProperty(SH.resultPath, SHACLPaths.clonePath(basePath, result.getModel()));
+						    }
+
+						    if(!SH.HasValueConstraintComponent.equals(constraint.getComponent())) { // See https://github.com/w3c/data-shapes/issues/111
+						        RDFNode selectValue = sol.get(SH.valueVar.getVarName());
+						        if(selectValue != null) {
+						            result.addProperty(SH.value, selectValue);
+						        }
+						        else if(SH.NodeShape.equals(constraint.getContext())) {
+						            result.addProperty(SH.value, focusNode);
+						        }
+						    }
 						}
 						
 						if(engine.getConfiguration().getReportDetails()) {
@@ -232,11 +234,13 @@ public abstract class AbstractSPARQLExecutor implements ConstraintExecutor {
 			}
 			else if(createSuccessResults) {
 				Resource success = engine.createResult(DASH.SuccessResult, constraint, focusNode);
-				if(SH.SPARQLConstraintComponent.equals(constraint.getComponent())) {
-					success.addProperty(SH.sourceConstraint, constraint.getParameterValue());
-				}
-				if(engine.getConfiguration().getReportDetails()) {
-					addDetails(success, nestedResults);
+				synchronized (success) {
+				    if(SH.SPARQLConstraintComponent.equals(constraint.getComponent())) {
+				        success.addProperty(SH.sourceConstraint, constraint.getParameterValue());
+				    }
+				    if(engine.getConfiguration().getReportDetails()) {
+				        addDetails(success, nestedResults);
+				    }
 				}
 			}
 		}
@@ -264,7 +268,7 @@ public abstract class AbstractSPARQLExecutor implements ConstraintExecutor {
 	}
 
 	
-	public static void addDetails(Resource parentResult, Model nestedResults) {
+	synchronized public static void addDetails(Resource parentResult, Model nestedResults) {
 		if(!nestedResults.isEmpty()) {
 			parentResult.getModel().add(nestedResults);
 			for(Resource type : SHACLUtil.RESULT_TYPES) {
