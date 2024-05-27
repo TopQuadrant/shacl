@@ -110,11 +110,6 @@ public class SHACLSPARQLARQFunction extends SHACLARQFunction {
 
 		addParameters(shaclFunction);
 	}
-	
-
-	@Override
-    public void build(String uri, ExprList args) {
-	}
 
 	
 	@Override

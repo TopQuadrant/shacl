@@ -30,6 +30,7 @@ import java.util.function.BiFunction;
 
 import org.apache.jena.enhanced.EnhGraph;
 import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.GraphMemFactory;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.compose.MultiUnion;
 import org.apache.jena.ontology.OntModel;
@@ -71,7 +72,6 @@ import org.apache.jena.sparql.expr.ExprVar;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.expr.nodevalue.NodeFunctions;
 import org.apache.jena.sparql.function.FunctionEnv;
-import org.apache.jena.sparql.graph.GraphFactory;
 import org.apache.jena.sparql.graph.NodeTransform;
 import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransform;
 import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformSubst;
@@ -318,7 +318,7 @@ public class JenaUtil {
 	 * @return a new memory graph
 	 */
 	public static Graph createMemoryGraph() {
-		return GraphFactory.createDefaultGraph();
+		return GraphMemFactory.createDefaultGraph();
 	}
 	
 	
