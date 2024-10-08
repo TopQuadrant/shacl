@@ -43,7 +43,7 @@ jobs:
         
       - name: Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@d70bba72b1f3fd22344832f00baa16ece964efeb # v3.3.0
+        uses: docker/setup-buildx-action@c47758b77c9736f4b2ef4073d4d51994fabfe349 # v3.7.1
         
       # inspired by https://github.com/reloc8/action-latest-release-version
       - name: Get release version
@@ -131,7 +131,7 @@ jobs:
             merge-multiple: true
 
         - name: Set up Docker Buildx
-          uses: docker/setup-buildx-action@d70bba72b1f3fd22344832f00baa16ece964efeb # v3.3.0
+          uses: docker/setup-buildx-action@c47758b77c9736f4b2ef4073d4d51994fabfe349 # v3.7.1
 
         - name: Extract metadata (tags, labels) for Docker
           id: meta
