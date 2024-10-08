@@ -30,7 +30,7 @@ public class TestCaseTypes {
 	static {
 		types.add(new FunctionTestCaseType());
 		types.add(new GraphValidationTestCaseType());
-		//types.add(new InferencingTestCaseType());
+		types.add(new InferencingTestCaseType());
 		types.add(new JSTestCaseType());
 		types.add(new QueryTestCaseType());
 	}

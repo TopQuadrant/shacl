@@ -7,8 +7,10 @@
 @prefix dash: <http://datashapes.org/dash#> .
 @prefix ex: <http://datashapes.org/shasf/tests/rules/triple/person2schema.test#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix person: <http://datashapes.org/shasf/tests/rules/triple/person#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <http://schema.org/> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
@@ -33,48 +35,55 @@
 ex:InferencingTestCase
   rdf:type dash:InferencingTestCase ;
   dash:expectedResult [
-      rdf:object <http://datashapes.org/shasf/tests/rules/triple/person#JohnDoe-Address> ;
-      rdf:predicate <http://schema.org/address> ;
-      rdf:subject <http://datashapes.org/shasf/tests/rules/triple/person#JohnDoe> ;
+      rdf:object person:JohnDoe-Address ;
+      rdf:predicate schema:address ;
+      rdf:subject person:JohnDoe ;
     ] ;
   dash:expectedResult [
-      rdf:object <http://schema.org/Person> ;
+      rdf:object schema:Person ;
       rdf:predicate rdf:type ;
-      rdf:subject <http://datashapes.org/shasf/tests/rules/triple/person#JohnDoe> ;
+      rdf:subject person:JohnDoe ;
     ] ;
   dash:expectedResult [
-      rdf:object <http://schema.org/PostalAddress> ;
+      rdf:object schema:PostalAddress ;
       rdf:predicate rdf:type ;
-      rdf:subject <http://datashapes.org/shasf/tests/rules/triple/person#JohnDoe-Address> ;
+      rdf:subject person:JohnDoe-Address ;
     ] ;
   dash:expectedResult [
       rdf:object 12345 ;
-      rdf:predicate <http://schema.org/postalCode> ;
-      rdf:subject <http://datashapes.org/shasf/tests/rules/triple/person#JohnDoe-Address> ;
+      rdf:predicate schema:postalCode ;
+      rdf:subject person:JohnDoe-Address ;
     ] ;
   dash:expectedResult [
       rdf:object "Doe" ;
-      rdf:predicate <http://schema.org/familyName> ;
-      rdf:subject <http://datashapes.org/shasf/tests/rules/triple/person#JohnDoe> ;
+      rdf:predicate schema:familyName ;
+      rdf:subject person:JohnDoe ;
     ] ;
   dash:expectedResult [
       rdf:object "John" ;
-      rdf:predicate <http://schema.org/givenName> ;
-      rdf:subject <http://datashapes.org/shasf/tests/rules/triple/person#JohnDoe> ;
+      rdf:predicate schema:givenName ;
+      rdf:subject person:JohnDoe ;
     ] ;
+.
+person:JohnDoe
+  rdf:type person:Person ;
+  person:lastName "Doe" ;
+  person:firstName "John" ;
+  person:zipCode 12345 ;
+  rdfs:label "John Doe" ;
 .
 ex:Person2SchemaMappingShape
   rdf:type sh:NodeShape ;
   rdfs:label "Person-to-Schema Mapping Shape" ;
   sh:rule [
       rdf:type sh:TripleRule ;
-      sh:object <http://schema.org/Person> ;
+      sh:object schema:Person ;
       sh:predicate rdf:type ;
       sh:subject sh:this ;
     ] ;
   sh:rule [
       rdf:type sh:TripleRule ;
-      sh:object <http://schema.org/PostalAddress> ;
+      sh:object schema:PostalAddress ;
       sh:predicate rdf:type ;
       sh:subject [
           ex:deriveURI (
@@ -86,25 +95,25 @@ ex:Person2SchemaMappingShape
   sh:rule [
       rdf:type sh:TripleRule ;
       sh:object [
-          sh:path <http://datashapes.org/shasf/tests/rules/triple/person#firstName> ;
+          sh:path person:firstName ;
         ] ;
-      sh:predicate <http://schema.org/givenName> ;
+      sh:predicate schema:givenName ;
       sh:subject sh:this ;
     ] ;
   sh:rule [
       rdf:type sh:TripleRule ;
       sh:object [
-          sh:path <http://datashapes.org/shasf/tests/rules/triple/person#lastName> ;
+          sh:path person:lastName ;
         ] ;
-      sh:predicate <http://schema.org/familyName> ;
+      sh:predicate schema:familyName ;
       sh:subject sh:this ;
     ] ;
   sh:rule [
       rdf:type sh:TripleRule ;
       sh:object [
-          sh:path <http://datashapes.org/shasf/tests/rules/triple/person#zipCode> ;
+          sh:path person:zipCode ;
         ] ;
-      sh:predicate <http://schema.org/postalCode> ;
+      sh:predicate schema:postalCode ;
       sh:subject [
           ex:deriveURI (
               sh:this
@@ -120,10 +129,10 @@ ex:Person2SchemaMappingShape
               "-Address"
             ) ;
         ] ;
-      sh:predicate <http://schema.org/address> ;
+      sh:predicate schema:address ;
       sh:subject sh:this ;
     ] ;
-  sh:targetClass <http://datashapes.org/shasf/tests/rules/triple/person#Person> ;
+  sh:targetClass person:Person ;
 .
 ex:deriveURI
   rdf:type sh:SPARQLFunction ;
@@ -142,8 +151,10 @@ ex:deriveURI
     ] ;
   sh:prefixes <http://datashapes.org/shasf/tests/rules/triple/person2schema.test> ;
   sh:returnType rdfs:Resource ;
-  sh:select """SELECT ?result
-WHERE {
-    BIND (IRI(CONCAT(str($base), $concat)) AS ?result)
-}""" ;
+  sh:select """
+    SELECT ?result
+    WHERE {
+      BIND (IRI(CONCAT(str($base), $concat)) AS ?result)
+    }
+  """ ;
 .
