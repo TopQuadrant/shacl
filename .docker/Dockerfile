@@ -1,5 +1,5 @@
 ARG ARCH_BASE
-FROM $ARCH_BASE as jre-build
+FROM $ARCH_BASE AS jre-build
 
 WORKDIR /app
 
@@ -32,12 +32,12 @@ RUN unzip target/shacl-${VERSION}-bin.zip -d /app/
 
 # BUILD STAGE 2: keep only Java and SHACL
 
-FROM alpine:3.19.1
+FROM alpine:3.20.3
 
 ARG VERSION
 
 ENV JAVA_HOME=/usr
-ENV PATH "/app/shacl-${VERSION}/bin:${PATH}"
+ENV PATH="/app/shacl-${VERSION}/bin:${PATH}"
 
 COPY --from=jre-build /javaruntime $JAVA_HOME
 COPY --chmod=0755 --from=jre-build /app/shacl-${VERSION} /app/shacl-${VERSION}
