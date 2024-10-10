@@ -612,7 +612,7 @@ public class ValidationEngine extends AbstractEngine {
 		}
 		catch(Exception ex) {
 			Resource result = createResult(DASH.FailureResult, constraint, constraint.getShapeResource());
-			result.addProperty(SH.resultMessage, "Failed to create validator: " + ex.getMessage());
+			result.addProperty(SH.resultMessage, "Failed to create validator: " + ExceptionUtil.getDeepMessage(ex));
 			return;
 		}
 		if(executor != null) {
@@ -622,7 +622,7 @@ public class ValidationEngine extends AbstractEngine {
 				}
 				catch(Exception ex) {
 					Resource result = createResult(DASH.FailureResult, constraint, constraint.getShapeResource());
-					result.addProperty(SH.resultMessage, "Exception during validation: " + ex.getMessage());
+					result.addProperty(SH.resultMessage, "Exception during validation: " + ExceptionUtil.getDeepMessage(ex));
 				}
 			}
 			else {
