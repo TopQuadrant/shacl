@@ -29,6 +29,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.expr.ExprEvalException;
 import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.expr.NodeValue;
+import org.apache.jena.sparql.util.Context;
 import org.topbraid.jenax.util.ARQFactory;
 import org.topbraid.jenax.util.DatasetWithDifferentDefaultModel;
 import org.topbraid.jenax.util.JenaUtil;
@@ -54,7 +55,10 @@ public class SHACLSPARQLARQFunction extends SHACLARQFunction {
 	private org.apache.jena.query.Query arqQuery;
 	
 	private String queryString;
-	
+
+	@Override
+	public void build(String var1, ExprList var2, Context var3) {
+	}
 
 	/**
 	 * Constructs a new SHACLSPARQLARQFunction based on a given sh:ConstraintComponent
@@ -105,11 +109,6 @@ public class SHACLSPARQLARQFunction extends SHACLARQFunction {
 		}
 
 		addParameters(shaclFunction);
-	}
-	
-
-	@Override
-    public void build(String uri, ExprList args) {
 	}
 
 	
