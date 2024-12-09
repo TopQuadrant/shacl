@@ -16,22 +16,21 @@
  */
 package org.topbraid.shacl.optimize;
 
-import com.github.jsonldjava.shaded.com.google.common.cache.Cache;
-import com.github.jsonldjava.shaded.com.google.common.cache.CacheBuilder;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Cache;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
 import org.topbraid.jenax.util.ARQFactory;
-import org.topbraid.jenax.util.ExceptionUtil;
 import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.engine.ShapesGraphFactory;
+
 
 /**
  * A singleton managing Ontology-based optimizations, to be used (for example) with OptimizedMultiUnions.
@@ -79,19 +78,25 @@ public class OntologyOptimizations {
 	}
 	
 	private static final int capacity = 10000;
-	
-	private Cache<Object,Object> cache = CacheBuilder.
-			newBuilder().
-			maximumSize(capacity).
-			build();
-	
-	
+
+	private Cache<Object, Object> cache = Caffeine
+			.newBuilder()
+			.maximumSize(capacity)
+			.build();
+
+
 	public ClassMetadata getClassMetadata(Node cls, Graph graph, String graphKey) {
 		Object cacheKey = ClassMetadata.createKey(cls, graphKey);
-		return (ClassMetadata) getOrComputeObject(cacheKey, () -> new ClassMetadata(cls, graphKey));
+
+		ClassMetadata cachedMetadata = (ClassMetadata) getOrComputeObject(cacheKey, (key) -> {
+			return new ClassMetadata((Node) key, graphKey);
+		});
+
+		return cachedMetadata;
 	}
-	
-	
+
+
+
 	public Object getObject(Object key) {
 		return cache.getIfPresent(key);
 	}
@@ -99,17 +104,7 @@ public class OntologyOptimizations {
 
 	// Legacy version with Function parameter
 	public Object getOrComputeObject(Object key, Function<Object,Object> function) {
-		return getOrComputeObject(key, () -> function.apply(key));
-	}
-	
-	
-	public Object getOrComputeObject(Object key, Callable<Object> callable) {
-		try {
-			return cache.get(key, callable);
-		} catch (ExecutionException ex) {
-			log.error("Failed to populate OntologyOptimizations with key " + key, ex);
-			throw ExceptionUtil.throwUnchecked(ex);
-		}
+		return cache.get(key, function);
 	}
 
 	public ShapesGraph getCachableShapesGraph(String uri) {
