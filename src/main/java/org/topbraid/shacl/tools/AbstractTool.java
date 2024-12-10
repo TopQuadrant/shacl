@@ -16,11 +16,6 @@
  */
 package org.topbraid.shacl.tools;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.apache.jena.ontology.OntDocumentManager;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
@@ -34,78 +29,78 @@ import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.shacl.vocabulary.TOSH;
 
+import java.io.*;
+
 class AbstractTool {
 
-	private final static String DATA_FILE = "-datafile";
-	
-	private final static String SHAPES_FILE = "-shapesfile";
+    private final static String DATA_FILE = "-datafile";
 
-	private final static String MAX_ITERATIONS = "-maxiterations";
+    private final static String SHAPES_FILE = "-shapesfile";
 
-	
-	private OntDocumentManager dm = new OntDocumentManager();
-	
-	private OntModelSpec spec = new OntModelSpec(OntModelSpec.OWL_MEM);
-	
-	
-	AbstractTool() {
-		
-		InputStream shaclTTL = SHACLSystemModel.class.getResourceAsStream("/rdf/shacl.ttl");
-		Model shacl = JenaUtil.createMemoryModel();
-		shacl.read(shaclTTL, SH.BASE_URI, FileUtils.langTurtle);
-		shacl.add(SystemTriples.getVocabularyModel());
-		dm.addModel(SH.BASE_URI, shacl);
-		
-		InputStream dashTTL = SHACLSystemModel.class.getResourceAsStream("/rdf/dash.ttl");
-		Model dash = JenaUtil.createMemoryModel();
-		dash.read(dashTTL, SH.BASE_URI, FileUtils.langTurtle);
-		dm.addModel(DASH.BASE_URI, dash);
-		
-		InputStream toshTTL = SHACLSystemModel.class.getResourceAsStream("/rdf/tosh.ttl");
-		Model tosh = JenaUtil.createMemoryModel();
-		tosh.read(toshTTL, SH.BASE_URI, FileUtils.langTurtle);
-		dm.addModel(TOSH.BASE_URI, tosh);
-		
-		spec.setDocumentManager(dm);
-	}
-	
-	protected int getMaxIterations(String[] args) {
-		for(int i = 0; i < args.length - 1; i++) {
-			if(MAX_ITERATIONS.equals(args[i])) {
-				return Integer.parseInt(args[i + 1]);
-			}
-		}
-		return 1;
-	}
-	
-	protected Model getDataModel(String[] args) throws IOException {
-		for(int i = 0; i < args.length - 1; i++) {
-			if(DATA_FILE.equals(args[i])) {
-				String dataFileName = args[i + 1];
-				OntModel dataModel = ModelFactory.createOntologyModel(spec);
-				File file = new File(dataFileName);
-				String lang = FileUtils.langTurtle;
-				dataModel.read(new FileInputStream(file), "urn:x:base", lang);
-				return dataModel;
-			}
-		}
-		System.err.println("Missing -datafile, e.g.: -datafile myfile.ttl");
-		System.exit(0);
-		return null;
-	}
-	
-	
-	protected Model getShapesModel(String[] args) throws IOException {
-		for(int i = 0; i < args.length - 1; i++) {
-			if(SHAPES_FILE.equals(args[i])) {
-				String fileName = args[i + 1];
-				OntModel model = ModelFactory.createOntologyModel(spec);
-				File file = new File(fileName);
-				String lang = FileUtils.langTurtle;
-				model.read(new FileInputStream(file), "urn:x:base", lang);
-				return model;
-			}
-		}
-		return null;
-	}
+    private final static String MAX_ITERATIONS = "-maxiterations";
+
+    protected final OntDocumentManager dm = new OntDocumentManager();
+
+    private OntModelSpec spec = new OntModelSpec(OntModelSpec.OWL_MEM);
+
+
+    AbstractTool() {
+
+        InputStream shaclTTL = SHACLSystemModel.class.getResourceAsStream("/rdf/shacl.ttl");
+        Model shacl = JenaUtil.createMemoryModel();
+        shacl.read(shaclTTL, SH.BASE_URI, FileUtils.langTurtle);
+        shacl.add(SystemTriples.getVocabularyModel());
+        dm.addModel(SH.BASE_URI, shacl);
+
+        InputStream dashTTL = SHACLSystemModel.class.getResourceAsStream("/rdf/dash.ttl");
+        Model dash = JenaUtil.createMemoryModel();
+        dash.read(dashTTL, SH.BASE_URI, FileUtils.langTurtle);
+        dm.addModel(DASH.BASE_URI, dash);
+
+        InputStream toshTTL = SHACLSystemModel.class.getResourceAsStream("/rdf/tosh.ttl");
+        Model tosh = JenaUtil.createMemoryModel();
+        tosh.read(toshTTL, SH.BASE_URI, FileUtils.langTurtle);
+        dm.addModel(TOSH.BASE_URI, tosh);
+
+        spec.setDocumentManager(dm);
+    }
+
+    protected int getMaxIterations(String[] args) {
+        for (int i = 0; i < args.length - 1; i++) {
+            if (MAX_ITERATIONS.equals(args[i])) {
+                return Integer.parseInt(args[i + 1]);
+            }
+        }
+        return 1;
+    }
+
+    protected Model getDataModel(String[] args) throws IOException {
+        for (int i = 0; i < args.length - 1; i++) {
+            if (DATA_FILE.equals(args[i])) {
+                return getModel(args, i);
+            }
+        }
+        System.err.println("Missing -datafile, e.g.: -datafile myfile.ttl");
+        System.exit(0);
+        return null;
+    }
+
+    protected Model getShapesModel(String[] args) throws IOException {
+        for (int i = 0; i < args.length - 1; i++) {
+            if (SHAPES_FILE.equals(args[i])) {
+                return getModel(args, i);
+            }
+        }
+        return null;
+    }
+
+    private Model getModel(String[] args, int i) throws FileNotFoundException {
+        String fileName = args[i + 1];
+        OntModel dataModel = ModelFactory.createOntologyModel(spec);
+        File file = new File(fileName);
+        String lang = FileUtils.langTurtle;
+        dataModel.read(new FileInputStream(file), "urn:x:base", lang);
+        return dataModel;
+    }
+
 }
