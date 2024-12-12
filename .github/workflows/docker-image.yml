@@ -25,10 +25,10 @@ jobs:
         include:
           - package: "x86_64"
             platform: linux/amd64
-            base: eclipse-temurin:11-alpine
+            base: eclipse-temurin:17-alpine
           - package: "arm64"
             platform: linux/arm64
-            base: amazoncorretto:11-alpine3.18-jdk
+            base: amazoncorretto:17-alpine3.18-jdk
 
     steps:
       - name: lowercase image name
