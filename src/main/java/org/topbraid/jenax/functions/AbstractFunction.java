@@ -31,6 +31,7 @@ import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.function.Function;
 import org.apache.jena.sparql.function.FunctionEnv;
 import org.apache.jena.sparql.sse.SSE;
+import org.apache.jena.sparql.util.Context;
 import org.apache.jena.sparql.util.FmtUtils;
 import org.topbraid.jenax.statistics.ExecStatistics;
 import org.topbraid.jenax.statistics.ExecStatisticsManager;
@@ -44,10 +45,8 @@ import org.topbraid.jenax.statistics.ExecStatisticsManager;
 public abstract class AbstractFunction implements Function {
 
 	@Override
-    public void build(String uri, ExprList args) {
-	}
+	public void build(String var1, ExprList var2, Context var3){}
 
-	
 	@Override
     public NodeValue exec(Binding binding, ExprList args, String uri, FunctionEnv env) {
 		Node[] nodes = new Node[args.size()];
