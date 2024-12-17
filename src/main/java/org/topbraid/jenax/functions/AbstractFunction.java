@@ -45,7 +45,7 @@ import org.topbraid.jenax.statistics.ExecStatisticsManager;
 public abstract class AbstractFunction implements Function {
 
 	@Override
-	public void build(String var1, ExprList var2, Context var3){}
+	public void build(String uri, ExprList args, Context context){}
 
 	@Override
     public NodeValue exec(Binding binding, ExprList args, String uri, FunctionEnv env) {

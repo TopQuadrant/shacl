@@ -57,7 +57,7 @@ public class SHACLSPARQLARQFunction extends SHACLARQFunction {
 	private String queryString;
 
 	@Override
-	public void build(String var1, ExprList var2, Context var3) {
+	public void build(String uri, ExprList args, Context context) {
 	}
 
 	/**
