@@ -121,7 +121,7 @@ public class QueryExecutionFactoryFilter {
 	}
 	
 	private static final DateTimeFormatter timestamp  = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
-	// Development support. Dynmically controlled print query.
+	// Development support. Dynamically controlled print query.
 	private void printQuery(Query query, QuerySolution initialBinding) {
 	    if ( PRINT ) {
 	        String time = DateTimeUtils.nowAsString(timestamp); 
