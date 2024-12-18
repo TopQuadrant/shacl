@@ -50,7 +50,7 @@ public class CheckRegexSyntaxFunction extends AbstractFunction1 {
 	/**
 	 * Convert the specified exception's message to a system-independent
 	 * format while preserving the message's embedded regex unchanged.
-	 * This allows whomever catches the exception to inspect the original regex
+	 * This allows whoever catches the exception to inspect the original regex
 	 * unchanged.
 	 * 
 	 * @see PatternSyntaxException#getMessage()

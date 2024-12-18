@@ -57,7 +57,7 @@ import org.topbraid.jenax.util.ARQFactory;
 import org.topbraid.shacl.vocabulary.SH;
 
 /**
- * Utilties to manage the conversion between SHACL paths and SPARQL 1.1 property paths.
+ * Utilities to manage the conversion between SHACL paths and SPARQL 1.1 property paths.
  * 
  * @author Holger Knublauch
  */

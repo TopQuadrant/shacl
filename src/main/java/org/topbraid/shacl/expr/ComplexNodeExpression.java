@@ -16,40 +16,40 @@
  */
 package org.topbraid.shacl.expr;
 
+import org.apache.jena.rdf.model.RDFNode;
+
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.jena.rdf.model.RDFNode;
-
 public abstract class ComplexNodeExpression extends AbstractNodeExpression {
-	
-	protected ComplexNodeExpression(RDFNode expr) {
-		super(expr);
-	}
-	
-	
-	@Override
-	public String getFunctionalSyntax() {
-		String str = getFunctionalSyntaxName();
-		str += "(";
-		List<String> args = getFunctionalSyntaxArguments();
-		Iterator<String> it = args.iterator();
-		while(it.hasNext()) {
-			String next = it.next();
-			str += next;
-			if(it.hasNext()) {
-				str += ", ";
-			}
-		}
-		str += ")";
-		return str;
-	}
+
+    protected ComplexNodeExpression(RDFNode expr) {
+        super(expr);
+    }
 
 
-	protected String getFunctionalSyntaxName() {
-		return getTypeId().toString();
-	}
-	
-	
-	public abstract List<String> getFunctionalSyntaxArguments();
+    @Override
+    public String getFunctionalSyntax() {
+        String str = getFunctionalSyntaxName();
+        str += "(";
+        List<String> args = getFunctionalSyntaxArguments();
+        Iterator<String> it = args.iterator();
+        while (it.hasNext()) {
+            String next = it.next();
+            str += next;
+            if (it.hasNext()) {
+                str += ", ";
+            }
+        }
+        str += ")";
+        return str;
+    }
+
+
+    protected String getFunctionalSyntaxName() {
+        return getTypeId();
+    }
+
+
+    public abstract List<String> getFunctionalSyntaxArguments();
 }

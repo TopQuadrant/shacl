@@ -1,56 +1,56 @@
 package org.topbraid.shacl.expr;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.util.iterator.ExtendedIterator;
 
+import java.util.Collections;
+import java.util.List;
+
 public abstract class AbstractNodeExpression implements NodeExpression {
-	
-	private final static List<NodeExpression> EMPTY = Collections.emptyList();
 
-	private RDFNode expr;
-	
-	
-	protected AbstractNodeExpression(RDFNode expr) {
-		this.expr = expr;
-	}
+    private final static List<NodeExpression> EMPTY = Collections.emptyList();
+
+    private final RDFNode expr;
 
 
-	@Override
-	public ExtendedIterator<RDFNode> evalReverse(RDFNode valueNode, NodeExpressionContext context) {
-		throw new IllegalStateException("Reverse evaluation is not supported for this node expression: " + toString());
-	}
+    protected AbstractNodeExpression(RDFNode expr) {
+        this.expr = expr;
+    }
 
 
-	@Override
-	public List<NodeExpression> getInputExpressions() {
-		return EMPTY;
-	}
+    @Override
+    public ExtendedIterator<RDFNode> evalReverse(RDFNode valueNode, NodeExpressionContext context) {
+        throw new IllegalStateException("Reverse evaluation is not supported for this node expression: " + this);
+    }
 
 
-	@Override
-	public Resource getOutputShape(Resource contextShape) {
-		return null;
-	}
+    @Override
+    public List<NodeExpression> getInputExpressions() {
+        return EMPTY;
+    }
 
 
-	@Override
-	public RDFNode getRDFNode() {
-		return expr;
-	}
+    @Override
+    public Resource getOutputShape(Resource contextShape) {
+        return null;
+    }
 
 
-	@Override
-	public boolean isReversible(NodeExpressionContext context) {
-		return false;
-	}
+    @Override
+    public RDFNode getRDFNode() {
+        return expr;
+    }
 
 
-	@Override
-	public String toString() {
-		return getFunctionalSyntax();
-	}
+    @Override
+    public boolean isReversible(NodeExpressionContext context) {
+        return false;
+    }
+
+
+    @Override
+    public String toString() {
+        return getFunctionalSyntax();
+    }
 }

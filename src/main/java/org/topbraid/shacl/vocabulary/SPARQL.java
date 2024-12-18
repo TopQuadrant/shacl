@@ -5,8 +5,8 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 
 /**
- * Vocabulary for http://datashapes.org/sparql
- *
+ * Vocabulary for <a href="http://datashapes.org/sparql">Datashapes SPARQL</a>
+ * <p>
  * Automatically generated with TopBraid Composer.
  */
 public class SPARQL {
