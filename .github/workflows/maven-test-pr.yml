@@ -6,7 +6,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-22.04.5
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         distribution: [ "temurin", "corretto" ]
