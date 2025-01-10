@@ -30,7 +30,7 @@ import org.apache.jena.vocabulary.RDFS;
 
 /**
  * A singleton that is used to render resources into strings.
- * By default this displays qnames (if possible). 
+ * By default, this displays qnames (if possible).
  * Can be changed, for example, to switch to displaying rdfs:labels
  * instead of qnames etc.
  * 
