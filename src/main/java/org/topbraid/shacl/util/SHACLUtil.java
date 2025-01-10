@@ -503,7 +503,7 @@ public class SHACLUtil {
 		String key = OntologyOptimizations.get().getKeyIfEnabledFor(clsOrShape.getModel().getGraph());
 		if(key != null) {
 			key += ".getAllShapesAtClassOrShape(" + clsOrShape + ")";
-			return (List<SHNodeShape>) OntologyOptimizations.get().getOrComputeObject(key, () -> {				
+			return (List<SHNodeShape>) OntologyOptimizations.get().getOrComputeObject(key, (cacheKey) -> {
 				List<SHNodeShape> results = new LinkedList<SHNodeShape>();
 				addAllShapesAtClassOrShape(clsOrShape, results, new HashSet<Resource>());
 				return results;
@@ -515,8 +515,9 @@ public class SHACLUtil {
 			return results;
 		}
 	}
-	
-	
+
+
+
 	private static void addAllShapesAtClassOrShape(Resource clsOrShape, List<SHNodeShape> results, Set<Resource> reached) {
 		addDirectShapesAtClassOrShape(clsOrShape, results);
 		reached.add(clsOrShape);

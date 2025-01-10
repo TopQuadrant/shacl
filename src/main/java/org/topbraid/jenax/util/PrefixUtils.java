@@ -9,7 +9,7 @@ public class PrefixUtils {
 
     /**
      * Make the {@code dstGraph} prefix map the same {@code srcGraph} prefix map,
-     * only making chnages where necessary.
+     * only making changes where necessary.
      * @param dstGraph  the destination graph
      * @param srcGraph  the source graph
      * @return false if no changes where made.
