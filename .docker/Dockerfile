@@ -14,6 +14,8 @@ LABEL org.opencontainers.image.version=${VERSION}
 
 # BUILD STAGE 1: install minimal Java environment + curl & zip for SHACL API
 
+RUN apk add --no-cache binutils maven curl zip
+
 # Create a custom Java runtime
 RUN $JAVA_HOME/bin/jlink \
          --add-modules java.base,java.compiler,java.desktop,java.management,java.naming,java.net.http,java.rmi,java.scripting,java.security.jgss,java.security.sasl,java.sql,java.xml.crypto,jdk.unsupported \
@@ -22,8 +24,6 @@ RUN $JAVA_HOME/bin/jlink \
          --no-header-files \
          --compress=2 \
          --output /javaruntime
-
-RUN apk add maven curl zip
 
 # Compile with maven, extract binaries and copy into image
 COPY . /app
