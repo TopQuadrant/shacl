@@ -68,11 +68,11 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <ver.jena>4.10.0</ver.jena>
+    <ver.jena>5.2.0</ver.jena>
     <ver.junit>4.13.2</ver.junit>
-    <ver.slf4j>1.7.36</ver.slf4j>
-    <ver.log4j2>2.20.0</ver.log4j2>
-    <java.version>11</java.version>
+    <ver.slf4j>2.0.16</ver.slf4j>
+    <ver.log4j2>2.24.3</ver.log4j2>
+    <java.version>17</java.version>
   </properties>
 
   <dependencies>
@@ -99,7 +99,7 @@
     <!-- Require a logging implementation -->
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-slf4j-impl</artifactId>
+      <artifactId>log4j-slf4j2-impl</artifactId>
       <version>${ver.log4j2}</version>
       <optional>true</optional>
     </dependency>
@@ -210,7 +210,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>3.11.1</version>
+            <version>3.11.2</version>
             <executions>
               <execution>
                 <id>attach-javadocs</id>

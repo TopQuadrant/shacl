@@ -16,151 +16,150 @@
  */
 package org.topbraid.jenax.util;
 
-import java.net.http.HttpClient;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-
-import org.apache.jena.atlas.lib.DateTimeUtils ;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QuerySolution;
+import org.apache.jena.atlas.lib.DateTimeUtils;
+import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.exec.http.QueryExecutionHTTP;
 import org.apache.jena.sparql.exec.http.QueryExecutionHTTPBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.http.HttpClient;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
 public class QueryExecutionFactoryFilter {
-	static final String LOG_NAME = "QueryLog";
-	private Logger logger;
-	private static QueryExecutionFactoryFilter singleton = new QueryExecutionFactoryFilter();
-	
-	// ---- Support for controlling printing queries while running. See function "printQuery".
-	private static boolean PRINT = false;
+    static final String LOG_NAME = "QueryLog";
+    private Logger logger;
+    private static QueryExecutionFactoryFilter singleton = new QueryExecutionFactoryFilter();
+
+    // ---- Support for controlling printing queries while running. See function "printQuery".
+    private static boolean PRINT = false;
     // ---- Support for controlling printing queries while running.
-	
-	/**
-	 * Gets the singleton instance of this class.
-	 * @return the singleton
-	 */
-	public static QueryExecutionFactoryFilter get() {
-		return singleton;
-	}
-	
-	private QueryExecutionFactoryFilter() {
-		logger = LoggerFactory.getLogger(LOG_NAME);
-	}
 
-	public QueryExecution create(Query query, Model model) {
-		analyzeRequest(query, model, null);
-		return QueryExecutionFactory.create(query, model);
-	}
+    /**
+     * Gets the singleton instance of this class.
+     *
+     * @return the singleton
+     */
+    public static QueryExecutionFactoryFilter get() {
+        return singleton;
+    }
 
-	public QueryExecution create(Query query, Model model, QuerySolution initialBinding) {
-		analyzeRequest(query, model, initialBinding);
-		return QueryExecution.create()
-				.query(query)
-				.model(model)
-				.initialBinding(initialBinding)
-				.build();
-	}
+    private QueryExecutionFactoryFilter() {
+        logger = LoggerFactory.getLogger(LOG_NAME);
+    }
 
-	public QueryExecution create(Query query, Dataset dataset) {
-		analyzeRequest(query, dataset, null);
-		return QueryExecutionFactory.create(query, dataset);
-	}
+    public QueryExecution create(Query query, Model model) {
+        analyzeRequest(query, model, null);
+        return QueryExecutionFactory.create(query, model);
+    }
 
-	public QueryExecution create(Query query, Dataset dataset, QuerySolution initialBinding) {
-		analyzeRequest(query, dataset, initialBinding);
-		return QueryExecutionFactory.create(query, dataset, initialBinding);
-	}
+    public QueryExecution create(Query query, Model model, QuerySolution initialBinding) {
+        analyzeRequest(query, model, initialBinding);
+        return QueryExecution.create()
+                .query(query)
+                .model(model)
+                .initialBinding(initialBinding)
+                .build();
+    }
 
-	public QueryExecution sparqlService(String service, Query query) {
-		return sparqlServiceBuilder(service, query).build();
-	}
-	
+    public QueryExecution create(Query query, Dataset dataset) {
+        analyzeRequest(query, dataset, null);
+        return QueryExecutionFactory.create(query, dataset);
+    }
+
+    public QueryExecution create(Query query, Dataset dataset, QuerySolution querySolution) {
+        analyzeRequest(query, dataset, querySolution);
+        return QueryExecution.dataset(dataset).query(query).substitution(querySolution).build();
+    }
+
+    public QueryExecution sparqlService(String service, Query query) {
+        return sparqlServiceBuilder(service, query).build();
+    }
+
     public QueryExecution sparqlService(String service, Query query, HttpClient httpClient) {
-		return sparqlServiceBuilder(service, query, httpClient).build();
+        return sparqlServiceBuilder(service, query, httpClient).build();
     }
 
-	public QueryExecutionHTTP sparqlService(String service, Query query, HttpClient httpClient, List<String> defaultGraphURIs, List<String> namedGraphURIs) {
-		QueryExecutionHTTPBuilder builder = sparqlServiceBuilder(service, query, httpClient);
-		defaultGraphURIs.forEach(uri -> builder.addDefaultGraphURI(uri));
-		namedGraphURIs.forEach(uri -> builder.addNamedGraphURI(uri));
-		return builder.build();
-	}
-	
-    private QueryExecutionHTTPBuilder sparqlServiceBuilder(String service, Query query, HttpClient httpClient) {
-		return sparqlServiceBuilder(service, query).httpClient(httpClient);
-	}
-	
-    private QueryExecutionHTTPBuilder sparqlServiceBuilder(String service, Query query) {
-		return QueryExecution.service(service).query(query);
+    public QueryExecutionHTTP sparqlService(String service, Query query, HttpClient httpClient, List<String> defaultGraphURIs, List<String> namedGraphURIs) {
+        QueryExecutionHTTPBuilder builder = sparqlServiceBuilder(service, query, httpClient);
+        defaultGraphURIs.forEach(builder::addDefaultGraphURI);
+        namedGraphURIs.forEach(builder::addNamedGraphURI);
+        return builder.build();
     }
-    
-	private void analyzeRequest(Query query, Model model, QuerySolution initialBinding) {
+
+    private QueryExecutionHTTPBuilder sparqlServiceBuilder(String service, Query query, HttpClient httpClient) {
+        return sparqlServiceBuilder(service, query).httpClient(httpClient);
+    }
+
+    private QueryExecutionHTTPBuilder sparqlServiceBuilder(String service, Query query) {
+        return QueryExecution.service(service).query(query);
+    }
+
+    private void analyzeRequest(Query query, Model model, QuerySolution initialBinding) {
         printQuery(query, initialBinding);
 
-		if(logger.isTraceEnabled()) {	
-			logger.trace("QUERY[" + analyzeQuery(query) 
-				+ "]\nMODEL[" + analyzeModel(model) + "]" 
-				+  serializeBindings(initialBinding));
-		}
-	}
-	
-	private void analyzeRequest(Query query, Dataset dataset, QuerySolution initialBinding) {
-	    printQuery(query, initialBinding);
-	    
-		if(logger.isTraceEnabled()) {	
-			logger.trace("QUERY[" + analyzeQuery(query) 
-				+ "]\nDATASET[" + analyzeDataset(dataset) + "]" 
-				+  serializeBindings(initialBinding));
-		}
-	}
-	
-	private static final DateTimeFormatter timestamp  = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
-	// Development support. Dynmically controlled print query.
-	private void printQuery(Query query, QuerySolution initialBinding) {
-	    if ( PRINT ) {
-	        String time = DateTimeUtils.nowAsString(timestamp); 
+        if (logger.isTraceEnabled()) {
+            logger.trace("QUERY[" + analyzeQuery(query)
+                    + "]\nMODEL[" + analyzeModel(model) + "]"
+                    + serializeBindings(initialBinding));
+        }
+    }
+
+    private void analyzeRequest(Query query, Dataset dataset, QuerySolution initialBinding) {
+        printQuery(query, initialBinding);
+
+        if (logger.isTraceEnabled()) {
+            logger.trace("QUERY[" + analyzeQuery(query)
+                    + "]\nDATASET[" + analyzeDataset(dataset) + "]"
+                    + serializeBindings(initialBinding));
+        }
+    }
+
+    private static final DateTimeFormatter timestamp = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
+
+    // Development support. Dynamically controlled print query.
+    private void printQuery(Query query, QuerySolution initialBinding) {
+        if (PRINT) {
+            String time = DateTimeUtils.nowAsString(timestamp);
             System.err.print("~~ ");
             System.err.print(time);
             System.err.println(" ~~");
             System.err.println(initialBinding);
             System.err.print(query);
         }
-	}
+    }
 
     /**
      * Allow query printing to be switched on/off around specific sections of code that
      * are issuing queries.
-     * @param value  true to enable
+     *
+     * @param value true to enable
      */
     public static void enableQueryPrinting(boolean value) {
         PRINT = value;
     }
-		
-	private String serializeBindings(QuerySolution bindings) {
-		if(bindings == null) return "";
-		return "\nINITIAL BINDINGS[" + bindings.toString() + "]";
-	}
-	
-	private String analyzeQuery(Query query) {
-		if(query == null) return "null query";
-		return query.toString();
-	}
-	
-	private String analyzeModel(Model model) {
-		if(model == null) return "null model";
-		
-		return "this space for rent";
-	}
-	
-	private String analyzeDataset(Dataset dataset) {
-		if(dataset == null) return "null dataset";
-		
-		return "A Dataset";
-	}
+
+    private String serializeBindings(QuerySolution bindings) {
+        if (bindings == null) return "";
+        return "\nINITIAL BINDINGS[" + bindings.toString() + "]";
+    }
+
+    private String analyzeQuery(Query query) {
+        if (query == null) return "null query";
+        return query.toString();
+    }
+
+    private String analyzeModel(Model model) {
+        if (model == null) return "null model";
+
+        return "this space for rent";
+    }
+
+    private String analyzeDataset(Dataset dataset) {
+        if (dataset == null) return "null dataset";
+
+        return "A Dataset";
+    }
 }

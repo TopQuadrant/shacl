@@ -16,33 +16,17 @@
  */
 package org.topbraid.shacl.validation.sparql;
 
+import org.apache.jena.query.Query;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.core.VarExprList;
+import org.apache.jena.sparql.expr.*;
+import org.apache.jena.sparql.syntax.*;
+import org.topbraid.shacl.vocabulary.SH;
+
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
-import org.apache.jena.query.Query;
-import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.core.VarExprList;
-import org.apache.jena.sparql.expr.Expr;
-import org.apache.jena.sparql.expr.ExprAggregator;
-import org.apache.jena.sparql.expr.ExprFunction;
-import org.apache.jena.sparql.expr.ExprFunctionOp;
-import org.apache.jena.sparql.expr.ExprNone;
-import org.apache.jena.sparql.expr.ExprTripleTerm;
-import org.apache.jena.sparql.expr.ExprVar;
-import org.apache.jena.sparql.expr.ExprVisitorFunction;
-import org.apache.jena.sparql.expr.NodeValue;
-import org.apache.jena.sparql.syntax.ElementBind;
-import org.apache.jena.sparql.syntax.ElementData;
-import org.apache.jena.sparql.syntax.ElementFilter;
-import org.apache.jena.sparql.syntax.ElementMinus;
-import org.apache.jena.sparql.syntax.ElementService;
-import org.apache.jena.sparql.syntax.ElementSubQuery;
-import org.apache.jena.sparql.syntax.ElementVisitor;
-import org.apache.jena.sparql.syntax.ElementVisitorBase;
-import org.apache.jena.sparql.syntax.PatternVars;
-import org.topbraid.shacl.vocabulary.SH;
 
 /**
  * Can be used to check for the violation of any of the syntax rules in Appendix A of the SHACL
@@ -55,7 +39,7 @@ public class SPARQLSyntaxChecker {
     /**
      * Checks whether a given Query violates any of the syntax rules in Appendix A.
      *
-     * @param query the Query to check
+     * @param query        the Query to check
      * @param preBoundVars the potentially pre-bound variables
      * @return an List of error messages (empty if OK)
      */
@@ -142,16 +126,20 @@ public class SPARQLSyntaxChecker {
                                     }
 
                                     @Override
-                                    public void visit(NodeValue nv) {}
+                                    public void visit(NodeValue nv) {
+                                    }
 
                                     @Override
-                                    public void visit(ExprVar nv) {}
+                                    public void visit(ExprVar nv) {
+                                    }
 
                                     @Override
-                                    public void visit(ExprAggregator eAgg) {}
+                                    public void visit(ExprAggregator eAgg) {
+                                    }
 
                                     @Override
-                                    public void visit(ExprNone exprNone) {}
+                                    public void visit(ExprNone exprNone) {
+                                    }
 
                                     @Override
                                     protected void visitExprFunction(ExprFunction func) {
@@ -161,7 +149,8 @@ public class SPARQLSyntaxChecker {
                                     }
 
                                     @Override
-                                    public void visit(ExprTripleTerm tripleTerm) {}
+                                    public void visit(ExprTripleTerm tripleTerm) {
+                                    }
                                 });
                     }
                 };
