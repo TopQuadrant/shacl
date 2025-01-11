@@ -23,6 +23,14 @@ PARAMETER:
 		input to be validated (only .ttl format supported)
 	-shapesfile /data/myshapes.ttl [OPTIONAL]
 		shapes for validation (only .ttl format supported)
+    -maxiterations 1 [OPTIONAL] - default is 1
+        iteratively applies the inference rules until the maximum number of iterations is reached (or no new triples are inferred)
+    -validateShapes [OPTIONAL]
+        in case you want to include the metashapes (from the tosh namespace in particular)
+    -addBlankNodes [OPTIONAL]
+        adds the blank nodes to the validation report
+    -noImports [OPTIONAL]
+        disables the import of external ontologies
 EOF
 	exit 1
 fi
