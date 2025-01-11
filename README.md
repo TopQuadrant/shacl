@@ -53,7 +53,7 @@ The binary distribution is:
 
 `https://repo1.maven.org/maven2/org/topbraid/shacl/*VER*/shacl-*VER*-bin.zip`.
 
-Two command line utilities are included: shaclvalidate (performs constraint validation) and shaclinfer (performs SHACL rule inferencing).
+Two command line utilities are included: `shaclvalidate` (performs constraint validation) and `shaclinfer` (performs SHACL rule inferencing).
 
 To use them, set up your environment similar to https://jena.apache.org/documentation/tools/ (note that the SHACL download includes Jena).
 
@@ -72,9 +72,11 @@ export SHACLROOT=/home/holger/shacl/shacl-1.4.3-bin/shacl-1.4.3/bin
 export PATH=$SHACLROOT:$PATH 
 ```
 
-To run the validator, use the following command:
+After setting up the environment, you can run the command line utilities (i.e. validation) using the following command:
 
-`shaclvalidate.bat -datafile myfile.ttl -shapesfile myshapes.ttl`
+- Windows: `shaclvalidate.bat -datafile myfile.ttl -shapesfile myshapes.ttl`
+
+- Linux/Unix: `shaclvalidate.sh -datafile myfile.ttl -shapesfile myshapes.ttl`
 
 Both tools (Windows, Linux) take the parameters described in the [Dockerfile Usage](#dockerfile-usage) section. **Currently, only Turtle (.ttl) files are supported.**
 
