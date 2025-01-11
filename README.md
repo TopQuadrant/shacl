@@ -53,7 +53,7 @@ The binary distribution is:
 
 `https://repo1.maven.org/maven2/org/topbraid/shacl/*VER*/shacl-*VER*-bin.zip`.
 
-Two command line utilities are included: shaclvalidate (performs constraint validation) and shaclinfer (performs SHACL rule inferencing).
+Two command line utilities are included: `shaclvalidate` (performs constraint validation) and `shaclinfer` (performs SHACL rule inferencing).
 
 To use them, set up your environment similar to https://jena.apache.org/documentation/tools/ (note that the SHACL download includes Jena).
 
@@ -72,17 +72,13 @@ export SHACLROOT=/home/holger/shacl/shacl-1.4.3-bin/shacl-1.4.3/bin
 export PATH=$SHACLROOT:$PATH 
 ```
 
-Both tools take the following parameters, for example:
+After setting up the environment, you can run the command line utilities (i.e. validation) using the following command:
 
-`shaclvalidate.bat -datafile myfile.ttl -shapesfile myshapes.ttl`
+- Windows: `shaclvalidate.bat -datafile myfile.ttl -shapesfile myshapes.ttl`
 
-where `-shapesfile` is optional and falls back to using the data graph as shapes graph.
-Add -validateShapes in case you want to include the metashapes (from the tosh namespace in particular).
+- Linux/Unix: `shaclvalidate.sh -datafile myfile.ttl -shapesfile myshapes.ttl`
 
-For the shaclinfer tool, you can use the `-maxiterations` argument to apply SHACL rule inferencing multiple times; this will add inferred results back to the data graph to see if further triples can be inferred.
-The tool will iterate until either (a) the maximum number of iterations is reached, or (b) no new triples are inferred. The flag is optional and defaults to `1` (single iteration).
-
-Currently only Turtle (.ttl) files are supported.
+Both tools (Windows, Linux) take the parameters described in the [Dockerfile Usage](#dockerfile-usage) section. **Currently, only Turtle (.ttl) files are supported.**
 
 The tools print the validation report or the inferences graph to the output screen.
 
@@ -113,15 +109,23 @@ Any other command after `ghcr.io/topquadrant/shacl:1.4.3` will print the followi
 Please use this docker image as follows:
 docker run -v /path/to/data:/data ghcr.io/topquadrant/shacl:1.4.3 [COMMAND] [PARAMETERS]
 COMMAND:
-	validate 
-		to run validation
-	infer
-		to run rule inferencing
+    validate 
+        to run validation
+    infer
+        to run rule inferencing
 PARAMETERS:
-	-datafile /data/myfile.ttl [MANDATORY]
-		input to be validated (only .ttl format supported)
-	-shapesfile /data/myshapes.ttl [OPTIONAL]
-		shapes for validation (only .ttl format supported)
+    -datafile /data/myfile.ttl [MANDATORY]
+        input to be validated (only .ttl format supported)
+    -shapesfile /data/myshapes.ttl [OPTIONAL]
+        shapes for validation (only .ttl format supported)
+    -maxiterations 1 [OPTIONAL] - default is 1
+        iteratively applies the inference rules until the maximum number of iterations is reached (or no new triples are inferred)
+    -validateShapes [OPTIONAL]
+        in case you want to include the metashapes (from the tosh namespace in particular)
+    -addBlankNodes [OPTIONAL]
+        adds the blank nodes to the validation report
+    -noImports [OPTIONAL]
+        disables the import of external ontologies
 ```
 
 If you'd like to build the image locally in an `x86` architecture, use:
