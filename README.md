@@ -1,5 +1,7 @@
 # TopBraid SHACL API
 
+[![Latest Release](https://img.shields.io/github/v/release/topquadrant/shacl)](https://github.com/topquadrant/shacl/releases/latest)
+
 **An open source implementation of the W3C Shapes Constraint Language (SHACL) based on Apache Jena.**
 
 Contact: Ashley Caselli (ashley.caselli@unige.ch)\
@@ -31,9 +33,16 @@ To get started, look at the class ValidationUtil in
 the package org.topbraid.shacl.validation.
 There is also an [Example Test Case](../master/src/test/java/org/topbraid/shacl/ValidationExample.java)
 
+# How to use it
+- [Application dependency](#application-dependency)
+- [Docker](#docker-usage)
+- [Command line](#command-line-usage)
+
 ## Application dependency
 
-Releases are available in the central maven repository:
+Releases are available in the [central maven repository](https://mvnrepository.com/artifact/org.topbraid/shacl):
+
+> :warning: Replace `*VER*` with the actual package version. Consult the package page to find what versions are available.
 
 ```
 <dependency>
@@ -41,6 +50,80 @@ Releases are available in the central maven repository:
   <artifactId>shacl</artifactId>
   <version>*VER*</version>
 </dependency>
+```
+
+## Docker Usage
+
+You can use the tool as Docker image. Prebuild Docker images are available at the [GitHub Container Registry](https://github.com/ashleycaselli/shacl/pkgs/container/shacl). The SHACL API runs inside the Docker image, with two possible commands available. To run the validator:
+
+> :warning: It is generally better to use a fixed version of the docker image, rather than the `latest` tag. Consult the package page to find what versions are available.
+
+```
+docker run --rm -v /path/to/data:/data ghcr.io/ashleycaselli/shacl:latest validate -datafile /data/myfile.ttl -shapesfile /data/myshapes.ttl
+```
+
+To run rule inferencing:
+
+```
+docker run --rm -v /path/to/data:/data ghcr.io/ashleycaselli/shacl:latest infer -datafile /data/myfile.ttl -shapesfile /data/myshapes.ttl
+```
+
+Any other command after `ghcr.io/ashleycaselli/shacl:latest` will print the following help page:
+
+```
+Please use this docker image as follows:
+docker run -v /path/to/data:/data ghcr.io/ashleycaselli/shacl:latest [COMMAND] [PARAMETERS]
+COMMAND:
+    validate 
+        to run validation
+    infer
+        to run rule inferencing
+PARAMETERS:
+    -datafile /data/myfile.ttl [MANDATORY]
+        input to be validated (only .ttl format supported)
+    -shapesfile /data/myshapes.ttl [OPTIONAL]
+        shapes for validation (only .ttl format supported)
+    -maxiterations 1 [OPTIONAL] - default is 1
+        iteratively applies the inference rules until the maximum number of iterations is reached (or no new triples are inferred)
+    -validateShapes [OPTIONAL]
+        in case you want to include the metashapes (from the tosh namespace in particular)
+    -addBlankNodes [OPTIONAL]
+        adds the blank nodes to the validation report
+    -noImports [OPTIONAL]
+        disables the import of external ontologies
+```
+
+### Build image locally
+
+You can build your own Docker image locally by using the `Dockerfile` provided in the `.docker` folder. It includes a minimal Java Runtime Environment for the SHACL API that clocks in at ~85Mb. To build it locally use:
+
+> :warning: If no value for the `ARCH_BASE` variable is provided, the image will be built using the default architecture value (**eclipse-temurin:21-alpine**)
+
+```
+docker build \
+    -f .docker/Dockerfile \
+    -t ghcr.io/topquadrant/shacl:VER \
+    --build-arg VERSION=VER .
+```
+
+If you'd like to build the image locally in an `x86` architecture, use:
+
+```
+docker build    
+    -f .docker/Dockerfile \
+    -t ghcr.io/topquadrant/shacl:VER \
+    --build-arg VERSION=VER \
+    --build-arg ARCH_BASE=eclipse-temurin:21-alpine .
+```
+
+If your architecture is `arm`, use:
+
+```
+docker build \
+    -f .docker/Dockerfile \
+    -t ghcr.io/topquadrant/shacl:VER \
+    --build-arg VERSION=VER \
+    --build-arg ARCH_BASE=amazoncorretto:21-alpine3.20-jdk .
 ```
 
 ## Command Line Usage
@@ -78,64 +161,6 @@ After setting up the environment, you can run the command line utilities (i.e. v
 
 - Linux/Unix: `shaclvalidate.sh -datafile myfile.ttl -shapesfile myshapes.ttl`
 
-Both tools (Windows, Linux) take the parameters described in the [Dockerfile Usage](#dockerfile-usage) section. **Currently, only Turtle (.ttl) files are supported.**
+Both tools (Windows, Linux) take the parameters described in the [Docker Usage](#docker-usage) section. **Currently, only Turtle (.ttl) files are supported.**
 
-The tools print the validation report or the inferences graph to the output screen.
-
-## Dockerfile Usage
-
-The `Dockerfile` in the `.docker` folder includes a minimal Java Runtime Environment for the SHACL API that clocks in at ~85Mb. To get the latest release of the image use:
-
-```
-docker build -f .docker/Dockerfile -t ghcr.io/topquadrant/shacl:1.4.3 --build-arg VERSION=1.4.3 .
-```
-> :warning: It is generally better to use a fixed version of the docker image, rather than the `latest` tag. Consult the package page to find what versions are available.
-
-To use the Docker image, there are two possible commands. To run the validator:
-
-```
-docker run --rm -v /path/to/data:/data ghcr.io/topquadrant/shacl:1.4.3 validate -datafile /data/myfile.ttl -shapesfile /data/myshapes.ttl
-```
-
-To run rule inferencing:
-
-```
-docker run --rm -v /path/to/data:/data ghcr.io/topquadrant/shacl:1.4.3 infer -datafile /data/myfile.ttl -shapesfile /data/myshapes.ttl
-```
-
-Any other command after `ghcr.io/topquadrant/shacl:1.4.3` will print the following help page:
-
-```
-Please use this docker image as follows:
-docker run -v /path/to/data:/data ghcr.io/topquadrant/shacl:1.4.3 [COMMAND] [PARAMETERS]
-COMMAND:
-    validate 
-        to run validation
-    infer
-        to run rule inferencing
-PARAMETERS:
-    -datafile /data/myfile.ttl [MANDATORY]
-        input to be validated (only .ttl format supported)
-    -shapesfile /data/myshapes.ttl [OPTIONAL]
-        shapes for validation (only .ttl format supported)
-    -maxiterations 1 [OPTIONAL] - default is 1
-        iteratively applies the inference rules until the maximum number of iterations is reached (or no new triples are inferred)
-    -validateShapes [OPTIONAL]
-        in case you want to include the metashapes (from the tosh namespace in particular)
-    -addBlankNodes [OPTIONAL]
-        adds the blank nodes to the validation report
-    -noImports [OPTIONAL]
-        disables the import of external ontologies
-```
-
-If you'd like to build the image locally in an `x86` architecture, use:
-
-```
-docker build -f .docker/Dockerfile -t ghcr.io/topquadrant/shacl:1.4.3 --build-arg VERSION=1.4.3 --build-arg ARCH_BASE=eclipse-temurin:11-alpine .
-```
-
-If your architecture is `arm`, use:
-
-```
-docker build -f .docker/Dockerfile -t ghcr.io/topquadrant/shacl:1.4.3 --build-arg VERSION=1.4.3 --build-arg ARCH_BASE=amazoncorretto:11-alpine3.18-jdk .
-```
+The tool print the validation report or the inferences graph to the output screen.
