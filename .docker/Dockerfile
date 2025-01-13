@@ -1,4 +1,4 @@
-ARG ARCH_BASE
+ARG ARCH_BASE=eclipse-temurin:21-alpine
 FROM $ARCH_BASE AS jre-build
 
 WORKDIR /app
