@@ -124,7 +124,7 @@ jobs:
             echo "version_build=${LATEST_RELEASE}_"$(git rev-parse --short "$GITHUB_SHA") >> $GITHUB_OUTPUT
           
         - name: Download digests
-          uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+          uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4.1.9
           with:
             path: /tmp/digests
             pattern: digests-*
