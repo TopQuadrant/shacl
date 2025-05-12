@@ -60,7 +60,7 @@ public class QueryExecutionFactoryFilter {
         return QueryExecution.create()
                 .query(query)
                 .model(model)
-                .initialBinding(initialBinding)
+                .substitution(initialBinding)
                 .build();
     }
 
