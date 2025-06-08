@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.util.FileUtils;
 import org.topbraid.shacl.rules.RuleUtil;
 
 /**
@@ -48,6 +47,7 @@ public class Infer extends AbstractTool {
 	private void run(String[] args) throws IOException {
 		Model dataModel = getDataModel(args);
 		Model shapesModel = getShapesModel(args);
+		String outFormat = getOutputFormat(args);
 		if(shapesModel == null) {
 			shapesModel = dataModel;
 		}
@@ -92,6 +92,6 @@ public class Infer extends AbstractTool {
 		} while (iteration < maxIterations);
 
 		// print results
-		results.write(System.out, FileUtils.langTurtle);
+		results.write(System.out, outFormat);
 	}
 }

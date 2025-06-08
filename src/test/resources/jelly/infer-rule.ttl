@@ -1,0 +1,30 @@
+PREFIX osh_kg: <https://ibspan.waw.pl/osh_kg/ontology#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX temporal: <http://www.loa-cnr.it/ontologies/TemporalRelations.owl#>
+
+osh_kg:YearValueRule a sh:NodeShape ;
+    sh:targetClass osh_kg:YearValue ;
+    sh:rule [
+        a sh:SPARQLRule ;
+        sh:construct """
+        PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+        PREFIX osh_kg: <https://ibspan.waw.pl/osh_kg/ontology#>
+        PREFIX temporal: <http://www.loa-cnr.it/ontologies/TemporalRelations.owl#>
+        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+        CONSTRUCT {
+            $this temporal:precedes ?next .
+            ?next temporal:follows $this .
+        }
+        WHERE {
+            $this skos:notation ?year .
+            FILTER(DATATYPE(?year) = xsd:gYear) .
+            BIND(xsd:gYear(str(xsd:int(?year) + 1)) AS ?nextYear) .
+
+            ?next a osh_kg:YearValue ;
+                skos:notation ?nextYear .
+        }
+        """ ;
+    ] .
