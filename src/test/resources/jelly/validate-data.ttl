@@ -1,3 +1,5 @@
+## Licensed under the terms of http://www.apache.org/licenses/LICENSE-2.0
+
 @prefix : <https://w3id.org/riverbench/temp#> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .

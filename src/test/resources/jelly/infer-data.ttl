@@ -1,3 +1,5 @@
+## Licensed under the terms of http://www.apache.org/licenses/LICENSE-2.0
+
 @prefix osh_kg: <https://ibspan.waw.pl/osh_kg/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix qb: <http://purl.org/linked-data/cube#> .
