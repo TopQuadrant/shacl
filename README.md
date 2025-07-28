@@ -80,11 +80,13 @@ COMMAND:
         to run rule inferencing
 PARAMETERS:
     -datafile /data/myfile.ttl [MANDATORY]
-        input to be validated (only .ttl format supported)
+        input to be validated (only .ttl and .jelly formats supported)
     -shapesfile /data/myshapes.ttl [OPTIONAL]
-        shapes for validation (only .ttl format supported)
+        shapes for validation (only .ttl and .jelly formats supported)
     -maxiterations 1 [OPTIONAL] - default is 1
         iteratively applies the inference rules until the maximum number of iterations is reached (or no new triples are inferred)
+    -outputFormat ttl [OPTIONAL] - default is ttl
+        output format of the validation report or inferences graph, supported values: ttl, jelly
     -validateShapes [OPTIONAL]
         in case you want to include the metashapes (from the tosh namespace in particular)
     -addBlankNodes [OPTIONAL]
@@ -161,6 +163,8 @@ After setting up the environment, you can run the command line utilities (i.e. v
 
 - Linux/Unix: `shaclvalidate.sh -datafile myfile.ttl -shapesfile myshapes.ttl`
 
-Both tools (Windows, Linux) take the parameters described in the [Docker Usage](#docker-usage) section. **Currently, only Turtle (.ttl) files are supported.**
+Both tools (Windows, Linux) take the parameters described in the [Docker Usage](#docker-usage) section. **Currently, only Turtle (.ttl) and [Jelly (.jelly)](https://w3id.org/jelly) files are supported.**
+
+To change the output format from Turtle to Jelly, you can use the `-outputFormat jelly` parameter.
 
 The tool print the validation report or the inferences graph to the output screen.

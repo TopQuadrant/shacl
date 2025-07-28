@@ -18,7 +18,6 @@ package org.topbraid.shacl.tools;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.util.FileUtils;
 import org.topbraid.jenax.util.JenaDatatypes;
 import org.topbraid.shacl.validation.ValidationUtil;
 import org.topbraid.shacl.vocabulary.SH;
@@ -55,6 +54,7 @@ public class Validate extends AbstractTool {
     private void run(String[] args) throws IOException {
         Model dataModel = getDataModel(args);
         Model shapesModel = getShapesModel(args);
+        String outFormat = getOutputFormat(args);
         if (shapesModel == null) {
             shapesModel = dataModel;
         }
@@ -72,7 +72,7 @@ public class Validate extends AbstractTool {
             report.getModel().add(referencedNodes);
         }
 
-        report.getModel().write(System.out, FileUtils.langTurtle);
+        report.getModel().write(System.out, outFormat);
 
         if (report.hasProperty(SH.conforms, JenaDatatypes.FALSE)) {
             // See https://github.com/TopQuadrant/shacl/issues/56

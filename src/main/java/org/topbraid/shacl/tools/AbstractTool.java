@@ -16,6 +16,7 @@
  */
 package org.topbraid.shacl.tools;
 
+import eu.neverblink.jelly.convert.jena.riot.JellyLanguage;
 import org.apache.jena.ontology.OntDocumentManager;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
@@ -74,6 +75,25 @@ class AbstractTool {
         return 1;
     }
 
+    protected String getOutputFormat(String[] args) {
+        for (int i = 0; i < args.length - 1; i++) {
+            if ("-outputFormat".equals(args[i])) {
+                switch (args[i + 1]) {
+                    case "ttl":
+                        return FileUtils.langTurtle;
+                    case "jelly":
+                        return JellyLanguage.JELLY.getName();
+                    default:
+                        System.err.println("Unknown output format: " + args[i + 1] +
+                                ". Supported formats: ttl, jelly");
+                        System.exit(1);
+                }
+                return args[i + 1];
+            }
+        }
+        return FileUtils.langTurtle; // default output format
+    }
+
     protected Model getDataModel(String[] args) throws IOException {
         for (int i = 0; i < args.length - 1; i++) {
             if (DATA_FILE.equals(args[i])) {
@@ -98,7 +118,12 @@ class AbstractTool {
         String fileName = args[i + 1];
         OntModel dataModel = ModelFactory.createOntologyModel(spec);
         File file = new File(fileName);
-        String lang = FileUtils.langTurtle;
+        String lang;
+        if (fileName.endsWith(".jelly")) {
+            lang = JellyLanguage.JELLY.getName();
+        } else {
+            lang = FileUtils.langTurtle;
+        }
         dataModel.read(new FileInputStream(file), "urn:x:base", lang);
         return dataModel;
     }
