@@ -23,6 +23,8 @@ PARAMETER:
 		input to be validated (only .ttl format supported)
 	-shapesfile /data/myshapes.ttl [OPTIONAL]
 		shapes for validation (only .ttl format supported)
+    -outputFormat ttl [OPTIONAL] - default is ttl
+        output format of the validation report or inferences graph, supported values: ttl, jelly
     -maxiterations 1 [OPTIONAL] - default is 1
         iteratively applies the inference rules until the maximum number of iterations is reached (or no new triples are inferred)
     -validateShapes [OPTIONAL]

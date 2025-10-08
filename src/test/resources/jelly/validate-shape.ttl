@@ -1,0 +1,51 @@
+## Licensed under the terms of http://www.apache.org/licenses/LICENSE-2.0
+
+PREFIX :        <https://w3id.org/riverbench/schema/dataset-shacl#>
+PREFIX dcat:    <http://www.w3.org/ns/dcat#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
+PREFIX rb:      <https://w3id.org/riverbench/schema/metadata#>
+PREFIX rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs:    <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX schema:  <http://schema.org/>
+PREFIX sh:      <http://www.w3.org/ns/shacl#>
+PREFIX skos:    <http://www.w3.org/2004/02/skos/core#>
+PREFIX spdx:    <http://spdx.org/rdf/terms#>
+PREFIX stax:    <https://w3id.org/stax/ontology#>
+PREFIX void:    <http://rdfs.org/ns/void#>
+PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>
+
+:CategoryShape  rdf:type  sh:NodeShape;
+        sh:property    [ sh:datatype    rdf:langString;
+                         sh:minCount    1;
+                         sh:path        dcterms:description;
+                         sh:uniqueLang  true
+                       ];
+        sh:property    [ sh:datatype    rdf:langString;
+                         sh:minCount    1;
+                         sh:path        dcterms:title;
+                         sh:uniqueLang  true
+                       ];
+        sh:property    [ sh:datatype  xsd:string;
+                         sh:maxCount  1;
+                         sh:minCount  1;
+                         sh:path      dcterms:identifier
+                       ];
+        sh:property    [ sh:hasValue  <https://w3id.org/riverbench/schema/metadata>;
+                         sh:maxCount  1;
+                         sh:minCount  1;
+                         sh:path      dcterms:conformsTo
+                       ];
+        sh:property    [ sh:hasValue  rb:Category;
+                         sh:maxCount  1;
+                         sh:minCount  1;
+                         sh:path      rdf:type
+                       ];
+        sh:targetNode  <https://w3id.org/riverbench/temp#category> .
+
+:CategoryGraphShape  rdf:type  sh:NodeShape;
+        sh:property    [ sh:maxCount  1;
+                         sh:minCount  1;
+                         sh:path      [ sh:inversePath  rdf:type ]
+                       ];
+        sh:targetNode  rb:Category .

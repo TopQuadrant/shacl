@@ -8,3 +8,6 @@
 
 # Force Unix bash files to use LF
 *.sh text eol=lf
+
+# Mark Jelly files as binary
+*.jelly binary

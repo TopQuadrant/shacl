@@ -1,0 +1,107 @@
+## Licensed under the terms of http://www.apache.org/licenses/LICENSE-2.0
+
+@prefix osh_kg: <https://ibspan.waw.pl/osh_kg/ontology#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix qb: <http://purl.org/linked-data/cube#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sdmx-dimension: <http://purl.org/linked-data/sdmx/2009/dimension#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+sdmx-dimension:refPeriod a qb:DimensionProperty,
+        owl:ObjectProperty ;
+    rdfs:range osh_kg:YearValue .
+
+osh_kg:year_2008 a osh_kg:YearValue ;
+    rdfs:label "2008"@en,
+        "2008"@pl ;
+    skos:notation "2008"^^xsd:gYear,
+        "2008" .
+
+osh_kg:year_2009 a osh_kg:YearValue ;
+    rdfs:label "2009"@en,
+        "2009"@pl ;
+    skos:notation "2009"^^xsd:gYear,
+        "2009" .
+
+osh_kg:year_2010 a osh_kg:YearValue ;
+    rdfs:label "2010"@en,
+        "2010"@pl ;
+    skos:notation "2010"^^xsd:gYear,
+        "2010" .
+
+osh_kg:year_2011 a osh_kg:YearValue ;
+    rdfs:label "2011"@en,
+        "2011"@pl ;
+    skos:notation "2011"^^xsd:gYear,
+        "2011" .
+
+osh_kg:year_2012 a osh_kg:YearValue ;
+    rdfs:label "2012"@en,
+        "2012"@pl ;
+    skos:notation "2012"^^xsd:gYear,
+        "2012" .
+
+osh_kg:year_2013 a osh_kg:YearValue ;
+    rdfs:label "2013"@en,
+        "2013"@pl ;
+    skos:notation "2013"^^xsd:gYear,
+        "2013" .
+
+osh_kg:year_2014 a osh_kg:YearValue ;
+    rdfs:label "2014"@en,
+        "2014"@pl ;
+    skos:notation "2014"^^xsd:gYear,
+        "2014" .
+
+osh_kg:year_2015 a osh_kg:YearValue ;
+    rdfs:label "2015"@en,
+        "2015"@pl ;
+    skos:notation "2015"^^xsd:gYear,
+        "2015" .
+
+osh_kg:year_2016 a osh_kg:YearValue ;
+    rdfs:label "2016"@en,
+        "2016"@pl ;
+    skos:notation "2016"^^xsd:gYear,
+        "2016" .
+
+osh_kg:year_2017 a osh_kg:YearValue ;
+    rdfs:label "2017"@en,
+        "2017"@pl ;
+    skos:notation "2017"^^xsd:gYear,
+        "2017" .
+
+osh_kg:year_2018 a osh_kg:YearValue ;
+    rdfs:label "2018"@en,
+        "2018"@pl ;
+    skos:notation "2018"^^xsd:gYear,
+        "2018" .
+
+osh_kg:year_2019 a osh_kg:YearValue ;
+    rdfs:label "2019"@en,
+        "2019"@pl ;
+    skos:notation "2019"^^xsd:gYear,
+        "2019" .
+
+osh_kg:year_2020 a osh_kg:YearValue ;
+    rdfs:label "2020"@en,
+        "2020"@pl ;
+    skos:notation "2020"^^xsd:gYear,
+        "2020" .
+
+osh_kg:year_2021 a osh_kg:YearValue ;
+    rdfs:label "2021"@en,
+        "2021"@pl ;
+    skos:notation "2021"^^xsd:gYear,
+        "2021" .
+
+osh_kg:year_2022 a osh_kg:YearValue ;
+    rdfs:label "2022"@en,
+        "2022"@pl ;
+    skos:notation "2022"^^xsd:gYear,
+        "2022" .
+
+osh_kg:YearValue a owl:Class ;
+    rdfs:subClassOf skos:Concept .
+
