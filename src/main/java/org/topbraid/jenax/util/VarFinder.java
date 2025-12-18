@@ -24,7 +24,7 @@ import org.apache.jena.sparql.util.VarUtils;
 
 
 public class VarFinder {
-	
+
 	/**
 	 * Gets the names of all variables mentioned in a SPARQL Query.
 	 * @param query  the Query to query
@@ -54,7 +54,7 @@ public class VarFinder {
 
 		final Set<Var> vars = new HashSet<Var>();
         ElementVisitor v = new ElementVisitorBase() {
-        	
+
 			@Override
             public void visit(ElementTriplesBlock el) {
                 for (Iterator<Triple> iter = el.patternElts(); iter.hasNext(); ) {
@@ -67,7 +67,7 @@ public class VarFinder {
             public void visit(ElementPathBlock el) {
                 for (Iterator<TriplePath> iter = el.patternElts() ; iter.hasNext() ; ) {
                     TriplePath tp = iter.next() ;
-                    // If it's triple-izable, then use the triple. 
+                    // If it's triple-izable, then use the triple.
                     if ( tp.isTriple() ) {
                         VarUtils.addVarsFromTriple(vars, tp.asTriple()) ;
                     }
@@ -76,7 +76,7 @@ public class VarFinder {
                     }
                 }
             }
-            
+
             @Override
             public void visit(ElementFilter el) {
         	  	ExprVars.varsMentioned(vars, el.getExpr());
@@ -86,31 +86,31 @@ public class VarFinder {
             public void visit(ElementNamedGraph el) {
                 VarUtils.addVar(vars, el.getGraphNameNode()) ;
             }
-            
+
             @Override
             public void visit(ElementService el) {
             	VarUtils.addVar(vars, el.getServiceNode());
             }
-            
+
 			@Override
             public void visit(ElementSubQuery el) {
-                el.getQuery().setResultVars() ;
+                el.getQuery().ensureResultVars();
                 VarExprList x = el.getQuery().getProject() ;
                 vars.addAll(x.getVars()) ;
             }
-            
+
             @Override
             public void visit(ElementAssign el) {
                 vars.add(el.getVar()) ;
         	  	ExprVars.varsMentioned(vars, el.getExpr());
             }
-        };   	
+        };
         ElementWalker.walk(query.getQueryPattern(), v) ;
-        
+
         for(Var var : vars) {
         	results.add(var.getName());
         }
-        
+
         return results;
     }
 }

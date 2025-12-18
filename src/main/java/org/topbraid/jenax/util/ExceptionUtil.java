@@ -43,7 +43,7 @@ public class ExceptionUtil {
 		return ExceptionUtil.throwDeepCauseChecked(t,RuntimeException.class);
 	}
 
-	
+
 	/**
 	 * Does not return:
 	 * throws an unchecked exception, based on <code>t</code>.
@@ -68,9 +68,9 @@ public class ExceptionUtil {
 		throw new RuntimeException(t);
 	}
 
-	
+
 	/**
-	 * Always 
+	 * Always
 	 * throw an exception; based on <code>t</code>.
 	 * The <code>getCause</code> chain of <code>t</code>
 	 * is analyzed, and then,
@@ -109,7 +109,7 @@ public class ExceptionUtil {
 	    if (firstError!=null) { throw firstError; }
 	    if (firstEX!=null) { throw firstEX; }
 	    if (firstRTE!=null) { throw firstRTE; }
-	    
+
 	    // Wrap original problem in clazz.
 	    EX rslt = null;
 	    try {
@@ -138,11 +138,11 @@ public class ExceptionUtil {
 	 * from its cause if the given throwable has no own message.
 	 * Will return null if no explicit message is provided
 	 * in the throwable or any of its causes.
-	 * 
+	 *
 	 * The intent is to get "The real message" instead of
 	 * "x.y.SomeException: The real message" when the throwable
 	 * bearing the real message is wrapped without a new message.
-	 * 
+	 *
 	 * @see Throwable#getMessage()
 	 * @see Throwable#getCause()
 	 */
@@ -164,7 +164,7 @@ public class ExceptionUtil {
 		// It's a custom message, good!
 		return msg;
 	}
-	
+
 	public static String getStackTrace(Throwable t) {
 		if (t == null) return null;
 		StringWriter writer = new StringWriter();
@@ -181,12 +181,12 @@ public class ExceptionUtil {
 
 	/**
 	 * True if the given throwable or one of its causes (via {@link Throwable#getCause()})
-	 * is an instance of the given class. 
+	 * is an instance of the given class.
 	 */
 	public static boolean hasDeepCause(Throwable t, Class<? extends Throwable> throwableClass) {
 		return t != null && getDeepCause(t, throwableClass) != null;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public static <EX extends Throwable> EX getDeepCause(Throwable t, Class<? extends EX> clazz) {
 		if (t == null ) {
@@ -194,8 +194,8 @@ public class ExceptionUtil {
 	    }
 	    // Walk chain finding first item of each interesting class.
 	    for (Throwable tt=t;tt!=null;tt=tt.getCause()) {
-			if (clazz.isInstance(tt)) { 
-				return (EX)tt; 
+			if (clazz.isInstance(tt)) {
+				return (EX)tt;
 			}
 	    }
 		return null;
@@ -259,7 +259,6 @@ public class ExceptionUtil {
 	 *
 	 * @see #shortenStackTrace(String, String)
 	 */
-	@SuppressWarnings("serial")
 	public static Throwable withServletContainerStackOmitted(Throwable t) {
 		if (t == null) return null;
 		return new Throwable(t) {

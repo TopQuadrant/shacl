@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.regex.Pattern;
 
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.sparql.expr.RegexJava;
+import org.apache.jena.sparql.expr.RegexEngine;
 import org.apache.jena.sparql.expr.nodevalue.NodeFunctions;
 import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.engine.Constraint;
@@ -29,7 +29,7 @@ class PatternConstraintExecutor extends AbstractNativeConstraintExecutor {
 	PatternConstraintExecutor(Constraint constraint) {
 		flagsStr = JenaUtil.getStringProperty(constraint.getShapeResource(), SH.flags);
 		patternString = JenaUtil.getStringProperty(constraint.getShapeResource(), SH.pattern);
-        int flags = RegexJava.makeMask(flagsStr);
+        int flags = RegexEngine.RegexJava.makeMask(flagsStr);
         if (flagsStr != null && flagsStr.contains("q")) {
             patternString = Pattern.quote(patternString);
         }
