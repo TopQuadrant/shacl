@@ -149,7 +149,7 @@ public class DiffGraph extends TransparentWrappedGraph {
 
     @Override
     public ExtendedIterator<Triple> find(Triple m) {
-        return find(m.getMatchSubject(), m.getMatchPredicate(), m.getMatchObject());
+        return find(m.getSubject(), m.getPredicate(), m.getObject());
     }
 
 

@@ -40,14 +40,14 @@ public class VarFinder {
 		}
 		else if(query.isConstructType()) {
 			for(Triple t : query.getConstructTemplate().getTriples()) {
-				if(t.getMatchSubject().isVariable()) {
-					results.add(t.getMatchSubject().getName());
+				if(t.getSubject().isVariable()) {
+					results.add(t.getSubject().getName());
 				}
-				if(t.getMatchPredicate().isVariable()) {
-					results.add(t.getMatchPredicate().getName());
+				if(t.getPredicate().isVariable()) {
+					results.add(t.getPredicate().getName());
 				}
-				if(t.getMatchObject().isVariable()) {
-					results.add(t.getMatchObject().getName());
+				if(t.getObject().isVariable()) {
+					results.add(t.getObject().getName());
 				}
 			}
 		}

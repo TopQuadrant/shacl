@@ -27,12 +27,12 @@ import org.apache.jena.sparql.function.FunctionRegistry;
  * An ARQ FunctionRegistry that can be used to associate functions
  * with Threads, so that additional functions from a given Model can
  * be made visible depending on the SPARQL query thread.
- * 
+ *
  * <p>The contract of this class is very strict to prevent memory leaks:
  * Users always need to make sure that unregister is called as soon
  * as a query (block) ends, and to restore any old CurrentThreadFunctions
  * object that was registered before.  So a typical block would be:</p>
- * 
+ *
  * <code>
  * 	Model model = ... a Model with extra SHACL/SPIN functions
  * 	CurrentThreadFunctions old = CurrentThreadFunctionRegistry.register(model);
@@ -42,10 +42,10 @@ import org.apache.jena.sparql.function.FunctionRegistry;
  * 	finally {
  * 		CurrentThreadFunctionRegistry.unregister(old);
  * 	}</code>
- * 
+ *
  * <p>In preparation of the above, the application should start up with code
  * such as</p>
- * 
+ *
  * <code>
  * 	FunctionRegistry oldFR = FunctionRegistry.get();
  *  CurrentThreadFunctionRegistry threadFR = new CurrentThreadFunctionRegistry(oldFR);
@@ -53,21 +53,21 @@ import org.apache.jena.sparql.function.FunctionRegistry;
  * </code>
  *
  * <p>and (for SPIN) do the same for the SPINThreadPropertyFunctionRegistry.</p>
- * 
+ *
  * @author Holger Knublauch
  */
 public class CurrentThreadFunctionRegistry extends FunctionRegistry {
-	
+
 	private static ThreadLocal<CurrentThreadFunctions> localFunctions = new ThreadLocal<>();
-	
+
 	private static CurrentThreadFunctionRegistry singleton = new CurrentThreadFunctionRegistry(FunctionRegistry.get());
-	
-	
+
+
 	public static CurrentThreadFunctionRegistry get() {
 		return singleton;
 	}
 
-	
+
 	/**
 	 * Registers a set of extra SPIN functions from a given Model for the current
 	 * Thread.
@@ -92,8 +92,8 @@ public class CurrentThreadFunctionRegistry extends FunctionRegistry {
 			};
 		}
 	}
-	
-	
+
+
 	/**
 	 * Unregisters the current Model for the current Thread.
 	 * @param old  the old functions that shall be restored or null
@@ -106,21 +106,21 @@ public class CurrentThreadFunctionRegistry extends FunctionRegistry {
 			localFunctions.remove();
 		}
 	}
-	
+
 	public static CurrentThreadFunctions getFunctions() {
 		return localFunctions.get();
 	}
-	
+
 	private FunctionRegistry base;
-	
+
 	private CurrentThreadFunctionRegistry(FunctionRegistry base) {
 		this.base = base;
 	}
 
 
 	@Override
-	public FunctionFactory get(String uri) {
-		FunctionFactory b = base.get(uri);
+	public FunctionFactory getFunctionFactory(String uri) {
+		FunctionFactory b = base.getFunctionFactory(uri);
 		if(b != null) {
 			return b;
 		}
@@ -141,7 +141,7 @@ public class CurrentThreadFunctionRegistry extends FunctionRegistry {
 			return true;
 		}
 		else {
-			return get(uri) != null;
+			return getFunctionFactory(uri) != null;
 		}
 	}
 
@@ -154,19 +154,21 @@ public class CurrentThreadFunctionRegistry extends FunctionRegistry {
 
 
 	@Override
-	public void put(String uri, Class<?> funcClass) {
+	public FunctionRegistry put(String uri, Class<?> funcClass) {
 		base.put(uri, funcClass);
+		return this;
 	}
 
 
 	@Override
-	public void put(String uri, FunctionFactory f) {
+	public FunctionRegistry put(String uri, FunctionFactory f) {
 		base.put(uri, f);
+		return this;
 	}
 
 
 	@Override
-	public FunctionFactory remove(String uri) {
-		return base.remove(uri);
+	public void remove(String uri) {
+	    base.remove(uri);
 	}
 }

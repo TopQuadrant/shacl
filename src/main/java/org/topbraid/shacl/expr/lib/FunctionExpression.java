@@ -111,7 +111,7 @@ public class FunctionExpression extends ComplexNodeExpression {
 		cxt.set(ARQConstants.sysCurrentTime, NodeFactoryExtra.nowAsDateTime());
 
 		OptionalArgsFunction opt = null;
-		FunctionFactory ff = FunctionRegistry.get().get(function.getURI());
+		FunctionFactory ff = FunctionRegistry.get().getFunctionFactory(function.getURI());
 		if(ff != null) {
 			Function arq = ff.create(function.getURI());
 			if(arq instanceof OptionalArgsFunction) {
