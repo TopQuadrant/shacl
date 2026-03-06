@@ -71,7 +71,7 @@
     <ver.jena>5.2.0</ver.jena>
     <ver.junit>4.13.2</ver.junit>
     <ver.slf4j>2.0.17</ver.slf4j>
-    <ver.log4j2>2.25.2</ver.log4j2>
+    <ver.log4j2>2.25.3</ver.log4j2>
     <java.version>17</java.version>
   </properties>
 
@@ -112,7 +112,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.14.1</version>
+        <version>3.15.0</version>
         <configuration>
           <release>${java.version}</release>
          </configuration>
@@ -121,7 +121,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.4.2</version>
+        <version>3.5.0</version>
         <executions>
           <execution>
             <goals>
@@ -134,7 +134,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>3.3.1</version>
+        <version>3.4.0</version>
         <executions> 
           <execution>
             <id>attach-sources</id>
@@ -155,7 +155,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>3.7.1</version>
+        <version>3.8.0</version>
         <configuration>
           <descriptors>
             <descriptor>src/assembly/bin.xml</descriptor>
@@ -174,7 +174,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
-        <version>3.1.1</version>
+        <version>3.3.1</version>
         <configuration>
           <goals>deploy</goals>
           <autoVersionSubmodules>true</autoVersionSubmodules>
