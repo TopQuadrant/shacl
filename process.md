@@ -8,12 +8,12 @@ This page describes processes for the SHACL API Project.
 
 To build the latest snapshot code for your local system:
 
-Clone the github repo, run maven in the local directory:
+Clone the GitHub repo, run maven in the local directory:
 
 ```
 git clone https://github.com/TopQuadrant/shacl
 cd shacl
-mvn clean install
+./mvnw clean install
 ```
 
 The latest SNAPSHOT code is now available in you local maven
@@ -37,11 +37,11 @@ One time setup:
 
 1. A PGP key for signing the release. This needs to be registered on one
 of the public servers e.g. [http://pgpkeys.mit.edu/](http://pgpkeys.mit.edu/).
-1. Write access to the GitHub repo - the release process updates the
+2. Write access to the GitHub repo - the release process updates the
 versions and creates a tag.
-1. Write access to the Sonatype OpenSource Hosting Nexus server for `org.topbraid`.
+3. Write access to the Sonatype OpenSource Hosting Nexus server for `org.topbraid`.
 
-Put your user name and password for accessing the Sonatype open source
+Put your username and password for accessing the Sonatype open source
 repository in your personal `settings.xml` (e.g. `$HOME/.m2/settings.xml`).
 
 ```
@@ -69,7 +69,7 @@ export VER="-DreleaseVersion=x.y.z -DdevelopmentVersion=x.next.z-SNAPSHOT -Dtag=
 ```
 
 The maven release plugin will move the version from the current SNAPSHOT
-to the release version, and tag the github repository. It will also move
+to the release version, and tag the GitHub repository. It will also move
 to the next SNAPSHOT version after building the release.
 
 #### Signing
@@ -94,7 +94,7 @@ or omit `$KEY` in the examples below.
 
 It is advisable to dry run the release:
 ```
-mvn release:clean release:prepare -DdryRun=true -Prelease $VER $KEY
+./mvnw release:clean release:prepare -DdryRun=true -Prelease $VER $KEY
 ```
 
 ### Check
@@ -115,14 +115,14 @@ It still says "SNAPSHOT" because the dry run does not change the version in POM.
 
 This has two steps:
 
-`mvn release:clean release:prepare  -Prelease $KEY $VER`
+`./mvnw release:clean release:prepare  -Prelease $KEY $VER`
 
-`mvn release:perform -Prelease $KEY $VER`
+`./mvnw release:perform -Prelease $KEY $VER`
 
 ### If it goes wrong:
 
-`mvn release:rollback`  
-`mvn release:clean`
+`./mvnw release:rollback`  
+`./mvnw release:clean`
 
 You may also need to delete the tag.
 
@@ -135,7 +135,7 @@ The steps so far pushed the built artifacts to the staging repository.
 
 To push them up to central.maven, go to https://oss.sonatype.org/
 
-* Find repo (it's open) `orgtopbraid....`
+* Find repo (it's open) `org.topbraid....`
 * Check it ("content" tab)
 * Close it, at which point the checking rules run.
 * Refresh the webpage until rule checking completes.
@@ -145,15 +145,15 @@ The release artifacts end up in "Repositories -> Releases -> org.topbraid".
 
 ### Github
 
-Do a Github release using the tag `shacl-x.y.z` above.
+Do a GitHub release using the tag `shacl-x.y.z` above.
 
-### Clearup
+### Cleanup
 
 Check where any intermediate files are left over.
 
 You may wish to build the new SNAPSHOT development version for your
 local system with:
 
-`mvn clean install`
+`./mvnw clean install`
 
 and clean your local maven repository of old snapshots.

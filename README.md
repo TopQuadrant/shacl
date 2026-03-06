@@ -4,23 +4,28 @@
 
 **An open source implementation of the W3C Shapes Constraint Language (SHACL) based on Apache Jena.**
 
-Contact: Ashley Caselli (ashley.caselli@unige.ch)\
+Contact: Ashley Caselli (ashley@knowledgepixels.com)\
 Original developer: Holger Knublauch (holger@topquadrant.com)
 
 Can be used to perform SHACL constraint checking and rule inferencing in any Jena-based Java application.
 This API also serves as a reference implementation of the SHACL spec.
 
 Coverage:
+
 * [SHACL Core and SHACL-SPARQL validation](https://www.w3.org/TR/shacl/)
 * [SHACL Advanced Features (Rules etc)](https://www.w3.org/TR/shacl-af/)
 
 Former Coverage until version 1.4.0
+
 * [SHACL Compact Syntax](https://w3c.github.io/shacl/shacl-compact-syntax/)
 
 Former Coverage until version 1.3.2
+
 * [SHACL JavaScript Extensions](https://www.w3.org/TR/shacl-js/)
 
-The TopBraid SHACL API is internally used by the European Commission's generic [SHACL-based RDF validator](https://www.itb.ec.europa.eu/shacl/any/upload) (used to validate RDF content against SHACL shapes)
+The TopBraid SHACL API is internally used by the European Commission's
+generic [SHACL-based RDF validator](https://www.itb.ec.europa.eu/shacl/any/upload) (used to validate RDF content against
+SHACL shapes)
 and [SHACL shape validator](https://www.itb.ec.europa.eu/shacl/shacl/upload) (used to validate SHACL shapes themselves).
 
 The same code is used in the TopBraid products (currently aligned with the TopBraid 7.1 release).
@@ -34,6 +39,7 @@ the package org.topbraid.shacl.validation.
 There is also an [Example Test Case](../master/src/test/java/org/topbraid/shacl/ValidationExample.java)
 
 # How to use it
+
 - [Application dependency](#application-dependency)
 - [Docker](#docker-usage)
 - [Command line](#command-line-usage)
@@ -42,7 +48,8 @@ There is also an [Example Test Case](../master/src/test/java/org/topbraid/shacl/
 
 Releases are available in the [central maven repository](https://mvnrepository.com/artifact/org.topbraid/shacl):
 
-> :warning: Replace `*VER*` with the actual package version. Consult the package page to find what versions are available.
+> :warning: Replace `*VER*` with the actual package version. Consult the package page to find what versions are
+> available.
 
 ```
 <dependency>
@@ -54,9 +61,12 @@ Releases are available in the [central maven repository](https://mvnrepository.c
 
 ## Docker Usage
 
-You can use the tool as Docker image. Prebuild Docker images are available at the [GitHub Container Registry](https://github.com/ashleycaselli/shacl/pkgs/container/shacl). The SHACL API runs inside the Docker image, with two possible commands available. To run the validator:
+You can use the tool as Docker image. Prebuild Docker images are available at
+the [GitHub Container Registry](https://github.com/ashleycaselli/shacl/pkgs/container/shacl). The SHACL API runs inside
+the Docker image, with two possible commands available. To run the validator:
 
-> :warning: It is generally better to use a fixed version of the docker image, rather than the `latest` tag. Consult the package page to find what versions are available.
+> :warning: It is generally better to use a fixed version of the docker image, rather than the `latest` tag. Consult the
+> package page to find what versions are available.
 
 ```
 docker run --rm -v /path/to/data:/data ghcr.io/ashleycaselli/shacl:latest validate -datafile /data/myfile.ttl -shapesfile /data/myshapes.ttl
@@ -95,9 +105,11 @@ PARAMETERS:
 
 ### Build image locally
 
-You can build your own Docker image locally by using the `Dockerfile` provided in the `.docker` folder. It includes a minimal Java Runtime Environment for the SHACL API that clocks in at ~85Mb. To build it locally use:
+You can build your own Docker image locally by using the `Dockerfile` provided in the `.docker` folder. It includes a
+minimal Java Runtime Environment for the SHACL API that clocks in at ~85Mb. To build it locally use:
 
-> :warning: If no value for the `ARCH_BASE` variable is provided, the image will be built using the default architecture value (**eclipse-temurin:21-alpine**)
+> :warning: If no value for the `ARCH_BASE` variable is provided, the image will be built using the default architecture
+> value (**eclipse-temurin:21-alpine**)
 
 ```
 docker build \
@@ -136,9 +148,11 @@ The binary distribution is:
 
 `https://repo1.maven.org/maven2/org/topbraid/shacl/*VER*/shacl-*VER*-bin.zip`.
 
-Two command line utilities are included: `shaclvalidate` (performs constraint validation) and `shaclinfer` (performs SHACL rule inferencing).
+Two command line utilities are included: `shaclvalidate` (performs constraint validation) and `shaclinfer` (performs
+SHACL rule inferencing).
 
-To use them, set up your environment similar to https://jena.apache.org/documentation/tools/ (note that the SHACL download includes Jena).
+To use them, set up your environment similar to https://jena.apache.org/documentation/tools/ (note that the SHACL
+download includes Jena).
 
 For example, on Windows:
 
@@ -161,6 +175,7 @@ After setting up the environment, you can run the command line utilities (i.e. v
 
 - Linux/Unix: `shaclvalidate.sh -datafile myfile.ttl -shapesfile myshapes.ttl`
 
-Both tools (Windows, Linux) take the parameters described in the [Docker Usage](#docker-usage) section. **Currently, only Turtle (.ttl) files are supported.**
+Both tools (Windows, Linux) take the parameters described in the [Docker Usage](#docker-usage) section. **Currently,
+only Turtle (.ttl) files are supported.**
 
 The tool print the validation report or the inferences graph to the output screen.

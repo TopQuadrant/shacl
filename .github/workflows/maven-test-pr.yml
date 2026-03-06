@@ -21,4 +21,4 @@ jobs:
           java-version: ${{ matrix.java }}
 
       - name: Test with Maven
-        run: mvn -B test
+        run: ./mvnw -B test
