@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         distribution: [ "temurin" ]
-        java: [ "17", "21", "23", "25" ]
+        java: [ "21", "23", "25" ]
     name: Testing with Java ${{ matrix.java }} (${{ matrix.distribution }})
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
