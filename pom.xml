@@ -68,7 +68,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <ver.jelly>3.6.2</ver.jelly>
+    <ver.jelly>3.7.1</ver.jelly>
     <ver.jena>6.0.0</ver.jena>
     <ver.slf4j>2.0.17</ver.slf4j>
     <ver.junit>4.13.2</ver.junit>
