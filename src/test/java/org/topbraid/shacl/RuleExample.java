@@ -11,7 +11,7 @@ public class RuleExample {
     /**
      * Loads an example SHACL-AF (rules) file and execute it against the data.
      */
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
 
         // Load the main data model that contains rule(s)
         Model dataModel = JenaUtil.createMemoryModel();

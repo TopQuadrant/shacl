@@ -20,7 +20,7 @@ import org.apache.jena.rdf.model.Resource;
 
 public interface SHConstraintComponent extends SHParameterizable {
 
-	Resource getValidator(Resource executableType, Resource context);
-	
-	boolean isCore();
+    Resource getValidator(Resource executableType, Resource context);
+
+    boolean isCore();
 }

@@ -19,13 +19,13 @@ package org.topbraid.jenax.statistics;
 
 /**
  * An interface for objects interested in updates to the ExecStatisticsManager.
- * 
+ *
  * @author Holger Knublauch
  */
 public interface ExecStatisticsListener {
 
-	/**
-	 * Called whenever the statistics have been updated.
-	 */
-	void statisticsUpdated();
+    /**
+     * Called whenever the statistics have been updated.
+     */
+    void statisticsUpdated();
 }

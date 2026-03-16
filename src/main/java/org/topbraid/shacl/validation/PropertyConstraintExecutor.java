@@ -16,53 +16,51 @@
  */
 package org.topbraid.shacl.validation;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.RDFNode;
 import org.topbraid.shacl.engine.Constraint;
 import org.topbraid.shacl.util.RecursionGuard;
 
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * Implements the special handling of sh:property by recursively calling the validator
  * against the provided property shape.
- * 
+ *
  * @author Holger Knublauch
  */
 class PropertyConstraintExecutor implements ConstraintExecutor {
 
-	@Override
-	public void executeConstraint(Constraint constraint, ValidationEngine engine, Collection<RDFNode> focusNodes) {
-		Node propertyShape = constraint.getParameterValue().asNode();
-		if(constraint.getShapeResource().isPropertyShape()) {
-			for(RDFNode focusNode : focusNodes) {
-				Collection<RDFNode> valueNodes = engine.getValueNodes(constraint, focusNode);
-				executeHelper(engine, valueNodes, propertyShape);
-				engine.checkCanceled();
-			}
-		}
-		else {
-			executeHelper(engine, focusNodes, propertyShape);
-		}
-	}
+    @Override
+    public void executeConstraint(Constraint constraint, ValidationEngine engine, Collection<RDFNode> focusNodes) {
+        Node propertyShape = constraint.getParameterValue().asNode();
+        if (constraint.getShapeResource().isPropertyShape()) {
+            for (RDFNode focusNode : focusNodes) {
+                Collection<RDFNode> valueNodes = engine.getValueNodes(constraint, focusNode);
+                executeHelper(engine, valueNodes, propertyShape);
+                engine.checkCanceled();
+            }
+        } else {
+            executeHelper(engine, focusNodes, propertyShape);
+        }
+    }
 
-	
-	private void executeHelper(ValidationEngine engine, Collection<RDFNode> valueNodes, Node propertyShape) {
-		List<RDFNode> doNodes = new LinkedList<>();
-		for(RDFNode focusNode : valueNodes) {
-			if(!RecursionGuard.start(focusNode.asNode(), propertyShape)) {
-				doNodes.add(focusNode);
-			}
-		}
-		try {
-			engine.validateNodesAgainstShape(doNodes, propertyShape);
-		}
-		finally {
-			for(RDFNode valueNode : doNodes) {
-				RecursionGuard.end(valueNode.asNode(), propertyShape);
-			}
-		}
-	}
+
+    private void executeHelper(ValidationEngine engine, Collection<RDFNode> valueNodes, Node propertyShape) {
+        List<RDFNode> doNodes = new LinkedList<>();
+        for (RDFNode focusNode : valueNodes) {
+            if (!RecursionGuard.start(focusNode.asNode(), propertyShape)) {
+                doNodes.add(focusNode);
+            }
+        }
+        try {
+            engine.validateNodesAgainstShape(doNodes, propertyShape);
+        } finally {
+            for (RDFNode valueNode : doNodes) {
+                RecursionGuard.end(valueNode.asNode(), propertyShape);
+            }
+        }
+    }
 }

@@ -92,7 +92,7 @@ public class RuleEngine extends AbstractEngine {
     }
 
 
-    public void executeAllDefaultValues() throws InterruptedException {
+    public void executeAllDefaultValues() {
         // Add sh:defaultValues where applicable
         Model shapesModel = this.getShapesModel();
         Set<Property> defaultValuePredicates = new HashSet<>();

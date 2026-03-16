@@ -23,42 +23,42 @@ import org.topbraid.shacl.vocabulary.SH;
 
 public abstract class AbstractRule implements Rule {
 
-	private Number order;
+    private Number order;
 
-	private Resource resource;
-
-
-	protected AbstractRule(Resource resource) {
-		this.resource = resource;
-		order = 0;
-		Statement s = resource.getProperty(SH.order);
-		if(s != null && s.getObject().isLiteral()) {
-			order = (Number) s.getLiteral().getValue();
-		}
-	}
+    private Resource resource;
 
 
-	@Override
-	public Node getContextNode() {
-		return resource.asNode();
-	}
+    protected AbstractRule(Resource resource) {
+        this.resource = resource;
+        order = 0;
+        Statement s = resource.getProperty(SH.order);
+        if (s != null && s.getObject().isLiteral()) {
+            order = (Number) s.getLiteral().getValue();
+        }
+    }
 
 
-	public String getLabelStart(String type) {
-		Number index = getOrder();
-		int conditionCount = getResource().listProperties(SH.condition).toList().size();
-		return type + " rule (" + (index.doubleValue() == 0 ? "0" : index) +
-				(conditionCount > 0 ? (", with " + conditionCount + " conditions") : "") + "): ";
-	}
+    @Override
+    public Node getContextNode() {
+        return resource.asNode();
+    }
 
 
-	@Override
+    public String getLabelStart(String type) {
+        Number index = getOrder();
+        int conditionCount = getResource().listProperties(SH.condition).toList().size();
+        return type + " rule (" + (index.doubleValue() == 0 ? "0" : index) +
+               (conditionCount > 0 ? (", with " + conditionCount + " conditions") : "") + "): ";
+    }
+
+
+    @Override
     public Number getOrder() {
-		return order;
-	}
+        return order;
+    }
 
 
-	public Resource getResource() {
-		return resource;
-	}
+    public Resource getResource() {
+        return resource;
+    }
 }

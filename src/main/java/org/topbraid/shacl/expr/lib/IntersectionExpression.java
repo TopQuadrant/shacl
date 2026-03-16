@@ -16,12 +16,6 @@
  */
 package org.topbraid.shacl.expr.lib;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.util.iterator.ExtendedIterator;
@@ -31,79 +25,80 @@ import org.topbraid.shacl.expr.NodeExpression;
 import org.topbraid.shacl.expr.NodeExpressionContext;
 import org.topbraid.shacl.expr.NodeExpressionVisitor;
 
+import java.util.*;
+
 public class IntersectionExpression extends ComplexNodeExpression {
-	
-	private List<NodeExpression> inputs;
-	
-	
-	public IntersectionExpression(RDFNode expr, List<NodeExpression> inputs) {
-		super(expr);
-		this.inputs = inputs;
-	}
+
+    private List<NodeExpression> inputs;
 
 
-	@Override
-	public ExtendedIterator<RDFNode> eval(RDFNode focusNode, NodeExpressionContext context) {
-		Iterator<NodeExpression> it = inputs.iterator();
-		if(it.hasNext()) {
-			// TODO: maintain order
-			NodeExpression first = it.next();
-			Set<RDFNode> results = new HashSet<>(first.eval(focusNode, context).toList());
-			while(it.hasNext()) {
-				NodeExpression next = it.next();
-				results.retainAll(next.eval(focusNode, context).toList());
-			}
-			return WrappedIterator.create(results.iterator());
-		}
-		else {
-			return WrappedIterator.emptyIterator();
-		}
-	}
+    public IntersectionExpression(RDFNode expr, List<NodeExpression> inputs) {
+        super(expr);
+        this.inputs = inputs;
+    }
 
 
-	@Override
-	public List<String> getFunctionalSyntaxArguments() {
-		List<String> results = new LinkedList<>();
-		for(NodeExpression expr : inputs) {
-			results.add(expr.getFunctionalSyntax());
-		}
-		return results;
-	}
-	
-	
-	@Override
-	public List<NodeExpression> getInputExpressions() {
-		return inputs;
-	}
-
-	
-	@Override
-	public Resource getOutputShape(Resource contextShape) {
-		if(inputs.size() == 0) {
-			return null;
-		}
-		Resource s = inputs.get(0).getOutputShape(contextShape);
-		if(s == null) {
-			return null;
-		}
-		for(int i = 1; i < inputs.size(); i++) {
-			Resource o = inputs.get(i).getOutputShape(contextShape);
-			if(!s.equals(o)) {
-				return null;
-			}
-		}
-		return s;
-	}
+    @Override
+    public ExtendedIterator<RDFNode> eval(RDFNode focusNode, NodeExpressionContext context) {
+        Iterator<NodeExpression> it = inputs.iterator();
+        if (it.hasNext()) {
+            // TODO: maintain order
+            NodeExpression first = it.next();
+            Set<RDFNode> results = new HashSet<>(first.eval(focusNode, context).toList());
+            while (it.hasNext()) {
+                NodeExpression next = it.next();
+                results.retainAll(next.eval(focusNode, context).toList());
+            }
+            return WrappedIterator.create(results.iterator());
+        } else {
+            return WrappedIterator.emptyIterator();
+        }
+    }
 
 
-	@Override
-	public String getTypeId() {
-		return "intersection";
-	}
-	
-	
-	@Override
-	public void visit(NodeExpressionVisitor visitor) {
-		visitor.visit(this);
-	}
+    @Override
+    public List<String> getFunctionalSyntaxArguments() {
+        List<String> results = new LinkedList<>();
+        for (NodeExpression expr : inputs) {
+            results.add(expr.getFunctionalSyntax());
+        }
+        return results;
+    }
+
+
+    @Override
+    public List<NodeExpression> getInputExpressions() {
+        return inputs;
+    }
+
+
+    @Override
+    public Resource getOutputShape(Resource contextShape) {
+        if (inputs.size() == 0) {
+            return null;
+        }
+        Resource s = inputs.get(0).getOutputShape(contextShape);
+        if (s == null) {
+            return null;
+        }
+        for (int i = 1; i < inputs.size(); i++) {
+            Resource o = inputs.get(i).getOutputShape(contextShape);
+            if (!s.equals(o)) {
+                return null;
+            }
+        }
+        return s;
+    }
+
+
+    @Override
+    public String getTypeId() {
+        return "intersection";
+    }
+
+
+    @Override
+    public void visit(NodeExpressionVisitor visitor) {
+        visitor.visit(this);
+    }
 }

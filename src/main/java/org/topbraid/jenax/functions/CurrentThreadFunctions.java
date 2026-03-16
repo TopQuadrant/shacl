@@ -16,60 +16,57 @@
  */
 package org.topbraid.jenax.functions;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.function.FunctionFactory;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * A helper object that can be used to register SPARQL functions
  * per thread, e.g. per servlet request.
- * 
+ *
  * @author Holger Knublauch
  */
 public class CurrentThreadFunctions {
-	
-	private Map<String,FunctionFactory> functionsCache = new HashMap<>();
 
-	private Model model;
-	
-	
-	CurrentThreadFunctions(Model model) {
-		this.model = model;
-	}
-	
-	
-	FunctionFactory getFunctionFactory(String uri) {
-		FunctionFactory old = functionsCache.get(uri);
-		if(old != null) {
-			return old;
-		}
-		else if(functionsCache.containsKey(uri)) {
-			return null;
-		}
-		else {
-			return getFunctionFactoryFromModel(uri);
-		}
-	}
+    private Map<String, FunctionFactory> functionsCache = new HashMap<>();
+
+    private Model model;
 
 
-	private FunctionFactory getFunctionFactoryFromModel(String uri) {
-		Resource functionResource = model.getResource(uri);
-		DeclarativeFunctionDrivers drivers = DeclarativeFunctionDrivers.get();
-		if (drivers == null) {
-			return null;
-		}
-		FunctionFactory arqFunction = drivers.create(functionResource);
-		if(arqFunction != null) {
-			functionsCache.put(uri, arqFunction);
-			return arqFunction;
-		}
-		else {
-			// Remember failed attempt for future
-			functionsCache.put(uri, null);
-			return null;
-		}
-	}
+    CurrentThreadFunctions(Model model) {
+        this.model = model;
+    }
+
+
+    FunctionFactory getFunctionFactory(String uri) {
+        FunctionFactory old = functionsCache.get(uri);
+        if (old != null) {
+            return old;
+        } else if (functionsCache.containsKey(uri)) {
+            return null;
+        } else {
+            return getFunctionFactoryFromModel(uri);
+        }
+    }
+
+
+    private FunctionFactory getFunctionFactoryFromModel(String uri) {
+        Resource functionResource = model.getResource(uri);
+        DeclarativeFunctionDrivers drivers = DeclarativeFunctionDrivers.get();
+        if (drivers == null) {
+            return null;
+        }
+        FunctionFactory arqFunction = drivers.create(functionResource);
+        if (arqFunction != null) {
+            functionsCache.put(uri, arqFunction);
+            return arqFunction;
+        } else {
+            // Remember failed attempt for future
+            functionsCache.put(uri, null);
+            return null;
+        }
+    }
 }

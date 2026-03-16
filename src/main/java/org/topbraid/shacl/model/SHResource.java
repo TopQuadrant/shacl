@@ -20,9 +20,9 @@ import org.apache.jena.rdf.model.Resource;
 
 /**
  * The root interface of all resources of interest to SHACL.
- * 
+ * <p>
  * This extends Jena's Resource but it should be easy to adapt to, say, RDF4J.
- * 
+ *
  * @author Holger Knublauch
  */
 public interface SHResource extends Resource {

@@ -24,67 +24,67 @@ package org.topbraid.jenax.progress;
  * @author Holger Knublauch
  */
 public class SimpleProgressMonitor implements ProgressMonitor {
-	
-	private volatile boolean canceled;
-	
-	private int currentWork;
-	
-	private String name;
-	
-	private int totalWork;
-	
-	
-	public SimpleProgressMonitor(String name) {
-		this.name = name;
-	}
 
-	
-	@Override
+    private volatile boolean canceled;
+
+    private int currentWork;
+
+    private String name;
+
+    private int totalWork;
+
+
+    public SimpleProgressMonitor(String name) {
+        this.name = name;
+    }
+
+
+    @Override
     public void beginTask(String label, int totalWork) {
-		println("Beginning task " + label + " (" + totalWork + ")");
-		this.totalWork = totalWork;
-		this.currentWork = 0;
-	}
+        println("Beginning task " + label + " (" + totalWork + ")");
+        this.totalWork = totalWork;
+        this.currentWork = 0;
+    }
 
-	
-	@Override
+
+    @Override
     public void done() {
-		println("Done");
-	}
+        println("Done");
+    }
 
-	
-	@Override
+
+    @Override
     public boolean isCanceled() {
-		return canceled;
-	}
-	
-	
-	protected void println(String text) {
-		System.out.println(name + ": " + text);
-	}
-
-	
-	@Override
-	public void setCanceled(boolean value) {
-		this.canceled = value;
-	}
+        return canceled;
+    }
 
 
-	@Override
-	public void setTaskName(String value) {
-		println("Task name: " + value);
-	}
+    protected void println(String text) {
+        System.out.println(name + ": " + text);
+    }
 
 
-	@Override
+    @Override
+    public void setCanceled(boolean value) {
+        this.canceled = value;
+    }
+
+
+    @Override
+    public void setTaskName(String value) {
+        println("Task name: " + value);
+    }
+
+
+    @Override
     public void subTask(String label) {
-		println("Subtask: " + label);
-	}
+        println("Subtask: " + label);
+    }
 
-	
-	@Override
+
+    @Override
     public void worked(int amount) {
-		currentWork += amount;
-		println("Worked " + currentWork + " / " + totalWork);
-	}
+        currentWork += amount;
+        println("Worked " + currentWork + " / " + totalWork);
+    }
 }

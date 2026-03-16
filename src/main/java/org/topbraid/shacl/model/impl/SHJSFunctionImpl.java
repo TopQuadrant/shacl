@@ -23,20 +23,19 @@ import org.topbraid.shacl.model.SHJSFunction;
 import org.topbraid.shacl.vocabulary.SH;
 
 public class SHJSFunctionImpl extends SHParameterizableImpl implements SHJSFunction {
-	
-	public SHJSFunctionImpl(Node node, EnhGraph graph) {
-		super(node, graph);
-	}
 
-	
-	@Override
-	public String getFunctionName() {
-		String result = JenaUtil.getStringProperty(this, SH.jsFunctionName);
-		if(result == null) {
-			return getLocalName();
-		}
-		else {
-			return result;
-		}
-	}
+    public SHJSFunctionImpl(Node node, EnhGraph graph) {
+        super(node, graph);
+    }
+
+
+    @Override
+    public String getFunctionName() {
+        String result = JenaUtil.getStringProperty(this, SH.jsFunctionName);
+        if (result == null) {
+            return getLocalName();
+        } else {
+            return result;
+        }
+    }
 }

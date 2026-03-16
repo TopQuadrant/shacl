@@ -8,26 +8,26 @@ import org.topbraid.shacl.expr.NodeExpressionVisitor;
 
 /**
  * Node expressions based on a SPARQL ASK query, identified by sh:ask.
- * 
+ * <p>
  * This node expression type is not part of the SHACL-AF 1.0 document, but a candidate for 1.1.
- * 
+ *
  * @author Holger Knublauch
  */
 public class AskExpression extends AbstractSPARQLExpression {
-	
-	public AskExpression(Resource expr, Query query, NodeExpression input, String queryString) {
-		super(expr, query, input, queryString);
-	}
-	
-	
-	@Override
-	public String getTypeId() {
-		return "ask";
-	}
+
+    public AskExpression(Resource expr, Query query, NodeExpression input, String queryString) {
+        super(expr, query, input, queryString);
+    }
 
 
-	@Override
-	public void visit(NodeExpressionVisitor visitor) {
-		visitor.visit(this);
-	}
+    @Override
+    public String getTypeId() {
+        return "ask";
+    }
+
+
+    @Override
+    public void visit(NodeExpressionVisitor visitor) {
+        visitor.visit(this);
+    }
 }

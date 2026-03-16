@@ -114,8 +114,9 @@ public class DiffGraph extends TransparentWrappedGraph {
         ExtendedIterator<Triple> it = g.find(t);
         try {
             while (it.hasNext()) {
-                if (t.equals(it.next()))
+                if (t.equals(it.next())) {
                     return true;
+                }
             }
         } finally {
             it.close();

@@ -6,7 +6,7 @@ import org.apache.jena.rdf.model.ResourceFactory;
 
 public class EDG {
 
-	public final static String BASE_URI = "http://edg.topbraid.solutions/model/";
+    public final static String BASE_URI = "http://edg.topbraid.solutions/model/";
 
     public final static String NAME = "EDG";
 
@@ -36,7 +36,7 @@ public class EDG {
     public final static Resource LineageModel = ResourceFactory.createResource(NS + "LineageModel");
     public final static Resource NumericDataElement = ResourceFactory.createResource(NS + "NumericDataElement");
     public final static Resource Organization = ResourceFactory.createResource(EDG.NS + "Organization");
-	public static final Resource PermissionGovernanceRoleProperty = ResourceFactory.createResource(EDG.NS + "PermissionGovernanceRoleProperty");
+    public static final Resource PermissionGovernanceRoleProperty = ResourceFactory.createResource(EDG.NS + "PermissionGovernanceRoleProperty");
     public final static Resource PhysicalDataModel = ResourceFactory.createResource(NS + "PhysicalDataModel");
     public final static Resource PhysicalDatatype = ResourceFactory.createResource(NS + "PhysicalDatatype");
     public final static Resource QuantilesRecord = ResourceFactory.createResource(NS + "QuantilesRecord");
@@ -46,7 +46,7 @@ public class EDG {
     public final static Resource SpreadsheetsWorkbook = ResourceFactory.createResource(EDG.NS + "SpreadsheetsWorkbook");
     public final static Resource SQLdatatype = ResourceFactory.createResource(NS + "SQLdatatype");
     public final static Resource Stewardship = ResourceFactory.createResource(EDG.NS + "Stewardship");
-	public final static Resource StringDataElement = ResourceFactory.createResource(NS + "StringDataElement");
+    public final static Resource StringDataElement = ResourceFactory.createResource(NS + "StringDataElement");
     public final static Resource SubjectArea = ResourceFactory.createResource(EDG.NS + "SubjectArea");
     public final static Resource TechnicalAsset = ResourceFactory.createResource(NS + "TechnicalAsset");
     public final static Resource WorkflowParticipantProperty = ResourceFactory.createResource(NS + "WorkflowParticipantProperty");

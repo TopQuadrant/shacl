@@ -9,16 +9,16 @@ import org.topbraid.jenax.functions.AbstractFunction1;
 
 /**
  * The SPARQL function spif:isValidLangTag.
- * 
+ *
  * @author Holger Knublauch
  */
 public class IsValidLangTagFunction extends AbstractFunction1 {
 
-	@Override
-	protected NodeValue exec(Node arg, FunctionEnv env) {
-		if(arg == null || !arg.isLiteral()) {
-			throw new ExprEvalException("Argument must be a (string) literal");
-		}
-		return NodeValue.makeBoolean(LangTagX.checkLanguageTag(arg.getLiteralLexicalForm()));
-	}
+    @Override
+    protected NodeValue exec(Node arg, FunctionEnv env) {
+        if (arg == null || !arg.isLiteral()) {
+            throw new ExprEvalException("Argument must be a (string) literal");
+        }
+        return NodeValue.makeBoolean(LangTagX.checkLanguageTag(arg.getLiteralLexicalForm()));
+    }
 }

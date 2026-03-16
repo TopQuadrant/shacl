@@ -16,9 +16,6 @@
  */
 package org.topbraid.shacl.model.impl;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.apache.jena.enhanced.EnhGraph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.RDFNode;
@@ -35,123 +32,126 @@ import org.topbraid.shacl.model.SHShape;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.vocabulary.SH;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public abstract class SHShapeImpl extends SHParameterizableInstanceImpl implements SHShape {
-	
-	public SHShapeImpl(Node node, EnhGraph graph) {
-		super(node, graph);
-	}
+
+    public SHShapeImpl(Node node, EnhGraph graph) {
+        super(node, graph);
+    }
 
 
-	@Override
-	public Resource getPath() {
-		return getPropertyResourceValue(SH.path);
-	}
+    @Override
+    public Resource getPath() {
+        return getPropertyResourceValue(SH.path);
+    }
 
 
-	@Override
-	public List<SHPropertyShape> getPropertyShapes() {
-		List<SHPropertyShape> results = new LinkedList<>();
-		for(Statement s : listProperties(SH.parameter).toList()) {
-			if(s.getObject().isResource()) {
-				results.add(SHFactory.asPropertyShape(s.getObject()));
-			}
-		}
-		for(Statement s : listProperties(SH.property).toList()) {
-			if(s.getObject().isResource()) {
-				results.add(SHFactory.asPropertyShape(s.getObject()));
-			}
-		}
-		return results;
-	}
+    @Override
+    public List<SHPropertyShape> getPropertyShapes() {
+        List<SHPropertyShape> results = new LinkedList<>();
+        for (Statement s : listProperties(SH.parameter).toList()) {
+            if (s.getObject().isResource()) {
+                results.add(SHFactory.asPropertyShape(s.getObject()));
+            }
+        }
+        for (Statement s : listProperties(SH.property).toList()) {
+            if (s.getObject().isResource()) {
+                results.add(SHFactory.asPropertyShape(s.getObject()));
+            }
+        }
+        return results;
+    }
 
 
-	@Override
-	public List<SHPropertyShape> getPropertyShapes(RDFNode predicate) {
-		List<SHPropertyShape> results = new LinkedList<>();
-		for(Resource property : JenaUtil.getResourceProperties(this, SH.parameter)) {
-			if(property.hasProperty(SH.path, predicate)) {
-				results.add(SHFactory.asPropertyShape(property));
-			}
-		}
-		for(Resource property : JenaUtil.getResourceProperties(this, SH.property)) {
-			if(property.hasProperty(SH.path, predicate)) {
-				results.add(SHFactory.asPropertyShape(property));
-			}
-		}
-		return results;
-	}
+    @Override
+    public List<SHPropertyShape> getPropertyShapes(RDFNode predicate) {
+        List<SHPropertyShape> results = new LinkedList<>();
+        for (Resource property : JenaUtil.getResourceProperties(this, SH.parameter)) {
+            if (property.hasProperty(SH.path, predicate)) {
+                results.add(SHFactory.asPropertyShape(property));
+            }
+        }
+        for (Resource property : JenaUtil.getResourceProperties(this, SH.property)) {
+            if (property.hasProperty(SH.path, predicate)) {
+                results.add(SHFactory.asPropertyShape(property));
+            }
+        }
+        return results;
+    }
 
 
-	@Override
-	public Iterable<SHRule> getRules() {
-		List<SHRule> results = new LinkedList<>();
-		for(Resource r : JenaUtil.getResourceProperties(this, SH.rule)) {
-			results.add(r.as(SHRule.class));
-		}
-		return results;
-	}
+    @Override
+    public Iterable<SHRule> getRules() {
+        List<SHRule> results = new LinkedList<>();
+        for (Resource r : JenaUtil.getResourceProperties(this, SH.rule)) {
+            results.add(r.as(SHRule.class));
+        }
+        return results;
+    }
 
 
-	@Override
-	public Resource getSeverity() {
-		Resource result = getPropertyResourceValue(SH.severity);
-		return result != null ? result : SH.Violation;
-	}
+    @Override
+    public Resource getSeverity() {
+        Resource result = getPropertyResourceValue(SH.severity);
+        return result != null ? result : SH.Violation;
+    }
 
 
-	@Override
-	public boolean hasTargetNode(RDFNode node) {
-		
-		// rdf:type / sh:targetClass
-		if(node instanceof Resource) {
-			boolean shapeClass = JenaUtil.hasIndirectType(this, RDFS.Class);
-			for(Resource type : JenaUtil.getAllTypes((Resource)node)) {
-				if(shapeClass && type.equals(this)) {
-					return true;
-				}
-				if(hasProperty(SH.targetClass, type)) {
-					return true;
-				}
-			}
-		}
-		
-		// property targets
-		if(node instanceof Resource) {
-			for(Statement s : listProperties(SH.targetSubjectsOf).toList()) {
-				if(((Resource)node).hasProperty(JenaUtil.asProperty(s.getResource()))) {
-					return true;
-				}
-			}
-		}
-		for(Statement s : listProperties(SH.targetObjectsOf).toList()) {
-			if(node.getModel().contains(null, JenaUtil.asProperty(s.getResource()), node)) {
-				return true;
-			}
-		}
-		
-		if(hasProperty(SH.targetNode, node)) {
-			return true;
-		}
-		
-		// sh:target
-		for(Statement s : listProperties(SH.target).toList()) {
-			if(SHACLUtil.isInTarget(node, ARQFactory.get().getDataset(node.getModel()), s.getResource())) {
-				return true;
-			}
-		}
+    @Override
+    public boolean hasTargetNode(RDFNode node) {
 
-		return false;
-	}
+        // rdf:type / sh:targetClass
+        if (node instanceof Resource) {
+            boolean shapeClass = JenaUtil.hasIndirectType(this, RDFS.Class);
+            for (Resource type : JenaUtil.getAllTypes((Resource) node)) {
+                if (shapeClass && type.equals(this)) {
+                    return true;
+                }
+                if (hasProperty(SH.targetClass, type)) {
+                    return true;
+                }
+            }
+        }
 
+        // property targets
+        if (node instanceof Resource) {
+            for (Statement s : listProperties(SH.targetSubjectsOf).toList()) {
+                if (((Resource) node).hasProperty(JenaUtil.asProperty(s.getResource()))) {
+                    return true;
+                }
+            }
+        }
+        for (Statement s : listProperties(SH.targetObjectsOf).toList()) {
+            if (node.getModel().contains(null, JenaUtil.asProperty(s.getResource()), node)) {
+                return true;
+            }
+        }
 
-	@Override
-	public boolean isDeactivated() {
-		return hasProperty(SH.deactivated, JenaDatatypes.TRUE);
-	}
+        if (hasProperty(SH.targetNode, node)) {
+            return true;
+        }
+
+        // sh:target
+        for (Statement s : listProperties(SH.target).toList()) {
+            if (SHACLUtil.isInTarget(node, ARQFactory.get().getDataset(node.getModel()), s.getResource())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
 
-	@Override
-	public boolean isPropertyShape() {
-		return hasProperty(SH.path);
-	}
+    @Override
+    public boolean isDeactivated() {
+        return hasProperty(SH.deactivated, JenaDatatypes.TRUE);
+    }
+
+
+    @Override
+    public boolean isPropertyShape() {
+        return hasProperty(SH.path);
+    }
 }

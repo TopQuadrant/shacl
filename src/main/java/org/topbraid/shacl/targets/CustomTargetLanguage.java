@@ -20,8 +20,8 @@ import org.apache.jena.rdf.model.Resource;
 import org.topbraid.shacl.model.SHParameterizableTarget;
 
 public interface CustomTargetLanguage {
-	
-	boolean canHandle(Resource target);
-	
-	Target createTarget(Resource executable, SHParameterizableTarget parameterizableTarget);
+
+    boolean canHandle(Resource target);
+
+    Target createTarget(Resource executable, SHParameterizableTarget parameterizableTarget);
 }

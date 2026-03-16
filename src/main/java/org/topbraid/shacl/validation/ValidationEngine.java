@@ -225,8 +225,8 @@ public class ValidationEngine extends AbstractEngine {
             result.addProperty(SH.resultPath, SHACLPaths.clonePath(constraint.getShapeResource().getPath(), result.getModel()));
         }
         Collection<RDFNode> messages = constraint.getMessages();
-        if (messages.size() > 0) {
-            messages.stream().forEach(message -> result.addProperty(SH.resultMessage, message));
+        if (!messages.isEmpty()) {
+            messages.forEach(message -> result.addProperty(SH.resultMessage, message));
         } else if (defaultMessage != null) {
             String m = defaultMessage.get();
             if (m != null) {

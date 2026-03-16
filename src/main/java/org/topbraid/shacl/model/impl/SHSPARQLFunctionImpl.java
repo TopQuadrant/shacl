@@ -23,19 +23,18 @@ import org.topbraid.shacl.model.SHSPARQLFunction;
 import org.topbraid.shacl.vocabulary.SH;
 
 public class SHSPARQLFunctionImpl extends SHParameterizableImpl implements SHSPARQLFunction {
-	
-	public SHSPARQLFunctionImpl(Node node, EnhGraph graph) {
-		super(node, graph);
-	}
 
-	@Override
-	public String getSPARQL() {
-		String result = JenaUtil.getStringProperty(this, SH.select);
-		if(result != null) {
-			return result;
-		}
-		else {
-			return JenaUtil.getStringProperty(this, SH.ask);
-		}
-	}
+    public SHSPARQLFunctionImpl(Node node, EnhGraph graph) {
+        super(node, graph);
+    }
+
+    @Override
+    public String getSPARQL() {
+        String result = JenaUtil.getStringProperty(this, SH.select);
+        if (result != null) {
+            return result;
+        } else {
+            return JenaUtil.getStringProperty(this, SH.ask);
+        }
+    }
 }

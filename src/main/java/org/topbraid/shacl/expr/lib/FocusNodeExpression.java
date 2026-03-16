@@ -16,8 +16,6 @@
  */
 package org.topbraid.shacl.expr.lib;
 
-import java.util.Collections;
-
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.util.iterator.ExtendedIterator;
@@ -27,39 +25,41 @@ import org.topbraid.shacl.expr.AtomicNodeExpression;
 import org.topbraid.shacl.expr.NodeExpressionContext;
 import org.topbraid.shacl.expr.NodeExpressionVisitor;
 
+import java.util.Collections;
+
 public class FocusNodeExpression extends AbstractNodeExpression implements AtomicNodeExpression {
-	
-	public FocusNodeExpression(RDFNode thisNode) {
-		super(thisNode);
-	}
 
-	
-	@Override
-	public ExtendedIterator<RDFNode> eval(RDFNode focusNode, NodeExpressionContext context) {
-		return WrappedIterator.create(Collections.singletonList(focusNode).iterator());
-	}
+    public FocusNodeExpression(RDFNode thisNode) {
+        super(thisNode);
+    }
 
 
-	@Override
-	public String getFunctionalSyntax() {
-		return "this";
-	}
-	
-	
-	@Override
-	public Resource getOutputShape(Resource contextShape) {
-		return contextShape;
-	}
-
-	
-	@Override
-	public String getTypeId() {
-		return "focusNode";
-	}
+    @Override
+    public ExtendedIterator<RDFNode> eval(RDFNode focusNode, NodeExpressionContext context) {
+        return WrappedIterator.create(Collections.singletonList(focusNode).iterator());
+    }
 
 
-	@Override
-	public void visit(NodeExpressionVisitor visitor) {
-		visitor.visit(this);
-	}
+    @Override
+    public String getFunctionalSyntax() {
+        return "this";
+    }
+
+
+    @Override
+    public Resource getOutputShape(Resource contextShape) {
+        return contextShape;
+    }
+
+
+    @Override
+    public String getTypeId() {
+        return "focusNode";
+    }
+
+
+    @Override
+    public void visit(NodeExpressionVisitor visitor) {
+        visitor.visit(this);
+    }
 }

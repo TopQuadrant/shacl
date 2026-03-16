@@ -52,14 +52,14 @@ public class SPARQLSyntaxChecker {
                     public void visit(ElementBind el) {
                         if (preBoundVars.contains(el.getVar().getVarName())) {
                             if (SH.valueVar.getVarName().equals(el.getVar().getVarName())
-                                    && el.getExpr().isVariable()
-                                    && el.getExpr().asVar().equals(SH.thisVar)) {
+                                && el.getExpr().isVariable()
+                                && el.getExpr().asVar().equals(SH.thisVar)) {
                                 // Ignore clauses injected by engine
                             } else {
                                 results.add(
                                         "Query must not reassign the pre-bound variable "
-                                                + el.getVar()
-                                                + " in a BIND clause");
+                                        + el.getVar()
+                                        + " in a BIND clause");
                             }
                         }
                     }
@@ -91,11 +91,11 @@ public class SPARQLSyntaxChecker {
                             PatternVars.vars(queryVars, el.getQuery().getQueryPattern());
                             for (String varName : preBoundVars) {
                                 if (!SH.currentShapeVar.getVarName().equals(varName)
-                                        && !SH.shapesGraphVar.getVarName().equals(varName)) {
+                                    && !SH.shapesGraphVar.getVarName().equals(varName)) {
                                     if (!queryVars.contains(Var.alloc(varName))) {
                                         results.add(
                                                 "Sub-query must return all potentially pre-bound variables including $"
-                                                        + varName);
+                                                + varName);
                                     }
                                 }
                             }
@@ -103,11 +103,11 @@ public class SPARQLSyntaxChecker {
                             VarExprList project = el.getQuery().getProject();
                             for (String varName : preBoundVars) {
                                 if (!SH.currentShapeVar.getVarName().equals(varName)
-                                        && !SH.shapesGraphVar.getVarName().equals(varName)) {
+                                    && !SH.shapesGraphVar.getVarName().equals(varName)) {
                                     if (!project.contains(Var.alloc(varName))) {
                                         results.add(
                                                 "Sub-query must return all potentially pre-bound variables including $"
-                                                        + varName);
+                                                + varName);
                                     }
                                 }
                             }
