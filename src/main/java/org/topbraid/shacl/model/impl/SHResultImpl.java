@@ -25,56 +25,56 @@ import org.topbraid.shacl.model.SHResult;
 import org.topbraid.shacl.vocabulary.SH;
 
 public class SHResultImpl extends SHResourceImpl implements SHResult {
-	
-	public SHResultImpl(Node node, EnhGraph graph) {
-		super(node, graph);
-	}
 
-	
-	@Override
-	public RDFNode getFocusNode() {
-		return JenaUtil.getProperty(this, SH.focusNode);
-	}
+    public SHResultImpl(Node node, EnhGraph graph) {
+        super(node, graph);
+    }
 
-	
-	@Override
-	public String getMessage() {
-		return JenaUtil.getStringProperty(this, SH.resultMessage);
-	}
 
-	
-	@Override
-	public Resource getPath() {
-		return getPropertyResourceValue(SH.resultPath);
-	}
+    @Override
+    public RDFNode getFocusNode() {
+        return JenaUtil.getProperty(this, SH.focusNode);
+    }
 
-	
-	@Override
-	public Resource getSeverity() {
-		return getPropertyResourceValue(SH.resultSeverity);
-	}
 
-	
-	@Override
-	public Resource getSourceConstraint() {
-		return getPropertyResourceValue(SH.sourceConstraint);
-	}
+    @Override
+    public String getMessage() {
+        return JenaUtil.getStringProperty(this, SH.resultMessage);
+    }
 
-	
-	@Override
-	public Resource getSourceConstraintComponent() {
-		return getPropertyResourceValue(SH.sourceConstraintComponent);
-	}
 
-	
-	@Override
-	public Resource getSourceShape() {
-		return getPropertyResourceValue(SH.sourceShape);
-	}
+    @Override
+    public Resource getPath() {
+        return getPropertyResourceValue(SH.resultPath);
+    }
 
-	
-	@Override
-	public RDFNode getValue() {
-		return JenaUtil.getProperty(this, SH.value);
-	}
+
+    @Override
+    public Resource getSeverity() {
+        return getPropertyResourceValue(SH.resultSeverity);
+    }
+
+
+    @Override
+    public Resource getSourceConstraint() {
+        return getPropertyResourceValue(SH.sourceConstraint);
+    }
+
+
+    @Override
+    public Resource getSourceConstraintComponent() {
+        return getPropertyResourceValue(SH.sourceConstraintComponent);
+    }
+
+
+    @Override
+    public Resource getSourceShape() {
+        return getPropertyResourceValue(SH.sourceShape);
+    }
+
+
+    @Override
+    public RDFNode getValue() {
+        return JenaUtil.getProperty(this, SH.value);
+    }
 }

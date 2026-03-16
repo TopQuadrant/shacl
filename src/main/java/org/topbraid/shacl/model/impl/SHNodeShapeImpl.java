@@ -24,13 +24,13 @@ import org.topbraid.shacl.vocabulary.SH;
 
 public class SHNodeShapeImpl extends SHShapeImpl implements SHNodeShape {
 
-	public SHNodeShapeImpl(Node node, EnhGraph graph) {
-		super(node, graph);
-	}
+    public SHNodeShapeImpl(Node node, EnhGraph graph) {
+        super(node, graph);
+    }
 
-	
-	@Override
-	public Resource getContext() {
-		return SH.NodeShape.inModel(getModel());
-	}
+
+    @Override
+    public Resource getContext() {
+        return SH.NodeShape.inModel(getModel());
+    }
 }

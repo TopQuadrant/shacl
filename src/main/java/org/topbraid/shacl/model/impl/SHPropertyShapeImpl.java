@@ -26,109 +26,103 @@ import org.topbraid.shacl.model.SHPropertyShape;
 import org.topbraid.shacl.vocabulary.SH;
 
 public class SHPropertyShapeImpl extends SHShapeImpl implements SHPropertyShape {
-	
-	public SHPropertyShapeImpl(Node node, EnhGraph graph) {
-		super(node, graph);
-	}
 
-	
-	@Override
-	public Resource getClassOrDatatype() {
-		Resource cls = getPropertyResourceValue(SH.class_);
-		if(cls != null) {
-			return cls;
-		}
-		else {
-			Resource datatype = getPropertyResourceValue(SH.datatype);
-			if(datatype != null) {
-				return datatype;
-			}
-			else {
-				Resource kind = getPropertyResourceValue(SH.nodeKind);
-				if(SH.IRI.equals(kind) || SH.BlankNode.equals(kind) || SH.BlankNodeOrIRI.equals(kind)) {
-					return RDFS.Resource.inModel(getModel());
-				}
-				else if(SH.Literal.equals(kind)) {
-					return RDFS.Literal.inModel(getModel());
-				}
-				else {
-					return null;
-				}
-			}
-		}
-	}
-	
-	
-	@Override
-	public Resource getContext() {
-		return SH.PropertyShape.inModel(getModel());
-	}
+    public SHPropertyShapeImpl(Node node, EnhGraph graph) {
+        super(node, graph);
+    }
 
 
-	@Override
-	public String getCountDisplayString() {
-		Integer minCount = getMinCount();
-		Integer maxCount = getMaxCount();
-		return "[" + (minCount == null ? 0 : minCount) + ".." + (maxCount == null ? "*" : maxCount) + "]";
-	}
+    @Override
+    public Resource getClassOrDatatype() {
+        Resource cls = getPropertyResourceValue(SH.class_);
+        if (cls != null) {
+            return cls;
+        } else {
+            Resource datatype = getPropertyResourceValue(SH.datatype);
+            if (datatype != null) {
+                return datatype;
+            } else {
+                Resource kind = getPropertyResourceValue(SH.nodeKind);
+                if (SH.IRI.equals(kind) || SH.BlankNode.equals(kind) || SH.BlankNodeOrIRI.equals(kind)) {
+                    return RDFS.Resource.inModel(getModel());
+                } else if (SH.Literal.equals(kind)) {
+                    return RDFS.Literal.inModel(getModel());
+                } else {
+                    return null;
+                }
+            }
+        }
+    }
 
 
-	@Override
-	public String getDescription() {
-		return JenaUtil.getStringProperty(this, SH.description);
-	}
+    @Override
+    public Resource getContext() {
+        return SH.PropertyShape.inModel(getModel());
+    }
 
 
-	@Override
-	public Integer getMaxCount() {
-		return JenaUtil.getIntegerProperty(this, SH.maxCount);
-	}
+    @Override
+    public String getCountDisplayString() {
+        Integer minCount = getMinCount();
+        Integer maxCount = getMaxCount();
+        return "[" + (minCount == null ? 0 : minCount) + ".." + (maxCount == null ? "*" : maxCount) + "]";
+    }
 
 
-	@Override
-	public Integer getMinCount() {
-		return JenaUtil.getIntegerProperty(this, SH.minCount);
-	}
+    @Override
+    public String getDescription() {
+        return JenaUtil.getStringProperty(this, SH.description);
+    }
 
 
-	@Override
-	public String getName() {
-		return JenaUtil.getStringProperty(this, SH.name);
-	}
-
-	
-	@Override
-	public Integer getOrder() {
-		return JenaUtil.getIntegerProperty(this, SH.order);
-	}
+    @Override
+    public Integer getMaxCount() {
+        return JenaUtil.getIntegerProperty(this, SH.maxCount);
+    }
 
 
-	@Override
-	public Property getPredicate() {
-		Resource r = getPropertyResourceValue(SH.path);
-		if(r != null && r.isURIResource()) {
-			return JenaUtil.asProperty(r);
-		}
-		else {
-			return null;
-		}
-	}
+    @Override
+    public Integer getMinCount() {
+        return JenaUtil.getIntegerProperty(this, SH.minCount);
+    }
 
 
-	@Override
-	public String getVarName() {
-		Property argProperty = getPredicate();
-		if(argProperty != null) {
-			return argProperty.getLocalName();
-		}
-		else {
-			return null;
-		}
-	}
+    @Override
+    public String getName() {
+        return JenaUtil.getStringProperty(this, SH.name);
+    }
 
 
-	@Override
+    @Override
+    public Integer getOrder() {
+        return JenaUtil.getIntegerProperty(this, SH.order);
+    }
+
+
+    @Override
+    public Property getPredicate() {
+        Resource r = getPropertyResourceValue(SH.path);
+        if (r != null && r.isURIResource()) {
+            return JenaUtil.asProperty(r);
+        } else {
+            return null;
+        }
+    }
+
+
+    @Override
+    public String getVarName() {
+        Property argProperty = getPredicate();
+        if (argProperty != null) {
+            return argProperty.getLocalName();
+        } else {
+            return null;
+        }
+    }
+
+
+    @Override
     public String toString() {
-		return "Property " + getVarName();
-	}
+        return "Property " + getVarName();
+    }
 }

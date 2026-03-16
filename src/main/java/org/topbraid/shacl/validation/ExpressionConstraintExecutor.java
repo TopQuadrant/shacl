@@ -43,7 +43,7 @@ public class ExpressionConstraintExecutor implements ConstraintExecutor {
             engine.checkCanceled();
             for (RDFNode valueNode : engine.getValueNodes(constraint, focusNode)) {
                 List<RDFNode> results = expr.eval(valueNode, engine).toList();
-                if (results.size() != 1 || !JenaDatatypes.TRUE.equals(results.get(0))) {
+                if (results.size() != 1 || !JenaDatatypes.TRUE.equals(results.getFirst())) {
                     Resource result = engine.createValidationResult(constraint, focusNode, valueNode, () -> "Expression does not evaluate to true");
                     result.addProperty(SH.sourceConstraint, constraint.getParameterValue());
                     if (constraint.getParameterValue() instanceof Resource && ((Resource) constraint.getParameterValue()).hasProperty(SH.message)) {

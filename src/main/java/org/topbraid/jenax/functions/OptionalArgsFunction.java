@@ -18,5 +18,5 @@ package org.topbraid.jenax.functions;
 
 public interface OptionalArgsFunction {
 
-	boolean isOptionalArg(int index);
+    boolean isOptionalArg(int index);
 }

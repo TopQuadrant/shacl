@@ -16,9 +16,6 @@
  */
 package org.topbraid.shacl.expr.lib;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.apache.jena.query.ARQ;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
@@ -53,156 +50,154 @@ import org.topbraid.shacl.expr.NodeExpressionContext;
 import org.topbraid.shacl.expr.NodeExpressionVisitor;
 import org.topbraid.shacl.vocabulary.SPARQL;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class FunctionExpression extends ComplexNodeExpression {
-	
-	private List<NodeExpression> args;
-	
-	private Expr expr;
-	
-	private Resource function;
-	
-	
-	public FunctionExpression(RDFNode expr, Resource function, List<NodeExpression> args) {
-		
-		super(expr);
-		
-		this.args = args;
-		this.function = function;
-		
-		if(function.getNameSpace().equals(SPARQL.NS)) {
-			if (!BuilderExpr.isDefined(function.getLocalName())) {
-				throw new IllegalArgumentException("Unknown SPARQL built-in " + function.getLocalName());
-			}
-			ItemList il = new ItemList();
-			il.add(function.getLocalName());
-			for(int i = 0; i < args.size(); i++) {
-				il.add(Var.alloc("a" + i));
-			}
-			try {
-				this.expr = BuilderExpr.buildExpr(il);
-			}
-			catch (SSE_ExprBuildException ebe) {
-				throw new IllegalArgumentException("Failed to build expression for " + il, ebe);
-			}
-		}
-		else {
-			StringBuffer sb = new StringBuffer();
-			sb.append("<");
-			sb.append(function);
-			sb.append(">(");
-			for(int i = 0; i < args.size(); i++) {
-				if(i > 0) {
-					sb.append(",");
-				}
-				sb.append("?a" + i);
-			}
-			sb.append(")");
-			
-			this.expr = ExprUtils.parse(sb.toString());
-		}
-	}
+
+    private List<NodeExpression> args;
+
+    private Expr expr;
+
+    private Resource function;
 
 
-	@Override
-	public ExtendedIterator<RDFNode> eval(RDFNode focusNode, NodeExpressionContext context) {
-		List<RDFNode> results = new LinkedList<>();
-		
-		Context cxt = ARQ.getContext().copy();
-		cxt.set(ARQConstants.sysCurrentTime, NodeFactoryExtra.nowAsDateTime());
+    public FunctionExpression(RDFNode expr, Resource function, List<NodeExpression> args) {
 
-		OptionalArgsFunction opt = null;
-		FunctionFactory ff = FunctionRegistry.get().get(function.getURI());
-		if(ff != null) {
-			Function arq = ff.create(function.getURI());
-			if(arq instanceof OptionalArgsFunction) {
-				opt = (OptionalArgsFunction) arq;
-			}
-		}
-		int total = 1;
-		List<List<RDFNode>> as = new LinkedList<>();
-		for(int i = 0; i < args.size(); i++) {
-			NodeExpression expr = args.get(i);
-			List<RDFNode> a = expr.eval(focusNode, context).toList();
-			if(a.isEmpty()) {
-				if(opt == null || !opt.isOptionalArg(i)) {
-					return WrappedIterator.create(results.iterator());
-				}
-			}
-			else {
-				total *= a.size();
-			}
-			as.add(a);
-		}
-		
-		Runnable tearDownCTFR = CurrentThreadFunctionRegistry.register(context.getShapesGraph().getShapesModel());
-		try {
-			for(int x = 0; x < total; x++) {
-				
-				int y = x;
-				BindingBuilder builder = BindingBuilder.create();
-				for(int i = 0; i < args.size(); i++) {
-					List<RDFNode> a = as.get(i);
-					if(!a.isEmpty()) {
-						int m = y % a.size();
-						builder.add(Var.alloc("a" + i), a.get(m).asNode());
-						y /= a.size();
-					}
-				}
-				
-				Dataset dataset = context.getDataset();
-				DatasetGraph dsg = dataset.asDatasetGraph();
-				FunctionEnv env = new ExecutionContext(cxt, dsg.getDefaultGraph(), dsg, null);
-				try {
-					NodeValue r = expr.eval(builder.build(), env);
-					if(r != null) {
-						Model defaultModel = dataset.getDefaultModel();
-						RDFNode rdfNode = defaultModel.asRDFNode(r.asNode());
-						if(!results.contains(rdfNode)) {
-							results.add(rdfNode);
-						}
-					}
-				}
-				catch(ExprEvalException ex) {
-				}
-			}
-		}
-		finally {
-			tearDownCTFR.run();
-		}
-		return WrappedIterator.create(results.iterator());
-	}
-	
-	
-	public Resource getFunction() {
-		return function;
-	}
+        super(expr);
+
+        this.args = args;
+        this.function = function;
+
+        if (function.getNameSpace().equals(SPARQL.NS)) {
+            if (!BuilderExpr.isDefined(function.getLocalName())) {
+                throw new IllegalArgumentException("Unknown SPARQL built-in " + function.getLocalName());
+            }
+            ItemList il = new ItemList();
+            il.add(function.getLocalName());
+            for (int i = 0; i < args.size(); i++) {
+                il.add(Var.alloc("a" + i));
+            }
+            try {
+                this.expr = BuilderExpr.buildExpr(il);
+            } catch (SSE_ExprBuildException ebe) {
+                throw new IllegalArgumentException("Failed to build expression for " + il, ebe);
+            }
+        } else {
+            StringBuilder sb = new StringBuilder();
+            sb.append("<");
+            sb.append(function);
+            sb.append(">(");
+            for (int i = 0; i < args.size(); i++) {
+                if (i > 0) {
+                    sb.append(",");
+                }
+                sb.append("?a").append(i);
+            }
+            sb.append(")");
+
+            this.expr = ExprUtils.parse(sb.toString());
+        }
+    }
 
 
-	@Override
-	public List<String> getFunctionalSyntaxArguments() {
-		List<String> results = new LinkedList<>();
-		results.add(FmtUtils.stringForRDFNode(function));
-		for(NodeExpression arg : args) {
-			results.add(arg.getFunctionalSyntax());
-		}
-		return results;
-	}
-	
-	
-	@Override
-	public List<NodeExpression> getInputExpressions() {
-		return args;
-	}
+    @Override
+    public ExtendedIterator<RDFNode> eval(RDFNode focusNode, NodeExpressionContext context) {
+        List<RDFNode> results = new LinkedList<>();
+
+        Context cxt = ARQ.getContext().copy();
+        cxt.set(ARQConstants.sysCurrentTime, NodeFactoryExtra.nowAsDateTime());
+
+        OptionalArgsFunction opt = null;
+        FunctionFactory ff = FunctionRegistry.get().getFunctionFactory(function.getURI());
+        if (ff != null) {
+            Function arq = ff.create(function.getURI());
+            if (arq instanceof OptionalArgsFunction) {
+                opt = (OptionalArgsFunction) arq;
+            }
+        }
+        int total = 1;
+        List<List<RDFNode>> as = new LinkedList<>();
+        for (int i = 0; i < args.size(); i++) {
+            NodeExpression expr = args.get(i);
+            List<RDFNode> a = expr.eval(focusNode, context).toList();
+            if (a.isEmpty()) {
+                if (opt == null || !opt.isOptionalArg(i)) {
+                    return WrappedIterator.create(results.iterator());
+                }
+            } else {
+                total *= a.size();
+            }
+            as.add(a);
+        }
+
+        Runnable tearDownCTFR = CurrentThreadFunctionRegistry.register(context.getShapesGraph().getShapesModel());
+        try {
+            for (int x = 0; x < total; x++) {
+
+                int y = x;
+                BindingBuilder builder = BindingBuilder.create();
+                for (int i = 0; i < args.size(); i++) {
+                    List<RDFNode> a = as.get(i);
+                    if (!a.isEmpty()) {
+                        int m = y % a.size();
+                        builder.add(Var.alloc("a" + i), a.get(m).asNode());
+                        y /= a.size();
+                    }
+                }
+
+                Dataset dataset = context.getDataset();
+                DatasetGraph dsg = dataset.asDatasetGraph();
+                FunctionEnv env = ExecutionContext.create(dsg, cxt);
+                try {
+                    NodeValue r = expr.eval(builder.build(), env);
+                    if (r != null) {
+                        Model defaultModel = dataset.getDefaultModel();
+                        RDFNode rdfNode = defaultModel.asRDFNode(r.asNode());
+                        if (!results.contains(rdfNode)) {
+                            results.add(rdfNode);
+                        }
+                    }
+                } catch (ExprEvalException ex) {
+                }
+            }
+        } finally {
+            tearDownCTFR.run();
+        }
+        return WrappedIterator.create(results.iterator());
+    }
 
 
-	@Override
-	public String getTypeId() {
-		return "function";
-	}
+    public Resource getFunction() {
+        return function;
+    }
 
 
-	@Override
-	public void visit(NodeExpressionVisitor visitor) {
-		visitor.visit(this);
-	}
+    @Override
+    public List<String> getFunctionalSyntaxArguments() {
+        List<String> results = new LinkedList<>();
+        results.add(FmtUtils.stringForRDFNode(function));
+        for (NodeExpression arg : args) {
+            results.add(arg.getFunctionalSyntax());
+        }
+        return results;
+    }
+
+
+    @Override
+    public List<NodeExpression> getInputExpressions() {
+        return args;
+    }
+
+
+    @Override
+    public String getTypeId() {
+        return "function";
+    }
+
+
+    @Override
+    public void visit(NodeExpressionVisitor visitor) {
+        visitor.visit(this);
+    }
 }

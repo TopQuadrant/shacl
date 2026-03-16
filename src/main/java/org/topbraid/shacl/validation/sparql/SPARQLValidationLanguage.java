@@ -25,22 +25,22 @@ import org.topbraid.shacl.vocabulary.SH;
 
 public class SPARQLValidationLanguage implements ValidationLanguage {
 
-	private final static SPARQLValidationLanguage singleton = new SPARQLValidationLanguage();
-	
-	public static SPARQLValidationLanguage get() {
-		return singleton;
-	}
+    private final static SPARQLValidationLanguage singleton = new SPARQLValidationLanguage();
 
-	
-	@Override
-	public boolean canExecute(Constraint constraint) {
-		Resource validator = constraint.getComponent().getValidator(SH.SPARQLExecutable, constraint.getContext());
-		return validator != null && ExecutionPlatform.canExecute(validator); 
-	}
+    public static SPARQLValidationLanguage get() {
+        return singleton;
+    }
 
-	
-	@Override
-	public ConstraintExecutor createExecutor(Constraint constraint) {
-		return new SPARQLComponentExecutor(constraint);
-	}
+
+    @Override
+    public boolean canExecute(Constraint constraint) {
+        Resource validator = constraint.getComponent().getValidator(SH.SPARQLExecutable, constraint.getContext());
+        return validator != null && ExecutionPlatform.canExecute(validator);
+    }
+
+
+    @Override
+    public ConstraintExecutor createExecutor(Constraint constraint) {
+        return new SPARQLComponentExecutor(constraint);
+    }
 }

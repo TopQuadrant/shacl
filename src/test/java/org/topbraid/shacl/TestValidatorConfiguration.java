@@ -26,13 +26,13 @@ public class TestValidatorConfiguration {
         Resource reportNoMaximum = ValidationUtil.validateModel(dataModel, dataModel, configuration);
 
         Model resultModel = reportNoMaximum.getModel();
-        
-        assert(resultModel.listStatements(null, SH.resultSeverity, SH.Violation).toList().size() == 2);
+
+        assert (resultModel.listStatements(null, SH.resultSeverity, SH.Violation).toList().size() == 2);
 
         configuration.setValidationErrorBatch(1);
         Resource reportMaximum = ValidationUtil.validateModel(dataModel, dataModel, configuration);
 
         resultModel = reportMaximum.getModel();
-        assert(resultModel.listStatements(null, SH.resultSeverity, SH.Violation).toList().size() == 1);
+        assert (resultModel.listStatements(null, SH.resultSeverity, SH.Violation).toList().size() == 1);
     }
 }

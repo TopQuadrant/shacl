@@ -29,63 +29,60 @@ import org.topbraid.shacl.vocabulary.DASH;
 
 public class JSTestCaseType extends TestCaseType {
 
-	public JSTestCaseType() {
-		super(DASH.JSTestCase);
-	}
+    public JSTestCaseType() {
+        super(DASH.JSTestCase);
+    }
 
 
-	@Override
-	protected TestCase createTestCase(Resource graph, Resource resource) {
-		return new JSTestCase(graph, resource);
-	}
+    @Override
+    protected TestCase createTestCase(Resource graph, Resource resource) {
+        return new JSTestCase(graph, resource);
+    }
 
 
-	private static class JSTestCase extends TestCase {
-		
-		JSTestCase(Resource graph, Resource resource) {
-			super(graph, resource);
-		}
+    private static class JSTestCase extends TestCase {
 
-		
-		@Override
-		public void run(Model results) {
-			Resource testCase = getResource();
-			
-			Runnable tearDownCTFR = CurrentThreadFunctionRegistry.register(testCase.getModel());
-	
-			Statement expectedResultS = testCase.getProperty(DASH.expectedResult);
-			String queryString = "SELECT (<" + getResource() + ">() AS ?result) WHERE {}";
-			Query query = ARQFactory.get().createQuery(testCase.getModel(), queryString);
-			try(QueryExecution qexec = ARQFactory.get().createQueryExecution(query, testCase.getModel())) {
-			    ResultSet rs = qexec.execSelect();
-			    if(!rs.hasNext()) {
-			        if(expectedResultS != null) {
-			            createFailure(results,
-			                          "Expression returned no result, but expected: " + expectedResultS.getObject());
-			            return;
-			        }
-			    }
-			    else {
-			        RDFNode result = rs.next().get("result");
-			        if(expectedResultS == null) {
-			            if(result != null) {
-			                createFailure(results,
-			                              "Expression returned a result, but none expected: " + result);
-			                return;
-			            }
-			        }
-			        else if(!expectedResultS.getObject().equals(result)) {
-			            createFailure(results,
-			                          "Mismatching result. Expected: " + expectedResultS.getObject() + ". Found: " + result);
-			            return;
-			        }
-			    }
-			}
-			finally {
-				tearDownCTFR.run();
-			}
-			
-			createResult(results, DASH.SuccessTestCaseResult);
-		}
-	}
+        JSTestCase(Resource graph, Resource resource) {
+            super(graph, resource);
+        }
+
+
+        @Override
+        public void run(Model results) {
+            Resource testCase = getResource();
+
+            Runnable tearDownCTFR = CurrentThreadFunctionRegistry.register(testCase.getModel());
+
+            Statement expectedResultS = testCase.getProperty(DASH.expectedResult);
+            String queryString = "SELECT (<" + getResource() + ">() AS ?result) WHERE {}";
+            Query query = ARQFactory.get().createQuery(testCase.getModel(), queryString);
+            try (QueryExecution qexec = ARQFactory.get().createQueryExecution(query, testCase.getModel())) {
+                ResultSet rs = qexec.execSelect();
+                if (!rs.hasNext()) {
+                    if (expectedResultS != null) {
+                        createFailure(results,
+                                "Expression returned no result, but expected: " + expectedResultS.getObject());
+                        return;
+                    }
+                } else {
+                    RDFNode result = rs.next().get("result");
+                    if (expectedResultS == null) {
+                        if (result != null) {
+                            createFailure(results,
+                                    "Expression returned a result, but none expected: " + result);
+                            return;
+                        }
+                    } else if (!expectedResultS.getObject().equals(result)) {
+                        createFailure(results,
+                                "Mismatching result. Expected: " + expectedResultS.getObject() + ". Found: " + result);
+                        return;
+                    }
+                }
+            } finally {
+                tearDownCTFR.run();
+            }
+
+            createResult(results, DASH.SuccessTestCaseResult);
+        }
+    }
 }

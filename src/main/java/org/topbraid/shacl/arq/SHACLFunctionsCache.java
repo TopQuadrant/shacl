@@ -48,7 +48,6 @@ public class SHACLFunctionsCache {
 
     private static final int capacity = 10000;
 
-    @SuppressWarnings("serial")
     private static class MyCache extends LinkedHashMap<Key, Result> {
 
         MyCache() {
@@ -57,11 +56,7 @@ public class SHACLFunctionsCache {
 
         @Override
         protected boolean removeEldestEntry(Entry<Key, Result> eldest) {
-            if (size() > capacity) {
-                return true;
-            } else {
-                return false;
-            }
+            return size() > capacity;
         }
     }
 

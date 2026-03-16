@@ -24,13 +24,13 @@ import org.topbraid.shacl.model.SHSPARQLFunction;
 
 /**
  * A DeclarativeFunctionDriver for SHACL-SPARQL functions.
- * 
+ *
  * @author Holger Knublauch
  */
 public class SHACLSPARQLFunctionDriver implements DeclarativeFunctionDriver {
-	
-	@Override
-	public DeclarativeFunctionFactory create(Resource shaclFunction) {
-		return new SHACLSPARQLARQFunction(shaclFunction.as(SHSPARQLFunction.class));
-	}
+
+    @Override
+    public DeclarativeFunctionFactory create(Resource shaclFunction) {
+        return new SHACLSPARQLARQFunction(shaclFunction.as(SHSPARQLFunction.class));
+    }
 }

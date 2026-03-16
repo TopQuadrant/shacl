@@ -21,41 +21,40 @@ package org.topbraid.shacl.engine;
  * that can be shared for all JavaScript evaluated as part of a SHACL validation.
  * This prevents cases in which new objects and their JS libraries would need to be
  * created over and over again.
- * 
+ * <p>
  * It is the responsibility of the caller to make sure that, once the validation has
  * completed, the engine is uninstalled.
- * 
+ *
  * @author Holger Knublauch
  */
 public class SHACLScriptEngineManager {
-	
-	private static SHACLScriptEngineManager singleton = new SHACLScriptEngineManager();
-	
-	public static SHACLScriptEngineManager get() {
-		return singleton;
-	}
-	
-	public static void set(SHACLScriptEngineManager value) {
-		singleton = value;
-	}
-	
-	private ThreadLocal<Boolean> actives = new ThreadLocal<>();
-	
-	
-	public boolean begin() {
-		if(actives.get() != null) {
-			return actives.get();
-		}
-		else {
-			actives.set(true);
-			return false; // Signal that we are not nested inside of another begin/end block
-		}
-	}
-	
-	
-	public void end(boolean nested) {
-		if(!nested) {
-			actives.remove();
-		}
-	}
+
+    private static SHACLScriptEngineManager singleton = new SHACLScriptEngineManager();
+
+    public static SHACLScriptEngineManager get() {
+        return singleton;
+    }
+
+    public static void set(SHACLScriptEngineManager value) {
+        singleton = value;
+    }
+
+    private ThreadLocal<Boolean> actives = new ThreadLocal<>();
+
+
+    public boolean begin() {
+        if (actives.get() != null) {
+            return actives.get();
+        } else {
+            actives.set(true);
+            return false; // Signal that we are not nested inside of another begin/end block
+        }
+    }
+
+
+    public void end(boolean nested) {
+        if (!nested) {
+            actives.remove();
+        }
+    }
 }

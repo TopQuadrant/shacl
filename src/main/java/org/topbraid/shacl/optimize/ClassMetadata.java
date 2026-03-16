@@ -90,11 +90,7 @@ public class ClassMetadata {
                 if (group != null) {
                     Node path = JenaNodeUtil.getObject(propertyShape, SH.path.asNode(), graph);
                     if (path != null) {
-                        Set<PathMetadata> paths = groupPaths.get(group);
-                        if (paths == null) {
-                            paths = new HashSet<>();
-                            groupPaths.put(group, paths);
-                        }
+                        Set<PathMetadata> paths = groupPaths.computeIfAbsent(group, k -> new HashSet<>());
                         if (path.isURI()) {
                             paths.add(new PathMetadata(path, false));
                         } else {
@@ -111,62 +107,32 @@ public class ClassMetadata {
 
 
     public Node getPropertyDescription(Node property, boolean inverse, Graph graph) {
-        return nearest(graph, new Function<ClassMetadata, Node>() {
-            @Override
-            public Node apply(ClassMetadata cm) {
-                return cm.getProperty(property, inverse, graph).getDescription();
-            }
-        }, null);
+        return nearest(graph, cm -> cm.getProperty(property, inverse, graph).getDescription(), null);
     }
 
 
     public Node getPropertyEditWidget(Node property, boolean inverse, Graph graph) {
-        return nearest(graph, new Function<ClassMetadata, Node>() {
-            @Override
-            public Node apply(ClassMetadata cm) {
-                return cm.getProperty(property, inverse, graph).getEditWidget();
-            }
-        }, null);
+        return nearest(graph, cm -> cm.getProperty(property, inverse, graph).getEditWidget(), null);
     }
 
 
     public Node getPropertyLocalRange(Node property, boolean inverse, Graph graph) {
-        return nearest(graph, new Function<ClassMetadata, Node>() {
-            @Override
-            public Node apply(ClassMetadata cm) {
-                return cm.getProperty(property, inverse, graph).getLocalRange();
-            }
-        }, null);
+        return nearest(graph, cm -> cm.getProperty(property, inverse, graph).getLocalRange(), null);
     }
 
 
     public Integer getPropertyMaxCount(Node property, boolean inverse, Graph graph) {
-        return (Integer) nearestObject(graph, new Function<ClassMetadata, Object>() {
-            @Override
-            public Object apply(ClassMetadata cm) {
-                return cm.getProperty(property, inverse, graph).getMaxCount();
-            }
-        }, new HashSet<Node>());
+        return (Integer) nearestObject(graph, cm -> cm.getProperty(property, inverse, graph).getMaxCount(), new HashSet<Node>());
     }
 
 
     public Node getPropertyName(Node property, boolean inverse, Graph graph) {
-        return nearest(graph, new Function<ClassMetadata, Node>() {
-            @Override
-            public Node apply(ClassMetadata cm) {
-                return cm.getProperty(property, inverse, graph).getName();
-            }
-        }, null);
+        return nearest(graph, cm -> cm.getProperty(property, inverse, graph).getName(), null);
     }
 
 
     public Node getPropertyViewWidget(Node property, boolean inverse, Graph graph) {
-        return nearest(graph, new Function<ClassMetadata, Node>() {
-            @Override
-            public Node apply(ClassMetadata cm) {
-                return cm.getProperty(property, inverse, graph).getViewWidget();
-            }
-        }, null);
+        return nearest(graph, cm -> cm.getProperty(property, inverse, graph).getViewWidget(), null);
     }
 
 
@@ -203,7 +169,7 @@ public class ClassMetadata {
      * Walks this and its superclasses until it finds one where the given Supplier returns a value.
      *
      * @param graph
-     * @param graph
+     * @param supplier
      * @param visited
      * @return the nearest supplied value
      */

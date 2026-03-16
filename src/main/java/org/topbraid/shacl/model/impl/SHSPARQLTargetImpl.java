@@ -24,36 +24,36 @@ import org.topbraid.shacl.model.SHSPARQLTarget;
 import org.topbraid.shacl.vocabulary.SH;
 
 public class SHSPARQLTargetImpl extends SHResourceImpl implements SHSPARQLTarget {
-	
-	public SHSPARQLTargetImpl(Node node, EnhGraph graph) {
-		super(node, graph);
-	}
+
+    public SHSPARQLTargetImpl(Node node, EnhGraph graph) {
+        super(node, graph);
+    }
 
 
-	@Override
-	public String getSPARQL() {
-		return JenaUtil.getStringProperty(this, SH.select);
-	}
+    @Override
+    public String getSPARQL() {
+        return JenaUtil.getStringProperty(this, SH.select);
+    }
 
 
-	@Override
+    @Override
     public String toString() {
 
-		String label = JenaUtil.getStringProperty(this, RDFS.label);
-		if(label != null) {
-			return label;
-		}
-		
-		String comment = JenaUtil.getStringProperty(this, RDFS.comment);
-		if(comment != null) {
-			return comment;
-		}
+        String label = JenaUtil.getStringProperty(this, RDFS.label);
+        if (label != null) {
+            return label;
+        }
 
-		String sparql = getSPARQL();
-		if(sparql != null) {
-			return sparql;
-		}
-		
-		return "(Incomplete SPARQL Target)";
-	}
+        String comment = JenaUtil.getStringProperty(this, RDFS.comment);
+        if (comment != null) {
+            return comment;
+        }
+
+        String sparql = getSPARQL();
+        if (sparql != null) {
+            return sparql;
+        }
+
+        return "(Incomplete SPARQL Target)";
+    }
 }

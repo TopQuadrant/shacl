@@ -476,7 +476,7 @@ public class JenaUtil {
 
 
     public static Literal getBestStringLiteral(Resource resource, List<String> langs, Iterable<Property> properties, BiFunction<Resource, Property, ExtendedIterator<Statement>> getter) {
-        String prefLang = langs.isEmpty() ? null : langs.get(0);
+        String prefLang = langs.isEmpty() ? null : langs.getFirst();
         Literal label = null;
         int bestLang = -1;
         for (Property predicate : properties) {
@@ -486,7 +486,7 @@ public class JenaUtil {
                 if (object.isLiteral()) {
                     Literal literal = (Literal) object;
                     String lang = literal.getLanguage();
-                    if (lang.length() == 0 && label == null) {
+                    if (lang.isEmpty() && label == null) {
                         label = literal;
                     } else if (prefLang != null && prefLang.equalsIgnoreCase(lang)) {
                         it.close();
@@ -1071,7 +1071,7 @@ public class JenaUtil {
             Node result = null;
             if (rs.hasNext()) {
                 QuerySolution qs = rs.next();
-                String firstVarName = rs.getResultVars().get(0);
+                String firstVarName = rs.getResultVars().getFirst();
                 RDFNode rdfNode = qs.get(firstVarName);
                 if (rdfNode != null) {
                     result = rdfNode.asNode();
@@ -1156,7 +1156,7 @@ public class JenaUtil {
         DatasetGraph dsg = dataset.asDatasetGraph();
         Context cxt = ARQ.getContext().copy();
         cxt.set(ARQConstants.sysCurrentTime, NodeFactoryExtra.nowAsDateTime());
-        FunctionEnv env = new ExecutionContext(cxt, dsg.getDefaultGraph(), dsg, null);
+        FunctionEnv env = ExecutionContext.create(dsg, cxt);
         try {
             NodeValue r = expr.eval(BindingRoot.create(), env);
             if (r != null) {
@@ -1182,19 +1182,16 @@ public class JenaUtil {
      * @return a new Query with the bindings applied
      */
     public static Query queryWithSubstitutions(Query query, final Map<Var, Node> substitutions) {
-        Query result = QueryTransformOps.transform(query, substitutions);
+        Query result = QueryTransformOps.replaceVars(query, substitutions);
 
         // TODO: Replace this hack once there is a Jena patch
         if (result.hasHaving()) {
-            NodeTransform nodeTransform = new NodeTransform() {
-                @Override
-                public Node apply(Node node) {
-                    Node n = substitutions.get(node);
-                    if (n == null) {
-                        return node;
-                    }
-                    return n;
+            NodeTransform nodeTransform = node -> {
+                Node n = substitutions.get(node);
+                if (n == null) {
+                    return node;
                 }
+                return n;
             };
             ElementTransform eltrans = new ElementTransformSubst(substitutions);
             ExprTransform exprTrans = new ExprTransformNodeElement(nodeTransform, eltrans);

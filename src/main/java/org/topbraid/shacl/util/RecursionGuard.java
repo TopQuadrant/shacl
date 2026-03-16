@@ -16,76 +16,74 @@
  */
 package org.topbraid.shacl.util;
 
+import org.apache.jena.graph.Node;
+
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.jena.graph.Node;
-
 /**
  * A ThreadLocal structure to prevent infinite loops of tosh:hasShape calls etc.
- * 
+ *
  * @author Holger Knublauch
  */
 public class RecursionGuard {
-	
-	private static ThreadLocal<Set<Call>> sets = new ThreadLocal<Set<Call>>();
-	
-	
-	public static boolean start(Node focusNode, Node shape) {
-		Set<Call> set = sets.get();
-		if(set == null) {
-			set = new HashSet<Call>();
-			sets.set(set);
-		}
-		Call call = new Call(focusNode, shape);
-		if(set.contains(call)) {
-			return true;
-		}
-		else {
-			set.add(call);
-			return false;
-		}
-	}
-	
-	
-	public static void end(Node focusNode, Node shape) {
-		sets.get().remove(new Call(focusNode, shape));
-	}
-	
-	
-	private static class Call {
-		
-		private Node focusNode;
-		
-		private Node shape;
-		
-		
-		Call(Node resource, Node shape) {
-			this.focusNode = resource;
-			this.shape = shape;
-		}
-		
 
-		@Override
-		public boolean equals(Object other) {
-			if(other instanceof Call) {
-				return ((Call)other).focusNode.equals(focusNode) && ((Call)other).shape.equals(shape);
-			}
-			else {
-				return false;
-			}
-		}
+    private static ThreadLocal<Set<Call>> sets = new ThreadLocal<Set<Call>>();
 
-		
-		@Override
-		public int hashCode() {
-			return focusNode.hashCode() + shape.hashCode();
-		}
-		
-		
-		@Override
+
+    public static boolean start(Node focusNode, Node shape) {
+        Set<Call> set = sets.get();
+        if (set == null) {
+            set = new HashSet<Call>();
+            sets.set(set);
+        }
+        Call call = new Call(focusNode, shape);
+        if (set.contains(call)) {
+            return true;
+        } else {
+            set.add(call);
+            return false;
+        }
+    }
+
+
+    public static void end(Node focusNode, Node shape) {
+        sets.get().remove(new Call(focusNode, shape));
+    }
+
+
+    private static class Call {
+
+        private Node focusNode;
+
+        private Node shape;
+
+
+        Call(Node resource, Node shape) {
+            this.focusNode = resource;
+            this.shape = shape;
+        }
+
+
+        @Override
+        public boolean equals(Object other) {
+            if (other instanceof Call) {
+                return ((Call) other).focusNode.equals(focusNode) && ((Call) other).shape.equals(shape);
+            } else {
+                return false;
+            }
+        }
+
+
+        @Override
+        public int hashCode() {
+            return focusNode.hashCode() + shape.hashCode();
+        }
+
+
+        @Override
         public String toString() {
-			return "(" + focusNode + ", " + shape + ")";
-		}
-	}
+            return "(" + focusNode + ", " + shape + ")";
+        }
+    }
 }

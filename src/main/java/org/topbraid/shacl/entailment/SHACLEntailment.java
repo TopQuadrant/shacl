@@ -55,12 +55,7 @@ public class SHACLEntailment {
 
 
     protected SHACLEntailment() {
-        setEngine(RDFS.getURI(), new Engine() {
-            @Override
-            public Model createModelWithEntailment(Dataset dataset, URI shapesGraphURI, ShapesGraph shapesGraph, ProgressMonitor monitor) {
-                return ModelFactory.createRDFSModel(dataset.getDefaultModel());
-            }
-        });
+        setEngine(RDFS.getURI(), (dataset, shapesGraphURI, shapesGraph, monitor) -> ModelFactory.createRDFSModel(dataset.getDefaultModel()));
         setEngine(SH.Rules.getURI(), new RulesEntailment());
     }
 

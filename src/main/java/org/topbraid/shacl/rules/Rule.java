@@ -16,31 +16,32 @@
  */
 package org.topbraid.shacl.rules;
 
-import java.util.List;
-
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.RDFNode;
 import org.topbraid.shacl.engine.Shape;
 
+import java.util.List;
+
 /**
  * Represents a single rule in executable "pre-compiled" form.
- * 
+ *
  * @author Holger Knublauch
  */
 public interface Rule {
-	
-	/**
-	 * Executes this rule, calling <code>ruleEngine.infer()</code> to add triples.
-	 * @param ruleEngine  the RuleEngine to operate on
-	 * @param focusNodes  the list of focus nodes for this execution
-	 * @param shape  the context shape
-	 */
-	void execute(RuleEngine ruleEngine, List<RDFNode> focusNodes, Shape shape);
-	
-	
-	// Used for statistics only, to identify the origin of an inference
-	Node getContextNode();
 
-	
-	Number getOrder();
+    /**
+     * Executes this rule, calling <code>ruleEngine.infer()</code> to add triples.
+     *
+     * @param ruleEngine the RuleEngine to operate on
+     * @param focusNodes the list of focus nodes for this execution
+     * @param shape      the context shape
+     */
+    void execute(RuleEngine ruleEngine, List<RDFNode> focusNodes, Shape shape);
+
+
+    // Used for statistics only, to identify the origin of an inference
+    Node getContextNode();
+
+
+    Number getOrder();
 }

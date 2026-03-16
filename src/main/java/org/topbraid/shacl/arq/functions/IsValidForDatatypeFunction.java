@@ -26,30 +26,29 @@ import org.topbraid.jenax.functions.AbstractFunction2;
 
 /**
  * The function spif:isValidForDatatype
- * 
+ *
  * @author Holger Knublauch
  */
 public class IsValidForDatatypeFunction extends AbstractFunction2 {
 
-	@Override
-	protected NodeValue exec(Node literalNode, Node datatypeNode, FunctionEnv env) {
-		
-		if(literalNode == null || !literalNode.isLiteral()) {
-			throw new ExprEvalException();
-		}
-		String lex = literalNode.getLiteralLexicalForm();
-		
-		if(!datatypeNode.isURI()) {
-			throw new ExprEvalException();
-		}
-		RDFDatatype datatype = TypeMapper.getInstance().getTypeByName(datatypeNode.getURI());
-		
-		if(datatype == null) {
-			return NodeValue.TRUE;
-		}
-		else {
-			boolean valid = datatype.isValid(lex);
-			return NodeValue.makeBoolean(valid);
-		}
-	}
+    @Override
+    protected NodeValue exec(Node literalNode, Node datatypeNode, FunctionEnv env) {
+
+        if (literalNode == null || !literalNode.isLiteral()) {
+            throw new ExprEvalException();
+        }
+        String lex = literalNode.getLiteralLexicalForm();
+
+        if (!datatypeNode.isURI()) {
+            throw new ExprEvalException();
+        }
+        RDFDatatype datatype = TypeMapper.getInstance().getTypeByName(datatypeNode.getURI());
+
+        if (datatype == null) {
+            return NodeValue.TRUE;
+        } else {
+            boolean valid = datatype.isValid(lex);
+            return NodeValue.makeBoolean(valid);
+        }
+    }
 }

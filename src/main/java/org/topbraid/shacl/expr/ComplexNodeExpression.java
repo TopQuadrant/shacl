@@ -30,19 +30,19 @@ public abstract class ComplexNodeExpression extends AbstractNodeExpression {
 
     @Override
     public String getFunctionalSyntax() {
-        String str = getFunctionalSyntaxName();
-        str += "(";
+        StringBuilder str = new StringBuilder(getFunctionalSyntaxName());
+        str.append("(");
         List<String> args = getFunctionalSyntaxArguments();
         Iterator<String> it = args.iterator();
         while (it.hasNext()) {
             String next = it.next();
-            str += next;
+            str.append(next);
             if (it.hasNext()) {
-                str += ", ";
+                str.append(", ");
             }
         }
-        str += ")";
-        return str;
+        str.append(")");
+        return str.toString();
     }
 
 

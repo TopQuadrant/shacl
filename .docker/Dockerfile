@@ -27,12 +27,12 @@ RUN $JAVA_HOME/bin/jlink \
 
 # Compile with maven, extract binaries and copy into image
 COPY . /app
-RUN mvn versions:set -DnewVersion=${VERSION} && mvn package -Dmaven.test.skip=true
+RUN ./mvnw versions:set -DnewVersion=${VERSION} && ./mvnw package -Dmaven.test.skip=true
 RUN unzip target/shacl-${VERSION}-bin.zip -d /app/
 
 # BUILD STAGE 2: keep only Java and SHACL
 
-FROM alpine:3.21.3
+FROM alpine:3.23.3
 
 ARG VERSION
 

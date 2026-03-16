@@ -20,27 +20,27 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 
 public interface SHResult extends SHResource {
-	
-	String getMessage();
-	
-	
-	RDFNode getFocusNode();
-	
-	
-	Resource getPath();
-	
-	
-	Resource getSeverity();
 
-	
-	Resource getSourceConstraint();
-	
-	
-	Resource getSourceConstraintComponent();
+    String getMessage();
 
-	
-	Resource getSourceShape();
-	
-	
-	RDFNode getValue();
+
+    RDFNode getFocusNode();
+
+
+    Resource getPath();
+
+
+    Resource getSeverity();
+
+
+    Resource getSourceConstraint();
+
+
+    Resource getSourceConstraintComponent();
+
+
+    Resource getSourceShape();
+
+
+    RDFNode getValue();
 }

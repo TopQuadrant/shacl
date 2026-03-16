@@ -60,7 +60,7 @@ public class QueryExecutionFactoryFilter {
         return QueryExecution.create()
                 .query(query)
                 .model(model)
-                .initialBinding(initialBinding)
+                .substitution(initialBinding)
                 .build();
     }
 
@@ -101,9 +101,7 @@ public class QueryExecutionFactoryFilter {
         printQuery(query, initialBinding);
 
         if (logger.isTraceEnabled()) {
-            logger.trace("QUERY[" + analyzeQuery(query)
-                    + "]\nMODEL[" + analyzeModel(model) + "]"
-                    + serializeBindings(initialBinding));
+            logger.trace("QUERY[{}]\nMODEL[{}]{}", analyzeQuery(query), analyzeModel(model), serializeBindings(initialBinding));
         }
     }
 
@@ -111,9 +109,7 @@ public class QueryExecutionFactoryFilter {
         printQuery(query, initialBinding);
 
         if (logger.isTraceEnabled()) {
-            logger.trace("QUERY[" + analyzeQuery(query)
-                    + "]\nDATASET[" + analyzeDataset(dataset) + "]"
-                    + serializeBindings(initialBinding));
+            logger.trace("QUERY[{}]\nDATASET[{}]{}", analyzeQuery(query), analyzeDataset(dataset), serializeBindings(initialBinding));
         }
     }
 
@@ -142,23 +138,31 @@ public class QueryExecutionFactoryFilter {
     }
 
     private String serializeBindings(QuerySolution bindings) {
-        if (bindings == null) return "";
+        if (bindings == null) {
+            return "";
+        }
         return "\nINITIAL BINDINGS[" + bindings.toString() + "]";
     }
 
     private String analyzeQuery(Query query) {
-        if (query == null) return "null query";
+        if (query == null) {
+            return "null query";
+        }
         return query.toString();
     }
 
     private String analyzeModel(Model model) {
-        if (model == null) return "null model";
+        if (model == null) {
+            return "null model";
+        }
 
         return "this space for rent";
     }
 
     private String analyzeDataset(Dataset dataset) {
-        if (dataset == null) return "null dataset";
+        if (dataset == null) {
+            return "null dataset";
+        }
 
         return "A Dataset";
     }

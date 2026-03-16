@@ -25,62 +25,62 @@ import org.topbraid.shacl.vocabulary.SH;
 
 public abstract class TestCase implements Comparable<TestCase> {
 
-	private Resource graph;
-	
-	private Resource resource;
-	
-	
-	public TestCase(Resource graph, Resource resource) {
-		this.graph = graph;
-		this.resource = resource;
-	}
-	
-	
-	@Override
-	public int compareTo(TestCase other) {
-		return getResource().getURI().compareTo(other.getResource().getURI());
-	}
+    private Resource graph;
+
+    private Resource resource;
 
 
-	public Resource createFailure(Model results, String message) {
-		return createFailure(results, message, (RDFNode) null);
-	}
+    public TestCase(Resource graph, Resource resource) {
+        this.graph = graph;
+        this.resource = resource;
+    }
 
 
-	public Resource createFailure(Model results, String message, RDFNode actualResult) {
-		Resource failure = createResult(results, DASH.FailureTestCaseResult);
-		failure.addProperty(SH.resultMessage, message);
-		if(actualResult != null) {
-			failure.addProperty(DASH.actualResult, actualResult);
-		}
-		return failure;
-	}
+    @Override
+    public int compareTo(TestCase other) {
+        return getResource().getURI().compareTo(other.getResource().getURI());
+    }
 
 
-	public Resource createFailure(Model results, String message, TestCaseContext context) {
-		Resource failure = createResult(results, DASH.FailureTestCaseResult);
-		failure.addProperty(SH.resultMessage, message + " (executed with " + context + ")");
-		return failure;
-	}
-	
-	
-	protected Resource createResult(Model results, Resource type) {
-		Resource result = results.createResource(type);
-		result.addProperty(DASH.testCase, resource);
-		result.addProperty(DASH.testGraph, graph);
-		return result;
-	}
-	
-	
-	public Resource getGraph() {
-		return graph;
-	}
-	
-	
-	public Resource getResource() {
-		return resource;
-	}
-	
-	
-	public abstract void run(Model results) throws Exception;
+    public Resource createFailure(Model results, String message) {
+        return createFailure(results, message, (RDFNode) null);
+    }
+
+
+    public Resource createFailure(Model results, String message, RDFNode actualResult) {
+        Resource failure = createResult(results, DASH.FailureTestCaseResult);
+        failure.addProperty(SH.resultMessage, message);
+        if (actualResult != null) {
+            failure.addProperty(DASH.actualResult, actualResult);
+        }
+        return failure;
+    }
+
+
+    public Resource createFailure(Model results, String message, TestCaseContext context) {
+        Resource failure = createResult(results, DASH.FailureTestCaseResult);
+        failure.addProperty(SH.resultMessage, message + " (executed with " + context + ")");
+        return failure;
+    }
+
+
+    protected Resource createResult(Model results, Resource type) {
+        Resource result = results.createResource(type);
+        result.addProperty(DASH.testCase, resource);
+        result.addProperty(DASH.testGraph, graph);
+        return result;
+    }
+
+
+    public Resource getGraph() {
+        return graph;
+    }
+
+
+    public Resource getResource() {
+        return resource;
+    }
+
+
+    public abstract void run(Model results) throws Exception;
 }

@@ -16,30 +16,30 @@
  */
 package org.topbraid.shacl.optimize;
 
-import java.util.List;
-import java.util.Map;
-
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * A Graph interface providing additional optimization features.
- * 
+ *
  * @author Holger Knublauch
  */
 public interface OptimizedMultiUnion {
-	
-	boolean getIncludesSHACL();
-	
-	
-	boolean getIncludesSPIN();
-	
-	
-	List<Node> getLabelProperties();
 
-	
-	void resetOptimizations();
-	
-	
-	void tellContainedNamespaces(Map<String,List<Graph>> subjectNamespaces, Map<String,List<Graph>> objectNamespaces);
+    boolean getIncludesSHACL();
+
+
+    boolean getIncludesSPIN();
+
+
+    List<Node> getLabelProperties();
+
+
+    void resetOptimizations();
+
+
+    void tellContainedNamespaces(Map<String, List<Graph>> subjectNamespaces, Map<String, List<Graph>> objectNamespaces);
 }

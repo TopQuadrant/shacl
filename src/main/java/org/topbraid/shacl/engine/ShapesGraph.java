@@ -255,7 +255,7 @@ public class ShapesGraph {
                         RDFNode exprNode = shapesModel.asRDFNode(key);
                         result.put(key, new DistinctExpression(exprNode, new UnionExpression(exprNode, list)));
                     } else {
-                        result.put(key, list.get(0));
+                        result.put(key, list.getFirst());
                     }
                 }
                 return result;

@@ -33,6 +33,7 @@ import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprEvalException;
 import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.expr.NodeValue;
+import org.apache.jena.sparql.function.Function;
 import org.apache.jena.sparql.function.FunctionEnv;
 import org.apache.jena.sparql.serializer.SerializationContext;
 import org.apache.jena.sparql.sse.SSE;
@@ -60,7 +61,7 @@ import java.util.List;
  *
  * @author Holger Knublauch
  */
-public abstract class SHACLARQFunction implements org.apache.jena.sparql.function.Function, OptionalArgsFunction, DeclarativeFunctionFactory {
+public abstract class SHACLARQFunction implements Function, OptionalArgsFunction, DeclarativeFunctionFactory {
 
     private boolean cachable;
 
@@ -103,7 +104,7 @@ public abstract class SHACLARQFunction implements org.apache.jena.sparql.functio
     }
 
     @Override
-    public org.apache.jena.sparql.function.Function create(String uri) {
+    public Function create(String uri) {
         return this;
     }
 

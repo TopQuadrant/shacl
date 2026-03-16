@@ -8,26 +8,26 @@ import org.topbraid.shacl.expr.NodeExpressionVisitor;
 
 /**
  * Node expressions based on a SPARQL SELECT query, identified by sh:select.
- * 
+ * <p>
  * This node expression type is not part of the SHACL-AF 1.0 document, but a candidate for 1.1.
- * 
+ *
  * @author Holger Knublauch
  */
 public class SelectExpression extends AbstractSPARQLExpression {
-	
-	public SelectExpression(Resource expr, Query query, NodeExpression input, String queryString) {
-		super(expr, query, input, queryString);
-	}
-	
-	
-	@Override
-	public String getTypeId() {
-		return "select";
-	}
-	
-	
-	@Override
-	public void visit(NodeExpressionVisitor visitor) {
-		visitor.visit(this);
-	}
+
+    public SelectExpression(Resource expr, Query query, NodeExpression input, String queryString) {
+        super(expr, query, input, queryString);
+    }
+
+
+    @Override
+    public String getTypeId() {
+        return "select";
+    }
+
+
+    @Override
+    public void visit(NodeExpressionVisitor visitor) {
+        visitor.visit(this);
+    }
 }

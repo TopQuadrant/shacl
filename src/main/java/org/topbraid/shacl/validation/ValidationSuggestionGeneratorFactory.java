@@ -20,30 +20,31 @@ import org.apache.jena.rdf.model.Model;
 
 /**
  * A singleton object that can create ValidationSuggestionGenerators.
- * 
+ *
  * @author Holger Knublauch
  */
 public class ValidationSuggestionGeneratorFactory {
-	
-	private static ValidationSuggestionGeneratorFactory singleton = new ValidationSuggestionGeneratorFactory();
-	
-	public static ValidationSuggestionGeneratorFactory get() {
-		return singleton;
-	}
-	
-	public static void set(ValidationSuggestionGeneratorFactory value) {
-		singleton = value;
-	}
-	
-	
-	/**
-	 * Default implementation returns nothing - no implementation is provided as part of the
-	 * open source package.
-	 * @param dataModel  the data graph to operate on
-	 * @param shapesModel  the shapes graph to operate on
-	 * @return a {@link ValidationSuggestionGenerator} or null
-	 */
-	public ValidationSuggestionGenerator createValidationSuggestionGenerator(Model dataModel, Model shapesModel) {
-		return null;
-	}
+
+    private static ValidationSuggestionGeneratorFactory singleton = new ValidationSuggestionGeneratorFactory();
+
+    public static ValidationSuggestionGeneratorFactory get() {
+        return singleton;
+    }
+
+    public static void set(ValidationSuggestionGeneratorFactory value) {
+        singleton = value;
+    }
+
+
+    /**
+     * Default implementation returns nothing - no implementation is provided as part of the
+     * open source package.
+     *
+     * @param dataModel   the data graph to operate on
+     * @param shapesModel the shapes graph to operate on
+     * @return a {@link ValidationSuggestionGenerator} or null
+     */
+    public ValidationSuggestionGenerator createValidationSuggestionGenerator(Model dataModel, Model shapesModel) {
+        return null;
+    }
 }

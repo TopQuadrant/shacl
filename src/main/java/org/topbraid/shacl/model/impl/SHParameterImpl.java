@@ -23,20 +23,20 @@ import org.topbraid.shacl.model.SHParameter;
 import org.topbraid.shacl.vocabulary.SH;
 
 public class SHParameterImpl extends SHPropertyShapeImpl implements SHParameter {
-	
-	public SHParameterImpl(Node node, EnhGraph graph) {
-		super(node, graph);
-	}
-	
-	
-	@Override
-	public boolean isOptional() {
-		return JenaUtil.getBooleanProperty(this, SH.optional);
-	}
+
+    public SHParameterImpl(Node node, EnhGraph graph) {
+        super(node, graph);
+    }
 
 
-	@Override
+    @Override
+    public boolean isOptional() {
+        return JenaUtil.getBooleanProperty(this, SH.optional);
+    }
+
+
+    @Override
     public String toString() {
-		return "Parameter " + getVarName();
-	}
+        return "Parameter " + getVarName();
+    }
 }
