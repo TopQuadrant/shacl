@@ -72,7 +72,7 @@ public class ExtraPrefixes {
     public static void add(Resource resource) {
         String ns = resource.getNameSpace();
         String prefix = resource.getModel().getNsURIPrefix(ns);
-        if (prefix != null && prefix.length() > 0) {
+        if (prefix != null && !prefix.isEmpty()) {
             add(prefix, ns);
         }
     }

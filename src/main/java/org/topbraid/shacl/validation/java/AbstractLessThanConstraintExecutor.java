@@ -3,6 +3,7 @@ package org.topbraid.shacl.validation.java;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.sparql.expr.ExprNotComparableException;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.topbraid.shacl.engine.Constraint;
@@ -33,7 +34,7 @@ abstract class AbstractLessThanConstraintExecutor extends AbstractNativeConstrai
         for (RDFNode focusNode : focusNodes) {
             if (focusNode instanceof Resource) {
                 Collection<RDFNode> valueNodes = engine.getValueNodes(constraint, focusNode);
-                Set<RDFNode> otherNodes = ((Resource) focusNode).listProperties(predicate).mapWith(s -> s.getObject()).toSet();
+                Set<RDFNode> otherNodes = ((Resource) focusNode).listProperties(predicate).mapWith(Statement::getObject).toSet();
                 for (RDFNode valueNode : valueNodes) {
                     valueNodeCount++;
                     NodeValue v = NodeValue.makeNode(valueNode.asNode());

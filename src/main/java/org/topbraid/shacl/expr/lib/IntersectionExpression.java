@@ -74,10 +74,10 @@ public class IntersectionExpression extends ComplexNodeExpression {
 
     @Override
     public Resource getOutputShape(Resource contextShape) {
-        if (inputs.size() == 0) {
+        if (inputs.isEmpty()) {
             return null;
         }
-        Resource s = inputs.get(0).getOutputShape(contextShape);
+        Resource s = inputs.getFirst().getOutputShape(contextShape);
         if (s == null) {
             return null;
         }

@@ -46,14 +46,14 @@ public class UpdateFactoryFilter {
 
     private void analyzeRequest(String update) {
         if (logger.isTraceEnabled()) {
-            logger.trace("QUERY[" + analyzeUpdate(update));
+            logger.trace("QUERY[{}", analyzeUpdate(update));
         }
     }
 
     private String analyzeUpdate(String update) {
-		if (update == null) {
-			return "null update query";
-		}
+        if (update == null) {
+            return "null update query";
+        }
         return update;
     }
 }

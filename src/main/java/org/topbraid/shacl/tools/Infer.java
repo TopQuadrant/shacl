@@ -72,7 +72,7 @@ public class Infer extends AbstractTool {
                 results.add(newResults);
             }
             // if no new results were found, break
-            if (newResults.size() == 0) {
+            if (newResults.isEmpty()) {
                 break;
             }
             // if the size of the allResults model did not increase, break

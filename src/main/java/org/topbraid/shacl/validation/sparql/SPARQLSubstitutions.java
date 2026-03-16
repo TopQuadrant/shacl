@@ -163,7 +163,7 @@ public class SPARQLSubstitutions {
         if (targets.isEmpty()) {
             throw new SHACLException("Shape without target " + shape);
         } else if (targets.size() == 1) {
-            sb.append(targets.get(0));
+            sb.append(targets.getFirst());
         } else {
             for (int i = 0; i < targets.size(); i++) {
                 sb.append("        {");

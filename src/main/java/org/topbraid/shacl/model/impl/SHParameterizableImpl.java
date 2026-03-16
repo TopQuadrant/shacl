@@ -91,42 +91,36 @@ public class SHParameterizableImpl extends SHResourceImpl implements SHParameter
             }
         }
         if (orderExists) {
-            Collections.sort(results, new Comparator<SHParameter>() {
-                @Override
-                public int compare(SHParameter param1, SHParameter param2) {
-                    Property p1 = param1.getPredicate();
-                    Property p2 = param2.getPredicate();
-                    if (p1 != null && p2 != null) {
-                        Integer index1 = param1.getOrder();
-                        if (index1 == null) {
-                            index1 = 0;
-                        }
-                        Integer index2 = param2.getOrder();
-                        if (index2 == null) {
-                            index2 = 0;
-                        }
-                        int comp = index1.compareTo(index2);
-                        if (comp != 0) {
-                            return comp;
-                        } else {
-                            return p1.getLocalName().compareTo(p2.getLocalName());
-                        }
-                    } else {
-                        return 0;
+            Collections.sort(results, (param1, param2) -> {
+                Property p1 = param1.getPredicate();
+                Property p2 = param2.getPredicate();
+                if (p1 != null && p2 != null) {
+                    Integer index1 = param1.getOrder();
+                    if (index1 == null) {
+                        index1 = 0;
                     }
+                    Integer index2 = param2.getOrder();
+                    if (index2 == null) {
+                        index2 = 0;
+                    }
+                    int comp = index1.compareTo(index2);
+                    if (comp != 0) {
+                        return comp;
+                    } else {
+                        return p1.getLocalName().compareTo(p2.getLocalName());
+                    }
+                } else {
+                    return 0;
                 }
             });
         } else {
-            Collections.sort(results, new Comparator<SHParameter>() {
-                @Override
-                public int compare(SHParameter param1, SHParameter param2) {
-                    Property p1 = param1.getPredicate();
-                    Property p2 = param2.getPredicate();
-                    if (p1 != null && p2 != null) {
-                        return p1.getLocalName().compareTo(p2.getLocalName());
-                    } else {
-                        return 0;
-                    }
+            Collections.sort(results, (param1, param2) -> {
+                Property p1 = param1.getPredicate();
+                Property p2 = param2.getPredicate();
+                if (p1 != null && p2 != null) {
+                    return p1.getLocalName().compareTo(p2.getLocalName());
+                } else {
+                    return 0;
                 }
             });
         }

@@ -87,9 +87,7 @@ public class CurrentThreadFunctionRegistry extends FunctionRegistry {
                 FunctionRegistry.set(ARQ.getContext(), oldFR);
             };
         } else {
-            return () -> {
-                unregister(old);
-            };
+            return () -> unregister(old);
         }
     }
 
@@ -126,10 +124,7 @@ public class CurrentThreadFunctionRegistry extends FunctionRegistry {
         }
         CurrentThreadFunctions functions = localFunctions.get();
         if (functions != null) {
-            FunctionFactory ff = functions.getFunctionFactory(uri);
-            if (ff != null) {
-                return ff;
-            }
+            return functions.getFunctionFactory(uri);
         }
         return null;
     }

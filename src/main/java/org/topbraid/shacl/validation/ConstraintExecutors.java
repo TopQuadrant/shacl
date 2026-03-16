@@ -51,7 +51,7 @@ public class ConstraintExecutors {
     public ConstraintExecutors() {
         addSpecialExecutor(SH.PropertyConstraintComponent, constraint -> new PropertyConstraintExecutor());
         addSpecialExecutor(DASH.ParameterConstraintComponent, constraint -> new PropertyConstraintExecutor());
-        addSpecialExecutor(SH.SPARQLConstraintComponent, constraint -> new SPARQLConstraintExecutor(constraint));
+        addSpecialExecutor(SH.SPARQLConstraintComponent, SPARQLConstraintExecutor::new);
         addSpecialExecutor(SH.ExpressionConstraintComponent, constraint -> new ExpressionConstraintExecutor());
 
         JavaConstraintExecutors.install(this);

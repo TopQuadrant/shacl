@@ -28,7 +28,6 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.topbraid.jenax.functions.CurrentThreadFunctionRegistry;
 import org.topbraid.jenax.util.ARQFactory;
-import org.topbraid.jenax.util.ExceptionUtil;
 import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.multifunctions.MultiFunctions;
 import org.topbraid.shacl.testcases.context.TestCaseContext;
@@ -37,7 +36,7 @@ import org.topbraid.shacl.vocabulary.DASH;
 import org.topbraid.shacl.vocabulary.SH;
 
 import java.io.ByteArrayOutputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -57,10 +56,8 @@ public class QueryTestCaseType extends TestCaseType {
                 ResultSet actualResults = qexec.execSelect();
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 ResultSetFormatter.outputAsJSON(os, actualResults);
-                return os.toString("UTF-8");
+                return os.toString(StandardCharsets.UTF_8);
             }
-        } catch (UnsupportedEncodingException e) {
-            throw ExceptionUtil.throwUnchecked(e);
         } finally {
             tearDownCTFR.run();
         }
@@ -119,7 +116,7 @@ public class QueryTestCaseType extends TestCaseType {
                 }
                 createResult(results, DASH.SuccessTestCaseResult);
             } finally {
-                tempURIs.forEach(uri -> MultiFunctions.unregister(uri));
+                tempURIs.forEach(MultiFunctions::unregister);
             }
         }
     }

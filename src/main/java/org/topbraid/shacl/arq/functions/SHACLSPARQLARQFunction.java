@@ -27,6 +27,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.expr.ExprEvalException;
 import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.expr.NodeValue;
+import org.apache.jena.sparql.function.Function;
 import org.apache.jena.sparql.util.Context;
 import org.topbraid.jenax.util.ARQFactory;
 import org.topbraid.jenax.util.DatasetWithDifferentDefaultModel;
@@ -113,7 +114,7 @@ public class SHACLSPARQLARQFunction extends SHACLARQFunction {
 
 
     @Override
-    public org.apache.jena.sparql.function.Function create(String uri) {
+    public Function create(String uri) {
         return this;
     }
 
@@ -139,7 +140,7 @@ public class SHACLSPARQLARQFunction extends SHACLARQFunction {
                 if (rs.hasNext()) {
                     QuerySolution s = rs.nextSolution();
                     List<String> resultVars = rs.getResultVars();
-                    String varName = resultVars.get(0);
+                    String varName = resultVars.getFirst();
                     RDFNode resultNode = s.get(varName);
                     if (resultNode != null) {
                         return NodeValue.makeNode(resultNode.asNode());

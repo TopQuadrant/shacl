@@ -98,7 +98,7 @@ public class SPARQLComponentExecutor extends AbstractSPARQLExecutor {
         while (constraint.getComponent().getParametersMap().containsKey(valueVar)) {
             valueVar += "_";
         }
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (SH.NodeShape.equals(constraint.getContext())) {
             sb.append("SELECT $this ?value\nWHERE {\n");
             sb.append("    BIND ($this AS ");
@@ -115,18 +115,18 @@ public class SPARQLComponentExecutor extends AbstractSPARQLExecutor {
             otherVarNames.remove(SH.pathVar.getVarName());
             otherVarNames.remove(SH.valueVar.getVarName());
             for (String varName : otherVarNames) {
-                sb.append(" ?" + varName);
+                sb.append(" ?").append(varName);
             }
 
             sb.append("\nWHERE {\n");
-            sb.append("    $this $" + SH.PATHVar.getVarName() + " " + valueVar + " .\n");
+            sb.append("    $this $").append(SH.PATHVar.getVarName()).append(" ").append(valueVar).append(" .\n");
         }
 
         String sparql = JenaUtil.getStringProperty(validator, SH.ask);
         int firstIndex = sparql.indexOf('{');
         int lastIndex = sparql.lastIndexOf('}');
         String body = "{" + sparql.substring(firstIndex + 1, lastIndex + 1);
-        sb.append("    FILTER NOT EXISTS " + body + "\n}");
+        sb.append("    FILTER NOT EXISTS ").append(body).append("\n}");
 
         return SPARQLSubstitutions.withPrefixes(sb.toString(), validator);
     }

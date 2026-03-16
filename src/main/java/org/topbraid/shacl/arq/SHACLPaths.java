@@ -225,7 +225,7 @@ public class SHACLPaths {
         Query query = ARQFactory.get().createQuery(model, "ASK { ?a \n" + string + "\n ?b }");
         Element element = query.getQueryPattern();
         if (element instanceof ElementGroup) {
-            Element e = ((ElementGroup) element).getElements().get(0);
+            Element e = ((ElementGroup) element).getElements().getFirst();
             if (e instanceof ElementPathBlock) {
                 Path path = ((ElementPathBlock) e).getPattern().get(0).getPath();
                 if (path instanceof P_Link && ((P_Link) path).isForward()) {

@@ -3,6 +3,7 @@ package org.topbraid.shacl.validation;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
 import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.vocabulary.SH;
 
@@ -36,7 +37,7 @@ public class ResourceValidationResult implements ValidationResult {
 
     @Override
     public Collection<RDFNode> getMessages() {
-        return result.listProperties(SH.resultMessage).mapWith(s -> s.getObject()).toList();
+        return result.listProperties(SH.resultMessage).mapWith(Statement::getObject).toList();
     }
 
     @Override
@@ -46,7 +47,7 @@ public class ResourceValidationResult implements ValidationResult {
 
     @Override
     public List<RDFNode> getPropertyValues(Property predicate) {
-        return result.listProperties(predicate).mapWith(s -> s.getObject()).toList();
+        return result.listProperties(predicate).mapWith(Statement::getObject).toList();
     }
 
     public Resource getResource() {

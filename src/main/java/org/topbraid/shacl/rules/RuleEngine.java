@@ -140,12 +140,7 @@ public class RuleEngine extends AbstractEngine {
             return;
         }
 
-        Collections.sort(ruleShapes, new Comparator<Shape>() {
-            @Override
-            public int compare(Shape shape1, Shape shape2) {
-                return shape1.getOrder().compareTo(shape2.getOrder());
-            }
-        });
+        Collections.sort(ruleShapes, (shape1, shape2) -> shape1.getOrder().compareTo(shape2.getOrder()));
 
         String baseMessage = null;
         if (monitor != null) {
@@ -157,7 +152,7 @@ public class RuleEngine extends AbstractEngine {
             monitor.beginTask(baseMessage, rules);
         }
 
-        Double oldOrder = ruleShapes.get(0).getOrder();
+        Double oldOrder = ruleShapes.getFirst().getOrder();
         for (Shape shape : ruleShapes) {
             if (!oldOrder.equals(shape.getOrder())) {
                 oldOrder = shape.getOrder();
@@ -188,7 +183,7 @@ public class RuleEngine extends AbstractEngine {
         }
 
         if (!targetNodes.isEmpty()) {
-            Number oldOrder = rules.get(0).getOrder();
+            Number oldOrder = rules.getFirst().getOrder();
             for (Rule rule : rules) {
                 if (monitor != null) {
                     if (monitor.isCanceled()) {

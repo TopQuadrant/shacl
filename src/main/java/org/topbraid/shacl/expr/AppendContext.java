@@ -51,8 +51,6 @@ public class AppendContext {
 
 
     public void indent() {
-        for (int i = 0; i < indentation; i++) {
-            sb.append("    ");
-        }
+        sb.append("    ".repeat(Math.max(0, indentation)));
     }
 }

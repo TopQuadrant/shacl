@@ -19,7 +19,7 @@ abstract class AbstractShapeListConstraintExecutor extends AbstractNativeConstra
     AbstractShapeListConstraintExecutor(Constraint constraint) {
         RDFList list = constraint.getParameterValue().as(RDFList.class);
         ExtendedIterator<RDFNode> sit = list.iterator();
-        shapes = sit.mapWith(n -> n.asResource()).toList();
+        shapes = sit.mapWith(RDFNode::asResource).toList();
     }
 
 

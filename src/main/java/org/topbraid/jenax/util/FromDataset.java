@@ -106,6 +106,6 @@ public class FromDataset extends DelegatingDataset {
     public boolean isEmpty() {
         return
                 defaultModel.isEmpty() &&
-                namedGraphs.stream().map(name -> getNamedModel(name)).allMatch(model -> model.isEmpty());
+                namedGraphs.stream().map(this::getNamedModel).allMatch(Model::isEmpty);
     }
 }

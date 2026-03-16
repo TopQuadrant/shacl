@@ -28,7 +28,7 @@ class UniqueLangConstraintExecutor extends AbstractNativeConstraintExecutor {
                 Collection<RDFNode> valueNodes = engine.getValueNodes(constraint, focusNode);
                 for (RDFNode valueNode : valueNodes) {
                     valueNodeCount++;
-                    if (valueNode.isLiteral() && valueNode.asNode().getLiteralLanguage().length() > 0) {
+                    if (valueNode.isLiteral() && !valueNode.asNode().getLiteralLanguage().isEmpty()) {
                         String lang = valueNode.asNode().getLiteralLanguage();
                         if (langs.contains(lang)) {
                             if (!reported.contains(lang)) {

@@ -66,7 +66,7 @@ public class Constraint {
 
     public void addBindings(QuerySolutionMap map) {
         if (parameterValue != null) {
-            SHParameter param = params.get(0);
+            SHParameter param = params.getFirst();
             if (!map.contains(param.getVarName())) {
                 map.add(param.getVarName(), parameterValue);
             }

@@ -65,7 +65,7 @@ public class FilterShapeExpression extends AbstractInputExpression {
     @Override
     public List<NodeExpression> getInputExpressions() {
         List<NodeExpression> is = super.getInputExpressions();
-        if (is.size() == 1 && is.get(0) instanceof FocusNodeExpression) {
+        if (is.size() == 1 && is.getFirst() instanceof FocusNodeExpression) {
             return Collections.emptyList();
         } else {
             return is;

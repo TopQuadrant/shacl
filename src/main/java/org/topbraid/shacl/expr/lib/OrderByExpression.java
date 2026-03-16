@@ -30,23 +30,20 @@ public class OrderByExpression extends AbstractInputExpression {
     public ExtendedIterator<RDFNode> eval(RDFNode focusNode, NodeExpressionContext context) {
         List<RDFNode> list = new ArrayList<>(evalInput(focusNode, context).toList());
         Map<RDFNode, RDFNode> values = new HashMap<>();
-        Collections.sort(list, new Comparator<RDFNode>() {
-            @Override
-            public int compare(RDFNode o1, RDFNode o2) {
-                RDFNode v1 = getOrCompute(o1, values, context);
-                RDFNode v2 = getOrCompute(o2, values, context);
-                if (v1 == null) {
-                    if (v2 == null) {
-                        return 0;
-                    } else {
-                        return descending ? 1 : -1;
-                    }
-                } else if (v2 == null) {
-                    return descending ? -1 : 1;
+        Collections.sort(list, (o1, o2) -> {
+            RDFNode v1 = getOrCompute(o1, values, context);
+            RDFNode v2 = getOrCompute(o2, values, context);
+            if (v1 == null) {
+                if (v2 == null) {
+                    return 0;
                 } else {
-                    int c = NodeValue.compareAlways(NodeValue.makeNode(v1.asNode()), NodeValue.makeNode(v2.asNode()));
-                    return descending ? -c : c;
+                    return descending ? 1 : -1;
                 }
+            } else if (v2 == null) {
+                return descending ? -1 : 1;
+            } else {
+                int c = NodeValue.compareAlways(NodeValue.makeNode(v1.asNode()), NodeValue.makeNode(v2.asNode()));
+                return descending ? -c : c;
             }
         });
         return WrappedIterator.create(list.iterator());

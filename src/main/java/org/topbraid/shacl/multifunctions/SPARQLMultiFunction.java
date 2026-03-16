@@ -81,7 +81,7 @@ public class SPARQLMultiFunction extends AbstractMultiFunction {
         Dataset ds = new DatasetWithDifferentDefaultModel(model, DatasetFactory.wrap(dataset));
         QueryExecution qexec = ARQFactory.get().createQueryExecution(query, ds, initialBindings);
         ResultSet rs = qexec.execSelect();
-        Iterator<Binding> bindings = Iter.map(rs, qs -> JenaUtil.asBinding(qs));
+        Iterator<Binding> bindings = Iter.map(rs, JenaUtil::asBinding);
         QueryIterator quit = QueryIterPlainWrapper.create(bindings);
         QueryIterator result = QueryIteratorClosing.protect(quit, qexec);
 

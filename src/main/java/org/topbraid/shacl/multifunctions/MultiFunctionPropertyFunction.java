@@ -110,7 +110,7 @@ class MultiFunctionPropertyFunction extends PropertyFunctionBase implements Prop
         } else {
             Node arg = argObject.getArg();
             if (arg.isVariable()) {
-                String varName = vars.get(0).getName();
+                String varName = vars.getFirst().getName();
                 map.put(varName, Var.alloc(arg));
             } else {
                 throw new ExprEvalException("Nodes on the right side of property function " + predicate + " must be unbound variables");

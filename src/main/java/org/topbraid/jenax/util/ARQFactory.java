@@ -147,7 +147,7 @@ public class ARQFactory {
         StringBuffer queryString = new StringBuffer();
         String defaultNamespace = JenaUtil.getNsPrefixURI(model, "");
         if (defaultNamespace != null) {
-            queryString.append("PREFIX :   <" + defaultNamespace + ">\n");
+            queryString.append("PREFIX :   <").append(defaultNamespace).append(">\n");
         }
         Map<String, String> map = model.getNsPrefixMap();
         if (includeExtraPrefixes) {
@@ -160,7 +160,7 @@ public class ARQFactory {
 
         map.forEach((prefix, namespace) -> {
             if (!prefix.isEmpty() && namespace != null) {
-                queryString.append("PREFIX " + prefix + ": <" + namespace + ">\n");
+                queryString.append("PREFIX ").append(prefix).append(": <").append(namespace).append(">\n");
             }
         });
         return queryString.toString();
@@ -310,7 +310,7 @@ public class ARQFactory {
 
 
     public QueryExecutionHTTP createRemoteQueryExecution(Query query, List<String> graphURIs) {
-        String service = graphURIs.get(0);
+        String service = graphURIs.getFirst();
         String serviceAsURI = service;
         if (service.endsWith("/sparql")) {
             serviceAsURI = service.substring(0, service.lastIndexOf('/'));

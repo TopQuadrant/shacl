@@ -177,7 +177,7 @@ public class Shape {
 
     public synchronized Collection<RDFNode> getMessages() {
         if (messages == null) {
-            messages = shape.listProperties(SH.message).mapWith(s -> s.getObject()).toList();
+            messages = shape.listProperties(SH.message).mapWith(Statement::getObject).toList();
         }
         return messages;
     }

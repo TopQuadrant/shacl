@@ -56,11 +56,7 @@ public class SHACLFunctionsCache {
 
         @Override
         protected boolean removeEldestEntry(Entry<Key, Result> eldest) {
-            if (size() > capacity) {
-                return true;
-            } else {
-                return false;
-            }
+            return size() > capacity;
         }
     }
 

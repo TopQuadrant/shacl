@@ -16,6 +16,7 @@
  */
 package org.topbraid.shacl.arq.functions;
 
+import org.apache.jena.graph.FrontsNode;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
@@ -105,7 +106,7 @@ public class ValuesPFunction extends PropertyFunctionBase {
             } else {
                 // subject is concrete, object is variable -> iterate over values with subject as focus node
                 ExtendedIterator<RDFNode> it = eval.eval(model.asRDFNode(focusNode), context);
-                Iterator<Node> nit = it.mapWith(rdfNode -> rdfNode.asNode());
+                Iterator<Node> nit = it.mapWith(FrontsNode::asNode);
                 return new QueryIterExtendByVar(binding, (Var) argObject.getArg(), nit, execCxt);
             }
         } else if (focusNode.isVariable()) {
@@ -113,7 +114,7 @@ public class ValuesPFunction extends PropertyFunctionBase {
             if (eval.isReversible(shapesGraph)) {
                 // If possible, evaluate in the reverse direction to compute subjects from objects
                 ExtendedIterator<RDFNode> it = eval.evalReverse(model.asRDFNode(argObject.getArg()), context);
-                Iterator<Node> nit = it.mapWith(rdfNode -> rdfNode.asNode());
+                Iterator<Node> nit = it.mapWith(FrontsNode::asNode);
                 return new QueryIterExtendByVar(binding, (Var) focusNode, nit, execCxt);
             } else {
                 return IterLib.noResults(execCxt);

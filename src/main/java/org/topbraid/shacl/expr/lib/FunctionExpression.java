@@ -84,7 +84,7 @@ public class FunctionExpression extends ComplexNodeExpression {
                 throw new IllegalArgumentException("Failed to build expression for " + il, ebe);
             }
         } else {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             sb.append("<");
             sb.append(function);
             sb.append(">(");
@@ -92,7 +92,7 @@ public class FunctionExpression extends ComplexNodeExpression {
                 if (i > 0) {
                     sb.append(",");
                 }
-                sb.append("?a" + i);
+                sb.append("?a").append(i);
             }
             sb.append(")");
 

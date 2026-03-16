@@ -34,7 +34,7 @@ public class MinusExpression extends AbstractInputExpression {
     @Override
     public ExtendedIterator<RDFNode> eval(RDFNode focusNode, NodeExpressionContext context) {
         Set<RDFNode> sans = minus.eval(focusNode, context).toSet();
-        return getInput().eval(focusNode, context).filterDrop(n -> sans.contains(n));
+        return getInput().eval(focusNode, context).filterDrop(sans::contains);
     }
 
 

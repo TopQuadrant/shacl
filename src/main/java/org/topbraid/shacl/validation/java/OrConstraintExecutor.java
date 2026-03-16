@@ -74,7 +74,7 @@ class OrConstraintExecutor extends AbstractShapeListConstraintExecutor {
 
 
     private boolean hasOnlyDatatypeConstraints() {
-        if (shapes.size() == 0) {
+        if (shapes.isEmpty()) {
             return false;
         }
         for (Resource shape : shapes) {

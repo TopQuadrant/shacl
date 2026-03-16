@@ -67,7 +67,7 @@ public abstract class AbstractFunction implements Function {
             }
         }
         if (ExecStatisticsManager.get().isRecording() && ExecStatisticsManager.get().isRecordingNativeFunctions()) {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             sb.append("SPARQL Function ");
             PrefixMapping pm = env.getActiveGraph() != null ? env.getActiveGraph().getPrefixMapping() : new PrefixMappingImpl();
             sb.append(SSE.str(NodeFactory.createURI(uri), pm));
@@ -77,7 +77,7 @@ public abstract class AbstractFunction implements Function {
                     sb.append(", ");
                 }
                 if (nodes[i] == null) {
-                    sb.append("?arg" + (i + 1));
+                    sb.append("?arg").append(i + 1);
                 } else {
                     sb.append(SSE.str(nodes[i], pm));
                 }

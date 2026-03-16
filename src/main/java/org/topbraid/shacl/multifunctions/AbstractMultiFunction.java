@@ -72,7 +72,7 @@ public abstract class AbstractMultiFunction implements MultiFunction {
         List<Resource> params = JenaUtil.getResourceProperties(declaration, predicate);
         Collections.sort(params, OrderThenPathLocalNameComparator.get());
         List<MultiFunctionParameter> parameters = params.stream().
-                map(param -> MultiFunctionParameter.create(param)).
+                map(MultiFunctionParameter::create).
                 collect(Collectors.toList());
         return parameters;
     }

@@ -707,7 +707,7 @@ public class SHACLUtil {
      * The shapes Model is the union of the input Model with all graphs referenced via
      * the sh:shapesGraph property (and transitive includes or shapesGraphs of those).
      *
-     * @param model the Model to create the shapes Model for
+     * @param dataset the Dataset to create the shapes Model for
      * @return a shapes graph Model
      */
     private static Model createShapesModel(Dataset dataset) {

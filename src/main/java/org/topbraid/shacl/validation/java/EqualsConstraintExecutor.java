@@ -3,6 +3,7 @@ package org.topbraid.shacl.validation.java;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
 import org.topbraid.shacl.engine.Constraint;
 import org.topbraid.shacl.validation.AbstractNativeConstraintExecutor;
 import org.topbraid.shacl.validation.ValidationEngine;
@@ -25,7 +26,7 @@ class EqualsConstraintExecutor extends AbstractNativeConstraintExecutor {
         for (RDFNode focusNode : focusNodes) {
             if (focusNode instanceof Resource) {
                 Collection<RDFNode> valueNodes = engine.getValueNodes(constraint, focusNode);
-                Set<RDFNode> otherNodes = ((Resource) focusNode).listProperties(equalsPredicate).mapWith(s -> s.getObject()).toSet();
+                Set<RDFNode> otherNodes = ((Resource) focusNode).listProperties(equalsPredicate).mapWith(Statement::getObject).toSet();
                 for (RDFNode valueNode : valueNodes) {
                     if (!otherNodes.contains(valueNode)) {
                         engine.createValidationResult(constraint, focusNode, valueNode, () -> "Does not have value at property " + engine.getLabelFunction().apply(equalsPredicate));

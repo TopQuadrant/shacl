@@ -57,7 +57,7 @@ public abstract class AbstractSPARQLExpression extends AbstractInputExpression {
                     results.add(qexec.execAsk() ? JenaDatatypes.TRUE : JenaDatatypes.FALSE);
                 } else {
                     ResultSet rs = qexec.execSelect();
-                    String varName = rs.getResultVars().get(0);
+                    String varName = rs.getResultVars().getFirst();
                     while (rs.hasNext()) {
                         RDFNode node = rs.next().get(varName);
                         if (node != null) {

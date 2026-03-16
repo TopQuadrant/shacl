@@ -22,12 +22,12 @@ class NodeKindConstraintExecutor extends AbstractNativeConstraintExecutor {
     private static final Map<RDFNode, Predicate<RDFNode>> checkers = new HashMap<>();
 
     static {
-        checkers.put(SH.BlankNode, (node) -> node.isAnon());
+        checkers.put(SH.BlankNode, RDFNode::isAnon);
         checkers.put(SH.BlankNodeOrIRI, (node) -> node.isAnon() || node.isURIResource());
         checkers.put(SH.BlankNodeOrLiteral, (node) -> node.isAnon() || node.isLiteral());
-        checkers.put(SH.IRI, (node) -> node.isURIResource());
+        checkers.put(SH.IRI, RDFNode::isURIResource);
         checkers.put(SH.IRIOrLiteral, (node) -> node.isURIResource() || node.isLiteral());
-        checkers.put(SH.Literal, (node) -> node.isLiteral());
+        checkers.put(SH.Literal, RDFNode::isLiteral);
     }
 
 
