@@ -25,47 +25,47 @@ import org.topbraid.shacl.model.SHJSConstraint;
 import org.topbraid.shacl.vocabulary.SH;
 
 public class SHJSConstraintImpl extends SHResourceImpl implements SHJSConstraint {
-	
-	public SHJSConstraintImpl(Node node, EnhGraph graph) {
-		super(node, graph);
-	}
-		
-	
-	@Override
-	public String getFunctionName() {
-		return JenaUtil.getStringProperty(this, SH.jsFunctionName);
-	}
+
+    public SHJSConstraintImpl(Node node, EnhGraph graph) {
+        super(node, graph);
+    }
 
 
-	@Override
-	public boolean isDeactivated() {
-		return hasProperty(SH.deactivated, JenaDatatypes.TRUE);
-	}
+    @Override
+    public String getFunctionName() {
+        return JenaUtil.getStringProperty(this, SH.jsFunctionName);
+    }
 
 
-	@Override
+    @Override
+    public boolean isDeactivated() {
+        return hasProperty(SH.deactivated, JenaDatatypes.TRUE);
+    }
+
+
+    @Override
     public String toString() {
 
-		String label = JenaUtil.getStringProperty(this, RDFS.label);
-		if(label != null) {
-			return label;
-		}
-		
-		String comment = JenaUtil.getStringProperty(this, RDFS.comment);
-		if(comment != null) {
-			return comment;
-		}
-		
-		String message = JenaUtil.getStringProperty(this, SH.message);
-		if(message != null) {
-			return message;
-		}
+        String label = JenaUtil.getStringProperty(this, RDFS.label);
+        if (label != null) {
+            return label;
+        }
 
-		String script = getFunctionName();
-		if(script != null) {
-			return script;
-		}
-		
-		return "(Incomplete JavaScript Constraint)";
-	}
+        String comment = JenaUtil.getStringProperty(this, RDFS.comment);
+        if (comment != null) {
+            return comment;
+        }
+
+        String message = JenaUtil.getStringProperty(this, SH.message);
+        if (message != null) {
+            return message;
+        }
+
+        String script = getFunctionName();
+        if (script != null) {
+            return script;
+        }
+
+        return "(Incomplete JavaScript Constraint)";
+    }
 }

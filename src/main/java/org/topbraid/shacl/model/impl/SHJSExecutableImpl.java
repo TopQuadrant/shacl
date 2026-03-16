@@ -24,13 +24,13 @@ import org.topbraid.shacl.vocabulary.SH;
 
 public class SHJSExecutableImpl extends SHResourceImpl implements SHJSExecutable {
 
-	public SHJSExecutableImpl(Node node, EnhGraph graph) {
-		super(node, graph);
-	}
+    public SHJSExecutableImpl(Node node, EnhGraph graph) {
+        super(node, graph);
+    }
 
-	
-	@Override
-	public String getFunctionName() {
-		return JenaUtil.getStringProperty(this, SH.jsFunctionName);
-	}
+
+    @Override
+    public String getFunctionName() {
+        return JenaUtil.getStringProperty(this, SH.jsFunctionName);
+    }
 }

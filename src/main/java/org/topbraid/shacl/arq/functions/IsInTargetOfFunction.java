@@ -27,15 +27,15 @@ import org.topbraid.shacl.model.SHShape;
 
 /**
  * The function tosh:isInTargetOf.
- * 
+ *
  * @author Holger Knublauch
  */
 public class IsInTargetOfFunction extends AbstractFunction2 {
 
-	@Override
-	protected NodeValue exec(Node nodeNode, Node shapeNode, FunctionEnv env) {
-		Model model = ModelFactory.createModelForGraph(env.getActiveGraph());
-		SHShape shape = SHFactory.asShape(model.asRDFNode(shapeNode));
-		return NodeValue.makeBoolean(shape.hasTargetNode(model.asRDFNode(nodeNode)));
-	}
+    @Override
+    protected NodeValue exec(Node nodeNode, Node shapeNode, FunctionEnv env) {
+        Model model = ModelFactory.createModelForGraph(env.getActiveGraph());
+        SHShape shape = SHFactory.asShape(model.asRDFNode(shapeNode));
+        return NodeValue.makeBoolean(shape.hasTargetNode(model.asRDFNode(nodeNode)));
+    }
 }

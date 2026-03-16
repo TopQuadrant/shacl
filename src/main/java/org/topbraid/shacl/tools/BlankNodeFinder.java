@@ -8,10 +8,13 @@ import org.topbraid.shacl.vocabulary.SH;
 import java.util.*;
 
 public class BlankNodeFinder {
+
     private static final Logger logger = LoggerFactory.getLogger(BlankNodeFinder.class);
+
     /**
      * Finds all blank nodes in the report that references the shapes graph
-     * @param report The validation report
+     *
+     * @param report      The validation report
      * @param shapesGraph The shapes graph
      * @return A model containing all blank nodes
      */
@@ -23,7 +26,7 @@ public class BlankNodeFinder {
         StmtIterator statements = report.listStatements(null, SH.result, (RDFNode) null);
 
         statements.mapWith(Statement::getResource).forEach(resource -> {
-            try{
+            try {
                 StmtIterator reportStatements = report.listStatements(resource, null, (RDFNode) null);
                 reportStatements.forEach(statement -> {
                     if (statement.getObject().isAnon()) {
@@ -32,17 +35,18 @@ public class BlankNodeFinder {
                         blankNodes.addAll(allBlankNodes);
                     }
                 });
-            }
-            catch (Exception e){
-                logger.error("Error while processing blank node: " + resource.toString());
+            } catch (Exception e) {
+                logger.error("Error while processing blank node: {}", resource.toString());
             }
         });
 
         return ModelFactory.createDefaultModel().add(new ArrayList<>(blankNodes));
     }
+
     /**
      * From given subject, find all blank nodes that can be reached from it recursively
-     * @param model The model to search in
+     *
+     * @param model   The model to search in
      * @param subject The subject to start from(BLANK NODE)
      * @return A list of all blank nodes that can be reached from the given subject
      */

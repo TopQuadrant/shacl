@@ -22,7 +22,7 @@
 
   <groupId>org.topbraid</groupId>
   <artifactId>shacl</artifactId>
-  <version>1.4.5-SNAPSHOT</version>
+  <version>1.5.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>TopBraid SHACL API</name>
@@ -68,11 +68,11 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <ver.jena>5.2.0</ver.jena>
-    <ver.junit>4.13.2</ver.junit>
+    <ver.jena>6.0.0</ver.jena>
     <ver.slf4j>2.0.17</ver.slf4j>
+    <ver.junit>4.13.2</ver.junit>
     <ver.log4j2>2.25.3</ver.log4j2>
-    <java.version>17</java.version>
+    <java.version>21</java.version>
   </properties>
 
   <dependencies>

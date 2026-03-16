@@ -21,12 +21,12 @@ package org.topbraid.shacl.testcases.context;
  * A context consists of a set-up step and a tear-down step.
  * It can, for example, be used to switch execution from preferring SPARQL
  * to preferring JavaScript.
- * 
+ *
  * @author Holger Knublauch
  */
 public interface TestCaseContext {
 
-	void setUpTestContext();
-	
-	void tearDownTestContext();
+    void setUpTestContext();
+
+    void tearDownTestContext();
 }

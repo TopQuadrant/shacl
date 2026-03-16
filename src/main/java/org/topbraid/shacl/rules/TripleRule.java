@@ -16,8 +16,6 @@
  */
 package org.topbraid.shacl.rules;
 
-import java.util.List;
-
 import org.apache.jena.graph.Triple;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
@@ -32,76 +30,78 @@ import org.topbraid.shacl.expr.NodeExpression;
 import org.topbraid.shacl.expr.NodeExpressionFactory;
 import org.topbraid.shacl.vocabulary.SH;
 
+import java.util.List;
+
 class TripleRule extends AbstractRule {
-	
-	private NodeExpression object;
-	
-	private NodeExpression predicate;
-	
-	private NodeExpression subject;
 
-	
-	TripleRule(Resource resource) {
-		super(resource);
-		this.object = createNodeExpression(resource, SH.object);
-		this.predicate = createNodeExpression(resource, SH.predicate);
-		this.subject = createNodeExpression(resource, SH.subject);
-	}
-	
-	
-	private NodeExpression createNodeExpression(Resource resource, Property predicate) {
-		Statement s = resource.getProperty(predicate);
-		if(s == null) {
-			throw new IllegalArgumentException("Triple rule without " + predicate.getLocalName());
-		}
-		return NodeExpressionFactory.get().create(s.getObject());
-	}
+    private NodeExpression object;
+
+    private NodeExpression predicate;
+
+    private NodeExpression subject;
 
 
-	@Override
-	public void execute(RuleEngine ruleEngine, List<RDFNode> focusNodes, Shape shape) {
-		ProgressMonitor monitor = ruleEngine.getProgressMonitor();
-		for(RDFNode focusNode : focusNodes) {
-			
-			if(monitor != null && monitor.isCanceled()) {
-				return;
-			}
+    TripleRule(Resource resource) {
+        super(resource);
+        this.object = createNodeExpression(resource, SH.object);
+        this.predicate = createNodeExpression(resource, SH.predicate);
+        this.subject = createNodeExpression(resource, SH.subject);
+    }
 
-			ExtendedIterator<RDFNode> objects = object.eval(focusNode, ruleEngine);
-			if(objects.hasNext()) {
-				ExtendedIterator<RDFNode> subjects = subject.eval(focusNode, ruleEngine);
-				if(subjects.hasNext()) {
-					ExtendedIterator<RDFNode> predicates = predicate.eval(focusNode, ruleEngine);
-					if(predicates.hasNext()) {
-						List<RDFNode> ss = subjects.toList();
-						List<RDFNode> ps = predicates.toList();
-						List<RDFNode> os = objects.toList();
-						for(RDFNode subjectR : ss) {
-							if(subjectR.isResource()) {
-								Resource subject = (Resource) subjectR;
-								for(RDFNode predicateR : ps) {
-									if(predicateR.isURIResource()) {
-										Property predicate = JenaUtil.asProperty((Resource)predicateR);
-										for(RDFNode object : os) {
-											ruleEngine.infer(Triple.create(subject.asNode(), predicate.asNode(), object.asNode()), this, shape);
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}	
-		}
-	}
-	
-	
-	@Override
+
+    private NodeExpression createNodeExpression(Resource resource, Property predicate) {
+        Statement s = resource.getProperty(predicate);
+        if (s == null) {
+            throw new IllegalArgumentException("Triple rule without " + predicate.getLocalName());
+        }
+        return NodeExpressionFactory.get().create(s.getObject());
+    }
+
+
+    @Override
+    public void execute(RuleEngine ruleEngine, List<RDFNode> focusNodes, Shape shape) {
+        ProgressMonitor monitor = ruleEngine.getProgressMonitor();
+        for (RDFNode focusNode : focusNodes) {
+
+            if (monitor != null && monitor.isCanceled()) {
+                return;
+            }
+
+            ExtendedIterator<RDFNode> objects = object.eval(focusNode, ruleEngine);
+            if (objects.hasNext()) {
+                ExtendedIterator<RDFNode> subjects = subject.eval(focusNode, ruleEngine);
+                if (subjects.hasNext()) {
+                    ExtendedIterator<RDFNode> predicates = predicate.eval(focusNode, ruleEngine);
+                    if (predicates.hasNext()) {
+                        List<RDFNode> ss = subjects.toList();
+                        List<RDFNode> ps = predicates.toList();
+                        List<RDFNode> os = objects.toList();
+                        for (RDFNode subjectR : ss) {
+                            if (subjectR.isResource()) {
+                                Resource subject = (Resource) subjectR;
+                                for (RDFNode predicateR : ps) {
+                                    if (predicateR.isURIResource()) {
+                                        Property predicate = JenaUtil.asProperty((Resource) predicateR);
+                                        for (RDFNode object : os) {
+                                            ruleEngine.infer(Triple.create(subject.asNode(), predicate.asNode(), object.asNode()), this, shape);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    @Override
     public String toString() {
-		String label = JenaUtil.getStringProperty(getResource(), RDFS.label);
-		if(label == null) {
-			label = subject.getFunctionalSyntax() + " - " + predicate.getFunctionalSyntax() + " - " + object.getFunctionalSyntax();
-		}
-		return getLabelStart("Triple") + label;
-	}
+        String label = JenaUtil.getStringProperty(getResource(), RDFS.label);
+        if (label == null) {
+            label = subject.getFunctionalSyntax() + " - " + predicate.getFunctionalSyntax() + " - " + object.getFunctionalSyntax();
+        }
+        return getLabelStart("Triple") + label;
+    }
 }

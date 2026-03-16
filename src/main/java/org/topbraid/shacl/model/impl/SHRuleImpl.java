@@ -26,47 +26,47 @@ import org.topbraid.shacl.model.SHRule;
 import org.topbraid.shacl.vocabulary.SH;
 
 public class SHRuleImpl extends SHResourceImpl implements SHRule {
-	
-	public SHRuleImpl(Node node, EnhGraph graph) {
-		super(node, graph);
-	}
 
-	
-	@Override
-	public RDFNode getSubject() {
-		Statement s = getProperty(SH.subject);
-		return s != null ? s.getObject() : null;
-	}
+    public SHRuleImpl(Node node, EnhGraph graph) {
+        super(node, graph);
+    }
 
-	
-	@Override
-	public Resource getPredicate() {
-		Statement s = getProperty(SH.predicate);
-		return s != null && s.getObject().isResource() ? s.getResource() : null;
-	}
 
-	
-	@Override
-	public RDFNode getObject() {
-		Statement s = getProperty(SH.object);
-		return s != null ? s.getObject() : null;
-	}
-	
+    @Override
+    public RDFNode getSubject() {
+        Statement s = getProperty(SH.subject);
+        return s != null ? s.getObject() : null;
+    }
 
-	@Override
-	public boolean isJSRule() {
-		return JenaUtil.hasIndirectType(this, SH.JSRule);
-	}
-	
-	
-	@Override
-	public boolean isSPARQLRule() {
-		return JenaUtil.hasIndirectType(this, SH.SPARQLRule);
-	}
-	
-	
-	@Override
-	public boolean isTripleRule() {
-		return JenaUtil.hasIndirectType(this, SH.TripleRule);
-	}
+
+    @Override
+    public Resource getPredicate() {
+        Statement s = getProperty(SH.predicate);
+        return s != null && s.getObject().isResource() ? s.getResource() : null;
+    }
+
+
+    @Override
+    public RDFNode getObject() {
+        Statement s = getProperty(SH.object);
+        return s != null ? s.getObject() : null;
+    }
+
+
+    @Override
+    public boolean isJSRule() {
+        return JenaUtil.hasIndirectType(this, SH.JSRule);
+    }
+
+
+    @Override
+    public boolean isSPARQLRule() {
+        return JenaUtil.hasIndirectType(this, SH.SPARQLRule);
+    }
+
+
+    @Override
+    public boolean isTripleRule() {
+        return JenaUtil.hasIndirectType(this, SH.TripleRule);
+    }
 }

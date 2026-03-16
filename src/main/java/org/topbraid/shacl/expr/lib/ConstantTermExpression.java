@@ -16,8 +16,6 @@
  */
 package org.topbraid.shacl.expr.lib;
 
-import java.util.Collections;
-
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.sparql.util.FmtUtils;
 import org.apache.jena.util.iterator.ExtendedIterator;
@@ -27,39 +25,41 @@ import org.topbraid.shacl.expr.AtomicNodeExpression;
 import org.topbraid.shacl.expr.NodeExpressionContext;
 import org.topbraid.shacl.expr.NodeExpressionVisitor;
 
+import java.util.Collections;
+
 public class ConstantTermExpression extends AbstractNodeExpression implements AtomicNodeExpression {
-	
-	public ConstantTermExpression(RDFNode term) {
-		super(term);
-	}
+
+    public ConstantTermExpression(RDFNode term) {
+        super(term);
+    }
 
 
-	@Override
-	public ExtendedIterator<RDFNode> eval(RDFNode focusNode, NodeExpressionContext context) {
-		return WrappedIterator.create(Collections.singletonList(getRDFNode()).iterator());
-	}
-
-	
-	@Override
-	public String getFunctionalSyntax() {
-		return FmtUtils.stringForNode(getRDFNode().asNode(), getRDFNode().getModel());
-	}
-	
-	
-	@Override
-	public String getTypeId() {
-		return "constant";
-	}
+    @Override
+    public ExtendedIterator<RDFNode> eval(RDFNode focusNode, NodeExpressionContext context) {
+        return WrappedIterator.create(Collections.singletonList(getRDFNode()).iterator());
+    }
 
 
-	@Override
-	public String toString() {
-		return FmtUtils.stringForRDFNode(getRDFNode());
-	}
-	
-	
-	@Override
-	public void visit(NodeExpressionVisitor visitor) {
-		visitor.visit(this);
-	}
+    @Override
+    public String getFunctionalSyntax() {
+        return FmtUtils.stringForNode(getRDFNode().asNode(), getRDFNode().getModel());
+    }
+
+
+    @Override
+    public String getTypeId() {
+        return "constant";
+    }
+
+
+    @Override
+    public String toString() {
+        return FmtUtils.stringForRDFNode(getRDFNode());
+    }
+
+
+    @Override
+    public void visit(NodeExpressionVisitor visitor) {
+        visitor.visit(this);
+    }
 }

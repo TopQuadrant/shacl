@@ -25,14 +25,14 @@ import org.topbraid.shacl.vocabulary.SH;
 
 public class SPARQLTargetLanguage implements CustomTargetLanguage {
 
-	@Override
-	public boolean canHandle(Resource executable) {
-		return executable.hasProperty(SH.select) && ExecutionPlatform.canExecute(executable);
-	}
+    @Override
+    public boolean canHandle(Resource executable) {
+        return executable.hasProperty(SH.select) && ExecutionPlatform.canExecute(executable);
+    }
 
-	
-	@Override
-	public Target createTarget(Resource executable, SHParameterizableTarget parameterizableTarget) {
-		return new SPARQLTarget(executable, parameterizableTarget);
-	}
+
+    @Override
+    public Target createTarget(Resource executable, SHParameterizableTarget parameterizableTarget) {
+        return new SPARQLTarget(executable, parameterizableTarget);
+    }
 }

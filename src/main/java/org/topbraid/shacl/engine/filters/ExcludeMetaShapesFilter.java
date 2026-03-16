@@ -51,6 +51,6 @@ public class ExcludeMetaShapesFilter implements Predicate<SHShape> {
     @Override
     public boolean test(SHShape shape) {
         return !JenaUtil.hasIndirectType(shape, SH.Parameter) && !systemShapes.contains(shape) &&
-                (shape.isAnon() || !shape.getURI().startsWith(TOSH.NS));
+               (shape.isAnon() || !shape.getURI().startsWith(TOSH.NS));
     }
 }

@@ -22,16 +22,17 @@ import org.apache.jena.rdf.model.Resource;
 
 /**
  * Can be used to define custom function factories such as spinx.
- * 
+ *
  * @author Holger Knublauch
  */
 public interface DeclarativeFunctionDriver {
 
-	/**
-	 * If this factory is responsible for the provided function Resource
-	 * then it must create a FunctionFactory which can then be registered.
-	 * @param function  the function's declaration resource
-	 * @return the FunctionFactory or null if this is not responsible
-	 */
-	DeclarativeFunctionFactory create(Resource function);
+    /**
+     * If this factory is responsible for the provided function Resource
+     * then it must create a FunctionFactory which can then be registered.
+     *
+     * @param function the function's declaration resource
+     * @return the FunctionFactory or null if this is not responsible
+     */
+    DeclarativeFunctionFactory create(Resource function);
 }

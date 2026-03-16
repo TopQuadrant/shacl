@@ -16,12 +16,6 @@
  */
 package org.topbraid.shacl.arq.functions;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.DatasetFactory;
@@ -33,32 +27,34 @@ import org.topbraid.shacl.multifunctions.AbstractMultiFunction1;
 import org.topbraid.shacl.util.SHACLUtil;
 import org.topbraid.shacl.vocabulary.TOSH;
 
+import java.util.*;
+
 /**
  * The property function tosh:targetContains.
  * Binds the variable on the right hand side with all focus nodes produced by the
  * SHACL target on the left hand side.
- * 
- * 		(?myTarget ?shapesGraph) tosh:targetContains ?focusNode .
- * 
+ * <p>
+ * (?myTarget ?shapesGraph) tosh:targetContains ?focusNode .
+ *
  * @author Holger Knublauch
  */
 public class TargetContainsMultiFunction extends AbstractMultiFunction1 {
-	
-	public TargetContainsMultiFunction() {
-		super(TOSH.targetContains.getURI(), Arrays.asList("target", "shapesGraph"), "focusNode"); 
-	}
 
-	@Override
-	protected Iterator<Node> executeIterator(List<Node> args, Graph activeGraph, DatasetGraph dataset) {
-		
-		Node targetNode = args.get(0);
-		Node shapesGraphNode = args.get(1);
-		
-		Model model = ModelFactory.createModelForGraph(dataset.getGraph(shapesGraphNode));
-		Resource target = (Resource) model.asRDFNode(targetNode);
+    public TargetContainsMultiFunction() {
+        super(TOSH.targetContains.getURI(), Arrays.asList("target", "shapesGraph"), "focusNode");
+    }
 
-		Set<Node> focusNodes = new HashSet<>();
-		SHACLUtil.addNodesInTarget(target, DatasetFactory.wrap(dataset), focusNodes);
-		return focusNodes.iterator();
-	}
+    @Override
+    protected Iterator<Node> executeIterator(List<Node> args, Graph activeGraph, DatasetGraph dataset) {
+
+        Node targetNode = args.get(0);
+        Node shapesGraphNode = args.get(1);
+
+        Model model = ModelFactory.createModelForGraph(dataset.getGraph(shapesGraphNode));
+        Resource target = (Resource) model.asRDFNode(targetNode);
+
+        Set<Node> focusNodes = new HashSet<>();
+        SHACLUtil.addNodesInTarget(target, DatasetFactory.wrap(dataset), focusNodes);
+        return focusNodes.iterator();
+    }
 }

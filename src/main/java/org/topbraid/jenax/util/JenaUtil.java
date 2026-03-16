@@ -1156,7 +1156,7 @@ public class JenaUtil {
         DatasetGraph dsg = dataset.asDatasetGraph();
         Context cxt = ARQ.getContext().copy();
         cxt.set(ARQConstants.sysCurrentTime, NodeFactoryExtra.nowAsDateTime());
-        FunctionEnv env = new ExecutionContext(cxt, dsg.getDefaultGraph(), dsg, null);
+        FunctionEnv env = ExecutionContext.create(dsg, cxt);
         try {
             NodeValue r = expr.eval(BindingRoot.create(), env);
             if (r != null) {
@@ -1182,7 +1182,7 @@ public class JenaUtil {
      * @return a new Query with the bindings applied
      */
     public static Query queryWithSubstitutions(Query query, final Map<Var, Node> substitutions) {
-        Query result = QueryTransformOps.transform(query, substitutions);
+        Query result = QueryTransformOps.replaceVars(query, substitutions);
 
         // TODO: Replace this hack once there is a Jena patch
         if (result.hasHaving()) {

@@ -16,47 +16,52 @@
  */
 package org.topbraid.shacl.model;
 
+import org.apache.jena.rdf.model.Property;
+
 import java.util.List;
 import java.util.Map;
 
-import org.apache.jena.rdf.model.Property;
-
 public interface SHParameterizable extends SHResource {
-	
-	/**
-	 * Gets an unordered List of all declared Parameters.
-	 * @return the (possibly empty) List of Parameters
-	 */
-	List<SHParameter> getParameters();
-	
 
-	/**
-	 * Gets a Map of variable names to Parameters.
-	 * @return a Map of variable names to Parameters
-	 */
-	Map<String,SHParameter> getParametersMap();
-
-	
-	/**
-	 * Gets the sh:labelTemplate if that exists.
-	 * @return the label template string or null
-	 */
-	String getLabelTemplate();
-
-	
-	/**
-	 * Gets an ordered List of all declared SHParameters, based on
-	 * sh:order values (if one of them exists), then the local names of the path predicates.
-	 * @return the (possibly empty) List of SHParameters
-	 */
-	List<SHParameter> getOrderedParameters();
+    /**
+     * Gets an unordered List of all declared Parameters.
+     *
+     * @return the (possibly empty) List of Parameters
+     */
+    List<SHParameter> getParameters();
 
 
-	/**
-	 * Checks if one of the sh:parameters declaring a given predicate is also marked
-	 * as sh:optional true.
-	 * @param predicate  the predicate to check
-	 * @return true if there is an optional declaration for the given predicate
-	 */
-	boolean isOptionalParameter(Property predicate);
+    /**
+     * Gets a Map of variable names to Parameters.
+     *
+     * @return a Map of variable names to Parameters
+     */
+    Map<String, SHParameter> getParametersMap();
+
+
+    /**
+     * Gets the sh:labelTemplate if that exists.
+     *
+     * @return the label template string or null
+     */
+    String getLabelTemplate();
+
+
+    /**
+     * Gets an ordered List of all declared SHParameters, based on
+     * sh:order values (if one of them exists), then the local names of the path predicates.
+     *
+     * @return the (possibly empty) List of SHParameters
+     */
+    List<SHParameter> getOrderedParameters();
+
+
+    /**
+     * Checks if one of the sh:parameters declaring a given predicate is also marked
+     * as sh:optional true.
+     *
+     * @param predicate the predicate to check
+     * @return true if there is an optional declaration for the given predicate
+     */
+    boolean isOptionalParameter(Property predicate);
 }

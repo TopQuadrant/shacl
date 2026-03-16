@@ -17,43 +17,41 @@
 
 package org.topbraid.shacl.util;
 
-import java.lang.reflect.Constructor;
-
 import org.apache.jena.enhanced.EnhGraph;
 import org.apache.jena.enhanced.EnhNode;
 import org.apache.jena.graph.Node;
 
+import java.lang.reflect.Constructor;
+
 /**
  * An extension of the Jena polymorphism mechanism.
- * 
+ *
  * @author Holger Knublauch
  */
 public class SimpleImplementation extends ImplementationByType {
 
-	@SuppressWarnings("rawtypes")
-	private Constructor constructor;
+    @SuppressWarnings("rawtypes")
+    private Constructor constructor;
 
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public SimpleImplementation(Node type, Class implClass) {
-		super(type);
-		try {
-			constructor = implClass.getConstructor(Node.class, EnhGraph.class);
-		}
-		catch (Throwable t) {
-			t.printStackTrace();
-		}
-	}
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public SimpleImplementation(Node type, Class implClass) {
+        super(type);
+        try {
+            constructor = implClass.getConstructor(Node.class, EnhGraph.class);
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+    }
 
 
-	@Override
-	public EnhNode wrap(Node node, EnhGraph eg) {
-		try {
-			return (EnhNode)constructor.newInstance(node, eg);
-		}
-		catch (Throwable t) {
-			t.printStackTrace();
-			return null;
-		}
-	}
+    @Override
+    public EnhNode wrap(Node node, EnhGraph eg) {
+        try {
+            return (EnhNode) constructor.newInstance(node, eg);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return null;
+        }
+    }
 }

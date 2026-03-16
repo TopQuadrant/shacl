@@ -25,47 +25,47 @@ import org.topbraid.shacl.model.SHSPARQLConstraint;
 import org.topbraid.shacl.vocabulary.SH;
 
 public class SHSPARQLConstraintImpl extends SHResourceImpl implements SHSPARQLConstraint {
-	
-	public SHSPARQLConstraintImpl(Node node, EnhGraph graph) {
-		super(node, graph);
-	}
+
+    public SHSPARQLConstraintImpl(Node node, EnhGraph graph) {
+        super(node, graph);
+    }
 
 
-	@Override
-	public String getSPARQL() {
-		return JenaUtil.getStringProperty(this, SH.select);
-	}
+    @Override
+    public String getSPARQL() {
+        return JenaUtil.getStringProperty(this, SH.select);
+    }
 
 
-	@Override
-	public boolean isDeactivated() {
-		return hasProperty(SH.deactivated, JenaDatatypes.TRUE);
-	}
+    @Override
+    public boolean isDeactivated() {
+        return hasProperty(SH.deactivated, JenaDatatypes.TRUE);
+    }
 
 
-	@Override
+    @Override
     public String toString() {
 
-		String label = JenaUtil.getStringProperty(this, RDFS.label);
-		if(label != null) {
-			return label;
-		}
-		
-		String comment = JenaUtil.getStringProperty(this, RDFS.comment);
-		if(comment != null) {
-			return comment;
-		}
-		
-		String message = JenaUtil.getStringProperty(this, SH.message);
-		if(message != null) {
-			return message;
-		}
+        String label = JenaUtil.getStringProperty(this, RDFS.label);
+        if (label != null) {
+            return label;
+        }
 
-		String sparql = getSPARQL();
-		if(sparql != null) {
-			return sparql;
-		}
-		
-		return "(Incomplete SPARQL Constraint)";
-	}
+        String comment = JenaUtil.getStringProperty(this, RDFS.comment);
+        if (comment != null) {
+            return comment;
+        }
+
+        String message = JenaUtil.getStringProperty(this, SH.message);
+        if (message != null) {
+            return message;
+        }
+
+        String sparql = getSPARQL();
+        if (sparql != null) {
+            return sparql;
+        }
+
+        return "(Incomplete SPARQL Constraint)";
+    }
 }

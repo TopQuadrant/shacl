@@ -20,14 +20,14 @@ import org.topbraid.shacl.engine.Constraint;
 
 /**
  * Shared interface for SHACL-SPARQL and SHACL-JS validation, or potential other languages.
- * 
+ * <p>
  * Managed and accessed via ValidationLanguages singleton.
- * 
+ *
  * @author Holger Knublauch
  */
 public interface ValidationLanguage {
 
-	boolean canExecute(Constraint constraint);
-	
-	ConstraintExecutor createExecutor(Constraint constraint);
+    boolean canExecute(Constraint constraint);
+
+    ConstraintExecutor createExecutor(Constraint constraint);
 }
