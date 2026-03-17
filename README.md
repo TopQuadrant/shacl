@@ -90,11 +90,13 @@ COMMAND:
         to run rule inferencing
 PARAMETERS:
     -datafile /data/myfile.ttl [MANDATORY]
-        input to be validated (only .ttl format supported)
+        input to be validated (only .ttl and .jelly formats supported)
     -shapesfile /data/myshapes.ttl [OPTIONAL]
-        shapes for validation (only .ttl format supported)
+        shapes for validation (only .ttl and .jelly formats supported)
     -maxiterations 1 [OPTIONAL] - default is 1
         iteratively applies the inference rules until the maximum number of iterations is reached (or no new triples are inferred)
+    -outputFormat ttl [OPTIONAL] - default is ttl
+        output format of the validation report or inferences graph, supported values: ttl, jelly
     -validateShapes [OPTIONAL]
         in case you want to include the metashapes (from the tosh namespace in particular)
     -addBlankNodes [OPTIONAL]

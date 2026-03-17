@@ -17,7 +17,6 @@
 package org.topbraid.shacl.tools;
 
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.util.FileUtils;
 import org.topbraid.shacl.rules.RuleUtil;
 
 import java.io.ByteArrayOutputStream;
@@ -45,12 +44,13 @@ public class Infer extends AbstractTool {
     }
 
 
-    private void run(String[] args) throws IOException {
-        Model dataModel = getDataModel(args);
-        Model shapesModel = getShapesModel(args);
-        if (shapesModel == null) {
-            shapesModel = dataModel;
-        }
+	private void run(String[] args) throws IOException {
+		Model dataModel = getDataModel(args);
+		Model shapesModel = getShapesModel(args);
+		String outFormat = getOutputFormat(args);
+		if(shapesModel == null) {
+			shapesModel = dataModel;
+		}
         int maxIterations = getMaxIterations(args);
 
         // iteratively applies the inference rules until either (a) no new results are found,
@@ -91,7 +91,7 @@ public class Infer extends AbstractTool {
             iteration++;
         } while (iteration < maxIterations);
 
-        // print results
-        results.write(System.out, FileUtils.langTurtle);
-    }
+		// print results
+		results.write(System.out, outFormat);
+	}
 }

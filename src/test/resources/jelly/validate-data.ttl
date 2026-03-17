@@ -1,0 +1,17 @@
+## Licensed under the terms of http://www.apache.org/licenses/LICENSE-2.0
+
+@prefix : <https://w3id.org/riverbench/temp#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix rb: <https://w3id.org/riverbench/schema/metadata#> .
+
+# This file contains the manually written metadata for the benchmark category.
+# The URI of the category here is temporary. Real URIs are assigned automatically in CI.
+
+:category
+    a rb:Category ;
+    dcterms:conformsTo <https://w3id.org/riverbench/schema/metadata> ;
+    dcterms:identifier "flat" ;
+    dcterms:title "Flat RDF (sequences of triples/quads)"@en ;
+    dcterms:description """Benchmark category of generic tasks involving flat RDF streams (elements are either RDF triples or RDF quads). Each dataset in this category can be also treated as a single RDF graph/RDF dataset."""@en ;
+.
