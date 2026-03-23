@@ -200,6 +200,7 @@
           <goals>deploy</goals>
           <autoVersionSubmodules>true</autoVersionSubmodules>
           <tagNameFormat>v@{project.version}</tagNameFormat>
+          <arguments>-DperformRelease=true</arguments>
         </configuration>
       </plugin>
 
