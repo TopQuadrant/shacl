@@ -17,7 +17,7 @@ cd shacl
 ```
 
 The latest SNAPSHOT code is now available in you local maven
-repository.  Check the pom.xml for the correct version string.
+repository. Check the pom.xml for the correct version string.
 
 ```
 <dependency>
@@ -36,9 +36,9 @@ repository.  Check the pom.xml for the correct version string.
 One time setup:
 
 1. A PGP key for signing the release. This needs to be registered on one
-of the public servers e.g. [http://pgpkeys.mit.edu/](http://pgpkeys.mit.edu/).
+   of the public servers e.g. [http://pgpkeys.mit.edu/](http://pgpkeys.mit.edu/).
 2. Write access to the GitHub repo - the release process updates the
-versions and creates a tag.
+   versions and creates a tag.
 3. Write access to the Sonatype OpenSource Hosting Nexus server for `org.topbraid`.
 
 Put your username and password for accessing the Sonatype open source
@@ -46,12 +46,12 @@ repository in your personal `settings.xml` (e.g. `$HOME/.m2/settings.xml`).
 
 ```
  <server>
-    <id>ossrh.snapshots</id>
+    <id>central</id>
     <username>SONATYPE_USERNAME</username>
     <password>SONATYPE_PASSWORD</password>
   </server>
   <server>
-    <id>ossrh.releases</id>
+    <id>central</id>
     <username>SONATYPE_USERNAME</username>
     <password>SONATYPE_PASSWORD</password>
   </server>
@@ -93,6 +93,7 @@ or omit `$KEY` in the examples below.
 ### Dry run
 
 It is advisable to dry run the release:
+
 ```
 ./mvnw release:clean release:prepare -DdryRun=true -Prelease $VER $KEY
 ```
@@ -115,9 +116,9 @@ It still says "SNAPSHOT" because the dry run does not change the version in POM.
 
 This has two steps:
 
-`./mvnw release:clean release:prepare  -Prelease $KEY $VER`
+`./mvnw release:clean release:prepare`
 
-`./mvnw release:perform -Prelease $KEY $VER`
+`./mvnw release:perform -DperformRelease=true`
 
 ### If it goes wrong:
 
@@ -128,20 +129,6 @@ You may also need to delete the tag.
 
 `git tag -d shacl-x.y.z`  
 `git push --delete origin shacl-x.y.z`
-
-### Release to central
-
-The steps so far pushed the built artifacts to the staging repository.
-
-To push them up to central.maven, go to https://oss.sonatype.org/
-
-* Find repo (it's open) `org.topbraid....`
-* Check it ("content" tab)
-* Close it, at which point the checking rules run.
-* Refresh the webpage until rule checking completes.
-* If all is good, click "release" at the top.
-
-The release artifacts end up in "Repositories -> Releases -> org.topbraid".
 
 ### Github
 
