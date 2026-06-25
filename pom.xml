@@ -86,14 +86,14 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <!-- Dependency versions -->
-    <jelly.version>3.7.1</jelly.version>
-    <jena.version>6.0.0</jena.version>
+    <jelly.version>3.7.3</jelly.version>
+    <jena.version>6.1.0</jena.version>
     <junit.version>4.13.2</junit.version>
-    <log4j2.version>2.25.3</log4j2.version>
-    <slf4j.version>2.0.17</slf4j.version>
+    <log4j2.version>2.26.0</log4j2.version>
+    <slf4j.version>2.0.18</slf4j.version>
 
     <!-- Plugin versions -->
-    <central-publishing-maven-plugin.version>0.10.0</central-publishing-maven-plugin.version>
+    <central-publishing-maven-plugin.version>0.11.0</central-publishing-maven-plugin.version>
     <maven-assembly-plugin.version>3.8.0</maven-assembly-plugin.version>
     <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
     <maven-gpg-plugin.version>3.2.8</maven-gpg-plugin.version>
