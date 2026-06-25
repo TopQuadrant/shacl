@@ -87,7 +87,7 @@
 
     <!-- Dependency versions -->
     <jelly.version>3.7.3</jelly.version>
-    <jena.version>6.0.0</jena.version>
+    <jena.version>6.1.0</jena.version>
     <junit.version>4.13.2</junit.version>
     <log4j2.version>2.26.0</log4j2.version>
     <slf4j.version>2.0.18</slf4j.version>
