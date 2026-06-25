@@ -81,68 +81,74 @@
   </scm>
 
   <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <ver.jelly>3.7.1</ver.jelly>
-    <ver.jena>6.0.0</ver.jena>
-    <ver.slf4j>2.0.17</ver.slf4j>
-    <ver.junit>4.13.2</ver.junit>
-    <ver.log4j2>2.25.3</ver.log4j2>
+    <!-- Project-wide properties -->
     <java.version>21</java.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <!-- Dependency versions -->
+    <jelly.version>3.7.1</jelly.version>
+    <jena.version>6.0.0</jena.version>
+    <junit.version>4.13.2</junit.version>
+    <log4j2.version>2.25.3</log4j2.version>
+    <slf4j.version>2.0.17</slf4j.version>
+
+    <!-- Plugin versions -->
+    <central-publishing-maven-plugin.version>0.10.0</central-publishing-maven-plugin.version>
+    <maven-assembly-plugin.version>3.8.0</maven-assembly-plugin.version>
+    <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
+    <maven-gpg-plugin.version>3.2.8</maven-gpg-plugin.version>
+    <maven-jar-plugin.version>3.5.0</maven-jar-plugin.version>
+    <maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
+    <maven-release-plugin.version>3.3.1</maven-release-plugin.version>
+    <maven-source-plugin.version>3.4.0</maven-source-plugin.version>
   </properties>
 
   <dependencies>
-
     <dependency>
       <groupId>org.apache.jena</groupId>
       <artifactId>jena-arq</artifactId>
-      <version>${ver.jena}</version>
+      <version>${jena.version}</version>
     </dependency>
-
     <dependency>
       <groupId>eu.neverblink.jelly</groupId>
       <artifactId>jelly-jena</artifactId>
-      <version>${ver.jelly}</version>
+      <version>${jelly.version}</version>
     </dependency>
-
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>${ver.junit}</version>
+      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
-
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>${ver.slf4j}</version>
+      <version>${slf4j.version}</version>
     </dependency>
 
     <!-- Require a logging implementation -->
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-slf4j2-impl</artifactId>
-      <version>${ver.log4j2}</version>
+      <version>${log4j2.version}</version>
       <optional>true</optional>
     </dependency>
-
   </dependencies>
 
   <build>
     <plugins>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.15.0</version>
+        <version>${maven-compiler-plugin.version}</version>
         <configuration>
           <release>${java.version}</release>
         </configuration>
       </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.5.0</version>
+        <version>${maven-jar-plugin.version}</version>
         <executions>
           <execution>
             <goals>
@@ -151,11 +157,10 @@
           </execution>
         </executions>
       </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>3.4.0</version>
+        <version>${maven-source-plugin.version}</version>
         <executions>
           <execution>
             <id>attach-sources</id>
@@ -172,11 +177,10 @@
           </execution>
         </executions>
       </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>3.8.0</version>
+        <version>${maven-assembly-plugin.version}</version>
         <configuration>
           <descriptors>
             <descriptor>src/assembly/bin.xml</descriptor>
@@ -191,11 +195,10 @@
           </execution>
         </executions>
       </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
-        <version>3.3.1</version>
+        <version>${maven-release-plugin.version}</version>
         <configuration>
           <goals>deploy</goals>
           <autoVersionSubmodules>true</autoVersionSubmodules>
@@ -203,11 +206,10 @@
           <arguments>-DperformRelease=true</arguments>
         </configuration>
       </plugin>
-
       <plugin>
         <groupId>org.sonatype.central</groupId>
         <artifactId>central-publishing-maven-plugin</artifactId>
-        <version>0.10.0</version>
+        <version>${central-publishing-maven-plugin.version}</version>
         <extensions>true</extensions>
         <configuration>
           <publishingServerId>central</publishingServerId>
@@ -215,7 +217,6 @@
           <waitUntil>published</waitUntil>
         </configuration>
       </plugin>
-
     </plugins>
   </build>
 
@@ -233,7 +234,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>3.12.0</version>
+            <version>${maven-javadoc-plugin.version}</version>
             <executions>
               <execution>
                 <id>attach-javadocs</id>
@@ -246,7 +247,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>3.2.8</version>
+            <version>${maven-gpg-plugin.version}</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>
